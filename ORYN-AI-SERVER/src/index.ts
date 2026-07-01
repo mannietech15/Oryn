@@ -20,7 +20,7 @@ const openai = new OpenAI({
   },
 });
 
-const MODEL_NAME = 'meta-llama/llama-3.1-8b-instruct:free';
+const MODEL_NAME = 'openrouter/free';
 
 console.log('🔑 OpenRouter API Key:', process.env.OPENROUTER_API_KEY ? `Loaded (${process.env.OPENROUTER_API_KEY.slice(0, 7)}...)` : 'MISSING');
 
@@ -185,8 +185,7 @@ Respond with a JSON object in this exact format (no markdown, just JSON):
       messages: [
         { role: 'system', content: systemInstruction },
         { role: 'user', content: query }
-      ],
-      response_format: { type: 'json_object' }
+      ]
     });
     const raw = (response.choices[0]?.message?.content || '').trim();
     try {
@@ -241,8 +240,7 @@ Respond ONLY with a JSON object (no markdown fences):
   try {
     const response = await openai.chat.completions.create({
       model: MODEL_NAME,
-      messages: [{ role: 'user', content: prompt }],
-      response_format: { type: 'json_object' }
+      messages: [{ role: 'user', content: prompt }]
     });
     const raw = (response.choices[0]?.message?.content || '').trim();
     try {
@@ -287,8 +285,7 @@ Return ONLY a JSON array of exactly 5 alert objects (no markdown fences):
   try {
     const response = await openai.chat.completions.create({
       model: MODEL_NAME,
-      messages: [{ role: 'user', content: prompt }],
-      response_format: { type: 'json_object' }
+      messages: [{ role: 'user', content: prompt }]
     });
     const raw = (response.choices[0]?.message?.content || '').trim();
     try {

@@ -63,8 +63,8 @@ export default function CustomDatePicker({ value, onChange }: Props) {
       <div 
         onClick={() => setIsOpen(!isOpen)}
         style={{
-          width: '100%', padding: '14px 18px', background: 'rgba(255,255,255,0.04)', 
-          border: `1px solid ${isOpen ? 'var(--cyan)' : 'rgba(255,255,255,0.1)'}`, 
+          width: '100%', padding: '14px 18px', background: 'var(--glass-bg-hover)', 
+          border: `1px solid ${isOpen ? 'var(--cyan)' : 'var(--glass-bg-strong)'}`, 
           borderRadius: 12, color: value ? 'white' : 'var(--muted)', cursor: 'pointer',
           display: 'flex', alignItems: 'center', justifyContent: 'space-between',
           transition: 'all 0.2s', boxShadow: isOpen ? '0 0 15px rgba(0,240,255,0.1)' : 'none'
@@ -127,7 +127,7 @@ export default function CustomDatePicker({ value, onChange }: Props) {
                     border: today && !active ? '1px solid var(--cyan)' : 'none',
                     transition: 'all 0.2s', cursor: 'pointer'
                   }}
-                  onMouseEnter={e => { if (!active) e.currentTarget.style.background = 'rgba(255,255,255,0.05)'; }}
+                  onMouseEnter={e => { if (!active) e.currentTarget.style.background = 'var(--glass-bg-hover)'; }}
                   onMouseLeave={e => { if (!active) e.currentTarget.style.background = today ? 'rgba(0,240,255,0.1)' : 'transparent'; }}
                 >
                   {d}
@@ -137,7 +137,7 @@ export default function CustomDatePicker({ value, onChange }: Props) {
           </div>
 
           {/* Footer */}
-          <div style={{ marginTop: 20, paddingTop: 16, borderTop: '1px solid rgba(255,255,255,0.05)', display: 'flex', justifyContent: 'center' }}>
+          <div style={{ marginTop: 20, paddingTop: 16, borderTop: '1px solid var(--glass-bg-hover)', display: 'flex', justifyContent: 'center' }}>
             <button 
               onClick={() => {
                 const today = new Date();

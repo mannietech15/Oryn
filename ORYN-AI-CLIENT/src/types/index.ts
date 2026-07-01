@@ -38,7 +38,7 @@ export interface Message {
   role: 'user' | 'assistant';
   content: string;
   timestamp: Date;
-  file?: string;
+  attachedFiles?: { name: string; url?: string; isImage: boolean }[];
   tasks?: string[];
 }
 

@@ -101,10 +101,10 @@ export default function ExplorePage() {
               width: '100%', padding: '20px 30px', borderRadius: 40, border: '1px solid var(--border)',
               background: 'rgba(10,29,58,0.7)', backdropFilter: 'blur(20px)', color: 'var(--white)',
               fontSize: 16, outline: 'none', transition: 'all 0.3s',
-              boxShadow: '0 8px 32px rgba(0,0,0,0.3), 0 0 15px rgba(249, 115, 22,0.05)'
+              boxShadow: 'var(--shadow-subtle), 0 0 15px rgba(249, 115, 22,0.05)'
             }}
-            onFocus={(e) => { e.target.style.borderColor = 'var(--cyan)'; e.target.style.boxShadow = '0 8px 32px rgba(0,0,0,0.3), 0 0 25px rgba(249, 115, 22,0.2)'; }}
-            onBlur={(e) => { e.target.style.borderColor = 'var(--border)'; e.target.style.boxShadow = '0 8px 32px rgba(0,0,0,0.3), 0 0 15px rgba(249, 115, 22,0.05)'; }}
+            onFocus={(e) => { e.target.style.borderColor = 'var(--cyan)'; e.target.style.boxShadow = 'var(--shadow-subtle), 0 0 25px rgba(249, 115, 22,0.2)'; }}
+            onBlur={(e) => { e.target.style.borderColor = 'var(--border)'; e.target.style.boxShadow = 'var(--shadow-subtle), 0 0 15px rgba(249, 115, 22,0.05)'; }}
           />
           <div style={{ position: 'absolute', right: 24, top: '50%', transform: 'translateY(-50%)', fontSize: 20 }}>🔍</div>
         </div>
@@ -140,11 +140,11 @@ export default function ExplorePage() {
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(350px, 1fr))', gap: 24 }}>
               {COMMUNITIES.map(c => (
                 <div key={c.id} style={{
-                  padding: 32, background: 'rgba(7,20,40,0.4)', border: '1px solid var(--border)', borderRadius: 20,
+                  padding: 32, background: 'var(--card-bg)', border: '1px solid var(--border)', borderRadius: 20,
                   backdropFilter: 'blur(10px)', transition: 'all 0.3s', cursor: 'pointer'
                 }}
-                onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-8px)'; e.currentTarget.style.background = 'rgba(7,20,40,0.6)'; e.currentTarget.style.borderColor = 'rgba(249, 115, 22,0.3)'; }}
-                onMouseLeave={e => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.background = 'rgba(7,20,40,0.4)'; e.currentTarget.style.borderColor = 'var(--border)'; }}
+                onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-8px)'; e.currentTarget.style.background = 'var(--card-bg)'; e.currentTarget.style.borderColor = 'rgba(249, 115, 22,0.3)'; }}
+                onMouseLeave={e => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.background = 'var(--card-bg)'; e.currentTarget.style.borderColor = 'var(--border)'; }}
                 >
                   <div style={{ fontSize: 40, marginBottom: 20 }}>{c.icon}</div>
                   <h3 style={{ fontFamily: 'var(--font-display)', fontSize: 20, marginBottom: 8 }}>{c.name}</h3>
@@ -204,7 +204,7 @@ export default function ExplorePage() {
               <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
                 <h2 style={{ fontFamily: 'var(--font-display)', fontSize: 24 }}>Emerging Shifts</h2>
                 {TRENDS.map(t => (
-                  <div key={t.id} style={{ padding: 24, background: 'rgba(7,20,40,0.4)', borderRadius: 16, border: '1px solid var(--border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <div key={t.id} style={{ padding: 24, background: 'var(--card-bg)', borderRadius: 16, border: '1px solid var(--border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                     <div>
                       <div style={{ fontSize: 12, color: 'var(--muted)', marginBottom: 4 }}>{t.category}</div>
                       <div style={{ fontSize: 18, fontWeight: 600 }}>{t.topic}</div>

@@ -60,10 +60,19 @@ const sections: { label: string; items: SideItem[] }[] = [
 
 export default function Sidebar({ page, onNavigate, isOpen, onClose, sessions, activeSessionId, onNewChat, onSelectSession }: Props) {
   const [hoveredItem, setHoveredItem] = useState<string | null>(null);
+  
+  const [windowWidth, setWindowWidth] = useState(typeof window !== 'undefined' ? window.innerWidth : 1024);
+  React.useEffect(() => {
+    const handleResize = () => setWindowWidth(window.innerWidth);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+  
+  const isMobile = windowWidth <= 768;
 
   return (
     <>
-      {isOpen && (
+      {isOpen && isMobile && (
         <div 
           className="mobile-overlay hide-on-desktop" 
           onClick={onClose}
@@ -73,25 +82,89 @@ export default function Sidebar({ page, onNavigate, isOpen, onClose, sessions, a
 
       <motion.aside 
         initial={{ x: -100, opacity: 0 }}
-        animate={{ x: 0, opacity: 1 }}
-        transition={{ duration: 0.5, ease: [0.23, 1, 0.32, 1], delay: 0.1 }}
+        animate={{ x: isMobile ? (isOpen ? 0 : '-100%') : 0, opacity: 1 }}
+        transition={{ duration: 0.4, ease: [0.23, 1, 0.32, 1] }}
         style={{
           width: 260, flexShrink: 0, display: 'flex', flexDirection: 'column',
           borderRight: '1px solid var(--card-border)',
-          background: 'rgba(9, 9, 11, 0.6)',
+          background: 'var(--card-bg)',
           backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)',
           overflowY: 'auto',
           position: 'relative', zIndex: 110,
-          ...(window.innerWidth <= 768 ? {
-            position: 'fixed', top: 0, bottom: 0, left: 0,
-            transform: isOpen ? 'translateX(0)' : 'translateX(-100%)',
+          ...(isMobile ? {
+            position: 'fixed', top: 0, bottom: 0, left: 0
           } : {})
         }}
       >
-        <div style={{ padding: '24px 20px 12px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '24px 20px 16px' }}>
+          <div onClick={() => onNavigate('chat')} style={{ display: 'flex', alignItems: 'center', cursor: 'pointer', gap: 8 }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+               <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--accent-primary)">
+                  <polygon points="12 2 20.66 7 20.66 17 12 22 3.34 17 3.34 7" strokeWidth="2" strokeLinejoin="round" />
+                  <circle cx="12" cy="12" r="3" fill="var(--accent-primary)" stroke="none" />
+                  <g strokeWidth="2" strokeLinecap="round">
+                    <line x1="12" y1="5.5" x2="12" y2="8" />
+                    <line x1="12" y1="16" x2="12" y2="18.5" />
+                    <line x1="17.6" y1="8.7" x2="15.46" y2="10" />
+                    <line x1="8.54" y1="14" x2="6.4" y2="15.3" />
+                    <line x1="17.6" y1="15.3" x2="15.46" y2="14" />
+                    <line x1="8.54" y1="10" x2="6.4" y2="8.7" />
+                  </g>
+                </svg>
+            </div>
+            <div style={{ fontFamily: 'var(--font-script)', fontSize: 24, color: 'var(--text-primary)', marginLeft: 0, paddingBottom: 4 }}>
+              Oryn
+            </div>
+          </div>
+          <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 8 }}>
+            <button style={{
+              background: 'transparent', border: '1px solid var(--card-border)', color: 'var(--text-secondary)', cursor: 'pointer',
+              display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'all 0.2s', padding: 6, borderRadius: 8
+            }} onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.color = 'var(--text-primary)'; (e.currentTarget as HTMLButtonElement).style.background = 'var(--glass-bg-hover)'; }}
+               onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.color = 'var(--text-secondary)'; (e.currentTarget as HTMLButtonElement).style.background = 'transparent'; }}>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>
+            </button>
+            <button 
+              className="hide-on-desktop"
+              onClick={onClose}
+              style={{
+                background: 'var(--glass-bg-subtle)', border: '1px solid var(--card-border)', color: 'var(--text-secondary)', cursor: 'pointer',
+                display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'all 0.2s', padding: 6, borderRadius: 8
+              }} onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.color = 'var(--danger)'; (e.currentTarget as HTMLButtonElement).style.background = 'rgba(239, 68, 68, 0.1)'; (e.currentTarget as HTMLButtonElement).style.borderColor = 'rgba(239, 68, 68, 0.2)'; }}
+                 onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.color = 'var(--text-secondary)'; (e.currentTarget as HTMLButtonElement).style.background = 'var(--glass-bg-subtle)'; (e.currentTarget as HTMLButtonElement).style.borderColor = 'var(--card-border)'; }}>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+            </button>
+          </div>
+        </div>
+
+        <div style={{ padding: '0 20px 16px' }}>
+          <div style={{ 
+            display: 'flex', alignItems: 'center', 
+            background: 'var(--card-bg)', border: '1px solid var(--card-border)', 
+            borderRadius: 12, padding: '10px 14px', gap: 10, transition: 'all 0.2s',
+            boxShadow: 'var(--shadow-subtle)'
+          }}
+          onMouseEnter={e => { e.currentTarget.style.borderColor = 'var(--glass-border)'; e.currentTarget.style.boxShadow = '0 4px 12px rgba(249,115,22,0.1)'; }}
+          onMouseLeave={e => { e.currentTarget.style.borderColor = 'var(--card-border)'; e.currentTarget.style.boxShadow = 'var(--shadow-subtle)'; }}
+          >
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--text-secondary)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <circle cx="11" cy="11" r="8"></circle>
+              <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+            </svg>
+            <input 
+              type="text" placeholder="Search commands..." 
+              style={{ background: 'transparent', border: 'none', outline: 'none', color: 'var(--text-primary)', fontSize: 13.5, width: '100%', fontFamily: 'var(--font-body)' }} 
+            />
+            <div style={{ display: 'flex', gap: 4, alignItems: 'center' }}>
+              <kbd style={{ background: 'var(--glass-bg-subtle)', border: '1px solid var(--card-border)', borderRadius: 6, padding: '2px 6px', fontSize: 10, fontWeight: 600, color: 'var(--text-muted)', fontFamily: 'monospace', letterSpacing: 0.5, boxShadow: '0 1px 2px rgba(0,0,0,0.05)' }}>⌘K</kbd>
+            </div>
+          </div>
+        </div>
+
+        <div style={{ padding: '0 20px 12px' }}>
           <div style={{ 
             display: 'flex', alignItems: 'center', justifyContent: 'space-between', 
-            background: 'rgba(255,255,255,0.03)', border: '1px solid var(--card-border)',
+            background: 'var(--glass-bg-subtle)', border: '1px solid var(--card-border)',
             padding: '10px 14px', borderRadius: 8, cursor: 'pointer', transition: 'all 0.2s'
           }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
@@ -122,7 +195,7 @@ export default function Sidebar({ page, onNavigate, isOpen, onClose, sessions, a
                         display: 'flex', alignItems: 'center', gap: 12,
                         padding: '10px 12px', cursor: item.page ? 'pointer' : 'default',
                         borderRadius: 8, position: 'relative',
-                        background: isActive ? 'rgba(249,115,22,0.1)' : isHovered ? 'rgba(255,255,255,0.03)' : 'transparent',
+                        background: isActive ? 'rgba(249,115,22,0.1)' : isHovered ? 'var(--glass-bg-subtle)' : 'transparent',
                         color: isActive ? 'var(--accent-primary)' : 'var(--text-secondary)',
                         transition: 'all 0.2s',
                       }}
@@ -175,11 +248,11 @@ export default function Sidebar({ page, onNavigate, isOpen, onClose, sessions, a
                     style={{
                       display: 'flex', alignItems: 'center', gap: 12,
                       padding: '10px 12px', borderRadius: 8, cursor: 'pointer',
-                      background: isActive ? 'rgba(255,255,255,0.06)' : 'transparent',
+                      background: isActive ? 'var(--glass-border-subtle)' : 'transparent',
                       color: isActive ? 'var(--text-primary)' : 'var(--text-secondary)',
                       transition: 'all 0.2s',
                     }}
-                    onMouseEnter={e => { if (!isActive) e.currentTarget.style.background = 'rgba(255,255,255,0.03)'; }}
+                    onMouseEnter={e => { if (!isActive) e.currentTarget.style.background = 'var(--glass-bg-subtle)'; }}
                     onMouseLeave={e => { if (!isActive) e.currentTarget.style.background = 'transparent'; }}
                   >
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 16 }}>
@@ -211,7 +284,7 @@ export default function Sidebar({ page, onNavigate, isOpen, onClose, sessions, a
               background: page === 'settings' ? 'rgba(249,115,22,0.1)' : 'transparent',
               transition: 'all 0.2s'
             }}
-            onMouseEnter={e => { if (page !== 'settings') e.currentTarget.style.background = 'rgba(255,255,255,0.03)'; }}
+            onMouseEnter={e => { if (page !== 'settings') e.currentTarget.style.background = 'var(--glass-bg-subtle)'; }}
             onMouseLeave={e => { if (page !== 'settings') e.currentTarget.style.background = 'transparent'; }}
           >
             {icons.settings}

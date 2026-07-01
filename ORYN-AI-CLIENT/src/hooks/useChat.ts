@@ -41,7 +41,7 @@ export function useChat() {
   const [stats, setStats] = useState<SessionStats>({ messages: 1, tasks: 3, files: 0 });
   const [features, setFeatures] = useState<ChatFeatures>({ voice: true, taskExtract: true, webSearch: true });
   const [isStreaming, setIsStreaming] = useState(false);
-  const [pendingFile, setPendingFile] = useState<File | null>(null);
+  const [pendingFiles, setPendingFiles] = useState<File[]>([]);
   const abortRef = useRef(false);
 
   const startNewSession = useCallback(() => {
@@ -57,7 +57,7 @@ export function useChat() {
       },
     ]);
     setTasks([]);
-    setPendingFile(null);
+    setPendingFiles([]);
   }, []);
 
   const addTask = useCallback((text: string) => {
@@ -89,28 +89,30 @@ export function useChat() {
       { id: genId(), text: 'APAC expansion brief', done: false, createdAt: new Date() },
     ]);
     setStats({ messages: 1, tasks: 3, files: 0 });
-    setPendingFile(null);
+    setPendingFiles([]);
   }, []);
 
   const sendMessage = useCallback(async (text: string) => {
     if (isStreaming) return;
-    if (!text.trim() && !pendingFile) return;
+    if (!text.trim() && pendingFiles.length === 0) return;
 
-    const file = pendingFile;
-    setPendingFile(null);
+    const files = [...pendingFiles];
+    setPendingFiles([]);
 
     // Add user message
     const userMsg: Message = {
       id: genId(),
       role: 'user',
-      content: text || `Analyze file: ${file?.name}`,
+      content: text || (files.length > 0 && files.every(f => f.type.startsWith('image/')) ? '' : files.length > 0 ? `Analyze ${files.length} file(s)` : ''),
       timestamp: new Date(),
-      file: file?.name,
+      attachedFiles: files.map(f => ({
+        name: f.name,
+        isImage: f.type.startsWith('image/'),
+        url: f.type.startsWith('image/') ? URL.createObjectURL(f) : undefined
+      }))
     };
     setMessages(prev => [...prev, userMsg]);
-    setStats(prev => ({ ...prev, messages: prev.messages + 1 }));
-
-    if (file) setStats(prev => ({ ...prev, files: prev.files + 1 }));
+    setStats(prev => ({ ...prev, messages: prev.messages + 1, files: prev.files + files.length }));
 
     // Add streaming assistant message
     const assistantId = genId();
@@ -126,9 +128,10 @@ export function useChat() {
     try {
       let fullText = '';
 
-      if (file) {
+      if (files.length > 0) {
         // File analysis route
-        const analysis = await analyzeFile(file, text || undefined);
+        // We only analyze the first file for now if there are multiple, to match backend API limit
+        const analysis = await analyzeFile(files[0], text || undefined);
         const { clean, tasks: extracted } = extractTasks(analysis);
         fullText = clean;
         if (features.taskExtract) extracted.forEach(addTask);
@@ -201,10 +204,10 @@ export function useChat() {
     } finally {
       setIsStreaming(false);
     }
-  }, [isStreaming, messages, pendingFile, features, addTask]);
+  }, [isStreaming, messages, pendingFiles, features, addTask]);
 
   return {
-    messages, tasks, stats, features, isStreaming, pendingFile, sessions, activeSessionId,
-    sendMessage, toggleTask, toggleFeature, setPendingFile, resetChat, startNewSession, setActiveSessionId
+    messages, tasks, stats, features, isStreaming, pendingFiles, sessions, activeSessionId,
+    sendMessage, toggleTask, toggleFeature, setPendingFiles, resetChat, startNewSession, setActiveSessionId
   };
 }

@@ -38,9 +38,9 @@ export default function FinancialsPage() {
         </div>
         <div style={{ display: 'flex', gap: 16, background: 'rgba(6,17,36,0.6)', padding: '10px 20px', borderRadius: 12, border: '1px solid var(--border)' }}>
           <StatMini label="Gross Revenue" value={`$${(totals.revenue / 1000).toFixed(1)}K`} color="var(--cyan)" />
-          <div style={{ width: 1, height: 30, background: 'rgba(255,255,255,0.1)' }} />
+          <div style={{ width: 1, height: 30, background: 'var(--glass-bg-strong)' }} />
           <StatMini label="Net Profit" value={`$${(netProfit / 1000).toFixed(1)}K`} color="var(--success)" />
-          <div style={{ width: 1, height: 30, background: 'rgba(255,255,255,0.1)' }} />
+          <div style={{ width: 1, height: 30, background: 'var(--glass-bg-strong)' }} />
           <StatMini label="Profit Margin" value={`${margin.toFixed(1)}%`} color="var(--violet)" />
         </div>
       </div>
@@ -61,9 +61,9 @@ export default function FinancialsPage() {
                     onClick={() => setNewEntry({ ...newEntry, type: t as any })}
                     style={{ 
                       flex: 1, padding: '12px', borderRadius: 10, fontSize: 11, fontWeight: 800, letterSpacing: 1, textTransform: 'uppercase', fontFamily: 'var(--font-display)',
-                      background: newEntry.type === t ? (t === 'revenue' ? 'rgba(0,255,170,0.15)' : 'rgba(255,51,102,0.15)') : 'rgba(255,255,255,0.03)',
+                      background: newEntry.type === t ? (t === 'revenue' ? 'rgba(0,255,170,0.15)' : 'rgba(255,51,102,0.15)') : 'var(--glass-bg-subtle)',
                       color: newEntry.type === t ? (t === 'revenue' ? 'var(--success)' : 'var(--danger)') : 'var(--muted)',
-                      border: `1px solid ${newEntry.type === t ? (t === 'revenue' ? 'var(--success)' : 'var(--danger)') : 'rgba(255,255,255,0.1)'}`,
+                      border: `1px solid ${newEntry.type === t ? (t === 'revenue' ? 'var(--success)' : 'var(--danger)') : 'var(--glass-bg-strong)'}`,
                       cursor: 'pointer', transition: 'all 0.2s'
                     }}>
                     {t}
@@ -100,7 +100,7 @@ export default function FinancialsPage() {
           <div style={{ fontFamily: 'var(--font-display)', fontSize: 10, fontWeight: 700, letterSpacing: 2.5, color: 'var(--violet)', textTransform: 'uppercase', marginBottom: 24 }}><span className="color-circle"></span>Transaction History</div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
             {entries.map(e => (
-              <div key={e.id} style={{ display: 'flex', alignItems: 'center', gap: 20, padding: '16px 20px', background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.05)', borderRadius: 12 }}>
+              <div key={e.id} style={{ display: 'flex', alignItems: 'center', gap: 20, padding: '16px 20px', background: 'var(--glass-bg-subtle)', border: '1px solid var(--glass-bg-hover)', borderRadius: 12 }}>
                 <div style={{ 
                   width: 44, height: 44, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20,
                   background: e.type === 'revenue' ? 'rgba(0,255,170,0.1)' : 'rgba(255,51,102,0.1)',
@@ -149,11 +149,11 @@ function Input(props: React.InputHTMLAttributes<HTMLInputElement>) {
     <input 
       {...props} 
       style={{ 
-        width: '100%', padding: '14px 18px', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 12,
+        width: '100%', padding: '14px 18px', background: 'var(--glass-bg-hover)', border: '1px solid var(--glass-bg-strong)', borderRadius: 12,
         color: 'white', fontFamily: 'inherit', fontSize: 14, outline: 'none', transition: 'all 0.2s', ...props.style 
       }} 
       onFocus={e => { e.currentTarget.style.borderColor = 'rgba(0,240,255,0.4)'; e.currentTarget.style.boxShadow = '0 0 12px rgba(0,240,255,0.1) inset'; }}
-      onBlur={e => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.1)'; e.currentTarget.style.boxShadow = 'none'; }}
+      onBlur={e => { e.currentTarget.style.borderColor = 'var(--glass-bg-strong)'; e.currentTarget.style.boxShadow = 'none'; }}
     />
   );
 }

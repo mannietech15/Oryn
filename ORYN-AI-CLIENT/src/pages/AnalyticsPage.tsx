@@ -21,7 +21,7 @@ function AnCard({ title, children, colSpan, style }: { title: string; children: 
       border: '1px solid var(--border)', 
       borderRadius: 16, 
       padding: 32, 
-      boxShadow: '0 8px 32px rgba(0,0,0,0.4)', 
+      boxShadow: 'var(--shadow-subtle)', 
       backdropFilter: 'blur(20px)', 
       gridColumn: colSpan ? `span ${colSpan}` : undefined,
       position: 'relative',
@@ -58,7 +58,7 @@ function AISummary() {
       display: 'flex',
       alignItems: 'center',
       gap: 24,
-      boxShadow: '0 8px 32px rgba(0,0,0,0.2)',
+      boxShadow: 'var(--shadow-subtle)',
       backdropFilter: 'blur(20px)',
       animation: 'rise 0.8s ease-out'
     }}>
@@ -81,10 +81,10 @@ function AISummary() {
         </div>
       </div>
       <button style={{ 
-        padding: '10px 20px', borderRadius: 8, background: 'rgba(255,255,255,0.05)', 
-        color: 'var(--white)', fontSize: 13, fontWeight: 600, border: '1px solid rgba(255,255,255,0.1)',
+        padding: '10px 20px', borderRadius: 8, background: 'var(--glass-bg-hover)', 
+        color: 'var(--white)', fontSize: 13, fontWeight: 600, border: '1px solid var(--glass-bg-strong)',
         transition: 'all 0.2s'
-      }} onMouseOver={e => e.currentTarget.style.background = 'rgba(255,255,255,0.1)'} onMouseOut={e => e.currentTarget.style.background = 'rgba(255,255,255,0.05)'}>
+      }} onMouseOver={e => e.currentTarget.style.background = 'var(--glass-bg-strong)'} onMouseOut={e => e.currentTarget.style.background = 'var(--glass-bg-hover)'}>
         Generate Repo Report
       </button>
     </div>
@@ -110,7 +110,7 @@ function AskORYN() {
           fontSize: 15,
           fontFamily: 'var(--font-body)',
           outline: 'none',
-          boxShadow: '0 4px 24px rgba(0,0,0,0.2)',
+          boxShadow: 'var(--shadow-subtle)',
           transition: 'all 0.3s ease'
         }}
         onFocus={(e) => {
@@ -119,7 +119,7 @@ function AskORYN() {
         }}
         onBlur={(e) => {
           e.currentTarget.style.borderColor = 'var(--border)';
-          e.currentTarget.style.boxShadow = '0 4px 24px rgba(0,0,0,0.2)';
+          e.currentTarget.style.boxShadow = 'var(--shadow-subtle)';
         }}
       />
       <span style={{ position: 'absolute', left: 24, top: '50%', transform: 'translateY(-50%)', opacity: 0.5 }}>🔍</span>
@@ -132,7 +132,7 @@ function AskORYN() {
           <div style={{ fontSize: 12, color: 'var(--muted)', marginBottom: 8 }}>AI SUGGESTIONS</div>
           {['Compare revenue growth to last quarter', 'List top performing agents', 'Explain the latency spike'].map(s => (
             <div key={s} style={{ padding: '8px 12px', borderRadius: 6, cursor: 'pointer', fontSize: 14, transition: 'background 0.2s' }} 
-              onMouseOver={e => e.currentTarget.style.background = 'rgba(255,255,255,0.05)'}
+              onMouseOver={e => e.currentTarget.style.background = 'var(--glass-bg-hover)'}
               onMouseOut={e => e.currentTarget.style.background = 'transparent'}
             >
               {s}
@@ -180,7 +180,7 @@ export default function AnalyticsPage() {
             padding: 32, background: 'var(--card)', borderRadius: 16,
             border: '1px solid var(--border)', position: 'relative',
             display: 'flex', flexDirection: 'column', gap: 16,
-            boxShadow: '0 4px 24px rgba(0,0,0,0.2)', backdropFilter: 'blur(20px)',
+            boxShadow: 'var(--shadow-subtle)', backdropFilter: 'blur(20px)',
             transition: 'transform 0.3s ease',
             cursor: 'default'
           }} onMouseOver={e => e.currentTarget.style.transform = 'translateY(-5px)'} onMouseOut={e => e.currentTarget.style.transform = 'translateY(0)'}>
@@ -218,7 +218,7 @@ export default function AnalyticsPage() {
               </defs>
               {/* Grid lines */}
               {[20, 50, 80, 110].map(y => (
-                <line key={y} x1="0" y1={y} x2="400" y2={y} stroke="rgba(255,255,255,0.05)" strokeWidth="1" />
+                <line key={y} x1="0" y1={y} x2="400" y2={y} stroke="var(--glass-bg-hover)" strokeWidth="1" />
               ))}
               {/* Historical Path */}
               <path d="M0,100 C20,95 40,80 60,85 C80,90 100,60 120,65 C140,70 160,40 180,45 C200,50 220,30 240,35 C260,40 280,20 300,25" 
@@ -256,7 +256,7 @@ export default function AnalyticsPage() {
                   <span>{b.label}</span>
                   <span style={{ color: b.color }}>{b.pct}%</span>
                 </div>
-                <div style={{ height: 6, background: 'rgba(255,255,255,0.05)', borderRadius: 10, overflow: 'hidden' }}>
+                <div style={{ height: 6, background: 'var(--glass-bg-hover)', borderRadius: 10, overflow: 'hidden' }}>
                   <div style={{ height: '100%', width: `${b.pct}%`, background: b.color, boxShadow: `0 0 10px ${b.color}40` }} />
                 </div>
               </div>
