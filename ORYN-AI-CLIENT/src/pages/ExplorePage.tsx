@@ -71,7 +71,7 @@ export default function ExplorePage() {
       {/* Hero / Header */}
       <div style={{
         padding: '60px 40px',
-        background: 'linear-gradient(180deg, rgba(0,240,255,0.05) 0%, transparent 100%)',
+        background: 'linear-gradient(180deg, rgba(249, 115, 22,0.05) 0%, transparent 100%)',
         textAlign: 'center',
         borderBottom: '1px solid var(--border)',
         position: 'relative',
@@ -79,7 +79,7 @@ export default function ExplorePage() {
       }}>
         <div style={{
           position: 'absolute', top: -100, left: '50%', transform: 'translateX(-50%)',
-          width: 600, height: 600, background: 'radial-gradient(circle, rgba(0,240,255,0.08) 0%, transparent 70%)',
+          width: 600, height: 600, background: 'radial-gradient(circle, rgba(249, 115, 22,0.08) 0%, transparent 70%)',
           pointerEvents: 'none'
         }} />
         
@@ -101,10 +101,10 @@ export default function ExplorePage() {
               width: '100%', padding: '20px 30px', borderRadius: 40, border: '1px solid var(--border)',
               background: 'rgba(10,29,58,0.7)', backdropFilter: 'blur(20px)', color: 'var(--white)',
               fontSize: 16, outline: 'none', transition: 'all 0.3s',
-              boxShadow: '0 8px 32px rgba(0,0,0,0.3), 0 0 15px rgba(0,240,255,0.05)'
+              boxShadow: '0 8px 32px rgba(0,0,0,0.3), 0 0 15px rgba(249, 115, 22,0.05)'
             }}
-            onFocus={(e) => { e.target.style.borderColor = 'var(--cyan)'; e.target.style.boxShadow = '0 8px 32px rgba(0,0,0,0.3), 0 0 25px rgba(0,240,255,0.2)'; }}
-            onBlur={(e) => { e.target.style.borderColor = 'var(--border)'; e.target.style.boxShadow = '0 8px 32px rgba(0,0,0,0.3), 0 0 15px rgba(0,240,255,0.05)'; }}
+            onFocus={(e) => { e.target.style.borderColor = 'var(--cyan)'; e.target.style.boxShadow = '0 8px 32px rgba(0,0,0,0.3), 0 0 25px rgba(249, 115, 22,0.2)'; }}
+            onBlur={(e) => { e.target.style.borderColor = 'var(--border)'; e.target.style.boxShadow = '0 8px 32px rgba(0,0,0,0.3), 0 0 15px rgba(249, 115, 22,0.05)'; }}
           />
           <div style={{ position: 'absolute', right: 24, top: '50%', transform: 'translateY(-50%)', fontSize: 20 }}>🔍</div>
         </div>
@@ -143,7 +143,7 @@ export default function ExplorePage() {
                   padding: 32, background: 'rgba(7,20,40,0.4)', border: '1px solid var(--border)', borderRadius: 20,
                   backdropFilter: 'blur(10px)', transition: 'all 0.3s', cursor: 'pointer'
                 }}
-                onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-8px)'; e.currentTarget.style.background = 'rgba(7,20,40,0.6)'; e.currentTarget.style.borderColor = 'rgba(0,240,255,0.3)'; }}
+                onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-8px)'; e.currentTarget.style.background = 'rgba(7,20,40,0.6)'; e.currentTarget.style.borderColor = 'rgba(249, 115, 22,0.3)'; }}
                 onMouseLeave={e => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.background = 'rgba(7,20,40,0.4)'; e.currentTarget.style.borderColor = 'var(--border)'; }}
                 >
                   <div style={{ fontSize: 40, marginBottom: 20 }}>{c.icon}</div>
@@ -152,10 +152,10 @@ export default function ExplorePage() {
                   <p style={{ color: 'var(--muted)', fontSize: 14, lineHeight: 1.6, marginBottom: 20 }}>{c.description}</p>
                   <div style={{ display: 'flex', gap: 8, marginBottom: 24 }}>
                     {c.tags.map(tag => (
-                      <span key={tag} style={{ padding: '4px 10px', background: 'rgba(0,240,255,0.05)', border: '1px solid rgba(0,240,255,0.1)', borderRadius: 4, fontSize: 10, color: 'var(--muted)', fontWeight: 600 }}>#{tag}</span>
+                      <span key={tag} style={{ padding: '4px 10px', background: 'rgba(249, 115, 22,0.05)', border: '1px solid rgba(249, 115, 22,0.1)', borderRadius: 4, fontSize: 10, color: 'var(--muted)', fontWeight: 600 }}>#{tag}</span>
                     ))}
                   </div>
-                  <button style={{ width: '100%', padding: '12px', background: 'rgba(0,240,255,0.08)', border: '1px solid var(--cyan)', borderRadius: 10, color: 'var(--cyan)', fontWeight: 700, cursor: 'pointer', transition: 'all 0.2s' }}>
+                  <button style={{ width: '100%', padding: '12px', background: 'rgba(249, 115, 22,0.08)', border: '1px solid var(--cyan)', borderRadius: 10, color: 'var(--cyan)', fontWeight: 700, cursor: 'pointer', transition: 'all 0.2s' }}>
                     Join Community
                   </button>
                 </div>
@@ -216,7 +216,7 @@ export default function ExplorePage() {
                   </div>
                 ))}
               </div>
-              <div style={{ background: 'rgba(0,240,255,0.03)', border: '1px dashed rgba(0,240,255,0.2)', borderRadius: 20, padding: 32, display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', gap: 16 }}>
+              <div style={{ background: 'rgba(249, 115, 22,0.03)', border: '1px dashed rgba(249, 115, 22,0.2)', borderRadius: 20, padding: 32, display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', gap: 16 }}>
                 <div style={{ fontSize: 40 }}>📊</div>
                 <div style={{ fontFamily: 'var(--font-display)', fontSize: 18, fontWeight: 600 }}>Detailed Trend Analysis</div>
                 <p style={{ color: 'var(--muted)', fontSize: 14, textAlign: 'center' }}>Connect your LinkedIn or Market data source to unlock deep trend forecasting.</p>
@@ -241,10 +241,10 @@ export default function ExplorePage() {
                 display: 'flex', gap: 24, padding: 40, background: 'rgba(10,29,58,0.7)', borderRadius: 24, border: '1px solid var(--border)',
                 transition: 'all 0.3s'
               }}
-              onMouseEnter={e => e.currentTarget.style.borderColor = 'rgba(0,240,255,0.4)'}
+              onMouseEnter={e => e.currentTarget.style.borderColor = 'rgba(249, 115, 22,0.4)'}
               onMouseLeave={e => e.currentTarget.style.borderColor = 'var(--border)'}
               >
-                <div style={{ width: 100, height: 100, background: 'rgba(0,240,255,0.1)', borderRadius: 20, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 48, flexShrink: 0 }}>
+                <div style={{ width: 100, height: 100, background: 'rgba(249, 115, 22,0.1)', borderRadius: 20, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 48, flexShrink: 0 }}>
                   {cs.image}
                 </div>
                 <div>
@@ -261,12 +261,12 @@ export default function ExplorePage() {
 
         {/* Footer Accent */}
         <div style={{ 
-          marginTop: 100, padding: 60, background: 'linear-gradient(135deg, rgba(0,240,255,0.1), rgba(108,47,255,0.1))',
-          borderRadius: 32, textAlign: 'center', border: '1px solid rgba(0,240,255,0.1)'
+          marginTop: 100, padding: 60, background: 'linear-gradient(135deg, rgba(249, 115, 22,0.1), rgba(108,47,255,0.1))',
+          borderRadius: 32, textAlign: 'center', border: '1px solid rgba(249, 115, 22,0.1)'
         }}>
           <h2 style={{ fontFamily: 'var(--font-display)', fontSize: 28, marginBottom: 16 }}>Ready to expand your footprint?</h2>
           <p style={{ color: 'var(--muted)', marginBottom: 32, maxWidth: 500, margin: '0 auto 32px' }}>AI-driven networking is just the beginning. Join the Oryn ecosystem and transform your business strategy today.</p>
-          <button style={{ padding: '16px 40px', background: 'var(--cyan)', color: 'black', border: 'none', borderRadius: 40, fontWeight: 800, fontSize: 16, cursor: 'pointer', boxShadow: '0 10px 30px rgba(0,240,255,0.4)' }}>Get Started Now</button>
+          <button style={{ padding: '16px 40px', background: 'var(--cyan)', color: 'black', border: 'none', borderRadius: 40, fontWeight: 800, fontSize: 16, cursor: 'pointer', boxShadow: '0 10px 30px rgba(249, 115, 22,0.4)' }}>Get Started Now</button>
         </div>
       </div>
     </div>

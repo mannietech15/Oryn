@@ -51,7 +51,7 @@ function AnCard({ title, children, colSpan, style }: { title: string; children: 
 function AISummary() {
   return (
     <div style={{ 
-      background: 'linear-gradient(135deg, rgba(0, 240, 255, 0.1), rgba(138, 43, 226, 0.1))',
+      background: 'linear-gradient(135deg, rgba(249, 115, 22, 0.1), rgba(138, 43, 226, 0.1))',
       border: '1px solid var(--border)',
       borderRadius: 16,
       padding: '24px 32px',
@@ -66,7 +66,7 @@ function AISummary() {
         width: 48, height: 48, borderRadius: 12, 
         background: 'var(--card)', border: '1px solid var(--border)',
         display: 'flex', alignItems: 'center', justifyContent: 'center',
-        fontSize: 24, boxShadow: '0 0 20px rgba(0,240,255,0.3)'
+        fontSize: 24, boxShadow: '0 0 20px rgba(249, 115, 22,0.3)'
       }}>
         ✨
       </div>
@@ -115,7 +115,7 @@ function AskORYN() {
         }}
         onFocus={(e) => {
           e.currentTarget.style.borderColor = 'var(--cyan)';
-          e.currentTarget.style.boxShadow = '0 0 20px rgba(0,240,255,0.2)';
+          e.currentTarget.style.boxShadow = '0 0 20px rgba(249, 115, 22,0.2)';
         }}
         onBlur={(e) => {
           e.currentTarget.style.borderColor = 'var(--border)';
@@ -198,7 +198,7 @@ export default function AnalyticsPage() {
               <div style={{ fontFamily: 'var(--font-display)', fontSize: 28, fontWeight: 800, color: 'var(--white)' }}>{k.value}</div>
               <div style={{ fontSize: 12, color: 'var(--muted)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: 1 }}>{k.label}</div>
             </div>
-            <div style={{ fontSize: 11, color: 'var(--cyan)', opacity: 0.8, background: 'rgba(0,240,255,0.05)', padding: '6px 10px', borderRadius: 6, border: '1px solid rgba(0,240,255,0.1)' }}>
+            <div style={{ fontSize: 11, color: 'var(--cyan)', opacity: 0.8, background: 'rgba(249, 115, 22,0.05)', padding: '6px 10px', borderRadius: 6, border: '1px solid rgba(249, 115, 22,0.1)' }}>
               ✨ {k.aiNote}
             </div>
           </div>

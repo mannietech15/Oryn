@@ -1,48 +1,49 @@
-@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap');
 
 :root {
   /* 🌌 Core Backgrounds */
-  --bg: #030712;               
-  --surface: #0b1120;          
-  --surface-hover: #1e293b;    
+  --bg: #09090b;               
+  --surface: #18181b;          
+  --surface-hover: #27272a;    
   
   /* 🪟 Glassmorphism & Materials */
-  --card-bg: rgba(11, 17, 32, 0.45); 
-  --card-border: rgba(255, 255, 255, 0.05);
+  --card-bg: rgba(24, 24, 27, 0.6); 
+  --card-border: rgba(255, 255, 255, 0.08);
   --glass-highlight: rgba(255, 255, 255, 0.1);
-  --glass-border: rgba(0, 240, 255, 0.15);
+  --glass-border: rgba(249, 115, 22, 0.3); /* Orange border */
   
-  /* ⚡ Glowing Accents */
-  --accent-cyan: #00f0ff;
-  --accent-purple: #9d00ff;
-  --accent-glow: rgba(0, 240, 255, 0.4);
-  --accent-gradient: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple));
+  /* ⚡ Glowing Accents (Solid Orange) */
+  --accent-primary: #f97316; /* Professional Orange */
+  --accent-cyan: #f97316; /* Redirecting old cyan to orange */
+  --accent-purple: #ea580c; /* Darker orange */
+  --accent-glow: rgba(249, 115, 22, 0.25);
+  --accent-gradient: var(--accent-primary); /* No gradient! */
   
   /* 🖋 Typography */
-  --text-primary: #f8fafc;     
-  --text-secondary: #94a3b8;   
-  --text-muted: #475569;       
+  --text-primary: #fafafa;     
+  --text-secondary: #a1a1aa;   
+  --text-muted: #71717a;       
   
   /* 🚥 Semantic Status */
   --success: #10b981;
-  --success-glow: rgba(16, 185, 129, 0.2);
+  --success-glow: rgba(16, 185, 129, 0.15);
   --warn: #f59e0b;
-  --danger: #f43f5e;
+  --danger: #ef4444;
   --info: #3b82f6;
 
-  /* Legacy mappings to prevent breaking components before they are updated */
+  /* Legacy mappings */
   --card: var(--card-bg);
   --border: var(--card-border);
   --border-glow: var(--accent-glow);
-  --accent: var(--accent-purple);
-  --cyan: var(--accent-cyan);
-  --violet: #8a2be2;
+  --accent: var(--accent-primary);
+  --cyan: var(--accent-primary);
+  --violet: var(--accent-purple);
   --text: var(--text-primary);
   --muted: var(--text-secondary);
   --white: #ffffff;
 
   /* 📏 Typography Definitions */
-  --font-display: 'Outfit', 'Inter', sans-serif;
+  --font-display: 'Plus Jakarta Sans', sans-serif;
   --font-body: 'Inter', sans-serif;
 }
 
@@ -54,29 +55,15 @@ html, body, #root {
   font-family: var(--font-body);
   font-size: 16px;
   line-height: 1.65;
-  background-color: var(--bg);
+  background-color: var(--bg); /* Solid background, no gradient */
   color: var(--text-primary);
-}
-
-body::before {
-  content: '';
-  position: fixed;
-  inset: 0;
-  background:
-    radial-gradient(circle at 15% -10%, rgba(157, 0, 255, 0.08) 0%, transparent 50%),
-    radial-gradient(circle at 85% 110%, rgba(0, 240, 255, 0.06) 0%, transparent 50%),
-    linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
-  background-size: auto, auto, 40px 40px, 40px 40px;
-  pointer-events: none;
-  z-index: 0;
 }
 
 /* Base resets */
 button { cursor: pointer; border: none; background: none; font-family: inherit; }
 input, textarea { font-family: inherit; }
 
-/* Cinematic Scrollbar */
+/* Scrollbar */
 ::-webkit-scrollbar { width: 6px; }
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { 
@@ -84,90 +71,48 @@ input, textarea { font-family: inherit; }
   border-radius: 3px; 
 }
 ::-webkit-scrollbar-thumb:hover { 
-  background: rgba(0, 240, 255, 0.3); 
+  background: rgba(249, 115, 22, 0.5); 
 }
 
-/* 🪟 Glassmorphism Utility Classes */
+/* 🪟 Panel Utility Classes */
 .glass-panel {
   background: var(--card-bg);
   border: 1px solid var(--card-border);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.2);
+  transition: all 0.25s ease;
 }
 .glass-panel:hover {
   border-color: var(--glass-border);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4), 0 0 24px var(--accent-glow) inset;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
 }
 
 /* 🪄 Animations */
-@keyframes neon-pulse {
-  0%, 100% { box-shadow: 0 0 10px var(--accent-glow); }
-  50% { box-shadow: 0 0 20px var(--accent-cyan), 0 0 10px var(--accent-purple) inset; }
-}
-
-@keyframes text-glow {
-  0%, 100% { text-shadow: 0 0 8px rgba(0, 240, 255, 0.3); }
-  50% { text-shadow: 0 0 16px rgba(0, 240, 255, 0.8); }
-}
-
 @keyframes fade-in {
   from { opacity: 0; transform: translateY(10px); }
   to { opacity: 1; transform: translateY(0); }
-}
-
-@keyframes pulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.4; }
 }
 
 @keyframes spin {
   to { transform: rotate(360deg); }
 }
 
-/* Original float animations preserved */
-@keyframes float-1 {
-  0%, 100% { transform: translate(0, 0) scale(1); }
-  33% { transform: translate(30vw, 20vh) scale(1.1); }
-  66% { transform: translate(-10vw, 40vh) scale(0.9); }
-}
-@keyframes float-2 {
-  0%, 100% { transform: translate(0, 0) scale(1); }
-  40% { transform: translate(-20vw, 30vh) scale(1.2); }
-  70% { transform: translate(20vw, -10vh) scale(0.8); }
-}
-@keyframes float-3 {
-  0%, 100% { transform: translate(0, 0) scale(1); }
-  50% { transform: translate(15vw, -25vh) scale(1.1); }
-  80% { transform: translate(-15vw, 10vh) scale(0.9); }
-}
-
-.bg-orb {
-  position: fixed;
-  border-radius: 50%;
-  filter: blur(40px);
-  pointer-events: none;
-  z-index: -1;
-  opacity: 0.8;
-}
-
 @keyframes color-shift {
-  0% { background-color: var(--accent-cyan); box-shadow: 0 0 8px var(--accent-cyan); }
-  33% { background-color: var(--accent-purple); box-shadow: 0 0 8px var(--accent-purple); }
-  66% { background-color: var(--info); box-shadow: 0 0 8px var(--info); }
-  100% { background-color: var(--accent-cyan); box-shadow: 0 0 8px var(--accent-cyan); }
+  0% { background-color: var(--accent-primary); }
+  50% { background-color: var(--accent-purple); }
+  100% { background-color: var(--accent-primary); }
 }
 
 .color-circle {
   display: inline-block;
   border-radius: 50%;
-  animation: color-shift 3s infinite linear;
   vertical-align: middle;
   margin-right: 0.4em;
   margin-bottom: 0.15em;
   width: 0.75em;
   height: 0.75em;
+  background-color: var(--accent-primary);
 }
 
 /* Responsive Utilities */

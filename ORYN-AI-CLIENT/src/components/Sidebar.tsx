@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useState } from 'react';
 import type { Page } from '../types';
+import { motion, AnimatePresence } from 'framer-motion';
 
 interface Props {
   page: Page;
@@ -13,207 +14,211 @@ interface Props {
 }
 
 interface SideItem {
-  icon: string | React.ReactNode;
+  icon: React.ReactNode;
   label: string;
   page?: Page;
   badge?: string;
 }
 
+const icons = {
+  chat: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>,
+  dashboard: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="7" height="9"></rect><rect x="14" y="3" width="7" height="5"></rect><rect x="14" y="12" width="7" height="9"></rect><rect x="3" y="16" width="7" height="5"></rect></svg>,
+  analytics: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg>,
+  organization: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>,
+  financials: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>,
+  explore: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"></polygon></svg>,
+  automation: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>,
+  integrations: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path></svg>,
+  documents: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>,
+  calendar: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>,
+  settings: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>,
+  session: <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+};
+
 const sections: { label: string; items: SideItem[] }[] = [
   {
     label: 'Workspace',
     items: [
-      { icon: <i className="fas fa-comment" style={{ color: 'rgb(116, 192, 252)' }}></i>, label: 'Chat', page: 'chat', badge: '1' },
-      { icon: <i className="fas fa-chart-line" style={{ color: 'rgba(139,18,59,1)' }}></i>, label: 'Dashboard', page: 'dashboard' },
-      { icon: <i className="fas fa-chart-bar" style={{ color: 'rgb(255, 212, 59)' }}></i>, label: 'Analytics', page: 'analytics' },
-      { icon: (
-        <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#EA33F7">
-          <path d="M80-320v-112q0-34 17.5-62.5T144-538q62-31 126-46.5T400-600q45 0 89 7t88 22q-17 14-31 30.5T521-505q-30-8-60-11.5t-61-3.5q-56 0-111 13.5T180-466q-9 5-14.5 14t-5.5 20v32h323q-2 20-2 40t2 40H80Zm320-80ZM287-687q-47-47-47-113t47-113q47-47 113-47t113 47q47 47 47 113t-47 113q-47 47-113 47t-113-47Zm169.5-56.5Q480-767 480-800t-23.5-56.5Q433-880 400-880t-56.5 23.5Q320-833 320-800t23.5 56.5Q367-720 400-720t56.5-23.5ZM400-800Zm353 113q-47 47-113 47-11 0-28-2.5t-28-5.5q27-32 41.5-71t14.5-81q0-42-14.5-81T584-952q14-5 28-6.5t28-1.5q66 0 113 47t47 113q0 66-47 113Zm7 527q-83 0-141.5-58.5T560-360q0-84 58.5-142T760-560q84 0 142 58t58 142q0 83-58 141.5T760-160Zm-28-110 141-142-28-28-113 113-57-57-28 29 85 85Z"/>
-        </svg>
-      ), label: 'Organization', page: 'organization' },
-      { icon: (
-        <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#75FB4C">
-          <path d="M320-414v-306h120v306l-60-56-60 56Zm200 60v-526h120v406L520-354ZM120-216v-344h120v224L120-216Zm0 98 258-258 142 122 224-224h-64v-80h200v200h-80v-64L524-146 382-268 232-118H120Z"/>
-        </svg>
-      ), label: 'Financials', page: 'financials' },
-      { icon: (
-        <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#F19E39">
-          <path d="m300-300 280-80 80-280-280 80-80 280Zm180-120q-25 0-42.5-17.5T420-480q0-25 17.5-42.5T480-540q25 0 42.5 17.5T540-480q0 25-17.5 42.5T480-420Zm0 340q-83 0-156-31.5T197-197q-54-54-85.5-127T80-480q0-83 31.5-156T197-763q54-54 127-85.5T480-880q83 0 156 31.5T763-763q54 54 85.5 127T880-480q0 83-31.5 156T763-197q-54 54-127 85.5T480-80Zm0-80q133 0 226.5-93.5T800-480q0-133-93.5-226.5T480-800q-133 0-226.5 93.5T160-480q0 133 93.5 226.5T480-160Zm0-320Z"/>
-        </svg>
-      ), label: 'Explore', page: 'explore' },
+      { icon: icons.chat, label: 'Chat', page: 'chat', badge: '1' },
+      { icon: icons.dashboard, label: 'Dashboard', page: 'dashboard' },
+      { icon: icons.analytics, label: 'Analytics', page: 'analytics' },
+      { icon: icons.organization, label: 'Organization', page: 'organization' },
+      { icon: icons.financials, label: 'Financials', page: 'financials' },
+      { icon: icons.explore, label: 'Explore', page: 'explore' },
     ],
   },
   {
     label: 'Tools',
     items: [
-      { icon: (
-        <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#EFEFEF">
-          <path d="M296-270q-42 35-87.5 32T129-269q-34-28-46.5-73.5T99-436l75-124q-25-22-39.5-53T120-680q0-66 47-113t113-47q66 0 113 47t47 113q0 66-47 113t-113 47q-9 0-18-1t-17-3l-77 130q-11 18-7 35.5t17 28.5q13 11 31 12.5t35-12.5l420-361q42-35 88-31.5t80 31.5q34 28 46 73.5T861-524l-75 124q25 22 39.5 53t14.5 67q0 66-47 113t-113 47q-66 0-113-47t-47-113q0-66 47-113t113-47q9 0 17.5 1t16.5 3l78-130q11-18 7-35.5T782-630q-13-11-31-12.5T716-630L296-270Zm40.5-353.5Q360-647 360-680t-23.5-56.5Q313-760 280-760t-56.5 23.5Q200-713 200-680t23.5 56.5Q247-600 280-600t56.5-23.5Zm400 400Q760-247 760-280t-23.5-56.5Q713-360 680-360t-56.5 23.5Q600-313 600-280t23.5 56.5Q647-200 680-200t56.5-23.5ZM280-680Zm400 400Z"/>
-        </svg>
-      ), label: 'Automation', page: 'automation' },
-      { icon: '◬', label: 'Integrations' },
-      { icon: (
-        <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#0000F5">
-          <path d="M560-80v-123l221-220q9-9 20-13t22-4q12 0 23 4.5t20 13.5l37 37q8 9 12.5 20t4.5 22q0 11-4 22.5T903-300L683-80H560Zm300-263-37-37 37 37ZM620-140h38l121-122-18-19-19-18-122 121v38ZM240-80q-33 0-56.5-23.5T160-160v-640q0-33 23.5-56.5T240-880h320l240 240v120h-80v-80H520v-200H240v640h240v80H240Zm280-400Zm241 199-19-18 37 37-18-19Z"/>
-        </svg>
-      ), label: 'Documents' },
-      { icon: (
-        <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#46152F">
-          <path d="M200-80q-33 0-56.5-23.5T120-160v-560q0-33 23.5-56.5T200-800h40v-80h80v80h320v-80h80v80h40q33 0 56.5 23.5T840-720v560q0 33-23.5 56.5T760-80H200Zm0-80h560v-400H200v400Zm0-480h560v-80H200v80Zm0 0v-80 80Zm280 240q-17 0-28.5-11.5T440-440q0-17 11.5-28.5T480-480q17 0 28.5 11.5T520-440q0 17-11.5 28.5T480-400Zm-188.5-11.5Q280-423 280-440t11.5-28.5Q303-480 320-480t28.5 11.5Q360-457 360-440t-11.5 28.5Q337-400 320-400t-28.5-11.5ZM640-400q-17 0-28.5-11.5T600-440q0-17 11.5-28.5T640-480q17 0 28.5 11.5T680-440q0 17-11.5 28.5T640-400ZM480-240q-17 0-28.5-11.5T440-280q0-17 11.5-28.5T480-320q17 0 28.5 11.5T520-280q0 17-11.5 28.5T480-240Zm-188.5-11.5Q280-263 280-280t11.5-28.5Q303-320 320-320t28.5 11.5Q360-297 360-280t-11.5 28.5Q337-240 320-240t-28.5-11.5ZM640-240q-17 0-28.5-11.5T600-280q0-17 11.5-28.5T640-320q17 0 28.5 11.5T680-280q0 17-11.5 28.5T640-240Z"/>
-        </svg>
-      ), label: 'Calendar' },
+      { icon: icons.automation, label: 'Automation', page: 'automation' },
+      { icon: icons.integrations, label: 'Integrations' },
+      { icon: icons.documents, label: 'Documents' },
+      { icon: icons.calendar, label: 'Calendar' },
     ],
-  },
-  {
-    label: 'Recent',
-    items: [
-      { icon: '·', label: 'Q1 Strategy' },
-      { icon: '·', label: 'Market Report' },
-      { icon: '·', label: 'Team Briefing' },
-    ],
-  },
-  {
-    label: 'System',
-    items: [
-      { icon: <i className="fas fa-cog" style={{ color: 'var(--muted)' }}></i>, label: 'Settings', page: 'settings' },
-    ],
-  },
+  }
 ];
 
 export default function Sidebar({ page, onNavigate, isOpen, onClose, sessions, activeSessionId, onNewChat, onSelectSession }: Props) {
+  const [hoveredItem, setHoveredItem] = useState<string | null>(null);
+
   return (
     <>
-      {/* Mobile Overlay */}
       {isOpen && (
         <div 
           className="mobile-overlay hide-on-desktop" 
           onClick={onClose}
-          style={{ opacity: isOpen ? 1 : 0 }}
+          style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', zIndex: 100 }}
         />
       )}
 
-      <aside style={{
-        width: 280, flexShrink: 0, display: 'flex', flexDirection: 'column',
-        background: 'rgba(4,14,31,0.9)', borderRight: '1px solid var(--border)',
-        backdropFilter: 'blur(20px)', overflowY: 'auto', padding: '24px 0',
-        boxShadow: '4px 0 24px rgba(0,0,0,0.5)',
-        position: 'relative',
-        zIndex: 110,
-        transition: 'transform 0.3s ease',
-        /* Responsive override */
-        ...(window.innerWidth <= 768 ? {
-          position: 'fixed',
-          top: 0,
-          bottom: 0,
-          left: 0,
-          transform: isOpen ? 'translateX(0)' : 'translateX(-100%)',
-        } : {})
-      }}>
-        {/* Mobile Close Button */}
-        <div className="hide-on-desktop" style={{ padding: '0 20px 20px', display: 'flex', justifyContent: 'flex-end' }}>
-          <button 
-            onClick={onClose}
-            style={{ 
-              width: 32, height: 32, borderRadius: '50%', background: 'rgba(255,51,102,0.1)', 
-              color: 'var(--danger)', border: '1px solid rgba(255,51,102,0.2)' 
-            }}
-          >
-            ✕
-          </button>
+      <motion.aside 
+        initial={{ x: -100, opacity: 0 }}
+        animate={{ x: 0, opacity: 1 }}
+        transition={{ duration: 0.5, ease: [0.23, 1, 0.32, 1], delay: 0.1 }}
+        style={{
+          width: 260, flexShrink: 0, display: 'flex', flexDirection: 'column',
+          borderRight: '1px solid var(--card-border)',
+          background: 'rgba(9, 9, 11, 0.6)',
+          backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)',
+          overflowY: 'auto',
+          position: 'relative', zIndex: 110,
+          ...(window.innerWidth <= 768 ? {
+            position: 'fixed', top: 0, bottom: 0, left: 0,
+            transform: isOpen ? 'translateX(0)' : 'translateX(-100%)',
+          } : {})
+        }}
+      >
+        <div style={{ padding: '24px 20px 12px' }}>
+          <div style={{ 
+            display: 'flex', alignItems: 'center', justifyContent: 'space-between', 
+            background: 'rgba(255,255,255,0.03)', border: '1px solid var(--card-border)',
+            padding: '10px 14px', borderRadius: 8, cursor: 'pointer', transition: 'all 0.2s'
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+              <div style={{ width: 20, height: 20, background: 'var(--accent-primary)', borderRadius: 4, boxShadow: '0 0 10px rgba(249,115,22,0.3)' }} />
+              <span style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-primary)' }}>Acme Corp</span>
+            </div>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--text-secondary)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+          </div>
         </div>
 
-        {sections.map(sec => (
-          <div key={sec.label}>
-            <div style={{ fontFamily: 'var(--font-display)', fontSize: 10, fontWeight: 600, letterSpacing: 2, color: 'var(--muted)', textTransform: 'uppercase', padding: '16px 20px 8px' }}>
-              {sec.label === 'Recent' ? 'Intelligence History' : sec.label}
-            </div>
-            {sec.label === 'Recent' ? (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 2, padding: '0 8px' }}>
-                {sessions?.map(s => {
-                  const isActive = s.id === activeSessionId;
+        <div style={{ flex: 1, overflowY: 'auto', padding: '12px 12px 24px' }}>
+          {sections.map(sec => (
+            <div key={sec.label} style={{ marginBottom: 24 }}>
+              <div style={{ fontFamily: 'var(--font-display)', fontSize: 11, fontWeight: 600, color: 'var(--text-secondary)', padding: '0 12px 8px' }}>
+                {sec.label}
+              </div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                {sec.items.map(item => {
+                  const isActive = item.page === page;
+                  const isHovered = hoveredItem === item.label;
                   return (
                     <div
-                      key={s.id}
-                      onClick={() => onSelectSession?.(s.id)}
+                      key={item.label}
+                      onClick={() => item.page && onNavigate(item.page)}
+                      onMouseEnter={() => setHoveredItem(item.label)}
+                      onMouseLeave={() => setHoveredItem(null)}
                       style={{
-                        padding: '12px 16px', borderRadius: 10, cursor: 'pointer',
-                        background: isActive ? 'rgba(0,240,255,0.08)' : 'transparent',
-                        border: `1px solid ${isActive ? 'rgba(0,240,255,0.2)' : 'transparent'}`,
+                        display: 'flex', alignItems: 'center', gap: 12,
+                        padding: '10px 12px', cursor: item.page ? 'pointer' : 'default',
+                        borderRadius: 8, position: 'relative',
+                        background: isActive ? 'rgba(249,115,22,0.1)' : isHovered ? 'rgba(255,255,255,0.03)' : 'transparent',
+                        color: isActive ? 'var(--accent-primary)' : 'var(--text-secondary)',
                         transition: 'all 0.2s',
-                        display: 'flex', flexDirection: 'column', gap: 4
                       }}
-                      onMouseEnter={e => { if (!isActive) e.currentTarget.style.background = 'rgba(255,255,255,0.03)'; }}
-                      onMouseLeave={e => { if (!isActive) e.currentTarget.style.background = 'transparent'; }}
                     >
-                      <div style={{ fontSize: 13, fontWeight: 600, color: isActive ? 'var(--cyan)' : 'var(--white)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                        {s.title}
+                      {isActive && (
+                        <motion.div layoutId="sidebar-active" style={{
+                          position: 'absolute', left: 0, top: '15%', height: '70%', width: 3,
+                          background: 'var(--accent-primary)', borderRadius: '0 4px 4px 0'
+                        }} />
+                      )}
+                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 18, color: isActive ? 'var(--accent-primary)' : 'inherit' }}>
+                        {item.icon}
                       </div>
-                      <div style={{ fontSize: 10, color: 'var(--muted)', letterSpacing: 0.5 }}>
-                        {s.date.toLocaleDateString([], { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
-                      </div>
+                      <span style={{ fontSize: 13.5, fontWeight: 500 }}>{item.label}</span>
+                      
+                      {item.badge && (
+                        <span style={{ marginLeft: 'auto', background: 'var(--accent-primary)', color: 'white', fontSize: 10, padding: '1px 6px', borderRadius: 10, fontWeight: 700 }}>
+                          {item.badge}
+                        </span>
+                      )}
                     </div>
                   );
                 })}
               </div>
-            ) : (
-              sec.items.map(item => {
-                const isActive = item.page === page;
+            </div>
+          ))}
+
+          {/* Intelligence History */}
+          <div style={{ marginBottom: 24 }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 12px 8px' }}>
+              <div style={{ fontFamily: 'var(--font-display)', fontSize: 11, fontWeight: 600, color: 'var(--text-secondary)' }}>
+                Intelligence History
+              </div>
+              {onNewChat && (
+                <button onClick={onNewChat} style={{ color: 'var(--text-secondary)', display: 'flex', alignItems: 'center' }}>
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                </button>
+              )}
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+              {sessions?.map(s => {
+                const isActive = s.id === activeSessionId && page === 'chat';
                 return (
                   <div
-                    key={item.label}
-                    onClick={() => item.page && onNavigate(item.page)}
-                    style={{
-                      display: 'flex', alignItems: 'center', gap: 14,
-                      padding: '12px 24px', cursor: item.page ? 'pointer' : 'default',
-                      fontSize: 16, fontWeight: 500,
-                      color: isActive ? 'var(--cyan)' : 'var(--muted)',
-                      background: isActive ? 'linear-gradient(90deg, rgba(0,240,255,0.15), transparent)' : 'transparent',
-                      borderLeft: `3px solid ${isActive ? 'var(--cyan)' : 'transparent'}`,
-                      transition: 'all 0.3s',
-                      boxShadow: isActive ? '-10px 0 20px rgba(0,240,255,0.2) inset' : 'none',
+                    key={s.id}
+                    onClick={() => {
+                      onSelectSession?.(s.id);
+                      if (page !== 'chat') onNavigate('chat');
                     }}
-                    onMouseEnter={e => { if (!isActive) { (e.currentTarget as HTMLDivElement).style.color = 'var(--white)'; (e.currentTarget as HTMLDivElement).style.background = 'linear-gradient(90deg, rgba(0,149,255,0.1), transparent)'; (e.currentTarget as HTMLDivElement).style.borderLeftColor = 'rgba(0,149,255,0.5)'; } }}
-                    onMouseLeave={e => { if (!isActive) { (e.currentTarget as HTMLDivElement).style.color = 'var(--muted)'; (e.currentTarget as HTMLDivElement).style.background = 'transparent'; (e.currentTarget as HTMLDivElement).style.borderLeftColor = 'transparent'; } }}
+                    style={{
+                      display: 'flex', alignItems: 'center', gap: 12,
+                      padding: '10px 12px', borderRadius: 8, cursor: 'pointer',
+                      background: isActive ? 'rgba(255,255,255,0.06)' : 'transparent',
+                      color: isActive ? 'var(--text-primary)' : 'var(--text-secondary)',
+                      transition: 'all 0.2s',
+                    }}
+                    onMouseEnter={e => { if (!isActive) e.currentTarget.style.background = 'rgba(255,255,255,0.03)'; }}
+                    onMouseLeave={e => { if (!isActive) e.currentTarget.style.background = 'transparent'; }}
                   >
-                    <span style={{ 
-                      display: 'flex', alignItems: 'center', justifyContent: 'center',
-                      fontSize: 18, width: 24, height: 24, textAlign: 'center', 
-                      textShadow: isActive ? '0 0 10px rgba(0,240,255,0.8)' : 'none' 
-                    }}>{item.icon}</span>
-                    {item.label}
-                    {item.badge && (
-                      <span style={{ marginLeft: 'auto', background: 'var(--accent)', color: 'white', fontSize: 12, padding: '3px 8px', borderRadius: 12, fontWeight: 700, boxShadow: '0 0 10px rgba(0,136,255,0.5)' }}>
-                        {item.badge}
-                      </span>
-                    )}
-                    {item.label === 'Chat' && (
-                      <div 
-                        style={{ 
-                          marginLeft: item.badge ? 10 : 'auto', 
-                          color: 'var(--muted)', 
-                          cursor: 'pointer', 
-                          display: 'flex', 
-                          alignItems: 'center', 
-                          justifyContent: 'center', 
-                          width: 28, height: 28, 
-                          borderRadius: '50%', 
-                          transition: 'all 0.2s',
-                          fontSize: 14
-                        }}
-                        onMouseEnter={e => { e.currentTarget.style.background = 'rgba(255,255,255,0.1)'; e.currentTarget.style.color = 'var(--white)'; }}
-                        onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = 'var(--muted)'; }}
-                        onClick={(e) => { e.stopPropagation(); }}
-                      >
-                        <i className="fas fa-ellipsis-v"></i>
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 16 }}>
+                      {icons.session}
+                    </div>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 2, overflow: 'hidden' }}>
+                      <div style={{ fontSize: 13, fontWeight: isActive ? 500 : 400, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                        {s.title}
                       </div>
-                    )}
+                      <div style={{ fontSize: 10, color: 'var(--text-muted)' }}>
+                        {s.date.toLocaleDateString([], { month: 'short', day: 'numeric' })}
+                      </div>
+                    </div>
                   </div>
                 );
-              })
-            )}
+              })}
+            </div>
           </div>
-        ))}
-      </aside>
+        </div>
+
+        {/* Bottom Section: Settings */}
+        <div style={{ padding: '12px', borderTop: '1px solid var(--card-border)' }}>
+          <div
+            onClick={() => onNavigate('settings')}
+            style={{
+              display: 'flex', alignItems: 'center', gap: 12,
+              padding: '10px 12px', cursor: 'pointer', borderRadius: 8,
+              color: page === 'settings' ? 'var(--accent-primary)' : 'var(--text-secondary)',
+              background: page === 'settings' ? 'rgba(249,115,22,0.1)' : 'transparent',
+              transition: 'all 0.2s'
+            }}
+            onMouseEnter={e => { if (page !== 'settings') e.currentTarget.style.background = 'rgba(255,255,255,0.03)'; }}
+            onMouseLeave={e => { if (page !== 'settings') e.currentTarget.style.background = 'transparent'; }}
+          >
+            {icons.settings}
+            <span style={{ fontSize: 13.5, fontWeight: 500 }}>Settings</span>
+          </div>
+        </div>
+      </motion.aside>
     </>
   );
 }

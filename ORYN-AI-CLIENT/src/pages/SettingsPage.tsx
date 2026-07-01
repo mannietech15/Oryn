@@ -30,7 +30,7 @@ export default function SettingsPage() {
                 key={p}
                 onClick={() => setPersona(p)}
                 style={{
-                  padding: '20px 16px', borderRadius: 16, background: persona === p ? 'rgba(0,240,255,0.1)' : 'rgba(255,255,255,0.02)',
+                  padding: '20px 16px', borderRadius: 16, background: persona === p ? 'rgba(249, 115, 22,0.1)' : 'rgba(255,255,255,0.02)',
                   border: `1px solid ${persona === p ? 'var(--cyan)' : 'rgba(255,255,255,0.05)'}`,
                   textAlign: 'left', transition: 'all 0.3s', cursor: 'pointer'
                 }}
@@ -128,11 +128,11 @@ export default function SettingsPage() {
 
       {/* AI Auditor Footer */}
       <div style={{ 
-        marginTop: 40, padding: 32, background: 'linear-gradient(90deg, rgba(0,240,255,0.05), rgba(138,43,226,0.05))',
+        marginTop: 40, padding: 32, background: 'linear-gradient(90deg, rgba(249, 115, 22,0.05), rgba(138,43,226,0.05))',
         borderRadius: 24, border: '1px solid rgba(255,255,255,0.05)', display: 'flex', alignItems: 'center', gap: 24
       }}>
         <div style={{ 
-          width: 50, height: 50, borderRadius: '50%', background: 'rgba(0,240,255,0.1)', 
+          width: 50, height: 50, borderRadius: '50%', background: 'rgba(249, 115, 22,0.1)', 
           display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 24
         }}>
           💡

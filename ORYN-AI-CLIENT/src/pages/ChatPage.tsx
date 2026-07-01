@@ -57,8 +57,8 @@ function CopyButton({ text }: { text: string }) {
       onMouseEnter={e => {
         if (!copied) {
           (e.currentTarget as HTMLButtonElement).style.color = 'var(--cyan)';
-          (e.currentTarget as HTMLButtonElement).style.borderColor = 'rgba(0,240,255,0.3)';
-          (e.currentTarget as HTMLButtonElement).style.background = 'rgba(0,240,255,0.08)';
+          (e.currentTarget as HTMLButtonElement).style.borderColor = 'rgba(249, 115, 22,0.3)';
+          (e.currentTarget as HTMLButtonElement).style.background = 'rgba(249, 115, 22,0.08)';
         }
       }}
       onMouseLeave={e => {
@@ -94,7 +94,7 @@ function MessageBubble({ msg }: { msg: Message }) {
             fontFamily: 'var(--font-display)', fontSize: 14, fontWeight: 800, letterSpacing: 1.5,
             background: 'linear-gradient(135deg,#0055ff,#00f0ff)',
             color: 'white',
-            boxShadow: '0 0 15px rgba(0,240,255,0.5)',
+            boxShadow: '0 0 15px rgba(249, 115, 22,0.5)',
           }}>
             ME
           </div>
@@ -102,16 +102,16 @@ function MessageBubble({ msg }: { msg: Message }) {
         </div>
       ) : (
         <div style={{ width: 44, height: 44, flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          <svg width="44" height="44" viewBox="0 0 32 32" fill="none" style={{ filter: 'drop-shadow(0 0 6px rgba(0,212,255,0.7))' }}>
-            <polygon points="16,1 31,9 31,23 16,31 1,23 1,9" stroke="#00d4ff" strokeWidth="1.2" fill="rgba(0,212,255,0.05)" />
-            <polygon points="16,7 25,12 25,20 16,25 7,20 7,12" stroke="#0095ff" strokeWidth="0.8" fill="rgba(0,149,255,0.07)" />
-            <circle cx="16" cy="16" r="3" fill="#00d4ff" />
-            <line x1="16" y1="7" x2="16" y2="13" stroke="#00d4ff" strokeWidth="0.8" opacity="0.6" />
-            <line x1="16" y1="19" x2="16" y2="25" stroke="#00d4ff" strokeWidth="0.8" opacity="0.6" />
-            <line x1="7" y1="12" x2="13" y2="15" stroke="#00d4ff" strokeWidth="0.8" opacity="0.6" />
-            <line x1="19" y1="17" x2="25" y2="20" stroke="#00d4ff" strokeWidth="0.8" opacity="0.6" />
-            <line x1="25" y1="12" x2="19" y2="15" stroke="#00d4ff" strokeWidth="0.8" opacity="0.6" />
-            <line x1="13" y1="17" x2="7" y2="20" stroke="#00d4ff" strokeWidth="0.8" opacity="0.6" />
+          <svg width="44" height="44" viewBox="0 0 32 32" fill="none" style={{ filter: 'drop-shadow(0 0 6px rgba(249, 115, 22,0.7))' }}>
+            <polygon points="16,1 31,9 31,23 16,31 1,23 1,9" stroke="#f97316" strokeWidth="1.2" fill="rgba(249, 115, 22,0.05)" />
+            <polygon points="16,7 25,12 25,20 16,25 7,20 7,12" stroke="#ea580c" strokeWidth="0.8" fill="rgba(249, 115, 22,0.07)" />
+            <circle cx="16" cy="16" r="3" fill="#f97316" />
+            <line x1="16" y1="7" x2="16" y2="13" stroke="#f97316" strokeWidth="0.8" opacity="0.6" />
+            <line x1="16" y1="19" x2="16" y2="25" stroke="#f97316" strokeWidth="0.8" opacity="0.6" />
+            <line x1="7" y1="12" x2="13" y2="15" stroke="#f97316" strokeWidth="0.8" opacity="0.6" />
+            <line x1="19" y1="17" x2="25" y2="20" stroke="#f97316" strokeWidth="0.8" opacity="0.6" />
+            <line x1="25" y1="12" x2="19" y2="15" stroke="#f97316" strokeWidth="0.8" opacity="0.6" />
+            <line x1="13" y1="17" x2="7" y2="20" stroke="#f97316" strokeWidth="0.8" opacity="0.6" />
           </svg>
         </div>
       )}
@@ -120,10 +120,10 @@ function MessageBubble({ msg }: { msg: Message }) {
       <div style={{
         maxWidth: '85%', padding: isUser ? '20px 28px' : '6px 0', fontSize: 17, fontWeight: 400, lineHeight: 1.7, color: 'var(--text)',
         borderRadius: isUser ? '20px 4px 20px 20px' : 0,
-        background: isUser ? 'linear-gradient(135deg, rgba(0,136,255,0.15), rgba(0,240,255,0.25))' : 'transparent',
-        border: isUser ? '1px solid rgba(0,240,255,0.4)' : 'none',
+        background: isUser ? 'linear-gradient(135deg, rgba(249, 115, 22,0.15), rgba(249, 115, 22,0.25))' : 'transparent',
+        border: isUser ? '1px solid rgba(249, 115, 22,0.4)' : 'none',
         borderRight: isUser ? '4px solid var(--cyan)' : 'none',
-        boxShadow: isUser ? '0 8px 32px rgba(0,240,255,0.2), 0 0 20px rgba(0,240,255,0.1) inset' : 'none',
+        boxShadow: isUser ? '0 8px 32px rgba(249, 115, 22,0.2), 0 0 20px rgba(249, 115, 22,0.1) inset' : 'none',
         backdropFilter: isUser ? 'blur(10px)' : 'none',
         textAlign: 'left',
       }}>
@@ -249,9 +249,9 @@ export default function ChatPage({
             maxWidth: '800px', 
             background: 'rgba(12,25,50,0.85)', 
             borderRadius: 40, 
-            border: '1px solid rgba(0,240,255,0.3)',
+            border: '1px solid rgba(249, 115, 22,0.3)',
             padding: '8px 12px', 
-            boxShadow: '0 20px 50px rgba(0,0,0,0.6), 0 0 20px rgba(0,240,255,0.1)', 
+            boxShadow: '0 20px 50px rgba(0,0,0,0.6), 0 0 20px rgba(249, 115, 22,0.1)', 
             display: 'flex', 
             flexDirection: 'column', 
             gap: 8,
@@ -281,9 +281,9 @@ export default function ChatPage({
                   onClick={() => setIsMenuOpen(!isMenuOpen)} 
                   style={{
                     width: 52, height: 52, flexShrink: 0, borderRadius: '50%', 
-                    border: `1px solid ${isRecording ? 'rgba(255,51,102,0.8)' : 'rgba(0,240,255,0.2)'}`,
+                    border: `1px solid ${isRecording ? 'rgba(255,51,102,0.8)' : 'rgba(249, 115, 22,0.2)'}`,
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    background: isRecording ? 'rgba(255,51,102,0.15)' : 'rgba(0,240,255,0.05)',
+                    background: isRecording ? 'rgba(255,51,102,0.15)' : 'rgba(249, 115, 22,0.05)',
                     transition: 'all 0.3s', 
                     boxShadow: isRecording ? '0 0 20px rgba(255,51,102,0.4)' : 'none',
                     cursor: 'pointer',
@@ -302,7 +302,7 @@ export default function ChatPage({
                   <div style={{
                     position: 'absolute', bottom: '100%', left: 0,
                     marginBottom: 15, width: 180, background: 'rgba(10,29,58,0.95)', 
-                    backdropFilter: 'blur(25px)', borderRadius: 16, border: '1px solid rgba(0,240,255,0.2)',
+                    backdropFilter: 'blur(25px)', borderRadius: 16, border: '1px solid rgba(249, 115, 22,0.2)',
                     boxShadow: '0 10px 40px rgba(0,0,0,0.5)', overflow: 'hidden', zIndex: 100,
                     animation: 'rise 0.2s ease-out'
                   }}>
@@ -311,9 +311,9 @@ export default function ChatPage({
                       style={{
                         padding: '14px 18px', display: 'flex', alignItems: 'center', gap: 12,
                         cursor: 'pointer', transition: 'all 0.2s', fontSize: 13, fontWeight: 600,
-                        color: 'var(--white)', borderBottom: '1px solid rgba(0,240,255,0.1)'
+                        color: 'var(--white)', borderBottom: '1px solid rgba(249, 115, 22,0.1)'
                       }}
-                      onMouseEnter={e => e.currentTarget.style.background = 'rgba(0,240,255,0.1)'}
+                      onMouseEnter={e => e.currentTarget.style.background = 'rgba(249, 115, 22,0.1)'}
                       onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
                     >
                       <span style={{ fontSize: 18 }}>📄</span>
@@ -326,7 +326,7 @@ export default function ChatPage({
                         cursor: 'pointer', transition: 'all 0.2s', fontSize: 13, fontWeight: 600,
                         color: isRecording ? 'var(--danger)' : 'var(--white)'
                       }}
-                      onMouseEnter={e => e.currentTarget.style.background = 'rgba(0,240,255,0.1)'}
+                      onMouseEnter={e => e.currentTarget.style.background = 'rgba(249, 115, 22,0.1)'}
                       onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
                     >
                       <span style={{ fontSize: 18 }}>🎙</span>
@@ -367,7 +367,7 @@ export default function ChatPage({
                   display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%',
                   opacity: isStreaming ? 0.6 : 1, 
                   transition: 'all 0.3s', 
-                  boxShadow: '0 0 20px rgba(0,240,255,0.3)',
+                  boxShadow: '0 0 20px rgba(249, 115, 22,0.3)',
                   cursor: 'pointer',
                   border: 'none'
                 }}

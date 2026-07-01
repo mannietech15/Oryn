@@ -106,7 +106,7 @@ export default function DashboardScene() {
     lnGeo.setAttribute('position', new THREE.BufferAttribute(lnPositions, 3));
 
     const lnMat = new THREE.LineBasicMaterial({
-      color: new THREE.Color('#00d4ff'),
+      color: new THREE.Color('#f97316'),
       transparent: true,
       opacity: 0.14,
       depthWrite: false,

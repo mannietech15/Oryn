@@ -79,24 +79,6 @@ function AutomationPlaceholder() {
 }
 
 function BackgroundOrbs() {
-  return (
-    <div style={{ position: 'fixed', inset: 0, overflow: 'hidden', pointerEvents: 'none', zIndex: 1 }}>
-      <div className="bg-orb" style={{ 
-        width: 600, height: 600, top: '-10%', left: '10%', 
-        background: 'radial-gradient(circle, rgba(0, 240, 255, 0.4) 0%, rgba(0, 240, 255, 0.15) 50%, transparent 80%)',
-        animation: 'float-1 30s ease-in-out infinite' 
-      }} />
-      <div className="bg-orb" style={{ 
-        width: 800, height: 800, bottom: '-10%', right: '5%', 
-        background: 'radial-gradient(circle, rgba(138, 43, 226, 0.3) 0%, rgba(138, 43, 226, 0.1) 50%, transparent 80%)',
-        animation: 'float-2 40s ease-in-out infinite' 
-      }} />
-      <div className="bg-orb" style={{ 
-        width: 500, height: 500, top: '40%', left: '40%', 
-        background: 'radial-gradient(circle, rgba(0, 136, 255, 0.35) 0%, rgba(0, 136, 255, 0.12) 50%, transparent 80%)',
-        animation: 'float-3 35s ease-in-out infinite' 
-      }} />
-    </div>
-  );
+  return null;
 }
 

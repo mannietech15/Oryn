@@ -12,9 +12,9 @@ import type {
 
 /* ─── Static KPI data ───────────────────────────────────── */
 const kpis = [
-  { label: 'Revenue MTD',    value: '$284K', change: '+18.4%', icon: '💰', color: 'var(--accent)',  glow: 'rgba(0,136,255,0.35)',  prompt: 'How is my revenue trending and what should I do to reach $500K this quarter?' },
+  { label: 'Revenue MTD',    value: '$284K', change: '+18.4%', icon: '💰', color: 'var(--accent)',  glow: 'rgba(249, 115, 22,0.35)',  prompt: 'How is my revenue trending and what should I do to reach $500K this quarter?' },
   { label: 'Active Users',   value: '1,842', change: '+9.2%',  icon: '👥', color: 'var(--violet)',  glow: 'rgba(138,43,226,0.35)', prompt: 'How can I grow active users faster and reduce churn risk?' },
-  { label: 'AI Tasks Done',  value: '3,291', change: '+34%',   icon: '⚡', color: 'var(--accent-cyan)',    glow: 'rgba(0,240,255,0.35)',  prompt: 'My AI task completion is at 3291 and growing 34%. How do I sustain this momentum?' },
+  { label: 'AI Tasks Done',  value: '3,291', change: '+34%',   icon: '⚡', color: 'var(--accent-cyan)',    glow: 'rgba(249, 115, 22,0.35)',  prompt: 'My AI task completion is at 3291 and growing 34%. How do I sustain this momentum?' },
   { label: 'Retention Rate', value: '91%',   change: '+3pts',  icon: '🎯', color: 'var(--success)', glow: 'rgba(0,255,170,0.35)',  prompt: 'How do I push my retention rate from 91% to 95%?' },
 ];
 
@@ -35,7 +35,7 @@ const alertTheme: Record<string, { bg: string; border: string; badge: string; te
   critical:    { bg: 'rgba(255,51,102,0.08)',  border: 'rgba(255,51,102,0.35)',  badge: '#ff3366', text: 'CRITICAL'    },
   warning:     { bg: 'rgba(255,170,0,0.08)',   border: 'rgba(255,170,0,0.35)',   badge: '#ffaa00', text: 'WARNING'     },
   opportunity: { bg: 'rgba(0,255,170,0.07)',   border: 'rgba(0,255,170,0.30)',   badge: '#00ffaa', text: 'OPPORTUNITY' },
-  info:        { bg: 'rgba(0,212,255,0.07)',   border: 'rgba(0,212,255,0.25)',   badge: '#00d4ff', text: 'INFO'        },
+  info:        { bg: 'rgba(249, 115, 22,0.07)',   border: 'rgba(249, 115, 22,0.25)',   badge: '#f97316', text: 'INFO'        },
 };
 
 /* ─── SVG Sparkline ──────────────────────────────────────── */
@@ -58,7 +58,7 @@ function SparkLine() {
         <filter id="glow"><feGaussianBlur stdDeviation="3" result="blur" /><feMerge><feMergeNode in="blur" /><feMergeNode in="SourceGraphic" /></feMerge></filter>
       </defs>
       {[0.25, 0.5, 0.75, 1].map(r => (
-        <line key={r} x1={pad} y1={pad + (1 - r) * (H - pad * 2)} x2={W - pad} y2={pad + (1 - r) * (H - pad * 2)} stroke="rgba(0,240,255,0.08)" strokeWidth="1" />
+        <line key={r} x1={pad} y1={pad + (1 - r) * (H - pad * 2)} x2={W - pad} y2={pad + (1 - r) * (H - pad * 2)} stroke="rgba(249, 115, 22,0.08)" strokeWidth="1" />
       ))}
       <path d={area} fill="url(#areaGrad)" />
       <path d={line} fill="none" stroke="var(--accent-cyan)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" filter="url(#glow)" />
@@ -92,7 +92,7 @@ function Ring({ value, color, label }: { value: number; color: string; label: st
           fill="white" fontFamily="var(--font-display)"
           style={{ transform: 'rotate(90deg)', transformOrigin: '36px 36px' }}>{value}%</text>
       </svg>
-      <span style={{ fontSize: 11, color: 'var(--text-secondary)', fontFamily: 'var(--font-display)', letterSpacing: 1.5, textTransform: 'uppercase' }}>{label}</span>
+      <span style={{ fontSize: 11, color: 'var(--text-secondary)', fontFamily: 'var(--font-display)', letterSpacing: 0, textTransform: 'none' }}>{label}</span>
     </div>
   );
 }
@@ -112,11 +112,11 @@ function Card({ title, accent, children, style, delay = 0 }: { title: string; ac
       }}
     >
       <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 2,
-        background: `linear-gradient(90deg, transparent, ${accent ?? 'var(--accent-cyan)'}, transparent)`,
+        background: accent ?? 'var(--accent-primary)',
         opacity: 0.8 }} />
       <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
         <div style={{ flex: 1, fontFamily: 'var(--font-display)', fontSize: 11, fontWeight: 700,
-          letterSpacing: 2.5, color: accent ?? 'var(--accent-cyan)', textTransform: 'uppercase',
+          letterSpacing: 0, color: accent ?? 'var(--accent-cyan)', textTransform: 'none',
           textShadow: `0 0 10px ${accent ?? 'var(--accent-cyan)'}60` }}><span className="color-circle"></span>{title}</div>
         <div style={{ width: 6, height: 6, borderRadius: '50%', background: accent ?? 'var(--accent-cyan)',
           boxShadow: `0 0 8px ${accent ?? 'var(--accent-cyan)'}` }} />
@@ -253,14 +253,14 @@ export default function DashboardPage() {
       {/* ─── Hero Header ─── */}
       <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', gap: 16, position: 'relative', zIndex: 1 }}>
         <div>
-          <div style={{ fontFamily: 'var(--font-display)', fontSize: 11, fontWeight: 600, letterSpacing: 3, color: 'var(--text-secondary)', textTransform: 'uppercase', marginBottom: 8 }}>Live Intelligence Overview</div>
-          <div style={{ fontFamily: 'var(--font-display)', fontSize: 28, fontWeight: 800, letterSpacing: 3, color: 'var(--text-primary)', lineHeight: 1.2 }}>
-            <span style={{ color: 'var(--accent-cyan)', textShadow: '0 0 20px rgba(0,240,255,0.7)' }}>ORYN</span>{' '}Dashboard
+          <div style={{ fontFamily: 'var(--font-display)', fontSize: 11, fontWeight: 600, letterSpacing: 0, color: 'var(--text-secondary)', textTransform: 'none', marginBottom: 8 }}>Live Intelligence Overview</div>
+          <div style={{ fontFamily: 'var(--font-display)', fontSize: 28, fontWeight: 800, letterSpacing: 0, color: 'var(--text-primary)', lineHeight: 1.2 }}>
+            <span style={{ color: 'var(--accent-cyan)', textShadow: '0 0 20px rgba(249, 115, 22,0.7)' }}>ORYN</span>{' '}Dashboard
           </div>
         </div>
         <div className="glass-panel" style={{ borderRadius: 12, padding: '12px 20px', textAlign: 'right' }}>
-          <div style={{ fontFamily: 'var(--font-display)', fontSize: 22, fontWeight: 700, color: 'var(--accent-cyan)', letterSpacing: 2, fontVariantNumeric: 'tabular-nums', textShadow: '0 0 12px rgba(0,240,255,0.6)' }}>{clockStr}</div>
-          <div style={{ fontFamily: 'var(--font-display)', fontSize: 11, color: 'var(--text-secondary)', letterSpacing: 1.5, marginTop: 2 }}>{dateStr}</div>
+          <div style={{ fontFamily: 'var(--font-display)', fontSize: 22, fontWeight: 700, color: 'var(--accent-cyan)', letterSpacing: 0, fontVariantNumeric: 'tabular-nums', textShadow: '0 0 12px rgba(249, 115, 22,0.6)' }}>{clockStr}</div>
+          <div style={{ fontFamily: 'var(--font-display)', fontSize: 11, color: 'var(--text-secondary)', letterSpacing: 0, marginTop: 2 }}>{dateStr}</div>
         </div>
       </div>
 
@@ -272,14 +272,14 @@ export default function DashboardPage() {
         }}>
           {/* Bar header */}
           <div style={{ display: 'flex', alignItems: 'center', gap: 14, padding: '16px 22px', borderBottom: '1px solid var(--glass-border)' }}>
-            <div style={{ width: 36, height: 36, borderRadius: 10, background: 'linear-gradient(135deg, var(--glass-border), rgba(138,43,226,0.2))', border: '1px solid rgba(0,240,255,0.3)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18, flexShrink: 0 }}>🧠</div>
+            <div style={{ width: 36, height: 36, borderRadius: 10, background: 'var(--accent-primary)', border: '1px solid var(--glass-border)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18, flexShrink: 0 }}>🧠</div>
             <div style={{ flex: 1 }}>
-              <div style={{ fontFamily: 'var(--font-display)', fontSize: 13, fontWeight: 700, color: 'var(--text-primary)', letterSpacing: 1 }}>ORYN Command Bar</div>
-              <div style={{ fontFamily: 'var(--font-display)', fontSize: 10, color: 'var(--text-secondary)', letterSpacing: 1.5 }}>ASK ANYTHING ABOUT YOUR BUSINESS</div>
+              <div style={{ fontFamily: 'var(--font-display)', fontSize: 13, fontWeight: 700, color: 'var(--text-primary)', letterSpacing: 0 }}>ORYN Command Bar</div>
+              <div style={{ fontFamily: 'var(--font-display)', fontSize: 10, color: 'var(--text-secondary)', letterSpacing: 0 }}>ASK ANYTHING ABOUT YOUR BUSINESS</div>
             </div>
             <div style={{ display: 'flex', alignItems: 'center', gap: 6, background: 'rgba(0,255,170,0.08)', border: '1px solid rgba(0,255,170,0.2)', borderRadius: 8, padding: '4px 10px' }}>
               <div style={{ width: 6, height: 6, borderRadius: '50%', background: 'var(--success)', boxShadow: '0 0 6px var(--success)', animation: 'pulse 2s infinite' }} />
-              <span style={{ fontFamily: 'var(--font-display)', fontSize: 10, fontWeight: 700, color: 'var(--success)', letterSpacing: 1.5 }}>AI LIVE</span>
+              <span style={{ fontFamily: 'var(--font-display)', fontSize: 10, fontWeight: 700, color: 'var(--success)', letterSpacing: 0 }}>AI LIVE</span>
             </div>
           </div>
 
@@ -300,9 +300,9 @@ export default function DashboardPage() {
               onClick={() => handleCommand()}
               disabled={cmdLoading || !cmdInput.trim()}
               style={{
-                background: cmdLoading ? 'rgba(0,240,255,0.08)' : 'linear-gradient(135deg, var(--accent), var(--accent-cyan))',
+                background: cmdLoading ? 'rgba(249, 115, 22,0.08)' : 'var(--accent-primary)',
                 border: 'none', borderRadius: 10, padding: '10px 20px', color: 'white',
-                fontFamily: 'var(--font-display)', fontSize: 12, fontWeight: 700, letterSpacing: 1.5,
+                fontFamily: 'var(--font-display)', fontSize: 12, fontWeight: 700, letterSpacing: 0,
                 cursor: cmdLoading || !cmdInput.trim() ? 'not-allowed' : 'pointer',
                 opacity: cmdInput.trim() ? 1 : 0.5,
                 transition: 'all 0.2s', display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0,
@@ -322,9 +322,9 @@ export default function DashboardPage() {
             <div style={{ display: 'flex', gap: 8, padding: '0 16px 14px', flexWrap: 'wrap' }}>
               {["What's my biggest opportunity today?", "Which team member is underperforming?", "How do I improve retention by 4%?"].map(s => (
                 <button key={s} onClick={() => { setCmdInput(s); setTimeout(() => handleCommand(s), 0); }}
-                  style={{ background: 'rgba(0,212,255,0.06)', border: '1px solid rgba(0,212,255,0.15)', borderRadius: 8, padding: '5px 12px', color: 'var(--text-secondary)', fontFamily: 'var(--font-display)', fontSize: 10, fontWeight: 600, letterSpacing: 1, cursor: 'pointer', transition: 'all 0.2s' }}
-                  onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.borderColor = 'rgba(0,240,255,0.4)'; (e.currentTarget as HTMLButtonElement).style.color = 'var(--accent-cyan)'; }}
-                  onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.borderColor = 'rgba(0,212,255,0.15)'; (e.currentTarget as HTMLButtonElement).style.color = 'var(--text-secondary)'; }}
+                  style={{ background: 'rgba(249, 115, 22,0.06)', border: '1px solid rgba(249, 115, 22,0.15)', borderRadius: 8, padding: '5px 12px', color: 'var(--text-secondary)', fontFamily: 'var(--font-display)', fontSize: 10, fontWeight: 600, letterSpacing: 0, cursor: 'pointer', transition: 'all 0.2s' }}
+                  onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.borderColor = 'rgba(249, 115, 22,0.4)'; (e.currentTarget as HTMLButtonElement).style.color = 'var(--accent-cyan)'; }}
+                  onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.borderColor = 'rgba(249, 115, 22,0.15)'; (e.currentTarget as HTMLButtonElement).style.color = 'var(--text-secondary)'; }}
                 >{s}</button>
               ))}
             </div>
@@ -338,14 +338,14 @@ export default function DashboardPage() {
               ) : cmdResult && (
                 <>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12 }}>
-                    <div style={{ fontFamily: 'var(--font-display)', fontSize: 9, fontWeight: 700, letterSpacing: 2, textTransform: 'uppercase', color: cmdTypeColor[cmdResult.type], background: `${cmdTypeColor[cmdResult.type]}18`, borderRadius: 5, padding: '3px 8px' }}>{cmdResult.type}</div>
-                    <div style={{ fontFamily: 'var(--font-display)', fontSize: 10, color: 'var(--text-secondary)', letterSpacing: 1 }}>↪ {cmdResult.metric}</div>
+                    <div style={{ fontFamily: 'var(--font-display)', fontSize: 9, fontWeight: 700, letterSpacing: 0, textTransform: 'none', color: cmdTypeColor[cmdResult.type], background: `${cmdTypeColor[cmdResult.type]}18`, borderRadius: 5, padding: '3px 8px' }}>{cmdResult.type}</div>
+                    <div style={{ fontFamily: 'var(--font-display)', fontSize: 10, color: 'var(--text-secondary)', letterSpacing: 0 }}>↪ {cmdResult.metric}</div>
                   </div>
                   <div style={{ fontFamily: 'var(--font-body)', fontSize: 14, color: 'var(--text)', lineHeight: 1.65, marginBottom: cmdResult.action ? 14 : 0 }}>{cmdResult.answer}</div>
                   {cmdResult.action && (
                     <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 12, padding: '10px 14px', background: `${cmdTypeColor[cmdResult.type]}10`, borderRadius: 8, border: `1px solid ${cmdTypeColor[cmdResult.type]}25` }}>
                       <span style={{ fontSize: 14 }}>⚡</span>
-                      <span style={{ fontFamily: 'var(--font-display)', fontSize: 11, fontWeight: 600, color: cmdTypeColor[cmdResult.type], letterSpacing: 0.5 }}>Next action: {cmdResult.action}</span>
+                      <span style={{ fontFamily: 'var(--font-display)', fontSize: 11, fontWeight: 600, color: cmdTypeColor[cmdResult.type], letterSpacing: 0 }}>Next action: {cmdResult.action}</span>
                     </div>
                   )}
                 </>
@@ -367,7 +367,7 @@ export default function DashboardPage() {
           >
             <div style={{ position: 'absolute', top: -16, right: -16, width: 55, height: 55, borderRadius: '50%', background: k.color, opacity: 0.1, filter: 'blur(16px)' }} />
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
-              <div style={{ fontFamily: 'var(--font-display)', fontSize: 10, fontWeight: 700, letterSpacing: 2, color: 'var(--text-secondary)', textTransform: 'uppercase' }}>{k.label}</div>
+              <div style={{ fontFamily: 'var(--font-display)', fontSize: 10, fontWeight: 700, letterSpacing: 0, color: 'var(--text-secondary)', textTransform: 'none' }}>{k.label}</div>
               <span style={{ fontSize: 15 }}>{k.icon}</span>
             </div>
             <div style={{ fontFamily: 'var(--font-display)', fontSize: 26, fontWeight: 800, color: 'var(--text-primary)', lineHeight: 1, marginBottom: 8, textShadow: `0 0 16px ${k.color}60` }}>{k.value}</div>
@@ -377,8 +377,8 @@ export default function DashboardPage() {
               </div>
               <button
                 onClick={() => prefillCommand(k.prompt)}
-                style={{ background: 'rgba(0,240,255,0.06)', border: '1px solid var(--glass-border)', borderRadius: 6, padding: '3px 8px', color: 'var(--text-secondary)', fontFamily: 'var(--font-display)', fontSize: 9, fontWeight: 700, letterSpacing: 1, cursor: 'pointer', transition: 'all 0.15s' }}
-                onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.color = 'var(--accent-cyan)'; (e.currentTarget as HTMLButtonElement).style.borderColor = 'rgba(0,240,255,0.4)'; }}
+                style={{ background: 'rgba(249, 115, 22,0.06)', border: '1px solid var(--glass-border)', borderRadius: 6, padding: '3px 8px', color: 'var(--text-secondary)', fontFamily: 'var(--font-display)', fontSize: 9, fontWeight: 700, letterSpacing: 0, cursor: 'pointer', transition: 'all 0.15s' }}
+                onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.color = 'var(--accent-cyan)'; (e.currentTarget as HTMLButtonElement).style.borderColor = 'rgba(249, 115, 22,0.4)'; }}
                 onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.color = 'var(--text-secondary)'; (e.currentTarget as HTMLButtonElement).style.borderColor = 'var(--glass-border)'; }}
               >Ask ORYN ▶</button>
             </div>
@@ -392,7 +392,7 @@ export default function DashboardPage() {
         <Card delay={0.1} title="ORYN Daily Briefing" accent="var(--accent-cyan)" style={{ minHeight: 160 }}>
           {briefingLoading ? (
             <div style={{ display: 'flex', alignItems: 'center', gap: 12, color: 'var(--text-secondary)', fontSize: 13 }}>
-              <div style={{ width: 16, height: 16, border: '2px solid rgba(0,240,255,0.3)', borderTopColor: 'var(--accent-cyan)', borderRadius: '50%', animation: 'spin 0.8s linear infinite' }} />
+              <div style={{ width: 16, height: 16, border: '2px solid rgba(249, 115, 22,0.3)', borderTopColor: 'var(--accent-cyan)', borderRadius: '50%', animation: 'spin 0.8s linear infinite' }} />
               ORYN is generating your briefing…
             </div>
           ) : briefing ? (
@@ -401,14 +401,14 @@ export default function DashboardPage() {
                 <div style={{ fontFamily: 'var(--font-display)', fontSize: 18, fontWeight: 800, color: 'var(--text-primary)', lineHeight: 1.3, flex: 1 }}>{briefing.headline}</div>
                 <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
                   <div style={{ fontFamily: 'var(--font-display)', fontSize: 22, fontWeight: 800, color: moodColor[briefing.mood] ?? 'var(--accent-cyan)', textShadow: `0 0 15px ${moodColor[briefing.mood] ?? 'var(--accent-cyan)'}` }}>{briefing.highlight}</div>
-                  <div style={{ fontFamily: 'var(--font-display)', fontSize: 9, fontWeight: 700, letterSpacing: 1.5, color: moodColor[briefing.mood] ?? 'var(--accent-cyan)', textTransform: 'uppercase', background: `${moodColor[briefing.mood] ?? 'var(--accent-cyan)'}15`, padding: '2px 8px', borderRadius: 4 }}>{briefing.mood}</div>
+                  <div style={{ fontFamily: 'var(--font-display)', fontSize: 9, fontWeight: 700, letterSpacing: 0, color: moodColor[briefing.mood] ?? 'var(--accent-cyan)', textTransform: 'none', background: `${moodColor[briefing.mood] ?? 'var(--accent-cyan)'}15`, padding: '2px 8px', borderRadius: 4 }}>{briefing.mood}</div>
                 </div>
               </div>
               <div style={{ fontFamily: 'var(--font-body)', fontSize: 13, color: 'var(--text)', lineHeight: 1.65 }}>{briefingText}</div>
-              <div style={{ display: 'flex', alignItems: 'flex-start', gap: 10, padding: '12px 14px', background: 'rgba(0,240,255,0.06)', border: '1px solid var(--glass-border)', borderRadius: 10 }}>
+              <div style={{ display: 'flex', alignItems: 'flex-start', gap: 10, padding: '12px 14px', background: 'rgba(249, 115, 22,0.06)', border: '1px solid var(--glass-border)', borderRadius: 10 }}>
                 <span style={{ fontSize: 16, flexShrink: 0 }}>💡</span>
                 <div>
-                  <div style={{ fontFamily: 'var(--font-display)', fontSize: 9, fontWeight: 700, letterSpacing: 1.5, color: 'var(--accent-cyan)', textTransform: 'uppercase', marginBottom: 4 }}>AI Recommended Action Today</div>
+                  <div style={{ fontFamily: 'var(--font-display)', fontSize: 9, fontWeight: 700, letterSpacing: 0, color: 'var(--accent-cyan)', textTransform: 'none', marginBottom: 4 }}>AI Recommended Action Today</div>
                   <div style={{ fontFamily: 'var(--font-body)', fontSize: 12, color: 'var(--text)', lineHeight: 1.5 }}>{briefing.tip}</div>
                 </div>
               </div>
@@ -432,7 +432,7 @@ export default function DashboardPage() {
                 {health.breakdown.map(b => (
                   <div key={b.label} style={{ width: '100%' }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4 }}>
-                      <span style={{ fontFamily: 'var(--font-display)', fontSize: 10, fontWeight: 600, color: 'var(--text-secondary)', letterSpacing: 1 }}>{b.label}</span>
+                      <span style={{ fontFamily: 'var(--font-display)', fontSize: 10, fontWeight: 600, color: 'var(--text-secondary)', letterSpacing: 0 }}>{b.label}</span>
                       <span style={{ fontFamily: 'var(--font-display)', fontSize: 10, fontWeight: 700, color: b.color }}>{b.value}</span>
                     </div>
                     <div style={{ height: 4, background: 'rgba(255,255,255,0.06)', borderRadius: 2, overflow: 'hidden' }}>
@@ -441,7 +441,7 @@ export default function DashboardPage() {
                   </div>
                 ))}
               </div>
-              <div style={{ fontFamily: 'var(--font-display)', fontSize: 10, color: 'var(--success)', letterSpacing: 0.5, textAlign: 'center' }}>{health.trend}</div>
+              <div style={{ fontFamily: 'var(--font-display)', fontSize: 10, color: 'var(--success)', letterSpacing: 0, textAlign: 'center' }}>{health.trend}</div>
             </>
           ) : null}
         </Card>
@@ -480,8 +480,8 @@ export default function DashboardPage() {
                       <span style={{ fontSize: 18, flexShrink: 0, lineHeight: 1.2 }}>{a.icon}</span>
                       <div style={{ flex: 1, minWidth: 0 }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
-                          <span style={{ fontFamily: 'var(--font-display)', fontSize: 8, fontWeight: 800, letterSpacing: 1.5, textTransform: 'uppercase', color: th.badge, background: `${th.badge}18`, padding: '2px 6px', borderRadius: 4 }}>{th.text}</span>
-                          <span style={{ fontFamily: 'var(--font-display)', fontSize: 9, color: 'var(--text-secondary)', letterSpacing: 0.5 }}>{a.time}</span>
+                          <span style={{ fontFamily: 'var(--font-display)', fontSize: 8, fontWeight: 800, letterSpacing: 0, textTransform: 'none', color: th.badge, background: `${th.badge}18`, padding: '2px 6px', borderRadius: 4 }}>{th.text}</span>
+                          <span style={{ fontFamily: 'var(--font-display)', fontSize: 9, color: 'var(--text-secondary)', letterSpacing: 0 }}>{a.time}</span>
                         </div>
                         <div style={{ fontFamily: 'var(--font-display)', fontSize: 12, fontWeight: 700, color: 'var(--text-primary)', marginBottom: 3 }}>{a.title}</div>
                         <div style={{ fontFamily: 'var(--font-body)', fontSize: 11, color: 'var(--text-secondary)', lineHeight: 1.4 }}>{a.detail}</div>
@@ -502,7 +502,7 @@ export default function DashboardPage() {
         <Card delay={0.5} title="Goal & OKR Tracker" accent="var(--accent)">
           {goalsLoading ? (
             <div style={{ display: 'flex', alignItems: 'center', gap: 12, color: 'var(--text-secondary)', fontSize: 13 }}>
-              <div style={{ width: 16, height: 16, border: '2px solid rgba(0,136,255,0.3)', borderTopColor: 'var(--accent)', borderRadius: '50%', animation: 'spin 0.8s linear infinite' }} />
+              <div style={{ width: 16, height: 16, border: '2px solid rgba(249, 115, 22,0.3)', borderTopColor: 'var(--accent)', borderRadius: '50%', animation: 'spin 0.8s linear infinite' }} />
               Loading goals…
             </div>
           ) : (
@@ -514,22 +514,22 @@ export default function DashboardPage() {
                   <div key={g.id}>
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
                       <div>
-                        <div style={{ fontFamily: 'var(--font-display)', fontSize: 12, fontWeight: 700, color: 'var(--text-primary)', letterSpacing: 0.5 }}>{g.label}</div>
-                        <div style={{ fontFamily: 'var(--font-display)', fontSize: 10, color: 'var(--text-secondary)', letterSpacing: 1, marginTop: 2 }}>{fmt(g.current)} / {fmt(g.target)}</div>
+                        <div style={{ fontFamily: 'var(--font-display)', fontSize: 12, fontWeight: 700, color: 'var(--text-primary)', letterSpacing: 0 }}>{g.label}</div>
+                        <div style={{ fontFamily: 'var(--font-display)', fontSize: 10, color: 'var(--text-secondary)', letterSpacing: 0, marginTop: 2 }}>{fmt(g.current)} / {fmt(g.target)}</div>
                       </div>
                       <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
                         <div style={{ fontFamily: 'var(--font-display)', fontSize: 18, fontWeight: 800, color: g.color, textShadow: `0 0 10px ${g.color}` }}>{pct}%</div>
                         <button
                           onClick={() => handleGoalAction(g.id)}
                           disabled={goalLoading[g.id]}
-                          style={{ background: `${g.color}15`, border: `1px solid ${g.color}40`, borderRadius: 7, padding: '5px 10px', color: g.color, fontFamily: 'var(--font-display)', fontSize: 9, fontWeight: 700, letterSpacing: 1, cursor: goalLoading[g.id] ? 'wait' : 'pointer', transition: 'all 0.2s' }}
+                          style={{ background: `${g.color}15`, border: `1px solid ${g.color}40`, borderRadius: 7, padding: '5px 10px', color: g.color, fontFamily: 'var(--font-display)', fontSize: 9, fontWeight: 700, letterSpacing: 0, cursor: goalLoading[g.id] ? 'wait' : 'pointer', transition: 'all 0.2s' }}
                         >
                           {goalLoading[g.id] ? '…' : goalAdvice[g.id] ? 'Hide ✕' : '💡 AI Advice'}
                         </button>
                       </div>
                     </div>
                     <div style={{ height: 8, background: 'rgba(255,255,255,0.05)', borderRadius: 4, overflow: 'hidden' }}>
-                      <div style={{ height: '100%', width: `${pct}%`, background: `linear-gradient(90deg, ${g.color}90, ${g.color})`, borderRadius: 4, boxShadow: `0 0 10px ${g.color}80`, transition: 'width 0.8s ease' }} />
+                      <div style={{ height: '100%', width: `${pct}%`, background: g.color, borderRadius: 4, boxShadow: `0 0 10px ${g.color}80`, transition: 'width 0.8s ease' }} />
                     </div>
                     {goalAdvice[g.id] && (
                       <div style={{ marginTop: 10, padding: '10px 14px', background: `${g.color}0d`, border: `1px solid ${g.color}25`, borderRadius: 10, fontFamily: 'var(--font-body)', fontSize: 12, color: 'var(--text)', lineHeight: 1.6 }}>
@@ -549,13 +549,13 @@ export default function DashboardPage() {
             {integrations.map(g => (
               <div key={g.name}
                 style={{ padding: '12px 14px', background: 'var(--card-bg)', border: `1px solid ${g.connected ? 'var(--glass-border)' : 'rgba(255,255,255,0.05)'}`, borderRadius: 10, display: 'flex', alignItems: 'center', gap: 10, cursor: 'pointer', transition: 'all 0.2s' }}
-                onMouseEnter={e => { const d = e.currentTarget as HTMLDivElement; d.style.borderColor = g.connected ? 'var(--accent-cyan)' : 'rgba(255,255,255,0.15)'; d.style.background = g.connected ? 'rgba(0,240,255,0.07)' : 'rgba(255,255,255,0.03)'; }}
+                onMouseEnter={e => { const d = e.currentTarget as HTMLDivElement; d.style.borderColor = g.connected ? 'var(--accent-cyan)' : 'rgba(255,255,255,0.15)'; d.style.background = g.connected ? 'rgba(249, 115, 22,0.07)' : 'rgba(255,255,255,0.03)'; }}
                 onMouseLeave={e => { const d = e.currentTarget as HTMLDivElement; d.style.borderColor = g.connected ? 'var(--glass-border)' : 'rgba(255,255,255,0.05)'; d.style.background = 'var(--card-bg)'; }}
               >
                 <span style={{ fontSize: 18 }}>{g.icon}</span>
                 <div>
                   <div style={{ fontSize: 13, fontWeight: 600, color: g.connected ? 'var(--text-primary)' : 'var(--text-secondary)' }}>{g.name}</div>
-                  <div style={{ fontSize: 10, fontFamily: 'var(--font-display)', fontWeight: 700, letterSpacing: 1, textTransform: 'uppercase', marginTop: 2, color: g.connected ? 'var(--success)' : 'rgba(255,255,255,0.25)', textShadow: g.connected ? '0 0 6px var(--success)' : 'none' }}>
+                  <div style={{ fontSize: 10, fontFamily: 'var(--font-display)', fontWeight: 700, letterSpacing: 0, textTransform: 'none', marginTop: 2, color: g.connected ? 'var(--success)' : 'rgba(255,255,255,0.25)', textShadow: g.connected ? '0 0 6px var(--success)' : 'none' }}>
                     {g.connected ? '● Live' : '○ Off'}
                   </div>
                 </div>
@@ -573,12 +573,12 @@ export default function DashboardPage() {
           </div>
           <div style={{ padding: '16px 20px', background: 'rgba(0,255,170,0.06)', border: '1px solid rgba(0,255,170,0.15)', borderRadius: 12, display: 'flex', alignItems: 'center', gap: 12 }}>
             <div style={{ width: 8, height: 8, borderRadius: '50%', background: 'var(--success)', boxShadow: '0 0 8px var(--success)', flexShrink: 0, animation: 'pulse 2s infinite' }} />
-            <span style={{ fontSize: 12, color: 'var(--success)', fontFamily: 'var(--font-display)', fontWeight: 600, letterSpacing: 0.5 }}>All systems operational · No incidents detected</span>
+            <span style={{ fontSize: 12, color: 'var(--success)', fontFamily: 'var(--font-display)', fontWeight: 600, letterSpacing: 0 }}>All systems operational · No incidents detected</span>
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
             {[{ label: 'Requests / min', val: '284', color: 'var(--accent-cyan)' }, { label: 'Avg Latency', val: '1.2s', color: 'var(--accent)' }, { label: 'Error Rate', val: '0.03%', color: 'var(--success)' }].map(s => (
-              <div key={s.label} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '8px 14px', background: 'rgba(4,14,31,0.5)', border: '1px solid rgba(0,240,255,0.08)', borderRadius: 8 }}>
-                <span style={{ fontFamily: 'var(--font-display)', fontSize: 10, color: 'var(--text-secondary)', letterSpacing: 1 }}>{s.label}</span>
+              <div key={s.label} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '8px 14px', background: 'rgba(4,14,31,0.5)', border: '1px solid rgba(249, 115, 22,0.08)', borderRadius: 8 }}>
+                <span style={{ fontFamily: 'var(--font-display)', fontSize: 10, color: 'var(--text-secondary)', letterSpacing: 0 }}>{s.label}</span>
                 <span style={{ fontFamily: 'var(--font-display)', fontSize: 14, fontWeight: 700, color: s.color, textShadow: `0 0 8px ${s.color}` }}>{s.val}</span>
               </div>
             ))}
