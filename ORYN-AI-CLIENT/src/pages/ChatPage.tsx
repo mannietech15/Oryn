@@ -1,10 +1,10 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { useChat } from '../hooks/useChat';
-import type { Message, Task } from '../types';
+import type { Message } from '../types';
 
 function formatContent(text: string) {
   return text
-    .replace(/\*\*(.*?)\*\*/g, '<strong style="color:var(--cyan)">$1</strong>')
+    .replace(/\*\*(.*?)\*\*/g, '<strong style="color:var(--accent-primary)">$1</strong>')
     .replace(/\n/g, '<br/>');
 }
 
@@ -49,29 +49,29 @@ function CopyButton({ text }: { text: string }) {
       style={{
         flexShrink: 0, alignSelf: 'center',
         display: 'flex', alignItems: 'center', justifyContent: 'center',
-        width: 36, height: 36, borderRadius: 6, cursor: 'pointer',
+        width: 32, height: 32, borderRadius: 8, cursor: 'pointer',
         background: 'none', border: '1px solid transparent',
-        color: copied ? 'var(--success)' : 'var(--muted)',
+        color: copied ? 'var(--success)' : 'var(--text-secondary)',
         transition: 'all 0.2s', padding: 0,
       }}
       onMouseEnter={e => {
         if (!copied) {
-          (e.currentTarget as HTMLButtonElement).style.color = 'var(--cyan)';
-          (e.currentTarget as HTMLButtonElement).style.borderColor = 'rgba(249, 115, 22,0.3)';
-          (e.currentTarget as HTMLButtonElement).style.background = 'rgba(249, 115, 22,0.08)';
+          (e.currentTarget as HTMLButtonElement).style.color = 'var(--text-primary)';
+          (e.currentTarget as HTMLButtonElement).style.borderColor = 'var(--card-border)';
+          (e.currentTarget as HTMLButtonElement).style.background = 'rgba(255,255,255,0.05)';
         }
       }}
       onMouseLeave={e => {
         if (!copied) {
-          (e.currentTarget as HTMLButtonElement).style.color = 'var(--muted)';
+          (e.currentTarget as HTMLButtonElement).style.color = 'var(--text-secondary)';
           (e.currentTarget as HTMLButtonElement).style.borderColor = 'transparent';
           (e.currentTarget as HTMLButtonElement).style.background = 'none';
         }
       }}
     >
       {copied
-        ? <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12" /></svg>
-        : <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" /><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" /></svg>
+        ? <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12" /></svg>
+        : <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" /><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" /></svg>
       }
     </button>
   );
@@ -81,55 +81,51 @@ function MessageBubble({ msg }: { msg: Message }) {
   const isUser = msg.role === 'user';
   return (
     <div style={{
-      display: 'flex', gap: 8, flexDirection: isUser ? 'row-reverse' : 'row',
+      display: 'flex', gap: 16, flexDirection: isUser ? 'row-reverse' : 'row',
       alignItems: 'flex-start',
-      animation: 'rise 0.35s ease both',
+      animation: 'rise 0.3s ease both',
     }}>
       {/* Avatar */}
       {isUser ? (
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 14, flexShrink: 0 }}>
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 10, flexShrink: 0 }}>
           <div style={{
-            width: 44, height: 44,
+            width: 40, height: 40,
             display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%',
-            fontFamily: 'var(--font-display)', fontSize: 14, fontWeight: 800, letterSpacing: 1.5,
-            background: 'linear-gradient(135deg,#0055ff,#00f0ff)',
-            color: 'white',
-            boxShadow: '0 0 15px rgba(249, 115, 22,0.5)',
+            fontFamily: 'var(--font-display)', fontSize: 13, fontWeight: 700,
+            background: 'var(--accent-primary)', color: 'white',
+            boxShadow: '0 0 15px rgba(249,115,22,0.3)', border: '2px solid rgba(255,255,255,0.1)'
           }}>
-            ME
+            Me
           </div>
           {msg.content && <CopyButton text={msg.content} />}
         </div>
       ) : (
-        <div style={{ width: 44, height: 44, flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          <svg width="44" height="44" viewBox="0 0 32 32" fill="none" style={{ filter: 'drop-shadow(0 0 6px rgba(249, 115, 22,0.7))' }}>
-            <polygon points="16,1 31,9 31,23 16,31 1,23 1,9" stroke="#f97316" strokeWidth="1.2" fill="rgba(249, 115, 22,0.05)" />
-            <polygon points="16,7 25,12 25,20 16,25 7,20 7,12" stroke="#ea580c" strokeWidth="0.8" fill="rgba(249, 115, 22,0.07)" />
-            <circle cx="16" cy="16" r="3" fill="#f97316" />
-            <line x1="16" y1="7" x2="16" y2="13" stroke="#f97316" strokeWidth="0.8" opacity="0.6" />
-            <line x1="16" y1="19" x2="16" y2="25" stroke="#f97316" strokeWidth="0.8" opacity="0.6" />
-            <line x1="7" y1="12" x2="13" y2="15" stroke="#f97316" strokeWidth="0.8" opacity="0.6" />
-            <line x1="19" y1="17" x2="25" y2="20" stroke="#f97316" strokeWidth="0.8" opacity="0.6" />
-            <line x1="25" y1="12" x2="19" y2="15" stroke="#f97316" strokeWidth="0.8" opacity="0.6" />
-            <line x1="13" y1="17" x2="7" y2="20" stroke="#f97316" strokeWidth="0.8" opacity="0.6" />
+        <div style={{ width: 40, height: 40, flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(255,255,255,0.03)', borderRadius: '50%', border: '1px solid var(--card-border)' }}>
+          <svg width="24" height="24" viewBox="0 0 32 32" fill="none">
+            <polygon points="16,1 31,9 31,23 16,31 1,23 1,9" stroke="var(--accent-primary)" strokeWidth="1.2" fill="rgba(249, 115, 22,0.1)" />
+            <circle cx="16" cy="16" r="3" fill="var(--accent-primary)" />
+            <line x1="16" y1="7" x2="16" y2="13" stroke="var(--accent-primary)" strokeWidth="0.8" opacity="0.6" />
+            <line x1="16" y1="19" x2="16" y2="25" stroke="var(--accent-primary)" strokeWidth="0.8" opacity="0.6" />
+            <line x1="7" y1="12" x2="13" y2="15" stroke="var(--accent-primary)" strokeWidth="0.8" opacity="0.6" />
+            <line x1="19" y1="17" x2="25" y2="20" stroke="var(--accent-primary)" strokeWidth="0.8" opacity="0.6" />
+            <line x1="25" y1="12" x2="19" y2="15" stroke="var(--accent-primary)" strokeWidth="0.8" opacity="0.6" />
+            <line x1="13" y1="17" x2="7" y2="20" stroke="var(--accent-primary)" strokeWidth="0.8" opacity="0.6" />
           </svg>
         </div>
       )}
 
       {/* Bubble */}
       <div style={{
-        maxWidth: '85%', padding: isUser ? '20px 28px' : '6px 0', fontSize: 17, fontWeight: 400, lineHeight: 1.7, color: 'var(--text)',
-        borderRadius: isUser ? '20px 4px 20px 20px' : 0,
-        background: isUser ? 'linear-gradient(135deg, rgba(249, 115, 22,0.15), rgba(249, 115, 22,0.25))' : 'transparent',
-        border: isUser ? '1px solid rgba(249, 115, 22,0.4)' : 'none',
-        borderRight: isUser ? '4px solid var(--cyan)' : 'none',
-        boxShadow: isUser ? '0 8px 32px rgba(249, 115, 22,0.2), 0 0 20px rgba(249, 115, 22,0.1) inset' : 'none',
-        backdropFilter: isUser ? 'blur(10px)' : 'none',
+        maxWidth: '80%', padding: isUser ? '16px 24px' : '8px 0', fontSize: 16, fontWeight: 400, lineHeight: 1.7, color: 'var(--text-primary)',
+        borderRadius: isUser ? '16px 16px 4px 16px' : 0,
+        background: isUser ? 'rgba(249, 115, 22, 0.12)' : 'transparent',
+        border: isUser ? '1px solid rgba(249, 115, 22, 0.2)' : 'none',
         textAlign: 'left',
       }}>
         {!isUser && (
-          <div style={{ fontFamily: 'var(--font-display)', fontSize: 11, fontWeight: 800, letterSpacing: 3, textTransform: 'uppercase', marginBottom: 10, color: 'var(--violet)', textAlign: 'left' }}>
-            Oryn · AI
+          <div style={{ fontFamily: 'var(--font-display)', fontSize: 12, fontWeight: 700, color: 'var(--text-secondary)', marginBottom: 8, display: 'flex', alignItems: 'center', gap: 8 }}>
+            Oryn AI
+            <span style={{ fontSize: 10, background: 'rgba(255,255,255,0.05)', padding: '2px 6px', borderRadius: 4, fontWeight: 500 }}>v2.0</span>
           </div>
         )}
 
@@ -137,51 +133,47 @@ function MessageBubble({ msg }: { msg: Message }) {
           isUser ? (
             <div dangerouslySetInnerHTML={{ __html: formatContent(msg.content) }} />
           ) : (
-            <div style={{ wordBreak: 'break-word' }}><Typewriter text={msg.content} /></div>
+            <div style={{ wordBreak: 'break-word', color: 'var(--text-primary)' }}><Typewriter text={msg.content} /></div>
           )
         ) : (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 8, padding: '4px 0' }}>
-            <div style={{ display: 'flex', gap: 5, alignItems: 'center' }}>
-              {[0, 0.2, 0.4].map((d, i) => (
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '8px 0' }}>
+            <div style={{ display: 'flex', gap: 4, alignItems: 'center' }}>
+              {[0, 0.15, 0.3].map((d, i) => (
                 <div key={i} style={{
-                  width: 6, height: 6, borderRadius: '50%', background: 'var(--accent)',
-                  animation: `tdBounce 1.2s ease ${d}s infinite`,
+                  width: 6, height: 6, borderRadius: '50%', background: 'var(--accent-primary)',
+                  animation: `tdBounce 1s ease ${d}s infinite`,
                 }} />
               ))}
             </div>
             <div style={{
-              fontFamily: 'var(--font-display)', fontSize: 10, fontWeight: 700,
-              letterSpacing: 2, textTransform: 'uppercase', color: 'var(--muted)',
-              animation: 'pulse 1.8s ease infinite',
+              fontFamily: 'var(--font-display)', fontSize: 12, fontWeight: 600,
+              color: 'var(--text-secondary)', animation: 'pulse 2s ease infinite',
             }}>
-              ORYN is thinking…
+              Analyzing...
             </div>
           </div>
         )}
 
         {msg.file && (
           <div style={{
-            display: 'inline-flex', alignItems: 'center', gap: 7, padding: '5px 10px', marginTop: 6,
-            background: 'rgba(108,47,255,0.09)', border: '1px solid rgba(108,47,255,0.28)', fontSize: 11,
+            display: 'inline-flex', alignItems: 'center', gap: 8, padding: '8px 12px', marginTop: 12,
+            background: 'rgba(255,255,255,0.03)', border: '1px solid var(--card-border)', borderRadius: 8, fontSize: 13,
+            color: 'var(--text-primary)'
           }}>
-            📄 {msg.file}
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+            {msg.file}
           </div>
         )}
       </div>
 
-      {/* Copy button — outside bubble, to the right (AI only) */}
+      {/* Copy button — AI only */}
       {!isUser && msg.content && <CopyButton text={msg.content} />}
     </div>
   );
 }
 
-// TaskPanel removed as per redesigned layout
-
-
-// CHIPS removed for a cleaner aesthetic
-
 export default function ChatPage({ 
-  messages, tasks, isStreaming, pendingFile, sendMessage, toggleTask, setPendingFile, resetChat 
+  messages, isStreaming, pendingFile, sendMessage, setPendingFile 
 }: ReturnType<typeof useChat>) {
   const [input, setInput] = useState('');
   const [isRecording, setIsRecording] = useState(false);
@@ -224,112 +216,101 @@ export default function ChatPage({
 
   return (
     <div style={{ display: 'flex', height: '100%', overflow: 'hidden' }}>
-      {/* Left Column: Messages + Input Area */}
-      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+      {/* Main Chat Column */}
+      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden', position: 'relative' }}>
+        
         {/* Messages List */}
-        <div style={{ flex: 1, overflowY: 'auto', padding: '32px', display: 'flex', flexDirection: 'column', gap: 24 }}>
+        <div style={{ flex: 1, overflowY: 'auto', padding: '32px 48px', display: 'flex', flexDirection: 'column', gap: 32 }}>
           {messages.map(m => <MessageBubble key={m.id} msg={m} />)}
-          <div ref={messagesEndRef} style={{ height: 1, flexShrink: 0 }} />
+          <div ref={messagesEndRef} style={{ height: 40, flexShrink: 0 }} />
         </div>
 
-        {/* Refined Input Area */}
-        {/* Floating Input Area */}
+        {/* Improved Input Area */}
         <div style={{ 
-          padding: '24px 32px 40px', 
-          background: 'none', 
+          padding: '0 48px 40px', 
           flexShrink: 0, 
           display: 'flex', 
           flexDirection: 'column',
           alignItems: 'center',
-          gap: 16
         }}>
-          {/* Centered Rounded Input Bar */}
           <div style={{
             width: '100%', 
-            maxWidth: '800px', 
-            background: 'rgba(12,25,50,0.85)', 
-            borderRadius: 40, 
-            border: '1px solid rgba(249, 115, 22,0.3)',
-            padding: '8px 12px', 
-            boxShadow: '0 20px 50px rgba(0,0,0,0.6), 0 0 20px rgba(249, 115, 22,0.1)', 
+            maxWidth: '850px', 
+            background: 'rgba(9, 9, 11, 0.7)',
+            backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)',
+            borderRadius: 24, 
+            border: '1px solid var(--card-border)',
+            padding: '12px 16px', 
+            boxShadow: '0 20px 40px rgba(0,0,0,0.4)', 
             display: 'flex', 
             flexDirection: 'column', 
-            gap: 8,
-            transition: 'all 0.3s'
+            gap: 12,
+            transition: 'border-color 0.3s'
           }}>
             {pendingFile && (
               <div style={{ 
-                display: 'flex', 
-                alignItems: 'center', 
-                gap: 10, 
-                padding: '8px 16px', 
-                borderRadius: 20, 
-                background: 'rgba(108,47,255,0.12)', 
-                border: '1px solid rgba(108,47,255,0.4)', 
-                fontSize: 13, 
-                fontWeight: 500, 
-                margin: '0 8px' 
+                display: 'flex', alignItems: 'center', gap: 10, padding: '8px 16px', 
+                borderRadius: 12, background: 'rgba(255,255,255,0.05)', 
+                border: '1px solid var(--card-border)', fontSize: 13, fontWeight: 500, 
+                color: 'var(--text-primary)' 
               }}>
-                <span>📄</span>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
                 <span style={{ flex: 1 }}>{pendingFile.name}</span>
-                <button onClick={() => setPendingFile(null)} style={{ color: 'var(--muted)', fontSize: 16, cursor: 'pointer' }}>✕</button>
+                <button onClick={() => setPendingFile(null)} style={{ color: 'var(--text-secondary)', background: 'none', border: 'none', cursor: 'pointer' }}>✕</button>
               </div>
             )}
-            <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
-              <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
+            
+            <div style={{ display: 'flex', gap: 12, alignItems: 'flex-end' }}>
+              <div style={{ position: 'relative' }}>
                 <button 
                   onClick={() => setIsMenuOpen(!isMenuOpen)} 
                   style={{
-                    width: 52, height: 52, flexShrink: 0, borderRadius: '50%', 
-                    border: `1px solid ${isRecording ? 'rgba(255,51,102,0.8)' : 'rgba(249, 115, 22,0.2)'}`,
+                    width: 44, height: 44, borderRadius: 12, 
+                    border: '1px solid var(--card-border)',
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    background: isRecording ? 'rgba(255,51,102,0.15)' : 'rgba(249, 115, 22,0.05)',
-                    transition: 'all 0.3s', 
-                    boxShadow: isRecording ? '0 0 20px rgba(255,51,102,0.4)' : 'none',
+                    background: isMenuOpen ? 'rgba(255,255,255,0.1)' : 'rgba(255,255,255,0.03)',
+                    transition: 'all 0.2s', 
                     cursor: 'pointer',
-                    color: isRecording ? 'var(--danger)' : 'var(--cyan)'
+                    color: 'var(--text-primary)'
                   }}
+                  onMouseEnter={e => e.currentTarget.style.background = 'rgba(255,255,255,0.08)'}
+                  onMouseLeave={e => { if (!isMenuOpen) e.currentTarget.style.background = 'rgba(255,255,255,0.03)' }}
                 >
-                  {isRecording ? '⏹' : (
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                      <line x1="12" y1="5" x2="12" y2="19"></line>
-                      <line x1="5" y1="12" x2="19" y2="12"></line>
-                    </svg>
-                  )}
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
                 </button>
                 
                 {isMenuOpen && (
                   <div style={{
                     position: 'absolute', bottom: '100%', left: 0,
-                    marginBottom: 15, width: 180, background: 'rgba(10,29,58,0.95)', 
-                    backdropFilter: 'blur(25px)', borderRadius: 16, border: '1px solid rgba(249, 115, 22,0.2)',
+                    marginBottom: 12, width: 200, background: 'rgba(9, 9, 11, 0.95)', 
+                    backdropFilter: 'blur(20px)', borderRadius: 12, border: '1px solid var(--card-border)',
                     boxShadow: '0 10px 40px rgba(0,0,0,0.5)', overflow: 'hidden', zIndex: 100,
                     animation: 'rise 0.2s ease-out'
                   }}>
                     <div 
                       onClick={() => { fileInputRef.current?.click(); setIsMenuOpen(false); }}
                       style={{
-                        padding: '14px 18px', display: 'flex', alignItems: 'center', gap: 12,
-                        cursor: 'pointer', transition: 'all 0.2s', fontSize: 13, fontWeight: 600,
-                        color: 'var(--white)', borderBottom: '1px solid rgba(249, 115, 22,0.1)'
+                        padding: '12px 16px', display: 'flex', alignItems: 'center', gap: 12,
+                        cursor: 'pointer', transition: 'all 0.2s', fontSize: 13, fontWeight: 500,
+                        color: 'var(--text-primary)'
                       }}
-                      onMouseEnter={e => e.currentTarget.style.background = 'rgba(249, 115, 22,0.1)'}
+                      onMouseEnter={e => e.currentTarget.style.background = 'rgba(255,255,255,0.05)'}
                       onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
                     >
-                      <span style={{ fontSize: 18 }}>📄</span>
-                      <span>File Upload</span>
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21.2 15c.7-1.2 1-2.5.7-3.9-.6-2-2.4-3.5-4.4-3.5h-1.2c-.7-3-3.2-5.2-6.2-5.6-3-.3-5.9 1.3-7.3 4-1.2 2.5-1 6.5.5 8.8m8.7-1.6V21"/><path d="M16 16l-4-4-4 4"/></svg>
+                      <span>Upload Document</span>
                     </div>
                     <div 
                       onClick={() => { handleMic(); setIsMenuOpen(false); }}
                       style={{
-                        padding: '14px 18px', display: 'flex', alignItems: 'center', gap: 12,
-                        cursor: 'pointer', transition: 'all 0.2s', fontSize: 13, fontWeight: 600,
-                        color: isRecording ? 'var(--danger)' : 'var(--white)'
+                        padding: '12px 16px', display: 'flex', alignItems: 'center', gap: 12,
+                        cursor: 'pointer', transition: 'all 0.2s', fontSize: 13, fontWeight: 500,
+                        color: isRecording ? 'var(--danger)' : 'var(--text-primary)'
                       }}
-                      onMouseEnter={e => e.currentTarget.style.background = 'rgba(249, 115, 22,0.1)'}
+                      onMouseEnter={e => e.currentTarget.style.background = 'rgba(255,255,255,0.05)'}
                       onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
                     >
-                      <span style={{ fontSize: 18 }}>🎙</span>
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="22"/></svg>
                       <span>{isRecording ? 'Stop Recording' : 'Voice Input'}</span>
                     </div>
                   </div>
@@ -340,49 +321,59 @@ export default function ChatPage({
                 value={input}
                 onChange={e => setInput(e.target.value)}
                 onKeyDown={handleKey}
-                placeholder="Ask ORYN anything..."
+                placeholder="Ask ORYN to analyze data, write code, or search the web..."
                 style={{
                   flex: 1, 
-                  height: 52, 
+                  height: 44, 
                   background: 'transparent', 
-                  borderRadius: 26,
                   border: 'none', 
-                  color: 'var(--white)', 
-                  fontFamily: 'var(--font-sans)', 
-                  fontSize: 16, 
-                  padding: '14px 16px',
+                  color: 'var(--text-primary)', 
+                  fontFamily: 'var(--font-body)', 
+                  fontSize: 15, 
+                  padding: '10px 4px',
                   resize: 'none', 
                   outline: 'none', 
-                  transition: 'all 0.2s',
                   lineHeight: 1.5
                 }}
               />
 
               <button 
                 onClick={handleSend} 
-                disabled={isStreaming} 
+                disabled={isStreaming || (!input.trim() && !pendingFile)} 
                 style={{
-                  width: 52, height: 52, flexShrink: 0,
-                  background: 'linear-gradient(135deg, var(--cyan), var(--violet))',
-                  display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%',
+                  width: 44, height: 44, flexShrink: 0, borderRadius: 12,
+                  background: (!input.trim() && !pendingFile) ? 'rgba(255,255,255,0.05)' : 'var(--accent-primary)',
+                  color: (!input.trim() && !pendingFile) ? 'var(--text-secondary)' : 'white',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
                   opacity: isStreaming ? 0.6 : 1, 
-                  transition: 'all 0.3s', 
-                  boxShadow: '0 0 20px rgba(249, 115, 22,0.3)',
-                  cursor: 'pointer',
+                  transition: 'all 0.2s', 
+                  boxShadow: (!input.trim() && !pendingFile) ? 'none' : '0 0 20px rgba(249,115,22,0.4)',
+                  cursor: isStreaming || (!input.trim() && !pendingFile) ? 'default' : 'pointer',
                   border: 'none'
                 }}
+                onMouseEnter={e => {
+                  if (input.trim() || pendingFile) {
+                    e.currentTarget.style.transform = 'translateY(-2px)';
+                  }
+                }}
+                onMouseLeave={e => e.currentTarget.style.transform = 'translateY(0)'}
               >
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="white" style={{ transform: 'rotate(-90deg)' }}><path d="M2 21l21-9L2 3v7l15 2-15 2v7z" /></svg>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ transform: 'translateX(-1px)' }}>
+                  <line x1="22" y1="2" x2="11" y2="13"></line>
+                  <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                </svg>
               </button>
             </div>
+            
+            <div style={{ display: 'flex', justifyContent: 'center', marginTop: 4 }}>
+              <span style={{ fontSize: 11, color: 'var(--text-secondary)', fontFamily: 'var(--font-body)' }}>
+                ORYN can make mistakes. Consider verifying important information.
+              </span>
+            </div>
           </div>
-
-          {/* Template Chips removed for minimalist look */}
         </div>
       </div>
-
-      {/* Right Sidebar removed */}
-
+      
       <input ref={fileInputRef} id="fileInput" type="file" style={{ display: 'none' }} onChange={handleFile} />
     </div>
   );

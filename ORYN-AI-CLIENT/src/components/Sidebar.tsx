@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import type { Page } from '../types';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 
 interface Props {
   page: Page;

@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import type { Page } from '../types';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
+import logoImg from '../images/logo.png';
 
 interface Props {
   page: Page;
@@ -44,21 +45,8 @@ export default function Header({ page, onNavigate, onToggleSidebar }: Props) {
           </svg>
         </button>
 
-        <div onClick={() => onNavigate('chat')} style={{ display: 'flex', alignItems: 'center', gap: 12, cursor: 'pointer' }}>
-          <div style={{ width: 32, height: 32, background: 'var(--accent-primary)', borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 0 15px rgba(249,115,22,0.4)' }}>
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <polygon points="12 2 22 8.5 22 15.5 12 22 2 15.5 2 8.5 12 2"></polygon>
-              <line x1="12" y1="22" x2="12" y2="15.5"></line>
-              <polyline points="22 8.5 12 15.5 2 8.5"></polyline>
-              <polyline points="2 15.5 12 8.5 22 15.5"></polyline>
-              <line x1="12" y1="2" x2="12" y2="8.5"></line>
-            </svg>
-          </div>
-          <div className="hide-on-mobile" style={{ display: 'flex', flexDirection: 'column' }}>
-            <div style={{ fontFamily: 'var(--font-display)', fontSize: 18, fontWeight: 800, color: 'var(--text-primary)', lineHeight: 1 }}>
-              ORYN
-            </div>
-          </div>
+        <div onClick={() => onNavigate('chat')} style={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }}>
+          <img src={logoImg} alt="ORYN Logo" style={{ height: 36, objectFit: 'contain' }} />
         </div>
       </div>
 
@@ -126,7 +114,7 @@ export default function Header({ page, onNavigate, onToggleSidebar }: Props) {
           fontFamily: 'var(--font-display)', fontSize: 13, fontWeight: 700, color: 'white',
           cursor: 'pointer', border: '2px solid rgba(255,255,255,0.1)'
         }}>
-          ME
+          Me
         </div>
       </div>
     </motion.header>
