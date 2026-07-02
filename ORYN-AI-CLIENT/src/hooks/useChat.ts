@@ -1,4 +1,4 @@
-import { useState, useCallback, useRef } from 'react';
+import { useState, useCallback, useRef, useEffect } from 'react';
 import { streamChat, analyzeFile } from '../api/oryn';
 import type { Message, Task, SessionStats, ChatFeatures } from '../types';
 
@@ -18,21 +18,52 @@ function extractTasks(text: string): { clean: string; tasks: string[] } {
 }
 
 export function useChat() {
-  const [sessions, setSessions] = useState<{ id: string, title: string, date: Date }[]>([
-    { id: '1', title: 'Q1 Revenue Deep Dive', date: new Date() },
-    { id: '2', title: 'Marketing Strategy APAC', date: new Date(Date.now() - 86400000) },
-    { id: '3', title: 'Team Performance Analysis', date: new Date(Date.now() - 172800000) },
-  ]);
-  const [activeSessionId, setActiveSessionId] = useState<string>('1');
+  const [sessions, setSessions] = useState<{ id: string, title: string, date: Date }[]>(() => {
+    const saved = localStorage.getItem('oryn_sessions');
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved);
+        parsed.forEach((s: any) => s.date = new Date(s.date));
+        return parsed;
+      } catch {}
+    }
+    return [{ id: '1', title: 'New Conversation', date: new Date() }];
+  });
 
-  const [messages, setMessages] = useState<Message[]>([
-    {
-      id: genId(),
-      role: 'assistant',
-      content: "Hello! I'm **ORYN**, your real-time business AI. I can answer questions, search the web, analyze files, and extract tasks automatically. What would you like to work on?",
-      timestamp: new Date(),
-    },
-  ]);
+  const [activeSessionId, setActiveSessionId] = useState<string>(() => {
+    return localStorage.getItem('oryn_active_session') || '1';
+  });
+
+  const [messagesMap, setMessagesMap] = useState<Record<string, Message[]>>(() => {
+    const saved = localStorage.getItem('oryn_messages');
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved);
+        Object.values(parsed).forEach((msgs: any) => {
+          msgs.forEach((m: any) => m.timestamp = new Date(m.timestamp));
+        });
+        return parsed;
+      } catch {}
+    }
+    return {
+      '1': [{
+        id: genId(),
+        role: 'assistant',
+        content: "Hello! I'm **ORYN**, your real-time business AI. I can answer questions, search the web, analyze files, and extract tasks automatically. What would you like to work on?",
+        timestamp: new Date(),
+      }]
+    };
+  });
+
+  const messages = messagesMap[activeSessionId] || [];
+
+  const setMessages = useCallback((updater: any) => {
+    setMessagesMap(prevMap => {
+      const prevMsgs = prevMap[activeSessionId] || [];
+      const newMsgs = typeof updater === 'function' ? updater(prevMsgs) : updater;
+      return { ...prevMap, [activeSessionId]: newMsgs };
+    });
+  }, [activeSessionId]);
   const [tasks, setTasks] = useState<Task[]>([
     { id: genId(), text: 'Review Q1 revenue report', done: true, createdAt: new Date() },
     { id: genId(), text: 'Enterprise upsell pipeline', done: false, createdAt: new Date() },
@@ -44,18 +75,31 @@ export function useChat() {
   const [pendingFiles, setPendingFiles] = useState<File[]>([]);
   const abortRef = useRef(false);
 
+  useEffect(() => {
+    localStorage.setItem('oryn_sessions', JSON.stringify(sessions));
+  }, [sessions]);
+
+  useEffect(() => {
+    localStorage.setItem('oryn_active_session', activeSessionId);
+  }, [activeSessionId]);
+
+  useEffect(() => {
+    localStorage.setItem('oryn_messages', JSON.stringify(messagesMap));
+  }, [messagesMap]);
+
   const startNewSession = useCallback(() => {
     const newId = genId();
     setSessions(prev => [{ id: newId, title: 'New Conversation', date: new Date() }, ...prev]);
-    setActiveSessionId(newId);
-    setMessages([
-      {
+    setMessagesMap(prev => ({
+      ...prev,
+      [newId]: [{
         id: genId(),
         role: 'assistant',
         content: "New intelligence session started. How can I assist you?",
         timestamp: new Date(),
-      },
-    ]);
+      }]
+    }));
+    setActiveSessionId(newId);
     setTasks([]);
     setPendingFiles([]);
   }, []);
@@ -98,6 +142,16 @@ export function useChat() {
 
     const files = [...pendingFiles];
     setPendingFiles([]);
+
+    // Rename session if it's new
+    setSessions(prev => prev.map(s => {
+      if (s.id === activeSessionId && s.title === 'New Conversation') {
+        const titleText = text.trim() || (files.length > 0 ? files[0].name : 'Untitled');
+        const newTitle = titleText.length > 28 ? titleText.substring(0, 25) + '...' : titleText;
+        return { ...s, title: newTitle };
+      }
+      return s;
+    }));
 
     // Add user message
     const userMsg: Message = {
@@ -194,7 +248,7 @@ export function useChat() {
     } finally {
       setIsStreaming(false);
     }
-  }, [isStreaming, messages, pendingFiles, features, addTask]);
+  }, [isStreaming, messages, pendingFiles, features, addTask, activeSessionId]);
 
   return {
     messages, tasks, stats, features, isStreaming, pendingFiles, sessions, activeSessionId,

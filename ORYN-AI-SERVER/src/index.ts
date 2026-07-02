@@ -49,8 +49,8 @@ Keep responses focused and powerful. Use **bold** for key numbers or insights. M
   const lastMsgContent = messages[messages.length - 1].content.trim();
   const lowerMsg = lastMsgContent.toLowerCase();
   
-  // Smarter regex to catch "/imagine", "generate an image of", "generate image of", "create an image of", etc.
-  const imageMatch = lowerMsg.match(/^(?:\/imagine\s+|(?:please\s+)?(?:generate|create|make|draw)\s+(?:an?\s+|the\s+)?image\s+of\s+)(.+)/);
+  // Smarter regex to catch "/imagine", "generate an image of", "generate pictures of", "create images", etc.
+  const imageMatch = lowerMsg.match(/^(?:\/imagine\s+|(?:please\s+)?(?:generate|create|make|draw)\s+(?:(?:an?\s+|the\s+)?(?:image|picture)s?(?:\s+of)?\s+))(.+)/);
   
   if (imageMatch) {
     const prompt = imageMatch[1].trim();

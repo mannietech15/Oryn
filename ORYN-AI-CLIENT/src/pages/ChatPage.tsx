@@ -436,11 +436,13 @@ export default function ChatPage({
               </button>
             </div>
             
-            <div style={{ display: 'flex', justifyContent: 'center', marginTop: 4 }}>
-              <span style={{ fontSize: 11, color: 'var(--text-secondary)', fontFamily: 'var(--font-body)' }}>
-                ORYN can make mistakes. Consider verifying important information.
-              </span>
-            </div>
+            {!isMobile && (
+              <div style={{ display: 'flex', justifyContent: 'center', marginTop: 4 }}>
+                <span style={{ fontSize: 11, color: 'var(--text-secondary)', fontFamily: 'var(--font-body)' }}>
+                  ORYN can make mistakes. Consider verifying important information.
+                </span>
+              </div>
+            )}
           </div>
         </div>
       </div>
