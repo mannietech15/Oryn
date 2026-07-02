@@ -135,6 +135,9 @@ export function useChat() {
         const { clean, tasks: extracted } = extractTasks(analysis);
         fullText = clean;
         if (features.taskExtract) extracted.forEach(addTask);
+        setMessages(prev => prev.map(m =>
+          m.id === assistantId ? { ...m, content: fullText } : m
+        ));
       } else {
         // Streaming chat route
         const history = [...messages, userMsg]
@@ -144,23 +147,13 @@ export function useChat() {
         const stream = streamChat(history, features.webSearch, features.taskExtract);
         let hasReceivedData = false;
         
-        // Timeout for initial response
-        const welcomeTimeout = setTimeout(() => {
-          if (!hasReceivedData && !abortRef.current) {
-            setMessages(prev => prev.map(m =>
-              m.id === assistantId ? { ...m, content: '_Initializing Mistral... (Cold start may take a few seconds)_' } : m
-            ));
-          }
-        }, 3500);
 
-        try {
           for await (const chunk of stream) {
             if (abortRef.current) break;
             if (chunk.type === 'text' && chunk.text) {
               if (!hasReceivedData) {
                 hasReceivedData = true;
-                clearTimeout(welcomeTimeout);
-                fullText = ''; // Clear the "Initializing" text
+                fullText = ''; // Ensure text starts clean
               }
               fullText += chunk.text;
               setMessages(prev => prev.map(m =>
@@ -170,9 +163,6 @@ export function useChat() {
               throw new Error(chunk.message || 'Unknown stream error');
             }
           }
-        } finally {
-          clearTimeout(welcomeTimeout);
-        }
         const { clean, tasks: extracted } = extractTasks(fullText);
         if (features.taskExtract) extracted.forEach(addTask);
         if (clean !== fullText) {

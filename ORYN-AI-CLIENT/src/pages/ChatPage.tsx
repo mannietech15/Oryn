@@ -3,10 +3,32 @@ import { useChat } from '../hooks/useChat';
 import type { Message } from '../types';
 
 function formatContent(text: string) {
-  return text
+  const codeBlocks: string[] = [];
+  let processedText = text.replace(/```([\w-]*)\n([\s\S]*?)```/g, (match, lang, code) => {
+    const escapedCode = code.replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    const base64Code = btoa(encodeURIComponent(code));
+    const block = `<div style="background: #000; border: 1px solid var(--card-border); border-radius: 12px; margin: 16px 0; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.2);">
+      <div style="background: #111; padding: 8px 16px; font-size: 12px; color: #888; font-family: monospace; border-bottom: 1px solid var(--card-border); display: flex; justify-content: space-between; align-items: center; text-transform: uppercase; font-weight: 600;">
+        <span>${lang || 'CODE'}</span>
+        <button onclick="navigator.clipboard.writeText(decodeURIComponent(atob('${base64Code}'))); this.innerText='Copied!'; setTimeout(() => this.innerText='Copy', 2000);" style="background: var(--glass-bg-subtle); border: 1px solid var(--card-border); color: #888; cursor: pointer; font-family: monospace; font-size: 11px; padding: 4px 8px; border-radius: 6px; transition: color 0.2s;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='#888'">Copy</button>
+      </div>
+      <pre style="margin: 0; padding: 16px; overflow-x: auto; line-height: 1.5;"><code style="font-family: 'JetBrains Mono', 'Fira Code', monospace; font-size: 13px; color: #e5e5e5;">${escapedCode}</code></pre>
+    </div>`;
+    codeBlocks.push(block);
+    return `__CODE_BLOCK_${codeBlocks.length - 1}__`;
+  });
+
+  processedText = processedText
+    .replace(/`([^`]+)`/g, '<code style="background: var(--glass-bg-subtle); border: 1px solid var(--card-border); padding: 2px 6px; border-radius: 6px; font-family: monospace; font-size: 13px; color: var(--accent-primary);">$1</code>')
     .replace(/\*\*ORYN\*\*/g, '<span style="font-family: var(--font-script); font-size: 1.3em; font-weight: 400; color: var(--accent-primary); padding-right: 2px;">Oryn</span>')
-    .replace(/\*\*(.*?)\*\*/g, '<strong style="color:var(--accent-primary)">$1</strong>')
+    .replace(/\*\*(.*?)\*\*/g, '<strong style="color:var(--text-primary); font-weight: 600;">$1</strong>')
     .replace(/\n/g, '<br/>');
+
+  codeBlocks.forEach((block, i) => {
+    processedText = processedText.replace(`__CODE_BLOCK_${i}__`, block);
+  });
+
+  return processedText;
 }
 
 function Typewriter({ text, timestamp }: { text: string, timestamp: Date }) {
@@ -186,6 +208,14 @@ export default function ChatPage({
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  const [windowWidth, setWindowWidth] = useState(typeof window !== 'undefined' ? window.innerWidth : 1024);
+  useEffect(() => {
+    const handleResize = () => setWindowWidth(window.innerWidth);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+  const isMobile = windowWidth <= 768;
+
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
@@ -250,7 +280,7 @@ export default function ChatPage({
           </button>
         </div>
         {/* Messages List */}
-        <div style={{ flex: 1, overflowY: 'auto', padding: '32px 48px', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+        <div style={{ flex: 1, overflowY: 'auto', padding: isMobile ? '24px 16px' : '32px 48px', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
           <div style={{ width: '100%', maxWidth: '850px', display: 'flex', flexDirection: 'column', gap: 32 }}>
             {messages.map(m => <MessageBubble key={m.id} msg={m} />)}
             <div ref={messagesEndRef} style={{ height: 40, flexShrink: 0 }} />
@@ -259,7 +289,7 @@ export default function ChatPage({
 
         {/* Improved Input Area */}
         <div style={{ 
-          padding: '0 48px 40px', 
+          padding: isMobile ? '0 16px 24px' : '0 48px 40px', 
           flexShrink: 0, 
           display: 'flex', 
           flexDirection: 'column',

@@ -12,17 +12,13 @@ const PORT = process.env.PORT || 3001;
 const upload = multer({ storage: multer.memoryStorage() });
 
 const openai = new OpenAI({
-  apiKey: process.env.OPENROUTER_API_KEY || '',
-  baseURL: 'https://openrouter.ai/api/v1',
-  defaultHeaders: {
-    'HTTP-Referer': 'https://oryn-ai.com', // Optional, for OpenRouter tracking
-    'X-Title': 'ORYN AI',
-  },
+  apiKey: process.env.NVIDIA_API_KEY || '',
+  baseURL: 'https://integrate.api.nvidia.com/v1',
 });
 
-const MODEL_NAME = 'openrouter/free';
+const MODEL_NAME = 'meta/llama-3.2-90b-vision-instruct';
 
-console.log('🔑 OpenRouter API Key:', process.env.OPENROUTER_API_KEY ? `Loaded (${process.env.OPENROUTER_API_KEY.slice(0, 7)}...)` : 'MISSING');
+console.log('🔑 NVIDIA API Key:', process.env.NVIDIA_API_KEY ? `Loaded (${process.env.NVIDIA_API_KEY.slice(0, 9)}...)` : 'MISSING');
 
 app.use(cors({ origin: 'http://localhost:5173' }));
 app.use(express.json());
@@ -49,6 +45,41 @@ You help with business strategy, productivity, data analysis, drafting, and deci
 ${webSearch ? 'You have web search capabilities — mention relevant current data when helpful.' : ''}
 ${taskExtract ? 'After your response, if there are clear action items, append a JSON block on a new line: {"tasks":["task1","task2"]} — only if tasks genuinely exist.' : ''}
 Keep responses focused and powerful. Use **bold** for key numbers or insights. Max 3-4 sentences unless detail is needed.`;
+
+  const lastMsgContent = messages[messages.length - 1].content.trim();
+  const lowerMsg = lastMsgContent.toLowerCase();
+  
+  // Smarter regex to catch "/imagine", "generate an image of", "generate image of", "create an image of", etc.
+  const imageMatch = lowerMsg.match(/^(?:\/imagine\s+|(?:please\s+)?(?:generate|create|make|draw)\s+(?:an?\s+|the\s+)?image\s+of\s+)(.+)/);
+  
+  if (imageMatch) {
+    const prompt = imageMatch[1].trim();
+    const encodedPrompt = encodeURIComponent(prompt);
+    // Pollinations generates beautiful images on the fly via URL params
+    const seed = Math.floor(Math.random() * 1000000);
+    const imageUrl = `https://image.pollinations.ai/prompt/${encodedPrompt}?width=800&height=800&nologo=true&seed=${seed}`;
+    const filename = prompt.replace(/[^a-z0-9]/gi, '_').toLowerCase().substring(0, 50) + '.jpg';
+    
+    const responseText = `Generating your vision for **"${prompt}"**...\n\n<style>
+      @keyframes shimmerGen {
+        0% { background-position: 200% center; }
+        100% { background-position: -200% center; }
+      }
+    </style>
+    <div style="margin-top: 16px; position: relative; border-radius: 12px; overflow: hidden; border: 1px solid var(--card-border); box-shadow: 0 8px 24px rgba(0,0,0,0.3); max-width: 400px; aspect-ratio: 1/1; background: linear-gradient(90deg, rgba(255,255,255,0.02) 25%, rgba(255,255,255,0.08) 50%, rgba(255,255,255,0.02) 75%); background-size: 200% 100%; animation: shimmerGen 2s infinite linear;">
+      <button onclick="const a=document.createElement('a'); a.href='/api/download?url='+encodeURIComponent('${imageUrl}')+'&filename=${filename}'; a.click();" style="position: absolute; top: 12px; right: 12px; background: rgba(0,0,0,0.6); backdrop-filter: blur(8px); border: 1px solid rgba(255,255,255,0.1); color: #fff; cursor: pointer; font-family: var(--font-sans); font-size: 11px; font-weight: 500; padding: 6px 12px; border-radius: 6px; transition: opacity 0.2s, background 0.2s; z-index: 10; opacity: 0;" onmouseover="this.style.background='rgba(0,0,0,0.8)'" onmouseout="this.style.background='rgba(0,0,0,0.6)'">Download</button>
+      <img onload="this.style.opacity=1; this.previousElementSibling.style.opacity=1;" src="${imageUrl}" alt="${prompt}" style="width: 100%; height: 100%; display: block; object-fit: cover; opacity: 0; transition: opacity 0.8s ease;" />
+    </div>`.replace(/\n/g, ' ');
+    
+    res.setHeader('Content-Type', 'text/event-stream');
+    res.setHeader('Cache-Control', 'no-cache');
+    res.setHeader('Connection', 'keep-alive');
+    
+    res.write(`data: ${JSON.stringify({ type: 'text', text: responseText })}\n\n`);
+    res.write(`data: ${JSON.stringify({ type: 'done' })}\n\n`);
+    res.end();
+    return;
+  }
 
   res.setHeader('Content-Type', 'text/event-stream');
   res.setHeader('Cache-Control', 'no-cache');
@@ -111,18 +142,26 @@ app.post('/api/analyze', upload.single('file'), async (req, res) => {
   }
 
   const { prompt } = req.body as { prompt?: string };
-  const fileContent = req.file.buffer.toString('utf-8');
   const userPrompt = prompt || 'Analyze this file and provide a concise business summary with key insights and action items.';
+  const isImage = req.file.mimetype.startsWith('image/');
+  let contentPayload: any;
+
+  if (isImage) {
+    const base64Image = req.file.buffer.toString('base64');
+    contentPayload = [
+      { type: 'text', text: userPrompt },
+      { type: 'image_url', image_url: { url: `data:${req.file.mimetype};base64,${base64Image}` } }
+    ];
+  } else {
+    const fileContent = req.file.buffer.toString('utf-8');
+    contentPayload = `${userPrompt}\n\nFile: ${req.file.originalname}\nContent:\n${fileContent.slice(0, 8000)}`;
+  }
 
   try {
     const response = await openai.chat.completions.create({
       model: MODEL_NAME,
-      messages: [
-        { 
-          role: 'user', 
-          content: `${userPrompt}\n\nFile: ${req.file.originalname}\nContent:\n${fileContent.slice(0, 8000)}`
-        }
-      ],
+      messages: [{ role: 'user', content: contentPayload }],
+      max_tokens: 1024,
     });
     const text = response.choices[0]?.message?.content || 'No analysis generated.';
     res.json({ analysis: text, filename: req.file.originalname });
@@ -365,6 +404,27 @@ app.get('/api/dashboard/health-score', (_req, res) => {
     trend: '+4 pts from last month',
     summary: 'Your business is performing well. Integration connectivity is the key area to improve.',
   });
+});
+
+// ── Proxy Image Download ──────────────────────────────────
+app.get('/api/download', async (req, res) => {
+  try {
+    const targetUrl = req.query.url as string;
+    const filename = (req.query.filename as string) || 'image.jpg';
+    if (!targetUrl) return res.status(400).send('No URL provided');
+
+    const imageRes = await fetch(targetUrl);
+    if (!imageRes.ok) throw new Error('Failed to fetch image');
+
+    res.setHeader('Content-Type', imageRes.headers.get('content-type') || 'image/jpeg');
+    res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
+    
+    const buffer = await imageRes.arrayBuffer();
+    res.send(Buffer.from(buffer));
+  } catch (err) {
+    console.error('Download Proxy Error:', err);
+    res.status(500).send('Download Error');
+  }
 });
 
 // ── Serve client in production ────────────────────────────
