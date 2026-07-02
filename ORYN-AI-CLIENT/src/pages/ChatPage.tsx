@@ -7,10 +7,16 @@ function formatContent(text: string) {
   let processedText = text.replace(/```([\w-]*)\n([\s\S]*?)```/g, (match, lang, code) => {
     const escapedCode = code.replace(/</g, '&lt;').replace(/>/g, '&gt;');
     const base64Code = btoa(encodeURIComponent(code));
+    const isPreviewable = ['html', 'svg', 'xml', 'javascript', 'js'].includes(lang.toLowerCase()) || code.includes('<html') || code.includes('<svg') || code.includes('<div');
+    const previewBtn = isPreviewable ? `<button onclick="window.dispatchEvent(new CustomEvent('preview-code', {detail: { code: '${base64Code}', lang: '${lang}' }})); this.innerText='Opening...'; setTimeout(() => this.innerText='Preview UI', 1000);" style="background: var(--accent-primary); border: none; color: white; cursor: pointer; font-family: var(--font-body); font-size: 11px; font-weight: 600; padding: 4px 12px; border-radius: 6px; transition: all 0.2s; box-shadow: 0 0 10px rgba(249,115,22,0.3);" onmouseover="this.style.transform='translateY(-1px)'" onmouseout="this.style.transform='translateY(0)'">Preview UI</button>` : '';
+
     const block = `<div style="background: #000; border: 1px solid var(--card-border); border-radius: 12px; margin: 16px 0; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.2);">
       <div style="background: #111; padding: 8px 16px; font-size: 12px; color: #888; font-family: monospace; border-bottom: 1px solid var(--card-border); display: flex; justify-content: space-between; align-items: center; text-transform: uppercase; font-weight: 600;">
         <span>${lang || 'CODE'}</span>
-        <button onclick="navigator.clipboard.writeText(decodeURIComponent(atob('${base64Code}'))); this.innerText='Copied!'; setTimeout(() => this.innerText='Copy', 2000);" style="background: var(--glass-bg-subtle); border: 1px solid var(--card-border); color: #888; cursor: pointer; font-family: monospace; font-size: 11px; padding: 4px 8px; border-radius: 6px; transition: color 0.2s;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='#888'">Copy</button>
+        <div style="display: flex; gap: 8px;">
+          ${previewBtn}
+          <button onclick="navigator.clipboard.writeText(decodeURIComponent(atob('${base64Code}'))); this.innerText='Copied!'; setTimeout(() => this.innerText='Copy', 2000);" style="background: var(--glass-bg-subtle); border: 1px solid var(--card-border); color: #888; cursor: pointer; font-family: monospace; font-size: 11px; padding: 4px 8px; border-radius: 6px; transition: color 0.2s;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='#888'">Copy</button>
+        </div>
       </div>
       <pre style="margin: 0; padding: 16px; overflow-x: auto; line-height: 1.5;"><code style="font-family: 'JetBrains Mono', 'Fira Code', monospace; font-size: 13px; color: #e5e5e5;">${escapedCode}</code></pre>
     </div>`;
@@ -205,6 +211,17 @@ export default function ChatPage({
   const [isRecording, setIsRecording] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isHistoryOpen, setIsHistoryOpen] = useState(false);
+  const [activeCodePreview, setActiveCodePreview] = useState<{code: string, lang: string} | null>(null);
+
+  useEffect(() => {
+    const handlePreview = (e: any) => {
+      const decodedCode = decodeURIComponent(atob(e.detail.code));
+      setActiveCodePreview({ code: decodedCode, lang: e.detail.lang });
+    };
+    window.addEventListener('preview-code', handlePreview);
+    return () => window.removeEventListener('preview-code', handlePreview);
+  }, []);
+
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -449,6 +466,84 @@ export default function ChatPage({
       
       <input ref={fileInputRef} id="fileInput" type="file" multiple style={{ display: 'none' }} onChange={handleFile} />
       
+      {/* Code Preview Pane (Artifacts) */}
+      {activeCodePreview && (
+        <div style={{
+          width: isMobile ? '100%' : '50%',
+          maxWidth: isMobile ? '100%' : '800px',
+          background: 'var(--bg-primary)',
+          borderLeft: '1px solid var(--card-border)',
+          display: 'flex', flexDirection: 'column',
+          zIndex: isMobile ? 1000 : 10,
+          position: isMobile ? 'absolute' : 'relative',
+          top: 0, bottom: 0, right: 0,
+          boxShadow: '-8px 0 32px rgba(0,0,0,0.2)',
+          animation: 'slideInRight 0.3s ease-out'
+        }}>
+          {/* Header */}
+          <div style={{ 
+            padding: '16px 24px', 
+            borderBottom: '1px solid var(--card-border)', 
+            display: 'flex', 
+            justifyContent: 'space-between', 
+            alignItems: 'center',
+            background: 'var(--card-bg)',
+            backdropFilter: 'blur(10px)'
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+              <div style={{ width: 32, height: 32, borderRadius: 8, background: 'rgba(249,115,22,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--accent-primary)' }}>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>
+              </div>
+              <div>
+                <h3 style={{ margin: 0, fontSize: 15, fontWeight: 600, color: 'var(--text-primary)', fontFamily: 'var(--font-display)' }}>Artifact Preview</h3>
+                <span style={{ fontSize: 11, color: 'var(--text-tertiary)', textTransform: 'uppercase', letterSpacing: 1 }}>{activeCodePreview.lang || 'HTML'} • Live Rendering</span>
+              </div>
+            </div>
+            
+            <div style={{ display: 'flex', gap: 8 }}>
+              <button 
+                onClick={() => {
+                  const blob = new Blob([activeCodePreview.code], { type: 'text/html' });
+                  const url = URL.createObjectURL(blob);
+                  window.open(url, '_blank');
+                }}
+                style={{
+                  background: 'var(--glass-bg-subtle)', border: '1px solid var(--card-border)',
+                  color: 'var(--text-secondary)', padding: '6px 12px', borderRadius: 8, fontSize: 12,
+                  cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6, transition: 'all 0.2s'
+                }}
+                onMouseEnter={e => { e.currentTarget.style.color = 'var(--text-primary)'; e.currentTarget.style.background = 'var(--glass-bg-hover)'; }}
+                onMouseLeave={e => { e.currentTarget.style.color = 'var(--text-secondary)'; e.currentTarget.style.background = 'var(--glass-bg-subtle)'; }}
+              >
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+                Open Tab
+              </button>
+              <button 
+                onClick={() => setActiveCodePreview(null)}
+                style={{
+                  background: 'transparent', border: 'none',
+                  color: 'var(--text-secondary)', padding: 6, borderRadius: 8,
+                  cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'all 0.2s'
+                }}
+                onMouseEnter={e => { e.currentTarget.style.color = 'var(--text-primary)'; e.currentTarget.style.background = 'var(--glass-bg-hover)'; }}
+                onMouseLeave={e => { e.currentTarget.style.color = 'var(--text-secondary)'; e.currentTarget.style.background = 'transparent'; }}
+              >
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+              </button>
+            </div>
+          </div>
+          
+          <div style={{ flex: 1, background: '#fff', position: 'relative' }}>
+            <iframe 
+               srcDoc={activeCodePreview.code} 
+               style={{ width: '100%', height: '100%', border: 'none', background: '#fff', display: 'block' }} 
+               sandbox="allow-scripts allow-modals allow-forms allow-popups allow-same-origin"
+               title="Code Preview"
+            />
+          </div>
+        </div>
+      )}
+
       {/* History Sidebar */}
       {isHistoryOpen && (
         <div style={{
