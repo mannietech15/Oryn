@@ -57,7 +57,7 @@ export function useChat() {
 
   const messages = messagesMap[activeSessionId] || [];
 
-  const setMessages = useCallback((updater: any) => {
+  const setMessages = useCallback((updater: Message[] | ((prev: Message[]) => Message[])) => {
     setMessagesMap(prevMap => {
       const prevMsgs = prevMap[activeSessionId] || [];
       const newMsgs = typeof updater === 'function' ? updater(prevMsgs) : updater;
