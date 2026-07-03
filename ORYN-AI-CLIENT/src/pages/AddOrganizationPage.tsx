@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence, Variants } from 'framer-motion';
 
 export default function AddOrganizationPage({ onComplete }: { onComplete?: (data: any) => void }) {
   const [step, setStep] = useState(1);
@@ -28,7 +28,7 @@ export default function AddOrganizationPage({ onComplete }: { onComplete?: (data
     }, 1500);
   };
 
-  const orbVariants = {
+  const orbVariants: Variants = {
     animate: {
       scale: [1, 1.2, 1],
       opacity: [0.3, 0.6, 0.3],

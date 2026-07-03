@@ -140,7 +140,7 @@ export default function Orb({
       float d0 = distance(uv, (r0 * invLen) * uv);
       float v0 = light1(1.0, 10.0, d0);
 
-      v0 *= smoothstep(r0 * 1.05, r0, len);
+      v0 *= (1.0 - smoothstep(r0, r0 * 1.05, len));
       float innerFade = smoothstep(r0 * 0.8, r0 * 0.95, len);
       v0 *= mix(innerFade, 1.0, bgLuminance * 0.7);
       float cl = cos(ang + iTime * 2.0) * 0.5 + 0.5;
@@ -151,7 +151,7 @@ export default function Orb({
       float v1 = light2(1.5, 5.0, d);
       v1 *= light1(1.0, 50.0, d0);
       
-      float v2 = smoothstep(1.0, mix(innerRadius, 1.0, n0 * 0.5), len);
+      float v2 = 1.0 - smoothstep(mix(innerRadius, 1.0, n0 * 0.5), 1.0, len);
       float v3 = smoothstep(innerRadius, mix(innerRadius, 1.0, 0.5), len);
       
       vec3 colBase = mix(color1, color2, cl);
