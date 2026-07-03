@@ -7,10 +7,12 @@ function genId() {
 }
 
 function extractTasks(text: string): { clean: string; tasks: string[] } {
-  const match = text.match(/\{"tasks":\s*\[([^\]]*)\]\}/);
+  const match = text.match(/(?:\n|^)?(?:\**Tasks?:?\**\s*)?(?:```(?:json)?\s*)?\{"tasks":\s*\[(.*?)\]\}(?:\s*```)?/is);
   if (!match) return { clean: text, tasks: [] };
   try {
-    const parsed = JSON.parse(match[0]) as { tasks: string[] };
+    const jsonMatch = match[0].match(/\{"tasks":\s*\[(.*?)\]\}/is);
+    if (!jsonMatch) return { clean: text, tasks: [] };
+    const parsed = JSON.parse(jsonMatch[0]) as { tasks: string[] };
     return { clean: text.replace(match[0], '').trim(), tasks: parsed.tasks ?? [] };
   } catch {
     return { clean: text, tasks: [] };

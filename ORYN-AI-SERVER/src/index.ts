@@ -17,10 +17,10 @@ const openai = new OpenAI({
 });
 
 // The 'Senior Professor' (Incredibly smart, but slower and strict rate limits)
-// const MODEL_NAME = 'meta/llama-3.2-90b-vision-instruct';
+const MODEL_NAME = 'meta/llama-3.2-90b-vision-instruct';
 
 // The 'Junior' (Extremely fast, perfect for real-time voice mode)
-const MODEL_NAME = 'meta/llama-3.1-8b-instruct';
+// const MODEL_NAME = 'meta/llama-3.1-8b-instruct';
 
 console.log('🔑 NVIDIA API Key:', process.env.NVIDIA_API_KEY ? `Loaded (${process.env.NVIDIA_API_KEY.slice(0, 9)}...)` : 'MISSING');
 
