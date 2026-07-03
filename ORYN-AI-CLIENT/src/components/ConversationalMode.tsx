@@ -5,10 +5,12 @@ import Orb from './Orb';
 
 export function ConversationalMode({ 
   onClose,
-  onSendMessage
+  onSendMessage,
+  onStopGeneration
 }: { 
   onClose: () => void,
-  onSendMessage: (text: string, files: any[]) => Promise<string | undefined>
+  onSendMessage: (text: string, files: any[]) => Promise<string | undefined>,
+  onStopGeneration: () => void
 }) {
   const [mode, setMode] = useState<'idle' | 'listening' | 'thinking' | 'speaking'>('idle');
   const [transcript, setTranscript] = useState('');
@@ -22,6 +24,14 @@ export function ConversationalMode({
   const mediaStreamRef = useRef<MediaStream | null>(null);
   const aiAudioRef = useRef<HTMLAudioElement | null>(null);
   const aiSourceNodeRef = useRef<MediaElementAudioSourceNode | null>(null);
+  const isCancelledRef = useRef<boolean>(false);
+
+  const handleCancel = () => {
+    isCancelledRef.current = true;
+    cleanupAudio();
+    setMode('idle');
+    onStopGeneration();
+  };
 
   const cleanupAudio = () => {
     if (animationFrameRef.current) cancelAnimationFrame(animationFrameRef.current);
@@ -56,6 +66,7 @@ export function ConversationalMode({
   };
 
   const startListening = async () => {
+    isCancelledRef.current = false;
     cleanupAudio();
     setMode('listening');
     setTranscript('');
@@ -114,6 +125,7 @@ export function ConversationalMode({
     // Actually call the AI via onSendMessage
     try {
       const responseText = await onSendMessage(finalText, []);
+      if (isCancelledRef.current) return;
       if (responseText) {
         startSpeaking(responseText);
       } else {
@@ -126,6 +138,7 @@ export function ConversationalMode({
   };
 
   const startSpeaking = async (aiResponseText: string) => {
+    if (isCancelledRef.current) return;
     setMode('speaking');
     setTranscript('');
     
@@ -256,7 +269,7 @@ export function ConversationalMode({
         </motion.p>
       </div>
 
-      {mode === 'idle' && (
+      {mode === 'idle' ? (
           <motion.button 
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -270,6 +283,25 @@ export function ConversationalMode({
               }}
           >
               Start Conversation
+          </motion.button>
+      ) : (
+          <motion.button 
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={handleCancel} 
+              style={{
+                  marginTop: 40, padding: '16px 48px', borderRadius: 32, fontSize: 18, fontWeight: 600,
+                  background: 'var(--accent-primary)', color: '#fff', border: 'none', cursor: 'pointer',
+                  boxShadow: '0 10px 30px rgba(249,115,22,0.3)',
+                  display: 'flex', alignItems: 'center', gap: 8
+              }}
+          >
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                 <rect x="6" y="6" width="12" height="12" rx="2" ry="2"></rect>
+              </svg>
+              Stop
           </motion.button>
       )}
     </motion.div>

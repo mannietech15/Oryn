@@ -486,7 +486,7 @@ export default function ChatPage({
 
   return (
     <>
-      {isConversationalMode && <ConversationalMode onClose={() => setIsConversationalMode(false)} onSendMessage={sendMessage} />}
+      {isConversationalMode && <ConversationalMode onClose={() => setIsConversationalMode(false)} onSendMessage={sendMessage} onStopGeneration={stopGeneration} />}
       <div style={{ display: 'flex', height: '100%', overflow: 'hidden' }}>
       {/* Main Chat Column */}
       <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden', position: 'relative' }}>
