@@ -259,7 +259,7 @@ function SpeakButton({ text }: { text: string }) {
   );
 }
 
-function MessageBubble({ msg, isMobile }: { msg: Message, isMobile?: boolean }) {
+function MessageBubble({ msg, isMobile, onImageClick }: { msg: Message, isMobile?: boolean, onImageClick?: (url: string) => void }) {
   const isUser = msg.role === 'user';
   
   if (isUser) {
@@ -290,7 +290,7 @@ function MessageBubble({ msg, isMobile }: { msg: Message, isMobile?: boolean }) 
                     maxWidth: 320, 
                     aspectRatio: imageCount > 1 ? '1 / 1' : 'auto'
                   }}>
-                    <img src={f.url} alt="Uploaded" style={{ width: '100%', height: '100%', display: 'block', objectFit: imageCount > 1 ? 'cover' : 'contain' }} />
+                    <img onClick={() => onImageClick?.(f.url!)} src={f.url} alt="Uploaded" style={{ width: '100%', height: '100%', display: 'block', objectFit: imageCount > 1 ? 'cover' : 'contain', cursor: 'pointer' }} />
                   </div>
                 ) : (
                   <div key={i} style={{
@@ -370,13 +370,15 @@ function MessageBubble({ msg, isMobile }: { msg: Message, isMobile?: boolean }) 
 }
 
 export default function ChatPage({ 
-  messages, isStreaming, pendingFiles, sessions, activeSessionId,
+  messages, isStreaming, pendingFiles, sessions, activeSessionId, model,
   sendMessage, stopGeneration, setPendingFiles, startNewSession, setActiveSessionId,
-  deleteSession, renameSession
+  deleteSession, renameSession, setModel
 }: ReturnType<typeof useChat>) {
   const [input, setInput] = useState('');
   const [isRecording, setIsRecording] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isModelMenuOpen, setIsModelMenuOpen] = useState(false);
+  const [previewImage, setPreviewImage] = useState<string | null>(null);
   const [isHistoryOpen, setIsHistoryOpen] = useState(false);
   const [activeCodePreview, setActiveCodePreview] = useState<{code: string, lang: string} | null>(null);
   const [isConversationalMode, setIsConversationalMode] = useState(false);
@@ -538,7 +540,7 @@ export default function ChatPage({
         {messages.length > 0 && (
           <div style={{ flex: 1, overflowY: 'auto', padding: isMobile ? '24px 16px' : '32px 48px', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
             <div style={{ width: '100%', maxWidth: '850px', display: 'flex', flexDirection: 'column', gap: 32 }}>
-              {messages.map(m => <MessageBubble key={m.id} msg={m} isMobile={isMobile} />)}
+              {messages.map(m => <MessageBubble key={m.id} msg={m} isMobile={isMobile} onImageClick={setPreviewImage} />)}
               <div ref={messagesEndRef} style={{ height: 40, flexShrink: 0 }} />
             </div>
           </div>
@@ -591,7 +593,7 @@ export default function ChatPage({
                 {pendingFiles.map((pendingFile, index) => (
                   <div key={index} style={{ position: 'relative', display: 'inline-block' }}>
                     {pendingFile.type.startsWith('image/') ? (
-                      <img src={URL.createObjectURL(pendingFile)} alt="preview" style={{ width: 72, height: 72, objectFit: 'cover', borderRadius: 16, border: '1px solid var(--card-border)' }} />
+                      <img onClick={() => setPreviewImage(URL.createObjectURL(pendingFile))} src={URL.createObjectURL(pendingFile)} alt="preview" style={{ width: 72, height: 72, objectFit: 'cover', borderRadius: 16, border: '1px solid var(--card-border)', cursor: 'pointer' }} />
                     ) : (
                       <div style={{ width: 72, height: 72, background: 'var(--glass-bg-hover)', borderRadius: 16, border: '1px solid var(--card-border)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column', gap: 6 }}>
                         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ color: 'var(--accent-primary)' }}><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
@@ -678,9 +680,51 @@ export default function ChatPage({
 
               {/* Right Side: Model, Mic, Send */}
               <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 6, color: 'var(--text-secondary)', fontSize: 13, cursor: 'pointer', padding: '0 8px' }} onMouseEnter={e => e.currentTarget.style.color = 'var(--text-primary)'} onMouseLeave={e => e.currentTarget.style.color = 'var(--text-secondary)'}>
-                  <span>ORYN 1.0 <span style={{ opacity: 0.6 }}>Fast</span></span>
-                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                <div style={{ position: 'relative' }}>
+                  <div 
+                    onClick={() => setIsModelMenuOpen(!isModelMenuOpen)}
+                    style={{ display: 'flex', alignItems: 'center', gap: 6, color: 'var(--text-secondary)', fontSize: 13, cursor: 'pointer', padding: '4px 8px', borderRadius: 8, background: isModelMenuOpen ? 'var(--glass-bg-strong)' : 'transparent', transition: 'all 0.2s' }} 
+                    onMouseEnter={e => e.currentTarget.style.color = 'var(--text-primary)'} 
+                    onMouseLeave={e => { if (!isModelMenuOpen) e.currentTarget.style.color = 'var(--text-secondary)' }}
+                  >
+                    <span>ORYN 1.0 <span style={{ opacity: 0.6 }}>{model === 'fast' ? 'Fast' : 'Pro'}</span></span>
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                  </div>
+                  
+                  {isModelMenuOpen && (
+                    <div style={{
+                      position: 'absolute', bottom: '100%', right: 0,
+                      marginBottom: 12, width: 220, background: 'var(--card-bg)', 
+                      backdropFilter: 'blur(20px)', borderRadius: 12, border: '1px solid var(--card-border)',
+                      boxShadow: 'var(--shadow-subtle)', overflow: 'hidden', zIndex: 100,
+                      animation: 'rise 0.2s ease-out', display: 'flex', flexDirection: 'column'
+                    }}>
+                      <div 
+                        onClick={() => { setModel('fast'); setIsModelMenuOpen(false); }}
+                        style={{ padding: '12px 16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', cursor: 'pointer', background: model === 'fast' ? 'var(--glass-bg-strong)' : 'transparent', borderBottom: '1px solid var(--card-border)' }}
+                        onMouseEnter={e => e.currentTarget.style.background = 'var(--glass-bg-hover)'}
+                        onMouseLeave={e => { if(model !== 'fast') e.currentTarget.style.background = 'transparent'; else e.currentTarget.style.background = 'var(--glass-bg-strong)'; }}
+                      >
+                        <div style={{ display: 'flex', flexDirection: 'column' }}>
+                          <span style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-primary)' }}>ORYN 1.0 Fast</span>
+                          <span style={{ fontSize: 11, color: 'var(--text-secondary)' }}>Text based • Instant</span>
+                        </div>
+                        {model === 'fast' && <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--accent-primary)" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>}
+                      </div>
+                      <div 
+                        onClick={() => { setModel('pro'); setIsModelMenuOpen(false); }}
+                        style={{ padding: '12px 16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', cursor: 'pointer', background: model === 'pro' ? 'var(--glass-bg-strong)' : 'transparent' }}
+                        onMouseEnter={e => e.currentTarget.style.background = 'var(--glass-bg-hover)'}
+                        onMouseLeave={e => { if(model !== 'pro') e.currentTarget.style.background = 'transparent'; else e.currentTarget.style.background = 'var(--glass-bg-strong)'; }}
+                      >
+                        <div style={{ display: 'flex', flexDirection: 'column' }}>
+                          <span style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-primary)' }}>ORYN 1.0 Pro</span>
+                          <span style={{ fontSize: 11, color: 'var(--text-secondary)' }}>Vision enabled • Deep Think</span>
+                        </div>
+                        {model === 'pro' && <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--accent-primary)" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>}
+                      </div>
+                    </div>
+                  )}
                 </div>
                 
                 <button 
@@ -1092,7 +1136,25 @@ export default function ChatPage({
           </div>
         </div>
       )}
-    </div>
+      </div>
+      
+      {/* Fullscreen Image Preview Modal */}
+      {previewImage && (
+        <div 
+          onClick={() => setPreviewImage(null)}
+          style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.85)', zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center', backdropFilter: 'blur(10px)', padding: 40, cursor: 'zoom-out', animation: 'fadeIn 0.2s ease-out' }}
+        >
+          <img src={previewImage} alt="Fullscreen Preview" style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain', borderRadius: 16, boxShadow: '0 20px 60px rgba(0,0,0,0.5)', cursor: 'default' }} onClick={e => e.stopPropagation()} />
+          <button 
+            onClick={() => setPreviewImage(null)}
+            style={{ position: 'absolute', top: 24, right: 32, background: 'rgba(255,255,255,0.1)', color: '#fff', border: 'none', borderRadius: '50%', width: 48, height: 48, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', transition: 'all 0.2s', backdropFilter: 'blur(4px)' }}
+            onMouseEnter={e => e.currentTarget.style.background = 'rgba(255,255,255,0.2)'}
+            onMouseLeave={e => e.currentTarget.style.background = 'rgba(255,255,255,0.1)'}
+          >
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+          </button>
+        </div>
+      )}
     </>
   );
 }

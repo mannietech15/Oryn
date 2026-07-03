@@ -16,11 +16,7 @@ const openai = new OpenAI({
   baseURL: 'https://integrate.api.nvidia.com/v1',
 });
 
-// The 'Senior Professor' (Incredibly smart, but slower and strict rate limits)
-const MODEL_NAME = 'meta/llama-3.2-90b-vision-instruct';
-
-// The 'Junior' (Extremely fast, perfect for real-time voice mode)
-// const MODEL_NAME = 'meta/llama-3.1-8b-instruct';
+// Dynamic model selection via API now
 
 console.log('🔑 NVIDIA API Key:', process.env.NVIDIA_API_KEY ? `Loaded (${process.env.NVIDIA_API_KEY.slice(0, 9)}...)` : 'MISSING');
 
@@ -33,16 +29,19 @@ app.get('/', (_req, res) => {
 });
 
 app.get('/api/health', (_req, res) => {
-  res.json({ status: 'ok', model: MODEL_NAME });
+  res.json({ status: 'ok', model: 'dynamic' });
 });
 
 // ── Chat (streaming) ──────────────────────────────────────
 app.post('/api/chat', async (req, res) => {
-  const { messages, webSearch, taskExtract } = req.body as {
+  const { messages, webSearch, taskExtract, model } = req.body as {
     messages: { role: 'user' | 'assistant'; content: string }[];
     webSearch: boolean;
     taskExtract: boolean;
+    model?: string;
   };
+
+  const activeModel = model === 'pro' ? 'meta/llama-3.2-90b-vision-instruct' : 'meta/llama-3.1-8b-instruct';
 
   const systemInstruction = `You are Oryn (pronounced "Orine"), a sleek futuristic business AI assistant. Your name is Oryn — always write it as "Oryn" (never spell it out letter by letter). You are professional, insightful, and concise.
 You help with business strategy, productivity, data analysis, drafting, and decision-making.
@@ -97,7 +96,7 @@ Keep responses focused and powerful. Use **bold** for key numbers or insights. M
       console.log(`💬 Chat request: "${messages[messages.length - 1].content.slice(0, 30)}..." (attempt ${attempt + 1})`);
 
       const response = await openai.chat.completions.create({
-        model: MODEL_NAME,
+        model: activeModel,
         messages: [
           { role: 'system', content: systemInstruction },
           ...messages.map(m => ({
@@ -146,9 +145,12 @@ app.post('/api/analyze', upload.single('file'), async (req, res) => {
     return;
   }
 
-  const { prompt } = req.body as { prompt?: string };
+  const { prompt, model } = req.body as { prompt?: string, model?: string };
   const userPrompt = prompt || 'Analyze this file and provide a concise business summary with key insights and action items.';
   const isImage = req.file.mimetype.startsWith('image/');
+  
+  // If it's an image, force the vision model (pro), otherwise use the requested model
+  const activeModel = (isImage || model === 'pro') ? 'meta/llama-3.2-90b-vision-instruct' : 'meta/llama-3.1-8b-instruct';
   let contentPayload: any;
 
   if (isImage) {
@@ -164,7 +166,7 @@ app.post('/api/analyze', upload.single('file'), async (req, res) => {
 
   try {
     const response = await openai.chat.completions.create({
-      model: MODEL_NAME,
+      model: activeModel,
       messages: [{ role: 'user', content: contentPayload }],
       max_tokens: 1024,
     });
