@@ -4,18 +4,46 @@ import type { Message } from '../types';
 
 function formatContent(text: string) {
   const codeBlocks: string[] = [];
+
+  // Extract all code blocks to build a unified preview payload
+  let combinedHtml = '';
+  let combinedCss = '';
+  let combinedJs = '';
+  
+  const matches = [...text.matchAll(/```([\w-]*)\n([\s\S]*?)```/g)];
+  matches.forEach(match => {
+    const lang = match[1].toLowerCase();
+    const code = match[2];
+    if (lang === 'html' || lang === 'svg' || code.includes('<html') || code.includes('<div')) {
+      combinedHtml += code + '\n';
+    } else if (lang === 'css') {
+      combinedCss += code + '\n';
+    } else if (lang === 'javascript' || lang === 'js') {
+      combinedJs += code + '\n';
+    }
+  });
+
+  // Create a merged document with default container if HTML is missing
+  let mergedDoc = combinedHtml || '<div id="app"></div>';
+  if (combinedCss) mergedDoc += `\n<style>\n${combinedCss}\n</style>`;
+  if (combinedJs) mergedDoc += `\n<script>\n${combinedJs}\n</script>`;
+  
+  const mergedBase64 = btoa(encodeURIComponent(mergedDoc));
+
   let processedText = text.replace(/```([\w-]*)\n([\s\S]*?)```/g, (match, lang, code) => {
     const escapedCode = code.replace(/</g, '&lt;').replace(/>/g, '&gt;');
-    const base64Code = btoa(encodeURIComponent(code));
-    const isPreviewable = ['html', 'svg', 'xml', 'javascript', 'js'].includes(lang.toLowerCase()) || code.includes('<html') || code.includes('<svg') || code.includes('<div');
-    const previewBtn = isPreviewable ? `<button onclick="window.dispatchEvent(new CustomEvent('preview-code', {detail: { code: '${base64Code}', lang: '${lang}' }})); this.innerText='Opening...'; setTimeout(() => this.innerText='Preview UI', 1000);" style="background: var(--accent-primary); border: none; color: white; cursor: pointer; font-family: var(--font-body); font-size: 11px; font-weight: 600; padding: 4px 12px; border-radius: 6px; transition: all 0.2s; box-shadow: 0 0 10px rgba(249,115,22,0.3);" onmouseover="this.style.transform='translateY(-1px)'" onmouseout="this.style.transform='translateY(0)'">Preview UI</button>` : '';
+    const blockBase64 = btoa(encodeURIComponent(code));
+    const isPreviewable = ['html', 'svg', 'xml', 'javascript', 'js', 'css'].includes(lang.toLowerCase()) || code.includes('<html') || code.includes('<svg') || code.includes('<div');
+    
+    // Instead of previewing just this block, we preview the unified mergedDoc!
+    const previewBtn = isPreviewable ? `<button onclick="window.dispatchEvent(new CustomEvent('preview-code', {detail: { code: '${mergedBase64}', lang: 'Combined App' }})); this.innerText='Opening...'; setTimeout(() => this.innerText='Preview UI', 1000);" style="background: var(--accent-primary); border: none; color: white; cursor: pointer; font-family: var(--font-body); font-size: 11px; font-weight: 600; padding: 4px 12px; border-radius: 6px; transition: all 0.2s; box-shadow: 0 0 10px rgba(249,115,22,0.3);" onmouseover="this.style.transform='translateY(-1px)'" onmouseout="this.style.transform='translateY(0)'">Preview UI</button>` : '';
 
     const block = `<div style="background: #000; border: 1px solid var(--card-border); border-radius: 12px; margin: 16px 0; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.2);">
       <div style="background: #111; padding: 8px 16px; font-size: 12px; color: #888; font-family: monospace; border-bottom: 1px solid var(--card-border); display: flex; justify-content: space-between; align-items: center; text-transform: uppercase; font-weight: 600;">
         <span>${lang || 'CODE'}</span>
         <div style="display: flex; gap: 8px;">
           ${previewBtn}
-          <button onclick="navigator.clipboard.writeText(decodeURIComponent(atob('${base64Code}'))); this.innerText='Copied!'; setTimeout(() => this.innerText='Copy', 2000);" style="background: var(--glass-bg-subtle); border: 1px solid var(--card-border); color: #888; cursor: pointer; font-family: monospace; font-size: 11px; padding: 4px 8px; border-radius: 6px; transition: color 0.2s;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='#888'">Copy</button>
+          <button onclick="navigator.clipboard.writeText(decodeURIComponent(atob('${blockBase64}'))); this.innerText='Copied!'; setTimeout(() => this.innerText='Copy', 2000);" style="background: var(--glass-bg-subtle); border: 1px solid var(--card-border); color: #888; cursor: pointer; font-family: monospace; font-size: 11px; padding: 4px 8px; border-radius: 6px; transition: color 0.2s;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='#888'">Copy</button>
         </div>
       </div>
       <pre style="margin: 0; padding: 16px; overflow-x: auto; line-height: 1.5;"><code style="font-family: 'JetBrains Mono', 'Fira Code', monospace; font-size: 13px; color: #e5e5e5;">${escapedCode}</code></pre>
