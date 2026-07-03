@@ -412,21 +412,45 @@ export default function ChatPage({
               </div>
             )}
             
-            <div style={{ display: 'flex', gap: 12, alignItems: 'flex-end' }}>
+            {/* Main Textarea */}
+            <textarea
+              value={input}
+              onChange={e => setInput(e.target.value)}
+              onKeyDown={handleKey}
+              onPaste={handlePaste}
+              placeholder="Ask ORYN to analyze data, write code, or search the web..."
+              style={{
+                width: '100%', 
+                minHeight: 60, 
+                background: 'transparent', 
+                border: 'none', 
+                color: 'var(--text-primary)', 
+                fontFamily: 'var(--font-body)', 
+                fontSize: 15, 
+                padding: '4px',
+                resize: 'none', 
+                outline: 'none', 
+                lineHeight: 1.5
+              }}
+            />
+
+            {/* Bottom Controls Row */}
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 8 }}>
+              {/* Left Side: Upload Menu Button */}
               <div style={{ position: 'relative' }}>
                 <button 
                   onClick={() => setIsMenuOpen(!isMenuOpen)} 
                   style={{
-                    width: 44, height: 44, borderRadius: 12, 
-                    border: '1px solid var(--card-border)',
+                    width: 36, height: 36, borderRadius: 18, 
+                    border: 'none',
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    background: isMenuOpen ? 'var(--glass-bg-strong)' : 'var(--glass-bg-subtle)',
+                    background: isMenuOpen ? 'var(--glass-bg-strong)' : 'transparent',
                     transition: 'all 0.2s', 
                     cursor: 'pointer',
-                    color: 'var(--text-primary)'
+                    color: 'var(--text-secondary)'
                   }}
-                  onMouseEnter={e => e.currentTarget.style.background = 'var(--glass-border-subtle)'}
-                  onMouseLeave={e => { if (!isMenuOpen) e.currentTarget.style.background = 'var(--glass-bg-subtle)' }}
+                  onMouseEnter={e => e.currentTarget.style.color = 'var(--text-primary)'}
+                  onMouseLeave={e => { if (!isMenuOpen) e.currentTarget.style.color = 'var(--text-secondary)' }}
                 >
                   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
                 </button>
@@ -452,70 +476,67 @@ export default function ChatPage({
                       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21.2 15c.7-1.2 1-2.5.7-3.9-.6-2-2.4-3.5-4.4-3.5h-1.2c-.7-3-3.2-5.2-6.2-5.6-3-.3-5.9 1.3-7.3 4-1.2 2.5-1 6.5.5 8.8m8.7-1.6V21"/><path d="M16 16l-4-4-4 4"/></svg>
                       <span>Upload Document</span>
                     </div>
-                    <div 
-                      onClick={() => { handleMic(); setIsMenuOpen(false); }}
-                      style={{
-                        padding: '12px 16px', display: 'flex', alignItems: 'center', gap: 12,
-                        cursor: 'pointer', transition: 'all 0.2s', fontSize: 13, fontWeight: 500,
-                        color: isRecording ? 'var(--danger)' : 'var(--text-primary)'
-                      }}
-                      onMouseEnter={e => e.currentTarget.style.background = 'var(--glass-bg-hover)'}
-                      onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
-                    >
-                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="22"/></svg>
-                      <span>{isRecording ? 'Stop Recording' : 'Voice Input'}</span>
-                    </div>
                   </div>
                 )}
               </div>
 
-              <textarea
-                value={input}
-                onChange={e => setInput(e.target.value)}
-                onKeyDown={handleKey}
-                onPaste={handlePaste}
-                placeholder="Ask ORYN to analyze data, write code, or search the web..."
-                style={{
-                  flex: 1, 
-                  height: 44, 
-                  background: 'transparent', 
-                  border: 'none', 
-                  color: 'var(--text-primary)', 
-                  fontFamily: 'var(--font-body)', 
-                  fontSize: 15, 
-                  padding: '10px 4px',
-                  resize: 'none', 
-                  outline: 'none', 
-                  lineHeight: 1.5
-                }}
-              />
+              {/* Right Side: Model, Mic, Send */}
+              <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 6, color: 'var(--text-secondary)', fontSize: 13, cursor: 'pointer', padding: '0 8px' }} onMouseEnter={e => e.currentTarget.style.color = 'var(--text-primary)'} onMouseLeave={e => e.currentTarget.style.color = 'var(--text-secondary)'}>
+                  <span>ORYN 1.0 <span style={{ opacity: 0.6 }}>Fast</span></span>
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                </div>
+                
+                <button 
+                  onClick={handleMic}
+                  style={{
+                    width: 36, height: 36, borderRadius: 18, 
+                    border: 'none',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    background: isRecording ? 'rgba(239, 68, 68, 0.1)' : 'transparent',
+                    transition: 'all 0.2s', 
+                    cursor: 'pointer',
+                    color: isRecording ? 'var(--danger)' : 'var(--text-secondary)'
+                  }}
+                  onMouseEnter={e => { if (!isRecording) e.currentTarget.style.color = 'var(--text-primary)' }}
+                  onMouseLeave={e => { if (!isRecording) e.currentTarget.style.color = 'var(--text-secondary)' }}
+                >
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="22"/></svg>
+                </button>
 
-              <button 
-                onClick={handleSend} 
-                disabled={isStreaming || (!input.trim() && pendingFiles.length === 0)} 
-                style={{
-                  width: 44, height: 44, flexShrink: 0, borderRadius: 12,
-                  background: (!input.trim() && pendingFiles.length === 0) ? 'var(--glass-bg-hover)' : 'var(--accent-primary)',
-                  color: (!input.trim() && pendingFiles.length === 0) ? 'var(--text-secondary)' : 'white',
-                  display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  opacity: isStreaming ? 0.6 : 1, 
-                  transition: 'all 0.2s', 
-                  boxShadow: (!input.trim() && pendingFiles.length === 0) ? 'none' : '0 0 20px rgba(249,115,22,0.4)',
-                  cursor: isStreaming || (!input.trim() && pendingFiles.length === 0) ? 'default' : 'pointer',
-                  border: 'none'
-                }}
-                onMouseEnter={e => {
-                  if (input.trim() || pendingFiles.length > 0) {
-                    e.currentTarget.style.transform = 'translateY(-2px)';
-                  }
-                }}
-                onMouseLeave={e => e.currentTarget.style.transform = 'translateY(0)'}
-              >
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ transform: 'translateX(-1px)' }}>
-                  <line x1="22" y1="2" x2="11" y2="13"></line>
-                  <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
-                </svg>
-              </button>
+                {/* Send Button */}
+                <button 
+                  onClick={handleSend} 
+                  disabled={isStreaming || (!input.trim() && pendingFiles.length === 0)} 
+                  style={{
+                    width: 36, height: 36, flexShrink: 0, borderRadius: 18,
+                    background: (!input.trim() && pendingFiles.length === 0) ? 'transparent' : 'var(--accent-primary)',
+                    color: (!input.trim() && pendingFiles.length === 0) ? 'transparent' : 'white',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    opacity: (!input.trim() && pendingFiles.length === 0) ? 0 : (isStreaming ? 0.6 : 1), 
+                    transition: 'all 0.2s', 
+                    boxShadow: (!input.trim() && pendingFiles.length === 0) ? 'none' : '0 0 15px rgba(249,115,22,0.3)',
+                    cursor: isStreaming || (!input.trim() && pendingFiles.length === 0) ? 'default' : 'pointer',
+                    border: 'none',
+                    transform: (!input.trim() && pendingFiles.length === 0) ? 'scale(0.8)' : 'scale(1)'
+                  }}
+                  onMouseEnter={e => {
+                    if (input.trim() || pendingFiles.length > 0) {
+                      e.currentTarget.style.transform = 'translateY(-1px) scale(1)';
+                    }
+                  }}
+                  onMouseLeave={e => {
+                    if (input.trim() || pendingFiles.length > 0) {
+                      e.currentTarget.style.transform = 'translateY(0) scale(1)';
+                    }
+                  }}
+                >
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ transform: 'translateX(-1px)' }}>
+                    <line x1="22" y1="2" x2="11" y2="13"></line>
+                    <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                  </svg>
+                </button>
+              </div>
             </div>
             
             {!isMobile && messages.length > 0 && (
