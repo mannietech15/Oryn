@@ -11,10 +11,10 @@ import type {
 
 /* ─── Static Data ───────────────────────────────────── */
 const kpis = [
-  { label: 'Revenue MTD',    value: '$284K', change: '+18.4%', icon: '💰', prompt: 'How is my revenue trending?' },
+  { label: 'Revenue MTD',    value: '$284K', change: '+18.4%', icon: '💰', prompt: 'Analyze my revenue drivers for this month.' },
   { label: 'Active Users',   value: '1,842', change: '+9.2%',  icon: '👥', prompt: 'How can I grow active users faster?' },
-  { label: 'AI Tasks Done',  value: '3,291', change: '+34%',   icon: '⚡', prompt: 'How do I sustain this momentum?' },
-  { label: 'Retention',      value: '91%',   change: '+3pts',  icon: '🎯', prompt: 'How do I push retention to 95%?' },
+  { label: 'Time Saved by ORYN', value: '340 hrs', change: '+15%', icon: '⏳', prompt: 'Break down time saved by department.' },
+  { label: 'Automated Actions', value: '12,492', change: '+34%', icon: '⚡', prompt: 'Which AI workflows are most active?' },
 ];
 
 const barHeights = [40, 55, 48, 65, 72, 60, 78, 85, 100];
@@ -26,6 +26,13 @@ const integrations = [
   { icon: '💬', name: 'Slack',    connected: false },
   { icon: '🗂',  name: 'Notion',  connected: false },
   { icon: '⚡', name: 'Zapier',  connected: true  },
+];
+
+const activeAgents = [
+  { name: 'Sales Co-Pilot', status: 'Running', task: 'Qualifying 43 inbound leads', load: 85, color: 'var(--success)' },
+  { name: 'Data Analyst', status: 'Idle', task: 'Awaiting new datasets', load: 10, color: 'var(--accent-primary)' },
+  { name: 'Support Bot', status: 'Running', task: 'Handling 12 active tickets', load: 60, color: 'var(--warn)' },
+  { name: 'Marketing Agent', status: 'Optimizing', task: 'A/B testing ad copy', load: 45, color: '#ec4899' },
 ];
 
 /* ─── Shared Components ───────────────────────────────────── */
@@ -136,6 +143,12 @@ export default function DashboardPage() {
   const clockStr = time.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
   const dateStr  = time.toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' });
 
+  const hour = time.getHours();
+  const greeting = hour < 12 ? 'Good Morning,' : hour < 18 ? 'Good Afternoon,' : 'Good Evening,';
+
+  /* Workspace / Business context */
+  const [businessName, setBusinessName] = useState('Acme Corp');
+
   /* ── Feature state ── */
   const [cmdInput, setCmdInput]           = useState('');
   const [cmdLoading, setCmdLoading]       = useState(false);
@@ -223,9 +236,15 @@ export default function DashboardPage() {
         {/* ── Header ── */}
         <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between' }}>
           <div>
-            <div className="dashboard-header-sub" style={{ fontFamily: 'var(--font-display)', fontSize: 13, fontWeight: 500, color: 'var(--accent-primary)', marginBottom: 8, letterSpacing: 1 }}>OVERVIEW</div>
-            <div className="dashboard-header-text" style={{ fontFamily: 'var(--font-script)', fontSize: 44, fontWeight: 400, color: 'var(--text-primary)', letterSpacing: 0, paddingBottom: 4 }}>
-              Good Morning.
+            <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 12 }}>
+              <div className="dashboard-header-sub" style={{ fontFamily: 'var(--font-display)', fontSize: 13, fontWeight: 600, color: 'var(--accent-primary)', letterSpacing: 1 }}>WORKSPACE</div>
+              <div style={{ padding: '6px 14px', background: 'var(--glass-bg-hover)', borderRadius: 20, border: '1px solid var(--glass-border-subtle)', fontSize: 13, fontWeight: 600, color: 'var(--text-primary)', display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer', transition: 'all 0.2s', boxShadow: '0 2px 8px rgba(0,0,0,0.2)' }}>
+                {businessName} <span style={{ fontSize: 10, color: 'var(--text-muted)' }}>▼</span>
+              </div>
+            </div>
+            <div className="dashboard-header-text" style={{ display: 'flex', alignItems: 'baseline', gap: 10 }}>
+              <span style={{ fontFamily: 'var(--font-script)', fontSize: 44, fontWeight: 400, color: 'var(--text-primary)' }}>{greeting}</span>
+              <span style={{ fontFamily: 'var(--font-display)', fontSize: 32, fontWeight: 700, color: 'var(--text-primary)', letterSpacing: -0.5 }}>{businessName}</span>
             </div>
           </div>
           <div style={{ textAlign: 'right' }}>
@@ -238,24 +257,25 @@ export default function DashboardPage() {
         <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} style={{ position: 'relative' }}>
           <div style={{ 
             background: 'var(--card-bg)', backdropFilter: 'blur(16px)', 
-            border: '1px solid var(--glass-border-subtle)', borderRadius: 16, 
-            padding: '8px 16px', display: 'flex', alignItems: 'center', gap: 12,
+            border: '1px solid var(--glass-border)', borderRadius: 16, 
+            padding: '12px 20px', display: 'flex', alignItems: 'center', gap: 16,
             boxShadow: 'var(--shadow-subtle)'
           }}>
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--text-secondary)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <circle cx="11" cy="11" r="8"></circle>
-              <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-            </svg>
+            <div style={{ width: 32, height: 32, borderRadius: 10, background: 'rgba(249, 115, 22, 0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--accent-primary)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"></path>
+              </svg>
+            </div>
             <input
               ref={cmdInputRef}
               value={cmdInput}
               onChange={e => setCmdInput(e.target.value)}
               onKeyDown={e => e.key === 'Enter' && handleCommand()}
-              placeholder="Ask ORYN to analyze revenue, churn, or team performance..."
+              placeholder={`Ask ORYN to analyze ${businessName}'s revenue, churn, or AI tasks...`}
               style={{
                 flex: 1, background: 'transparent', border: 'none', outline: 'none',
                 color: 'var(--text-primary)', fontFamily: 'var(--font-body)', fontSize: 16,
-                padding: '12px 0'
+                padding: '4px 0'
               }}
             />
             <div className="hide-on-mobile" style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
@@ -266,14 +286,14 @@ export default function DashboardPage() {
                 disabled={cmdLoading || !cmdInput.trim()}
                 style={{
                   background: 'var(--accent-primary)', color: 'white', border: 'none',
-                  borderRadius: 10, padding: '10px 20px', fontFamily: 'var(--font-display)', 
-                  fontSize: 13, fontWeight: 600, cursor: cmdLoading || !cmdInput.trim() ? 'not-allowed' : 'pointer',
+                  borderRadius: 10, padding: '10px 24px', fontFamily: 'var(--font-display)', 
+                  fontSize: 14, fontWeight: 600, cursor: cmdLoading || !cmdInput.trim() ? 'not-allowed' : 'pointer',
                   opacity: cmdInput.trim() ? 1 : 0.5, transition: 'all 0.2s', display: 'flex', alignItems: 'center', gap: 8
                 }}
               >
                 {cmdLoading ? (
                   <><div style={{ width: 14, height: 14, border: '2px solid rgba(255,255,255,0.3)', borderTopColor: 'white', borderRadius: '50%', animation: 'spin 0.8s linear infinite' }} /> Thinking</>
-                ) : 'Ask'}
+                ) : 'Ask ORYN'}
               </button>
           </div>
 
@@ -312,9 +332,9 @@ export default function DashboardPage() {
           
           {/* Row 1: Briefing & Health */}
           <div className="span-8" style={{ gridColumn: 'span 8' }}>
-            <Card delay={0.1} title="Daily Briefing" style={{ height: '100%' }}>
+            <Card delay={0.1} title="Executive Briefing" style={{ height: '100%' }}>
             {briefingLoading ? (
-              <div style={{ color: 'var(--text-secondary)', fontSize: 14 }}>Generating briefing...</div>
+              <div style={{ color: 'var(--text-secondary)', fontSize: 14 }}>Generating briefing for {businessName}...</div>
             ) : briefing ? (
               <div style={{ display: 'flex', flexDirection: 'column', gap: 16, height: '100%' }}>
                 <div style={{ fontSize: 22, fontWeight: 500, color: 'var(--text-primary)', fontFamily: 'var(--font-display)', lineHeight: 1.3 }}>
@@ -336,7 +356,7 @@ export default function DashboardPage() {
           </div>
 
           <div className="span-4" style={{ gridColumn: 'span 4' }}>
-            <Card delay={0.15} title="System Health" style={{ alignItems: 'center', height: '100%' }}>
+            <Card delay={0.15} title="Business Operations Health" style={{ alignItems: 'center', height: '100%' }}>
              {healthLoading ? (
                 <div style={{ color: 'var(--text-secondary)', fontSize: 14 }}>Analyzing...</div>
              ) : health ? (
@@ -385,9 +405,63 @@ export default function DashboardPage() {
             </motion.div>
           ))}
 
-          {/* Row 3: Chart & Alerts */}
+          {/* Row 3: Agent Swarm & Active Integrations */}
+          <div className="span-7" style={{ gridColumn: 'span 7' }}>
+            <Card delay={0.25} title="Active AI Agents" style={{ height: '100%' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+                {activeAgents.map(agent => (
+                  <div key={agent.name} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 16px', background: 'var(--glass-bg-subtle)', borderRadius: 12, border: '1px solid var(--glass-border-subtle)' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                      <div style={{ position: 'relative', width: 10, height: 10 }}>
+                        {agent.status === 'Running' && <div style={{ position: 'absolute', inset: 0, borderRadius: '50%', background: agent.color, opacity: 0.5, animation: 'ping 1.5s cubic-bezier(0, 0, 0.2, 1) infinite' }} />}
+                        <div style={{ position: 'relative', width: 10, height: 10, borderRadius: '50%', background: agent.color }} />
+                      </div>
+                      <div>
+                        <div style={{ fontSize: 14, fontWeight: 600, color: 'var(--text-primary)', marginBottom: 2 }}>{agent.name}</div>
+                        <div style={{ fontSize: 12, color: 'var(--text-secondary)' }}>{agent.task}</div>
+                      </div>
+                    </div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 12, width: 120 }}>
+                      <div style={{ height: 6, flex: 1, background: 'var(--glass-bg-hover)', borderRadius: 3, overflow: 'hidden' }}>
+                        <div style={{ height: '100%', width: `${agent.load}%`, background: agent.color, borderRadius: 3 }} />
+                      </div>
+                      <span style={{ fontSize: 11, fontWeight: 500, color: 'var(--text-secondary)', width: 30, textAlign: 'right' }}>{agent.load}%</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </Card>
+          </div>
+
+          <div className="span-5" style={{ gridColumn: 'span 5' }}>
+            <Card delay={0.3} title="Data Pipeline Integrations" style={{ height: '100%' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', gap: 12 }}>
+              {integrations.map(g => (
+                <div key={g.name}
+                  style={{ 
+                    padding: '16px', background: g.connected ? 'rgba(249, 115, 22, 0.03)' : 'var(--glass-bg-subtle)', 
+                    border: `1px solid ${g.connected ? 'rgba(249, 115, 22, 0.15)' : 'var(--glass-bg-subtle)'}`, 
+                    borderRadius: 12, display: 'flex', alignItems: 'center', gap: 12, transition: 'all 0.2s', cursor: 'pointer'
+                  }}
+                  onMouseEnter={e => { const d = e.currentTarget as HTMLDivElement; d.style.background = 'rgba(249, 115, 22, 0.08)'; d.style.borderColor = 'rgba(249, 115, 22, 0.3)'; }}
+                  onMouseLeave={e => { const d = e.currentTarget as HTMLDivElement; d.style.background = g.connected ? 'rgba(249, 115, 22, 0.03)' : 'var(--glass-bg-subtle)'; d.style.borderColor = g.connected ? 'rgba(249, 115, 22, 0.15)' : 'var(--glass-bg-subtle)'; }}
+                >
+                  <span style={{ fontSize: 20 }}>{g.icon}</span>
+                  <div>
+                    <div style={{ fontSize: 13, fontWeight: 500, color: 'var(--text-primary)' }}>{g.name}</div>
+                    <div style={{ fontSize: 11, color: g.connected ? 'var(--accent-primary)' : 'var(--text-muted)', marginTop: 2 }}>
+                      {g.connected ? 'Connected' : 'Configure'}
+                    </div>
+                  </div>
+                </div>
+              ))}
+              </div>
+            </Card>
+          </div>
+
+          {/* Row 4: Chart & Alerts */}
           <div className="span-8" style={{ gridColumn: 'span 8' }}>
-            <Card delay={0.3} title="Revenue Analytics" style={{ height: '100%' }}>
+            <Card delay={0.35} title="Revenue Analytics" style={{ height: '100%' }}>
             <div style={{ display: 'flex', alignItems: 'flex-end', gap: 16, marginBottom: 20 }}>
               <div style={{ fontSize: 32, fontFamily: 'var(--font-display)', fontWeight: 600, color: 'var(--text-primary)', lineHeight: 1 }}>$284K</div>
               <div style={{ fontSize: 13, color: 'var(--success)', fontWeight: 500, paddingBottom: 4 }}>+18.4%</div>
@@ -397,7 +471,7 @@ export default function DashboardPage() {
           </div>
 
           <div className="span-4" style={{ gridColumn: 'span 4' }}>
-            <Card delay={0.35} title="Smart Alerts" style={{ height: '100%' }}>
+            <Card delay={0.4} title="Smart Alerts" style={{ height: '100%' }}>
             {alertsLoading ? (
               <div style={{ color: 'var(--text-secondary)', fontSize: 14 }}>Scanning...</div>
             ) : (
@@ -423,75 +497,49 @@ export default function DashboardPage() {
             </Card>
           </div>
 
-          {/* Row 4: Goals & Integrations */}
-          <div className="span-7" style={{ gridColumn: 'span 7' }}>
-            <Card delay={0.4} title="Strategic Goals" style={{ height: '100%' }}>
+          {/* Row 5: Strategic Goals */}
+          <div className="span-12" style={{ gridColumn: 'span 12' }}>
+            <Card delay={0.45} title="Strategic AI Goals">
             {goalsLoading ? (
               <div style={{ color: 'var(--text-secondary)', fontSize: 14 }}>Loading goals...</div>
             ) : (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: 24 }}>
                 {goals.map(g => {
                   const pct = Math.round((g.current / g.target) * 100);
                   const fmt = (n: number) => g.unit === '$' ? `$${(n / 1000).toFixed(0)}K` : `${n.toLocaleString()}${g.unit}`;
                   return (
-                    <div key={g.id}>
-                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
+                    <div key={g.id} style={{ background: 'var(--glass-bg-subtle)', padding: '20px', borderRadius: 16, border: '1px solid var(--glass-border-subtle)' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
                         <div>
-                          <div style={{ fontSize: 14, color: 'var(--text-primary)', fontWeight: 500, marginBottom: 4 }}>{g.label}</div>
-                          <div style={{ fontSize: 12, color: 'var(--text-secondary)' }}>{fmt(g.current)} / {fmt(g.target)}</div>
+                          <div style={{ fontSize: 15, color: 'var(--text-primary)', fontWeight: 600, marginBottom: 4 }}>{g.label}</div>
+                          <div style={{ fontSize: 13, color: 'var(--text-secondary)' }}>{fmt(g.current)} / {fmt(g.target)}</div>
                         </div>
                         <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
-                          <div style={{ fontSize: 16, fontFamily: 'var(--font-display)', fontWeight: 600, color: 'var(--text-primary)' }}>{pct}%</div>
-                          <button
-                            onClick={() => handleGoalAction(g.id)}
-                            disabled={goalLoading[g.id]}
-                            style={{ background: 'var(--glass-bg-hover)', border: '1px solid var(--glass-bg-hover)', borderRadius: 8, padding: '6px 12px', color: 'var(--text-secondary)', fontSize: 11, fontWeight: 500, cursor: goalLoading[g.id] ? 'wait' : 'pointer', transition: 'all 0.2s' }}
-                            onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.background = 'rgba(249, 115, 22, 0.1)'; (e.currentTarget as HTMLButtonElement).style.color = 'var(--accent-primary)'; (e.currentTarget as HTMLButtonElement).style.borderColor = 'rgba(249, 115, 22, 0.2)'; }}
-                            onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.background = 'var(--glass-bg-hover)'; (e.currentTarget as HTMLButtonElement).style.color = 'var(--text-secondary)'; (e.currentTarget as HTMLButtonElement).style.borderColor = 'var(--glass-bg-hover)'; }}
-                          >
-                            {goalLoading[g.id] ? '...' : goalAdvice[g.id] ? 'Hide' : 'AI Advice'}
-                          </button>
+                          <div style={{ fontSize: 20, fontFamily: 'var(--font-display)', fontWeight: 600, color: 'var(--text-primary)' }}>{pct}%</div>
                         </div>
                       </div>
-                      <div style={{ height: 6, background: 'var(--glass-bg-hover)', borderRadius: 3, overflow: 'hidden' }}>
-                        <div style={{ height: '100%', width: `${pct}%`, background: 'var(--accent-primary)', borderRadius: 3 }} />
+                      <div style={{ height: 8, background: 'var(--glass-bg-hover)', borderRadius: 4, overflow: 'hidden', marginBottom: 16 }}>
+                        <div style={{ height: '100%', width: `${pct}%`, background: 'var(--accent-primary)', borderRadius: 4 }} />
                       </div>
+                      <button
+                        onClick={() => handleGoalAction(g.id)}
+                        disabled={goalLoading[g.id]}
+                        style={{ width: '100%', background: 'var(--card-bg)', border: '1px solid var(--glass-bg-hover)', borderRadius: 8, padding: '10px', color: 'var(--text-secondary)', fontSize: 13, fontWeight: 500, cursor: goalLoading[g.id] ? 'wait' : 'pointer', transition: 'all 0.2s' }}
+                        onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.background = 'rgba(249, 115, 22, 0.1)'; (e.currentTarget as HTMLButtonElement).style.color = 'var(--accent-primary)'; (e.currentTarget as HTMLButtonElement).style.borderColor = 'rgba(249, 115, 22, 0.2)'; }}
+                        onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.background = 'var(--card-bg)'; (e.currentTarget as HTMLButtonElement).style.color = 'var(--text-secondary)'; (e.currentTarget as HTMLButtonElement).style.borderColor = 'var(--glass-bg-hover)'; }}
+                      >
+                        {goalLoading[g.id] ? '...' : goalAdvice[g.id] ? 'Hide Advice' : 'Ask AI for Advice'}
+                      </button>
                       {goalAdvice[g.id] && (
-                        <div style={{ marginTop: 12, padding: '12px 16px', background: 'rgba(249, 115, 22, 0.05)', border: '1px solid rgba(249, 115, 22, 0.1)', borderRadius: 8, fontSize: 13, color: 'var(--text-primary)', lineHeight: 1.5 }}>
+                        <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} style={{ marginTop: 12, padding: '12px 16px', background: 'rgba(249, 115, 22, 0.05)', border: '1px solid rgba(249, 115, 22, 0.1)', borderRadius: 8, fontSize: 13, color: 'var(--text-primary)', lineHeight: 1.5 }}>
                           {goalAdvice[g.id]}
-                        </div>
+                        </motion.div>
                       )}
                     </div>
                   );
                 })}
               </div>
             )}
-            </Card>
-          </div>
-
-          <div className="span-5" style={{ gridColumn: 'span 5' }}>
-            <Card delay={0.45} title="Active Integrations" style={{ height: '100%' }}>
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', gap: 12 }}>
-              {integrations.map(g => (
-                <div key={g.name}
-                  style={{ 
-                    padding: '16px', background: g.connected ? 'rgba(249, 115, 22, 0.03)' : 'var(--glass-bg-subtle)', 
-                    border: `1px solid ${g.connected ? 'rgba(249, 115, 22, 0.15)' : 'var(--glass-bg-subtle)'}`, 
-                    borderRadius: 12, display: 'flex', alignItems: 'center', gap: 12, transition: 'all 0.2s', cursor: 'pointer'
-                  }}
-                  onMouseEnter={e => { const d = e.currentTarget as HTMLDivElement; d.style.background = 'rgba(249, 115, 22, 0.08)'; d.style.borderColor = 'rgba(249, 115, 22, 0.3)'; }}
-                  onMouseLeave={e => { const d = e.currentTarget as HTMLDivElement; d.style.background = g.connected ? 'rgba(249, 115, 22, 0.03)' : 'var(--glass-bg-subtle)'; d.style.borderColor = g.connected ? 'rgba(249, 115, 22, 0.15)' : 'var(--glass-bg-subtle)'; }}
-                >
-                  <span style={{ fontSize: 20 }}>{g.icon}</span>
-                  <div>
-                    <div style={{ fontSize: 13, fontWeight: 500, color: 'var(--text-primary)' }}>{g.name}</div>
-                    <div style={{ fontSize: 11, color: g.connected ? 'var(--accent-primary)' : 'var(--text-muted)', marginTop: 2 }}>
-                      {g.connected ? 'Connected' : 'Configure'}
-                    </div>
-                  </div>
-                </div>
-              ))}
-              </div>
             </Card>
           </div>
 

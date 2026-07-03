@@ -1,4 +1,4 @@
-export type Page = 'chat' | 'dashboard' | 'analytics' | 'automation' | 'organization' | 'financials' | 'insights' | 'explore' | 'settings';
+export type Page = 'chat' | 'dashboard' | 'analytics' | 'automation' | 'organization' | 'financials' | 'insights' | 'explore' | 'settings' | 'add-organization';
 
 export interface Company {
   name: string;

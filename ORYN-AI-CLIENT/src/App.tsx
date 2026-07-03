@@ -7,6 +7,7 @@ import OrganizationPage from './pages/OrganizationPage';
 import FinancialsPage from './pages/FinancialsPage';
 import ExplorePage from './pages/ExplorePage';
 import SettingsPage from './pages/SettingsPage';
+import AddOrganizationPage from './pages/AddOrganizationPage';
 import type { Page } from './types';
 import { useChat } from './hooks/useChat';
 import { Toaster } from './components/ui/Toaster';
@@ -32,6 +33,7 @@ export default function App() {
       case 'explore':      return <ExplorePage />;
       case 'settings':     return <SettingsPage />;
       case 'automation':   return <AutomationPlaceholder />;
+      case 'add-organization': return <AddOrganizationPage />;
       default:             return <DashboardPage />;
     }
   };

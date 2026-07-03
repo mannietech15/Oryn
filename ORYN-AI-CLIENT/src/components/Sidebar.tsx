@@ -162,16 +162,27 @@ export default function Sidebar({ page, onNavigate, isOpen, onClose, sessions, a
         </div>
 
         <div style={{ padding: '0 20px 12px' }}>
-          <div style={{ 
-            display: 'flex', alignItems: 'center', justifyContent: 'space-between', 
-            background: 'var(--glass-bg-subtle)', border: '1px solid var(--card-border)',
-            padding: '10px 14px', borderRadius: 8, cursor: 'pointer', transition: 'all 0.2s'
-          }}>
+          <div 
+            onClick={() => onNavigate('add-organization')}
+            style={{ 
+              display: 'flex', alignItems: 'center', justifyContent: 'space-between', 
+              background: 'linear-gradient(145deg, rgba(249,115,22,0.05), transparent)', 
+              border: '1px dashed var(--accent-primary)',
+              padding: '10px 14px', borderRadius: 8, cursor: 'pointer', transition: 'all 0.3s'
+            }}
+            onMouseEnter={e => { e.currentTarget.style.background = 'linear-gradient(145deg, rgba(249,115,22,0.15), rgba(249,115,22,0.05))'; }}
+            onMouseLeave={e => { e.currentTarget.style.background = 'linear-gradient(145deg, rgba(249,115,22,0.05), transparent)'; }}
+          >
             <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-              <div style={{ width: 20, height: 20, background: 'var(--accent-primary)', borderRadius: 4, boxShadow: '0 0 10px rgba(249,115,22,0.3)' }} />
-              <span style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-primary)' }}>Acme Corp</span>
+              <div style={{ 
+                width: 20, height: 20, background: 'var(--accent-primary)', borderRadius: 4, 
+                display: 'flex', alignItems: 'center', justifyContent: 'center', 
+                color: '#fff', boxShadow: '0 0 10px rgba(249,115,22,0.3)' 
+              }}>
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+              </div>
+              <span style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-primary)' }}>Add Organization.</span>
             </div>
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--text-secondary)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
           </div>
         </div>
 

@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { toast } from './ui/use-toast';
 import Orb from './Orb';
+import SplashCursor from './SplashCursor';
 
 export function ConversationalMode({ 
   onClose,
@@ -232,6 +233,10 @@ export function ConversationalMode({
         fontFamily: 'var(--font-body)'
       }}
     >
+      {/* Background Fluid Simulation */}
+      <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', zIndex: -1, opacity: 0.7 }}>
+        <SplashCursor autoAnimate={true} />
+      </div>
       <button onClick={onClose} style={{
           position: 'absolute', top: 32, right: 32, width: 48, height: 48, 
           borderRadius: 24, background: 'rgba(255,255,255,0.1)', border: 'none', color: '#fff', cursor: 'pointer',
