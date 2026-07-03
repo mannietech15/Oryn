@@ -351,8 +351,17 @@ export default function ChatPage({
         {/* Empty State Title */}
         {messages.length === 0 && (
           <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 24 }}>
-            <h1 style={{ fontFamily: 'var(--font-display)', fontSize: isMobile ? 32 : 42, color: 'var(--text-primary)', margin: 0, fontWeight: 500, display: 'flex', alignItems: 'center', gap: 16 }}>
-              <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="var(--accent-primary)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ transform: 'rotate(15deg)' }}><path d="M12 2v20M17 5l-10 14M22 12H2M19 17L5 7"/></svg>
+            <h1 style={{ fontFamily: 'var(--font-script)', fontSize: isMobile ? 36 : 48, color: 'var(--text-primary)', margin: 0, fontWeight: 400, display: 'flex', alignItems: 'center', gap: 16 }}>
+              <svg width="40" height="40" viewBox="0 0 32 32" fill="none">
+                <polygon points="16,1 31,9 31,23 16,31 1,23 1,9" stroke="var(--accent-primary)" strokeWidth="1.2" fill="rgba(249, 115, 22,0.1)" />
+                <circle cx="16" cy="16" r="3" fill="var(--accent-primary)" />
+                <line x1="16" y1="7" x2="16" y2="13" stroke="var(--accent-primary)" strokeWidth="0.8" opacity="0.6" />
+                <line x1="16" y1="19" x2="16" y2="25" stroke="var(--accent-primary)" strokeWidth="0.8" opacity="0.6" />
+                <line x1="7" y1="12" x2="13" y2="15" stroke="var(--accent-primary)" strokeWidth="0.8" opacity="0.6" />
+                <line x1="19" y1="17" x2="25" y2="20" stroke="var(--accent-primary)" strokeWidth="0.8" opacity="0.6" />
+                <line x1="25" y1="12" x2="19" y2="15" stroke="var(--accent-primary)" strokeWidth="0.8" opacity="0.6" />
+                <line x1="13" y1="17" x2="7" y2="20" stroke="var(--accent-primary)" strokeWidth="0.8" opacity="0.6" />
+              </svg>
               What shall we think through?
             </h1>
           </div>
@@ -522,11 +531,11 @@ export default function ChatPage({
           {messages.length === 0 && (
             <div style={{ display: 'flex', gap: 12, marginTop: 16, flexWrap: 'wrap', justifyContent: 'center', maxWidth: '850px', width: '100%' }}>
               {[
-                { icon: '</>', label: 'Code', prompt: 'Write a React component for...' },
-                { icon: '🎓', label: 'Learn', prompt: 'Explain quantum computing in simple terms...' },
-                { icon: '✏️', label: 'Write', prompt: 'Draft a professional email about...' },
-                { icon: '☕', label: 'Life stuff', prompt: 'Plan a healthy weekly meal prep...' },
-                { icon: '💡', label: "ORYN's choice", prompt: 'Tell me a fascinating fact about the universe...' }
+                { icon: '📊', label: 'Analyze Data', prompt: 'Analyze the recent sales trends and identify key growth opportunities...' },
+                { icon: '📈', label: 'Strategy', prompt: 'Help me outline a go-to-market strategy for a new product...' },
+                { icon: '✏️', label: 'Draft Email', prompt: 'Draft a professional email to stakeholders regarding Q3 performance...' },
+                { icon: '</>', label: 'Code', prompt: 'Write a Python script to extract and summarize customer feedback...' },
+                { icon: '💡', label: "ORYN's choice", prompt: 'Generate a summary of the top emerging trends in AI for business...' }
               ].map(item => (
                 <button 
                   key={item.label}
