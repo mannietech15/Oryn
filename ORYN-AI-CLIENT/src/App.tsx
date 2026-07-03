@@ -15,9 +15,22 @@ import { Toaster } from './components/ui/Toaster';
 export default function App() {
   const [page, setPage] = useState<Page>('chat');
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const [organizationName, setOrganizationName] = useState<string | null>(null);
-  const [organizationLogo, setOrganizationLogo] = useState<string | null>(null);
+  const [orgProfile, setOrgProfile] = useState<any>(() => {
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('oryn_orgProfile');
+      if (saved) {
+        try { return JSON.parse(saved); } catch (e) { return null; }
+      }
+    }
+    return null;
+  });
   const chat = useChat();
+
+  const handleCompleteOrg = (data: any) => {
+    setOrgProfile(data);
+    localStorage.setItem('oryn_orgProfile', JSON.stringify(data));
+    navigate('dashboard');
+  };
 
   const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
   const navigate = (p: Page) => {
@@ -28,15 +41,15 @@ export default function App() {
   const renderPage = () => {
     switch (page) {
       case 'chat':         return <ChatPage {...chat} />;
-      case 'dashboard':    return <DashboardPage organizationName={organizationName} />;
+      case 'dashboard':    return <DashboardPage orgProfile={orgProfile} />;
       case 'analytics':    return <AnalyticsPage />;
       case 'organization': return <OrganizationPage />;
       case 'financials':   return <FinancialsPage />;
       case 'explore':      return <ExplorePage />;
       case 'settings':     return <SettingsPage />;
       case 'automation':   return <AutomationPlaceholder />;
-      case 'add-organization': return <AddOrganizationPage onComplete={(name, logo) => { setOrganizationName(name); setOrganizationLogo(logo || null); navigate('dashboard'); }} />;
-      default:             return <DashboardPage organizationName={organizationName} />;
+      case 'add-organization': return <AddOrganizationPage onComplete={handleCompleteOrg} />;
+      default:             return <DashboardPage orgProfile={orgProfile} />;
     }
   };
 
@@ -76,8 +89,8 @@ export default function App() {
             activeSessionId={chat.activeSessionId}
             onNewChat={chat.startNewSession}
             onSelectSession={chat.setActiveSessionId}
-            organizationName={organizationName}
-            organizationLogo={organizationLogo}
+            organizationName={orgProfile?.name || null}
+            organizationLogo={orgProfile?.logo || null}
           />
           <main style={{ 
             flex: 1, 

@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 
-export default function AddOrganizationPage({ onComplete }: { onComplete?: (name: string, logo?: string) => void }) {
+export default function AddOrganizationPage({ onComplete }: { onComplete?: (data: any) => void }) {
   const [step, setStep] = useState(1);
   const [loading, setLoading] = useState(false);
-  const [orgData, setOrgData] = useState({ name: '', industry: '', website: '', logo: '' });
+  const [orgData, setOrgData] = useState({ name: '', industry: '', website: '', logo: '', integrations: [] as string[] });
 
   const handleLogoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -24,7 +24,7 @@ export default function AddOrganizationPage({ onComplete }: { onComplete?: (name
     setLoading(true);
     setTimeout(() => {
       setLoading(false);
-      if (onComplete) onComplete(orgData.name || 'New Organization', orgData.logo);
+      if (onComplete) onComplete({ ...orgData, name: orgData.name || 'New Organization' });
     }, 1500);
   };
 
@@ -109,10 +109,18 @@ export default function AddOrganizationPage({ onComplete }: { onComplete?: (name
                 <h2 style={{ fontSize: 20, fontWeight: 600, color: 'var(--text-primary)', marginBottom: 24 }}>2. Connect Data Sources</h2>
                 <p style={{ fontSize: 14, color: 'var(--text-secondary)', marginBottom: 24 }}>ORYN needs data to provide insights. You can connect these later.</p>
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
-                  <IntegrationCard icon="📊" name="Google Analytics" />
-                  <IntegrationCard icon="💳" name="Stripe" />
-                  <IntegrationCard icon="☁️" name="Salesforce" />
-                  <IntegrationCard icon="📝" name="Notion" />
+                  {['Google Analytics', 'Stripe', 'Salesforce', 'Notion'].map(name => (
+                    <IntegrationCard 
+                      key={name}
+                      icon={name === 'Google Analytics' ? '📊' : name === 'Stripe' ? '💳' : name === 'Salesforce' ? '☁️' : '📝'}
+                      name={name}
+                      selected={orgData.integrations.includes(name)}
+                      onToggle={() => setOrgData(prev => ({
+                        ...prev, 
+                        integrations: prev.integrations.includes(name) ? prev.integrations.filter(i => i !== name) : [...prev.integrations, name]
+                      }))}
+                    />
+                  ))}
                 </div>
               </motion.div>
             )}
@@ -168,11 +176,10 @@ function Input({ label, placeholder, value, onChange }: any) {
   );
 }
 
-function IntegrationCard({ icon, name }: any) {
-  const [selected, setSelected] = useState(false);
+function IntegrationCard({ icon, name, selected, onToggle }: any) {
   return (
     <div 
-      onClick={() => setSelected(!selected)}
+      onClick={onToggle}
       style={{ 
         padding: '16px', borderRadius: 16, cursor: 'pointer', transition: 'all 0.2s',
         background: selected ? 'rgba(249,115,22,0.05)' : 'var(--glass-bg-subtle)',

@@ -9,31 +9,7 @@ import type {
   DashboardGoal, HealthScore,
 } from '../types';
 
-/* ─── Static Data ───────────────────────────────────── */
-const kpis = [
-  { label: 'Revenue MTD',    value: '$284K', change: '+18.4%', icon: '💰', prompt: 'Analyze my revenue drivers for this month.' },
-  { label: 'Active Users',   value: '1,842', change: '+9.2%',  icon: '👥', prompt: 'How can I grow active users faster?' },
-  { label: 'Time Saved by ORYN', value: '340 hrs', change: '+15%', icon: '⏳', prompt: 'Break down time saved by department.' },
-  { label: 'Automated Actions', value: '12,492', change: '+34%', icon: '⚡', prompt: 'Which AI workflows are most active?' },
-];
-
 const barHeights = [40, 55, 48, 65, 72, 60, 78, 85, 100];
-
-const integrations = [
-  { icon: '📧', name: 'Gmail',    connected: true  },
-  { icon: '📅', name: 'Calendar', connected: true  },
-  { icon: '📊', name: 'Sheets',   connected: true  },
-  { icon: '💬', name: 'Slack',    connected: false },
-  { icon: '🗂',  name: 'Notion',  connected: false },
-  { icon: '⚡', name: 'Zapier',  connected: true  },
-];
-
-const activeAgents = [
-  { name: 'Sales Co-Pilot', status: 'Running', task: 'Qualifying 43 inbound leads', load: 85, color: 'var(--success)' },
-  { name: 'Data Analyst', status: 'Idle', task: 'Awaiting new datasets', load: 10, color: 'var(--accent-primary)' },
-  { name: 'Support Bot', status: 'Running', task: 'Handling 12 active tickets', load: 60, color: 'var(--warn)' },
-  { name: 'Marketing Agent', status: 'Optimizing', task: 'A/B testing ad copy', load: 45, color: '#ec4899' },
-];
 
 /* ─── Shared Components ───────────────────────────────────── */
 function Card({ title, children, style = {}, delay = 0, action }: any) {
@@ -136,7 +112,7 @@ function useTypewriter(text: string, speed = 18) {
 }
 
 /* ─── Main Page ──────────────────────────────────────────── */
-export default function DashboardPage({ organizationName }: { organizationName?: string | null }) {
+export default function DashboardPage({ orgProfile }: { orgProfile?: any }) {
   /* Clock */
   const [time, setTime] = useState(new Date());
   useEffect(() => { const t = setInterval(() => setTime(new Date()), 1000); return () => clearInterval(t); }, []);
@@ -147,7 +123,66 @@ export default function DashboardPage({ organizationName }: { organizationName?:
   const greeting = hour < 12 ? 'Good Morning,' : hour < 18 ? 'Good Afternoon,' : 'Good Evening,';
 
   /* Workspace / Business context */
-  const businessName = organizationName || 'My Workspace';
+  const businessName = orgProfile?.name || 'My Workspace';
+  const industry = (orgProfile?.industry || '').toLowerCase();
+
+  let dynamicKPIs = [
+    { label: 'Revenue MTD',    value: '$284K', change: '+18.4%', icon: '💰', prompt: 'Analyze my revenue drivers for this month.' },
+    { label: 'Active Users',   value: '1,842', change: '+9.2%',  icon: '👥', prompt: 'How can I grow active users faster?' },
+    { label: 'Time Saved by ORYN', value: '340 hrs', change: '+15%', icon: '⏳', prompt: 'Break down time saved by department.' },
+    { label: 'Automated Actions', value: '12,492', change: '+34%', icon: '⚡', prompt: 'Which AI workflows are most active?' },
+  ];
+
+  if (industry.includes('health') || industry.includes('medical')) {
+    dynamicKPIs[0] = { label: 'Patient Acquisitions', value: '412', change: '+12%', icon: '🩺', prompt: 'Analyze patient acquisition costs.' };
+    dynamicKPIs[1] = { label: 'Active Patients', value: '4,842', change: '+5%', icon: '👥', prompt: 'Show active patient demographic.' };
+  } else if (industry.includes('finance') || industry.includes('bank') || industry.includes('crypto')) {
+    dynamicKPIs[0] = { label: 'AUM', value: '$1.2B', change: '+4.2%', icon: '🏦', prompt: 'Analyze Assets Under Management trends.' };
+    dynamicKPIs[1] = { label: 'Active Clients', value: '842', change: '+2.1%', icon: '👥', prompt: 'Client retention risk factors.' };
+  } else if (industry.includes('tech') || industry.includes('software') || industry.includes('saas')) {
+    dynamicKPIs[0] = { label: 'MRR', value: '$84K', change: '+18.4%', icon: '📈', prompt: 'Analyze MRR growth drivers.' };
+    dynamicKPIs[1] = { label: 'Active Subscriptions', value: '2,842', change: '+12.2%', icon: '🔄', prompt: 'Show subscription churn risk.' };
+  } else if (industry.includes('ecommerce') || industry.includes('retail')) {
+    dynamicKPIs[0] = { label: 'Gross Sales', value: '$412K', change: '+22%', icon: '🛍️', prompt: 'Analyze best selling products.' };
+    dynamicKPIs[1] = { label: 'Conversion Rate', value: '4.8%', change: '+1.2%', icon: '🎯', prompt: 'How to improve cart conversion?' };
+  }
+
+  let dynamicAgents = [
+    { name: 'Sales Co-Pilot', status: 'Running', task: 'Qualifying 43 inbound leads', load: 85, color: 'var(--success)' },
+    { name: 'Data Analyst', status: 'Idle', task: 'Awaiting new datasets', load: 10, color: 'var(--accent-primary)' },
+    { name: 'Support Bot', status: 'Running', task: 'Handling 12 active tickets', load: 60, color: 'var(--warn)' },
+    { name: 'Marketing Agent', status: 'Optimizing', task: 'A/B testing ad copy', load: 45, color: '#ec4899' },
+  ];
+
+  if (industry.includes('health') || industry.includes('medical')) {
+    dynamicAgents[0] = { name: 'Compliance Checker', status: 'Running', task: 'Auditing 412 patient records', load: 92, color: 'var(--success)' };
+    dynamicAgents[3] = { name: 'Triage Bot', status: 'Running', task: 'Processing inbound symptoms', load: 78, color: '#ec4899' };
+  } else if (industry.includes('finance') || industry.includes('bank') || industry.includes('crypto')) {
+    dynamicAgents[0] = { name: 'Risk Analyst', status: 'Running', task: 'Running Monte Carlo simulations', load: 95, color: 'var(--success)' };
+    dynamicAgents[3] = { name: 'Fraud Detector', status: 'Monitoring', task: 'Scanning recent transactions', load: 30, color: '#ec4899' };
+  } else if (industry.includes('tech') || industry.includes('software') || industry.includes('saas')) {
+    dynamicAgents[0] = { name: 'Code Reviewer', status: 'Running', task: 'Reviewing 4 PRs', load: 65, color: 'var(--success)' };
+    dynamicAgents[3] = { name: 'DevOps Monitor', status: 'Monitoring', task: 'Watching server health', load: 20, color: '#ec4899' };
+  } else if (industry.includes('ecommerce') || industry.includes('retail')) {
+    dynamicAgents[0] = { name: 'Inventory Bot', status: 'Running', task: 'Forecasting Q3 stock levels', load: 45, color: 'var(--success)' };
+    dynamicAgents[3] = { name: 'Cart Recovery Agent', status: 'Running', task: 'Sending 214 reminder emails', load: 80, color: '#ec4899' };
+  }
+
+  const baseIntegrations = [
+    { icon: '📧', name: 'Gmail',    connected: true  },
+    { icon: '📅', name: 'Calendar', connected: true  },
+    { icon: '💬', name: 'Slack',    connected: false },
+    { icon: '⚡', name: 'Zapier',  connected: false },
+  ];
+
+  const userIntegrations = orgProfile?.integrations || [];
+  const dynamicIntegrations = [
+    ...baseIntegrations,
+    ...(userIntegrations.includes('Google Analytics') ? [{ icon: '📊', name: 'Google Analytics', connected: true }] : []),
+    ...(userIntegrations.includes('Stripe') ? [{ icon: '💳', name: 'Stripe', connected: true }] : []),
+    ...(userIntegrations.includes('Salesforce') ? [{ icon: '☁️', name: 'Salesforce', connected: true }] : []),
+    ...(userIntegrations.includes('Notion') ? [{ icon: '📝', name: 'Notion', connected: true }] : []),
+  ];
 
   /* ── Feature state ── */
   const [cmdInput, setCmdInput]           = useState('');
@@ -381,7 +416,7 @@ export default function DashboardPage({ organizationName }: { organizationName?:
           </div>
 
           {/* Row 2: KPIs */}
-          {kpis.map((k, i) => (
+          {dynamicKPIs.map((k, i) => (
             <motion.div key={k.label}
               initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, delay: 0.2 + (i * 0.05) }}
               style={{ 
@@ -409,8 +444,8 @@ export default function DashboardPage({ organizationName }: { organizationName?:
           <div className="span-7" style={{ gridColumn: 'span 7' }}>
             <Card delay={0.25} title="Active AI Agents" style={{ height: '100%' }}>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-                {activeAgents.map(agent => (
-                  <div key={agent.name} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 16px', background: 'var(--glass-bg-subtle)', borderRadius: 12, border: '1px solid var(--glass-border-subtle)' }}>
+                {dynamicAgents.map((agent, i) => (
+                  <div key={i} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 16px', background: 'var(--glass-bg-subtle)', borderRadius: 12, border: '1px solid var(--glass-border-subtle)' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
                       <div style={{ position: 'relative', width: 10, height: 10 }}>
                         {agent.status === 'Running' && <div style={{ position: 'absolute', inset: 0, borderRadius: '50%', background: agent.color, opacity: 0.5, animation: 'ping 1.5s cubic-bezier(0, 0, 0.2, 1) infinite' }} />}
@@ -436,8 +471,8 @@ export default function DashboardPage({ organizationName }: { organizationName?:
           <div className="span-5" style={{ gridColumn: 'span 5' }}>
             <Card delay={0.3} title="Data Pipeline Integrations" style={{ height: '100%' }}>
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', gap: 12 }}>
-              {integrations.map(g => (
-                <div key={g.name}
+              {dynamicIntegrations.map((g, i) => (
+                <div key={i}
                   style={{ 
                     padding: '16px', background: g.connected ? 'rgba(249, 115, 22, 0.03)' : 'var(--glass-bg-subtle)', 
                     border: `1px solid ${g.connected ? 'rgba(249, 115, 22, 0.15)' : 'var(--glass-bg-subtle)'}`, 
