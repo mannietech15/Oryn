@@ -46,12 +46,7 @@ export function useChat() {
       } catch {}
     }
     return {
-      '1': [{
-        id: genId(),
-        role: 'assistant',
-        content: "Hello! I'm **ORYN**, your real-time business AI. I can answer questions, search the web, analyze files, and extract tasks automatically. What would you like to work on?",
-        timestamp: new Date(),
-      }]
+      '1': []
     };
   });
 
@@ -92,12 +87,7 @@ export function useChat() {
     setSessions(prev => [{ id: newId, title: 'New Conversation', date: new Date() }, ...prev]);
     setMessagesMap(prev => ({
       ...prev,
-      [newId]: [{
-        id: genId(),
-        role: 'assistant',
-        content: "New intelligence session started. How can I assist you?",
-        timestamp: new Date(),
-      }]
+      [newId]: []
     }));
     setActiveSessionId(newId);
     setTasks([]);
@@ -119,14 +109,7 @@ export function useChat() {
   }, []);
 
   const resetChat = useCallback(() => {
-    setMessages([
-      {
-        id: genId(),
-        role: 'assistant',
-        content: "Hello! I'm **ORYN**, your real-time business AI. I can answer questions, search the web, analyze files, and extract tasks automatically. What would you like to work on?",
-        timestamp: new Date(),
-      },
-    ]);
+    setMessages([]);
     setTasks([
       { id: genId(), text: 'Review Q1 revenue report', done: true, createdAt: new Date() },
       { id: genId(), text: 'Enterprise upsell pipeline', done: false, createdAt: new Date() },

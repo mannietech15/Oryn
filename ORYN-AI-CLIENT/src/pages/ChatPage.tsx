@@ -335,13 +335,28 @@ export default function ChatPage({
             Open History
           </button>
         </div>
-        {/* Messages List */}
-        <div style={{ flex: 1, overflowY: 'auto', padding: isMobile ? '24px 16px' : '32px 48px', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-          <div style={{ width: '100%', maxWidth: '850px', display: 'flex', flexDirection: 'column', gap: 32 }}>
-            {messages.map(m => <MessageBubble key={m.id} msg={m} />)}
-            <div ref={messagesEndRef} style={{ height: 40, flexShrink: 0 }} />
+        {/* Top Spacer for Centered Empty State */}
+        {messages.length === 0 && <div style={{ flex: 1 }} />}
+
+        {/* Messages List (Hidden if empty) */}
+        {messages.length > 0 && (
+          <div style={{ flex: 1, overflowY: 'auto', padding: isMobile ? '24px 16px' : '32px 48px', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+            <div style={{ width: '100%', maxWidth: '850px', display: 'flex', flexDirection: 'column', gap: 32 }}>
+              {messages.map(m => <MessageBubble key={m.id} msg={m} />)}
+              <div ref={messagesEndRef} style={{ height: 40, flexShrink: 0 }} />
+            </div>
           </div>
-        </div>
+        )}
+
+        {/* Empty State Title */}
+        {messages.length === 0 && (
+          <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 24 }}>
+            <h1 style={{ fontFamily: 'var(--font-display)', fontSize: isMobile ? 32 : 42, color: 'var(--text-primary)', margin: 0, fontWeight: 500, display: 'flex', alignItems: 'center', gap: 16 }}>
+              <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="var(--accent-primary)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ transform: 'rotate(15deg)' }}><path d="M12 2v20M17 5l-10 14M22 12H2M19 17L5 7"/></svg>
+              What shall we think through?
+            </h1>
+          </div>
+        )}
 
         {/* Improved Input Area */}
         <div style={{ 
@@ -350,6 +365,7 @@ export default function ChatPage({
           display: 'flex', 
           flexDirection: 'column',
           alignItems: 'center',
+          width: '100%'
         }}>
           <div style={{
             width: '100%', 
@@ -493,7 +509,7 @@ export default function ChatPage({
               </button>
             </div>
             
-            {!isMobile && (
+            {!isMobile && messages.length > 0 && (
               <div style={{ display: 'flex', justifyContent: 'center', marginTop: 4 }}>
                 <span style={{ fontSize: 11, color: 'var(--text-secondary)', fontFamily: 'var(--font-body)' }}>
                   ORYN can make mistakes. Consider verifying important information.
@@ -501,7 +517,37 @@ export default function ChatPage({
               </div>
             )}
           </div>
+
+          {/* Pills for Empty State */}
+          {messages.length === 0 && (
+            <div style={{ display: 'flex', gap: 12, marginTop: 16, flexWrap: 'wrap', justifyContent: 'center', maxWidth: '850px', width: '100%' }}>
+              {[
+                { icon: '</>', label: 'Code', prompt: 'Write a React component for...' },
+                { icon: '🎓', label: 'Learn', prompt: 'Explain quantum computing in simple terms...' },
+                { icon: '✏️', label: 'Write', prompt: 'Draft a professional email about...' },
+                { icon: '☕', label: 'Life stuff', prompt: 'Plan a healthy weekly meal prep...' },
+                { icon: '💡', label: "ORYN's choice", prompt: 'Tell me a fascinating fact about the universe...' }
+              ].map(item => (
+                <button 
+                  key={item.label}
+                  onClick={() => setInput(item.prompt)}
+                  style={{
+                    background: 'var(--glass-bg-subtle)', border: '1px solid var(--card-border)',
+                    color: 'var(--text-primary)', padding: '8px 16px', borderRadius: 20, fontSize: 13, fontWeight: 500,
+                    cursor: 'pointer', transition: 'all 0.2s', display: 'flex', alignItems: 'center', gap: 8
+                  }}
+                  onMouseEnter={e => { e.currentTarget.style.background = 'var(--glass-bg-hover)'; e.currentTarget.style.transform = 'translateY(-1px)'; }}
+                  onMouseLeave={e => { e.currentTarget.style.background = 'var(--glass-bg-subtle)'; e.currentTarget.style.transform = 'translateY(0)'; }}
+                >
+                  <span style={{ color: 'var(--text-secondary)' }}>{item.icon}</span> {item.label}
+                </button>
+              ))}
+            </div>
+          )}
         </div>
+
+        {/* Bottom Spacer for Centered Empty State */}
+        {messages.length === 0 && <div style={{ flex: 1.5 }} />}
       </div>
       
       <input ref={fileInputRef} id="fileInput" type="file" multiple style={{ display: 'none' }} onChange={handleFile} />
