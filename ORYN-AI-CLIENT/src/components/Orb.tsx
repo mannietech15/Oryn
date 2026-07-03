@@ -7,6 +7,7 @@ interface OrbProps {
   rotateOnHover?: boolean;
   forceHoverState?: boolean;
   backgroundColor?: string;
+  autoAnimate?: boolean;
 }
 
 export default function Orb({
@@ -14,7 +15,8 @@ export default function Orb({
   hoverIntensity = 0.2,
   rotateOnHover = true,
   forceHoverState = false,
-  backgroundColor = '#000000'
+  backgroundColor = '#000000',
+  autoAnimate = false
 }: OrbProps) {
   const ctnDom = useRef<HTMLDivElement>(null);
 
@@ -232,12 +234,13 @@ export default function Orb({
     window.addEventListener('resize', resize);
     resize();
 
-    let targetHover = 0;
+    let targetHover = forceHoverState || autoAnimate ? 1 : 0;
     let lastTime = 0;
     let currentRot = 0;
-    const rotationSpeed = 0.3;
+    const baseRotationSpeed = 0.3;
 
     const handleMouseMove = (e: MouseEvent) => {
+      if (autoAnimate) return; // skip manual hover in auto mode
       const rect = container.getBoundingClientRect();
       const x = e.clientX - rect.left;
       const y = e.clientY - rect.top;
@@ -257,6 +260,7 @@ export default function Orb({
     };
 
     const handleMouseLeave = () => {
+      if (autoAnimate) return;
       targetHover = 0;
     };
 
@@ -272,11 +276,24 @@ export default function Orb({
       program.uniforms.hue.value = hue;
       program.uniforms.hoverIntensity.value = hoverIntensity;
 
-      const effectiveHover = forceHoverState ? 1 : targetHover;
-      program.uniforms.hover.value += (effectiveHover - program.uniforms.hover.value) * 0.1;
+      if (autoAnimate) {
+        // Simulate organic random hover pulsing using sine waves
+        const timeSec = t * 0.001;
+        const pulseA = Math.sin(timeSec * 1.3) * 0.5 + 0.5;
+        const pulseB = Math.sin(timeSec * 0.7 + 2.0) * 0.5 + 0.5;
+        targetHover = 0.4 + pulseA * 0.6; // oscillates between 0.4 and 1.0
+        // Dynamic rotation speed based on hoverIntensity (audio-reactive)
+        const dynamicSpeed = baseRotationSpeed + hoverIntensity * 0.8;
+        currentRot += dt * dynamicSpeed;
+        // Also modulate the hover intensity itself with a secondary pulse
+        program.uniforms.hoverIntensity.value = hoverIntensity * (0.6 + pulseB * 0.4);
+      }
 
-      if (rotateOnHover && effectiveHover > 0.5) {
-        currentRot += dt * rotationSpeed;
+      const effectiveHover = (forceHoverState || autoAnimate) ? Math.max(targetHover, 0.3) : targetHover;
+      program.uniforms.hover.value += (effectiveHover - program.uniforms.hover.value) * 0.08;
+
+      if (rotateOnHover && effectiveHover > 0.2) {
+        if (!autoAnimate) currentRot += dt * baseRotationSpeed;
       }
       program.uniforms.rot.value = currentRot;
       program.uniforms.backgroundColor.value = hexToVec3(backgroundColor);
@@ -293,7 +310,7 @@ export default function Orb({
       container.removeChild(gl.canvas);
       gl.getExtension('WEBGL_lose_context')?.loseContext();
     };
-  }, [hue, hoverIntensity, rotateOnHover, forceHoverState, backgroundColor]);
+  }, [hue, hoverIntensity, rotateOnHover, forceHoverState, backgroundColor, autoAnimate]);
 
   return <div ref={ctnDom} className="w-full h-full" style={{ width: '100%', height: '100%' }} />;
 }

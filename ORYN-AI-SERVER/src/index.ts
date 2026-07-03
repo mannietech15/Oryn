@@ -16,7 +16,11 @@ const openai = new OpenAI({
   baseURL: 'https://integrate.api.nvidia.com/v1',
 });
 
-const MODEL_NAME = 'meta/llama-3.2-90b-vision-instruct';
+// The 'Senior Professor' (Incredibly smart, but slower and strict rate limits)
+// const MODEL_NAME = 'meta/llama-3.2-90b-vision-instruct';
+
+// The 'Junior' (Extremely fast, perfect for real-time voice mode)
+const MODEL_NAME = 'meta/llama-3.1-8b-instruct';
 
 console.log('🔑 NVIDIA API Key:', process.env.NVIDIA_API_KEY ? `Loaded (${process.env.NVIDIA_API_KEY.slice(0, 9)}...)` : 'MISSING');
 
@@ -25,7 +29,7 @@ app.use(express.json());
 
 // ── Health check ──────────────────────────────────────────
 app.get('/', (_req, res) => {
-  res.send('<h1>ORYN AI Server is running (OpenRouter/Mistral)</h1><p>Visit <code>/api/health</code> for status.</p>');
+  res.send('<h1>ORYN AI Server is running (NVIDIA NIM)</h1><p>Visit <code>/api/health</code> for status.</p>');
 });
 
 app.get('/api/health', (_req, res) => {
@@ -118,6 +122,7 @@ Keep responses focused and powerful. Use **bold** for key numbers or insights. M
       const is429 = err.message?.includes('429') || err.status === 429 || err.message?.includes('rate-limit') || err.message?.includes('rate_limit');
       if (is429 && attempt < maxRetries) {
         console.log(`⏳ Rate limited, retrying in ${retryDelays[attempt] / 1000}s... (attempt ${attempt + 1}/${maxRetries})`);
+        res.write(`data: ${JSON.stringify({ type: 'status', text: `Thinking...` })}\n\n`);
         await new Promise(r => setTimeout(r, retryDelays[attempt]));
         continue;
       }

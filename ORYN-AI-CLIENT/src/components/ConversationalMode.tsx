@@ -25,6 +25,7 @@ export function ConversationalMode({
   const aiAudioRef = useRef<HTMLAudioElement | null>(null);
   const aiSourceNodeRef = useRef<MediaElementAudioSourceNode | null>(null);
   const isCancelledRef = useRef<boolean>(false);
+  const fullTranscriptRef = useRef<string>('');
 
   const handleCancel = () => {
     isCancelledRef.current = true;
@@ -67,6 +68,7 @@ export function ConversationalMode({
 
   const startListening = async () => {
     isCancelledRef.current = false;
+    fullTranscriptRef.current = '';
     cleanupAudio();
     setMode('listening');
     setTranscript('');
@@ -99,15 +101,17 @@ export function ConversationalMode({
       recognitionRef.current = recognition;
 
       recognition.onresult = (event: any) => {
-        let finalTrans = '';
+        let newTrans = '';
         for (let i = event.resultIndex; i < event.results.length; ++i) {
-          if (event.results[i].isFinal) finalTrans += event.results[i][0].transcript;
+          if (event.results[i].isFinal) newTrans += event.results[i][0].transcript;
         }
-        if (finalTrans) {
-          setTranscript(finalTrans);
+        if (newTrans.trim()) {
+          fullTranscriptRef.current += (fullTranscriptRef.current ? ' ' : '') + newTrans.trim();
+          setTranscript(fullTranscriptRef.current);
+          
           clearTimeout((window as any).silenceTimeout);
           (window as any).silenceTimeout = setTimeout(() => {
-            handleStopListeningAndThink(finalTrans);
+            handleStopListeningAndThink(fullTranscriptRef.current);
           }, 1500);
         }
       };
@@ -244,11 +248,12 @@ export function ConversationalMode({
       {/* The Central Orb Container */}
       <div style={{ position: 'relative', width: 300, height: 300, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
         <Orb 
-          hoverIntensity={0.2 + audioLevel * 2.0} 
+          hoverIntensity={0.2 + audioLevel * 5.0} 
           rotateOnHover={true} 
           hue={mode === 'listening' ? -60 : mode === 'thinking' ? 0 : mode === 'speaking' ? 120 : 0} 
           forceHoverState={mode !== 'idle' || audioLevel > 0.1}
           backgroundColor="transparent"
+          autoAnimate={true}
         />
       </div>
 

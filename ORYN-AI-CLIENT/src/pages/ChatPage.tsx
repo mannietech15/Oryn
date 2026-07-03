@@ -371,7 +371,8 @@ function MessageBubble({ msg, isMobile }: { msg: Message, isMobile?: boolean }) 
 
 export default function ChatPage({ 
   messages, isStreaming, pendingFiles, sessions, activeSessionId,
-  sendMessage, stopGeneration, setPendingFiles, startNewSession, setActiveSessionId 
+  sendMessage, stopGeneration, setPendingFiles, startNewSession, setActiveSessionId,
+  deleteSession, renameSession
 }: ReturnType<typeof useChat>) {
   const [input, setInput] = useState('');
   const [isRecording, setIsRecording] = useState(false);
@@ -379,6 +380,13 @@ export default function ChatPage({
   const [isHistoryOpen, setIsHistoryOpen] = useState(false);
   const [activeCodePreview, setActiveCodePreview] = useState<{code: string, lang: string} | null>(null);
   const [isConversationalMode, setIsConversationalMode] = useState(false);
+
+  // History menu & dialog state
+  const [historyMenuId, setHistoryMenuId] = useState<string | null>(null);
+  const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
+  const [renameId, setRenameId] = useState<string | null>(null);
+  const [renameValue, setRenameValue] = useState('');
+  const historyMenuRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const handlePreview = (e: any) => {
@@ -388,6 +396,18 @@ export default function ChatPage({
     window.addEventListener('preview-code', handlePreview);
     return () => window.removeEventListener('preview-code', handlePreview);
   }, []);
+
+  // Close history menu on outside click
+  useEffect(() => {
+    if (!historyMenuId) return;
+    const handleClick = (e: MouseEvent) => {
+      if (historyMenuRef.current && !historyMenuRef.current.contains(e.target as Node)) {
+        setHistoryMenuId(null);
+      }
+    };
+    document.addEventListener('mousedown', handleClick);
+    return () => document.removeEventListener('mousedown', handleClick);
+  }, [historyMenuId]);
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -881,45 +901,193 @@ export default function ChatPage({
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
             </button>
           </div>
-          <div style={{ padding: '24px', flex: 1, overflowY: 'auto' }}>
+          <div style={{ padding: '16px', flex: 1, overflowY: 'auto' }}>
             <button 
               onClick={() => { startNewSession(); setIsHistoryOpen(false); }}
               style={{
-                width: '100%', padding: '14px 16px', background: 'var(--accent-primary)', color: '#fff',
-                border: 'none', borderRadius: 12, fontWeight: 600, fontSize: 14, cursor: 'pointer',
-                display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, marginBottom: 32,
+                width: '100%', padding: '10px 16px', background: 'var(--accent-primary)', color: '#fff',
+                border: 'none', borderRadius: 10, fontWeight: 600, fontSize: 13, cursor: 'pointer',
+                display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, marginBottom: 20,
                 boxShadow: '0 4px 16px rgba(249, 115, 22, 0.25)', transition: 'all 0.2s'
               }}
-              onMouseEnter={e => e.currentTarget.style.transform = 'translateY(-2px)'}
+              onMouseEnter={e => e.currentTarget.style.transform = 'translateY(-1px)'}
               onMouseLeave={e => e.currentTarget.style.transform = 'translateY(0)'}
             >
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
               New Conversation
             </button>
             
-            <div style={{ fontSize: 12, fontWeight: 600, color: 'var(--text-tertiary)', textTransform: 'uppercase', letterSpacing: 1, marginBottom: 16 }}>Recent</div>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+            <div style={{ fontSize: 11, fontWeight: 600, color: 'var(--text-tertiary)', textTransform: 'uppercase', letterSpacing: 1, marginBottom: 10 }}>Recent ({sessions.length})</div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
               {sessions.map(s => (
                 <div 
                   key={s.id} 
-                  onClick={() => { setActiveSessionId(s.id); setIsHistoryOpen(false); }}
                   style={{
-                    padding: '16px', borderRadius: 12, cursor: 'pointer', transition: 'all 0.2s',
-                    background: activeSessionId === s.id ? 'rgba(249,115,22,0.1)' : 'var(--glass-bg-subtle)',
+                    padding: '8px 10px', borderRadius: 8, cursor: 'pointer', transition: 'all 0.15s',
+                    background: activeSessionId === s.id ? 'rgba(249,115,22,0.1)' : 'transparent',
                     border: '1px solid',
-                    borderColor: activeSessionId === s.id ? 'rgba(249,115,22,0.3)' : 'transparent',
+                    borderColor: activeSessionId === s.id ? 'rgba(249,115,22,0.2)' : 'transparent',
+                    display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                    position: 'relative'
                   }}
-                  onMouseEnter={e => { if (activeSessionId !== s.id) e.currentTarget.style.background = 'var(--glass-bg-hover)'; }}
-                  onMouseLeave={e => { if (activeSessionId !== s.id) e.currentTarget.style.background = 'var(--glass-bg-subtle)'; }}
+                  onMouseEnter={e => { if (activeSessionId !== s.id) e.currentTarget.style.background = 'var(--glass-bg-subtle)'; }}
+                  onMouseLeave={e => { if (activeSessionId !== s.id) e.currentTarget.style.background = 'transparent'; }}
                 >
-                  <div style={{ fontSize: 14, fontWeight: 500, color: activeSessionId === s.id ? 'var(--text-primary)' : 'var(--text-secondary)', marginBottom: 6, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                    {s.title}
+                  {/* Session info - clickable area */}
+                  <div 
+                    onClick={() => { setActiveSessionId(s.id); setIsHistoryOpen(false); }}
+                    style={{ flex: 1, overflow: 'hidden', minWidth: 0 }}
+                  >
+                    {renameId === s.id ? (
+                      <input
+                        autoFocus
+                        value={renameValue}
+                        onChange={e => setRenameValue(e.target.value)}
+                        onKeyDown={e => {
+                          if (e.key === 'Enter') { renameSession(s.id, renameValue.trim() || s.title); setRenameId(null); }
+                          if (e.key === 'Escape') setRenameId(null);
+                        }}
+                        onBlur={() => { renameSession(s.id, renameValue.trim() || s.title); setRenameId(null); }}
+                        onClick={e => e.stopPropagation()}
+                        style={{
+                          width: '100%', background: 'var(--glass-bg-subtle)', border: '1px solid var(--accent-primary)',
+                          borderRadius: 6, padding: '4px 8px', color: 'var(--text-primary)', fontSize: 13,
+                          fontFamily: 'var(--font-body)', outline: 'none'
+                        }}
+                      />
+                    ) : (
+                      <>
+                        <div style={{ fontSize: 13, fontWeight: 500, color: activeSessionId === s.id ? 'var(--text-primary)' : 'var(--text-secondary)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', lineHeight: 1.3 }}>
+                          {s.title}
+                        </div>
+                        <div style={{ fontSize: 11, color: activeSessionId === s.id ? 'var(--accent-primary)' : 'var(--text-tertiary)', lineHeight: 1.3, marginTop: 2 }}>
+                          {s.date.toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}
+                        </div>
+                      </>
+                    )}
                   </div>
-                  <div style={{ fontSize: 12, color: activeSessionId === s.id ? 'var(--accent-primary)' : 'var(--text-tertiary)' }}>
-                    {s.date.toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}
-                  </div>
+
+                  {/* Three-dot menu trigger */}
+                  <button
+                    onClick={e => { e.stopPropagation(); setHistoryMenuId(historyMenuId === s.id ? null : s.id); }}
+                    style={{
+                      background: 'none', border: 'none', color: 'var(--text-tertiary)', cursor: 'pointer',
+                      padding: '4px', borderRadius: 6, display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      transition: 'all 0.15s', flexShrink: 0, opacity: historyMenuId === s.id ? 1 : 0.4
+                    }}
+                    onMouseEnter={e => { e.currentTarget.style.background = 'var(--glass-bg-subtle)'; e.currentTarget.style.opacity = '1'; }}
+                    onMouseLeave={e => { e.currentTarget.style.background = 'none'; e.currentTarget.style.opacity = historyMenuId === s.id ? '1' : '0.4'; }}
+                  >
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="5" r="1.5"></circle><circle cx="12" cy="12" r="1.5"></circle><circle cx="12" cy="19" r="1.5"></circle></svg>
+                  </button>
+
+                  {/* Dropdown menu */}
+                  {historyMenuId === s.id && (
+                    <div
+                      ref={historyMenuRef}
+                      onClick={e => e.stopPropagation()}
+                      style={{
+                        position: 'absolute', top: '100%', right: 0, zIndex: 100,
+                        background: 'var(--card-bg)', border: '1px solid var(--card-border)',
+                        borderRadius: 10, padding: '4px', minWidth: 160,
+                        boxShadow: '0 8px 30px rgba(0,0,0,0.35)', backdropFilter: 'blur(12px)',
+                        animation: 'fadeIn 0.15s ease'
+                      }}
+                    >
+                      {[
+                        { label: 'Rename', icon: 'M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7', action: () => { setRenameId(s.id); setRenameValue(s.title); setHistoryMenuId(null); } },
+                        { label: 'Pin to Top', icon: 'M12 17v5M9 10.76a2 2 0 0 1-1.11 1.79l-1.78.9A2 2 0 0 0 5 15.24V16a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.76V7a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1z', action: () => { setHistoryMenuId(null); } },
+                        { label: 'Archive', icon: 'M21 8v13H3V8M1 3h22v5H1zM10 12h4', action: () => { setHistoryMenuId(null); } },
+                        { label: 'Delete', icon: 'M3 6h18M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2', action: () => { setDeleteConfirmId(s.id); setHistoryMenuId(null); }, danger: true },
+                      ].map(item => (
+                        <button
+                          key={item.label}
+                          onClick={item.action}
+                          style={{
+                            width: '100%', padding: '8px 12px', background: 'none', border: 'none',
+                            color: (item as any).danger ? '#ef4444' : 'var(--text-secondary)',
+                            cursor: 'pointer', fontSize: 13, fontWeight: 500, fontFamily: 'var(--font-body)',
+                            display: 'flex', alignItems: 'center', gap: 10, borderRadius: 8,
+                            transition: 'all 0.1s', textAlign: 'left'
+                          }}
+                          onMouseEnter={e => { e.currentTarget.style.background = (item as any).danger ? 'rgba(239,68,68,0.1)' : 'var(--glass-bg-subtle)'; e.currentTarget.style.color = (item as any).danger ? '#ef4444' : 'var(--text-primary)'; }}
+                          onMouseLeave={e => { e.currentTarget.style.background = 'none'; e.currentTarget.style.color = (item as any).danger ? '#ef4444' : 'var(--text-secondary)'; }}
+                        >
+                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d={item.icon}></path></svg>
+                          {item.label}
+                        </button>
+                      ))}
+                    </div>
+                  )}
                 </div>
               ))}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Delete Confirmation Dialog (shadcn-style) */}
+      {deleteConfirmId && (
+        <div
+          style={{
+            position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
+            background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(4px)',
+            zIndex: 10000, display: 'flex', alignItems: 'center', justifyContent: 'center',
+            animation: 'fadeIn 0.15s ease'
+          }}
+          onClick={() => setDeleteConfirmId(null)}
+        >
+          <div
+            onClick={e => e.stopPropagation()}
+            style={{
+              background: 'var(--card-bg)', border: '1px solid var(--card-border)',
+              borderRadius: 16, padding: '28px', maxWidth: 400, width: '90%',
+              boxShadow: '0 20px 60px rgba(0,0,0,0.5)',
+              animation: 'slideUp 0.2s ease'
+            }}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 16 }}>
+              <div style={{
+                width: 40, height: 40, borderRadius: 10,
+                background: 'rgba(239,68,68,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center'
+              }}>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#ef4444" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 6h18M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path></svg>
+              </div>
+              <div>
+                <h4 style={{ margin: 0, fontSize: 16, fontWeight: 600, color: 'var(--text-primary)' }}>Delete Conversation</h4>
+                <p style={{ margin: '4px 0 0', fontSize: 13, color: 'var(--text-tertiary)' }}>This action cannot be undone.</p>
+              </div>
+            </div>
+            <p style={{ fontSize: 14, color: 'var(--text-secondary)', lineHeight: 1.6, margin: '0 0 24px' }}>
+              Are you sure you want to permanently delete <strong style={{ color: 'var(--text-primary)' }}>"{ sessions.find(s => s.id === deleteConfirmId)?.title || 'this conversation' }"</strong>? All messages will be lost.
+            </p>
+            <div style={{ display: 'flex', gap: 10, justifyContent: 'flex-end' }}>
+              <button
+                onClick={() => setDeleteConfirmId(null)}
+                style={{
+                  padding: '10px 20px', borderRadius: 10, fontSize: 13, fontWeight: 600,
+                  background: 'var(--glass-bg-subtle)', color: 'var(--text-secondary)',
+                  border: '1px solid var(--card-border)', cursor: 'pointer', fontFamily: 'var(--font-body)',
+                  transition: 'all 0.15s'
+                }}
+                onMouseEnter={e => { e.currentTarget.style.background = 'var(--glass-bg-hover)'; e.currentTarget.style.color = 'var(--text-primary)'; }}
+                onMouseLeave={e => { e.currentTarget.style.background = 'var(--glass-bg-subtle)'; e.currentTarget.style.color = 'var(--text-secondary)'; }}
+              >
+                Cancel
+              </button>
+              <button
+                onClick={() => { deleteSession(deleteConfirmId); setDeleteConfirmId(null); }}
+                style={{
+                  padding: '10px 20px', borderRadius: 10, fontSize: 13, fontWeight: 600,
+                  background: '#ef4444', color: '#fff',
+                  border: 'none', cursor: 'pointer', fontFamily: 'var(--font-body)',
+                  boxShadow: '0 4px 14px rgba(239,68,68,0.3)', transition: 'all 0.15s'
+                }}
+                onMouseEnter={e => e.currentTarget.style.background = '#dc2626'}
+                onMouseLeave={e => e.currentTarget.style.background = '#ef4444'}
+              >
+                Delete
+              </button>
             </div>
           </div>
         </div>

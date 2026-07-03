@@ -84,7 +84,22 @@ export function useChat() {
 
   const startNewSession = useCallback(() => {
     const newId = genId();
-    setSessions(prev => [{ id: newId, title: 'New Conversation', date: new Date() }, ...prev]);
+    setSessions(prev => {
+      const updated = [{ id: newId, title: 'New Conversation', date: new Date() }, ...prev];
+      // Enforce 30-session cap — auto-prune oldest
+      if (updated.length > 30) {
+        const removed = updated.slice(30);
+        removed.forEach(s => {
+          setMessagesMap(prevMap => {
+            const copy = { ...prevMap };
+            delete copy[s.id];
+            return copy;
+          });
+        });
+        return updated.slice(0, 30);
+      }
+      return updated;
+    });
     setMessagesMap(prev => ({
       ...prev,
       [newId]: []
@@ -92,6 +107,36 @@ export function useChat() {
     setActiveSessionId(newId);
     setTasks([]);
     setPendingFiles([]);
+  }, []);
+
+  const deleteSession = useCallback((sessionId: string) => {
+    setSessions(prev => {
+      const filtered = prev.filter(s => s.id !== sessionId);
+      // If we deleted the active session, switch to the first remaining one or create a new one
+      if (sessionId === activeSessionId) {
+        if (filtered.length > 0) {
+          setActiveSessionId(filtered[0].id);
+        } else {
+          const newId = genId();
+          filtered.push({ id: newId, title: 'New Conversation', date: new Date() });
+          setMessagesMap(prevMap => ({ ...prevMap, [newId]: [] }));
+          setActiveSessionId(newId);
+        }
+      }
+      return filtered;
+    });
+    // Clean up messages for deleted session
+    setMessagesMap(prev => {
+      const copy = { ...prev };
+      delete copy[sessionId];
+      return copy;
+    });
+  }, [activeSessionId]);
+
+  const renameSession = useCallback((sessionId: string, newTitle: string) => {
+    setSessions(prev => prev.map(s =>
+      s.id === sessionId ? { ...s, title: newTitle } : s
+    ));
   }, []);
 
   const addTask = useCallback((text: string) => {
@@ -199,6 +244,12 @@ export function useChat() {
                 setMessages(prev => prev.map(m =>
                   m.id === assistantId ? { ...m, content: fullText } : m
                 ));
+              } else if (chunk.type === 'status' && chunk.text) {
+                 if (!hasReceivedData) {
+                    setMessages(prev => prev.map(m =>
+                      m.id === assistantId ? { ...m, content: `_${chunk.text}_` } : m
+                    ));
+                 }
               } else if (chunk.type === 'error') {
                 throw new Error(chunk.message || 'Unknown stream error');
               }
@@ -237,7 +288,7 @@ export function useChat() {
       
       let errorContent: string;
       if (isAuthError) {
-        errorContent = '***⚠ API AUTHENTICATION ERROR***<br/><br/>OpenRouter is reporting that your **API Key is invalid**. Please check your `.env` file in `ORYN-AI-SERVER`, ensure there are no trailing spaces, and **restart the server**.';
+        errorContent = '***⚠ API AUTHENTICATION ERROR***<br/><br/>NVIDIA NIM is reporting that your **API Key is invalid**. Please check your `.env` file in `ORYN-AI-SERVER`, ensure there are no trailing spaces, and **restart the server**.';
       } else if (isRateLimit) {
         errorContent = '***⏳ RATE LIMITED***<br/><br/>The free AI model is temporarily rate-limited. Please **wait 30 seconds** and try again. This is normal for free-tier models.';
       } else if (err.message?.includes('terminated')) {
@@ -264,6 +315,7 @@ export function useChat() {
 
   return {
     messages, tasks, stats, features, isStreaming, pendingFiles, sessions, activeSessionId,
-    sendMessage, stopGeneration, toggleTask, toggleFeature, setPendingFiles, resetChat, startNewSession, setActiveSessionId
+    sendMessage, stopGeneration, toggleTask, toggleFeature, setPendingFiles, resetChat, startNewSession, setActiveSessionId,
+    deleteSession, renameSession, setSessions
   };
 }
