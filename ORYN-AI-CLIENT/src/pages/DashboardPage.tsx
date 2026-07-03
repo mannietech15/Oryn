@@ -136,7 +136,7 @@ function useTypewriter(text: string, speed = 18) {
 }
 
 /* ─── Main Page ──────────────────────────────────────────── */
-export default function DashboardPage() {
+export default function DashboardPage({ organizationName }: { organizationName?: string | null }) {
   /* Clock */
   const [time, setTime] = useState(new Date());
   useEffect(() => { const t = setInterval(() => setTime(new Date()), 1000); return () => clearInterval(t); }, []);
@@ -147,7 +147,7 @@ export default function DashboardPage() {
   const greeting = hour < 12 ? 'Good Morning,' : hour < 18 ? 'Good Afternoon,' : 'Good Evening,';
 
   /* Workspace / Business context */
-  const [businessName, setBusinessName] = useState('Acme Corp');
+  const businessName = organizationName || 'My Workspace';
 
   /* ── Feature state ── */
   const [cmdInput, setCmdInput]           = useState('');

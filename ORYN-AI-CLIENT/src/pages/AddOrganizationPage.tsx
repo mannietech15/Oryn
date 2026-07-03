@@ -1,10 +1,21 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 
-export default function AddOrganizationPage() {
+export default function AddOrganizationPage({ onComplete }: { onComplete?: (name: string, logo?: string) => void }) {
   const [step, setStep] = useState(1);
   const [loading, setLoading] = useState(false);
-  const [orgData, setOrgData] = useState({ name: '', industry: '', website: '' });
+  const [orgData, setOrgData] = useState({ name: '', industry: '', website: '', logo: '' });
+
+  const handleLogoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setOrgData(prev => ({ ...prev, logo: reader.result as string }));
+      };
+      reader.readAsDataURL(file);
+    }
+  };
 
   const nextStep = () => setStep(s => Math.min(3, s + 1));
   const prevStep = () => setStep(s => Math.max(1, s - 1));
@@ -13,8 +24,8 @@ export default function AddOrganizationPage() {
     setLoading(true);
     setTimeout(() => {
       setLoading(false);
-      window.location.reload(); // Simple simulate complete
-    }, 2000);
+      if (onComplete) onComplete(orgData.name || 'New Organization', orgData.logo);
+    }, 1500);
   };
 
   const orbVariants = {
@@ -65,10 +76,30 @@ export default function AddOrganizationPage() {
             {step === 1 && (
               <motion.div key="step1" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} transition={{ duration: 0.3 }}>
                 <h2 style={{ fontSize: 20, fontWeight: 600, color: 'var(--text-primary)', marginBottom: 24 }}>1. Organization Profile</h2>
+                
+                <div style={{ display: 'flex', alignItems: 'center', gap: 20, marginBottom: 24 }}>
+                  <div style={{ 
+                    width: 80, height: 80, borderRadius: '50%', background: 'var(--glass-bg-subtle)', 
+                    border: '1px dashed var(--card-border)', display: 'flex', alignItems: 'center', 
+                    justifyContent: 'center', overflow: 'hidden', position: 'relative', flexShrink: 0 
+                  }}>
+                    {orgData.logo ? (
+                      <img src={orgData.logo} alt="Logo" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                    ) : (
+                      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
+                    )}
+                    <input type="file" accept="image/*" onChange={handleLogoUpload} style={{ position: 'absolute', inset: 0, opacity: 0, cursor: 'pointer' }} />
+                  </div>
+                  <div>
+                    <div style={{ fontSize: 14, fontWeight: 600, color: 'var(--text-primary)', marginBottom: 4 }}>Company Logo</div>
+                    <div style={{ fontSize: 13, color: 'var(--text-secondary)' }}>Upload a circular logo (PNG, JPG).</div>
+                  </div>
+                </div>
+
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
-                  <Input label="Organization Name" placeholder="e.g. Acme Corp" value={orgData.name} onChange={v => setOrgData({ ...orgData, name: v })} />
-                  <Input label="Industry" placeholder="e.g. Technology, Finance, Healthcare" value={orgData.industry} onChange={v => setOrgData({ ...orgData, industry: v })} />
-                  <Input label="Website URL" placeholder="https://example.com" value={orgData.website} onChange={v => setOrgData({ ...orgData, website: v })} />
+                  <Input label="Organization Name" placeholder="e.g. Acme Corp" value={orgData.name} onChange={(v: string) => setOrgData({ ...orgData, name: v })} />
+                  <Input label="Industry" placeholder="e.g. Technology, Finance, Healthcare" value={orgData.industry} onChange={(v: string) => setOrgData({ ...orgData, industry: v })} />
+                  <Input label="Website URL" placeholder="https://example.com" value={orgData.website} onChange={(v: string) => setOrgData({ ...orgData, website: v })} />
                 </div>
               </motion.div>
             )}

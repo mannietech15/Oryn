@@ -15,6 +15,8 @@ import { Toaster } from './components/ui/Toaster';
 export default function App() {
   const [page, setPage] = useState<Page>('chat');
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [organizationName, setOrganizationName] = useState<string | null>(null);
+  const [organizationLogo, setOrganizationLogo] = useState<string | null>(null);
   const chat = useChat();
 
   const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
@@ -26,15 +28,15 @@ export default function App() {
   const renderPage = () => {
     switch (page) {
       case 'chat':         return <ChatPage {...chat} />;
-      case 'dashboard':    return <DashboardPage />;
+      case 'dashboard':    return <DashboardPage organizationName={organizationName} />;
       case 'analytics':    return <AnalyticsPage />;
       case 'organization': return <OrganizationPage />;
       case 'financials':   return <FinancialsPage />;
       case 'explore':      return <ExplorePage />;
       case 'settings':     return <SettingsPage />;
       case 'automation':   return <AutomationPlaceholder />;
-      case 'add-organization': return <AddOrganizationPage />;
-      default:             return <DashboardPage />;
+      case 'add-organization': return <AddOrganizationPage onComplete={(name, logo) => { setOrganizationName(name); setOrganizationLogo(logo || null); navigate('dashboard'); }} />;
+      default:             return <DashboardPage organizationName={organizationName} />;
     }
   };
 
@@ -74,6 +76,8 @@ export default function App() {
             activeSessionId={chat.activeSessionId}
             onNewChat={chat.startNewSession}
             onSelectSession={chat.setActiveSessionId}
+            organizationName={organizationName}
+            organizationLogo={organizationLogo}
           />
           <main style={{ 
             flex: 1, 
