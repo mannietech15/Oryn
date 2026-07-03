@@ -163,12 +163,18 @@ input, textarea { font-family: inherit; }
 }
 @media (max-width: 768px) {
   .hide-on-mobile { display: none !important; }
-  .mobile-stack { flex-direction: column !important; gap: 16px !important; }
+  .mobile-stack { flex-direction: column !important; align-items: flex-start !important; gap: 16px !important; }
   .mobile-grid-1 { grid-template-columns: 1fr !important; }
   .dashboard-grid { display: flex !important; flex-direction: column !important; gap: 16px !important; }
   .dashboard-container { padding: 16px !important; }
-  .dashboard-header-text { font-size: 32px !important; }
+  .dashboard-header-text { flex-direction: column !important; gap: 0 !important; align-items: flex-start !important; }
+  .dashboard-header-text span:first-child { font-size: 28px !important; line-height: 1.2 !important; }
+  .dashboard-header-text span:last-child { font-size: 24px !important; line-height: 1.2 !important; }
   .dashboard-header-sub { font-size: 11px !important; }
+  .mobile-hide { display: none !important; }
+  .mobile-button-text { display: none !important; }
+  .mobile-command-bar { padding: 8px 12px !important; gap: 8px !important; }
+  .mobile-command-input { font-size: 14px !important; }
 }
 
 @keyframes slideInRight {

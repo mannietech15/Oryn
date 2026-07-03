@@ -269,7 +269,7 @@ export default function DashboardPage({ orgProfile }: { orgProfile?: any }) {
       <div style={{ maxWidth: 1280, margin: '0 auto', position: 'relative', zIndex: 1, display: 'flex', flexDirection: 'column', gap: 32 }}>
         
         {/* ── Header ── */}
-        <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between' }}>
+        <div className="mobile-stack" style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between' }}>
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 12 }}>
               <div className="dashboard-header-sub" style={{ fontFamily: 'var(--font-display)', fontSize: 13, fontWeight: 600, color: 'var(--accent-primary)', letterSpacing: 1 }}>WORKSPACE</div>
@@ -290,7 +290,7 @@ export default function DashboardPage({ orgProfile }: { orgProfile?: any }) {
 
         {/* ── Command Bar (Massive & Centered) ── */}
         <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} style={{ position: 'relative' }}>
-          <div style={{ 
+          <div className="mobile-command-bar" style={{ 
             background: 'var(--card-bg)', backdropFilter: 'blur(16px)', 
             border: '1px solid var(--glass-border)', borderRadius: 16, 
             padding: '12px 20px', display: 'flex', alignItems: 'center', gap: 16,
@@ -303,6 +303,7 @@ export default function DashboardPage({ orgProfile }: { orgProfile?: any }) {
             </div>
             <input
               ref={cmdInputRef}
+              className="mobile-command-input"
               value={cmdInput}
               onChange={e => setCmdInput(e.target.value)}
               onKeyDown={e => e.key === 'Enter' && handleCommand()}
@@ -310,7 +311,7 @@ export default function DashboardPage({ orgProfile }: { orgProfile?: any }) {
               style={{
                 flex: 1, background: 'transparent', border: 'none', outline: 'none',
                 color: 'var(--text-primary)', fontFamily: 'var(--font-body)', fontSize: 16,
-                padding: '4px 0'
+                padding: '4px 0', minWidth: 0
               }}
             />
             <div className="hide-on-mobile" style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
@@ -327,8 +328,14 @@ export default function DashboardPage({ orgProfile }: { orgProfile?: any }) {
                 }}
               >
                 {cmdLoading ? (
-                  <><div style={{ width: 14, height: 14, border: '2px solid rgba(255,255,255,0.3)', borderTopColor: 'white', borderRadius: '50%', animation: 'spin 0.8s linear infinite' }} /> Thinking</>
-                ) : 'Ask ORYN'}
+                  <><div style={{ width: 14, height: 14, border: '2px solid rgba(255,255,255,0.3)', borderTopColor: 'white', borderRadius: '50%', animation: 'spin 0.8s linear infinite' }} /> <span className="mobile-button-text">Thinking</span></>
+                ) : (
+                  <>
+                    <svg className="mobile-hide" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+                    <span className="mobile-button-text">Ask ORYN</span>
+                    <svg className="hide-on-desktop" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+                  </>
+                )}
               </button>
           </div>
 
@@ -418,6 +425,7 @@ export default function DashboardPage({ orgProfile }: { orgProfile?: any }) {
           {/* Row 2: KPIs */}
           {dynamicKPIs.map((k, i) => (
             <motion.div key={k.label}
+              className="span-3"
               initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, delay: 0.2 + (i * 0.05) }}
               style={{ 
                 gridColumn: 'span 3', padding: '20px', borderRadius: 16,  
