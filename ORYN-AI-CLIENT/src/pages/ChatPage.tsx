@@ -299,6 +299,17 @@ export default function ChatPage({
     e.target.value = '';
   };
 
+  const handlePaste = (e: React.ClipboardEvent<HTMLTextAreaElement>) => {
+    const files = Array.from(e.clipboardData.files);
+    if (files.length > 0) {
+      e.preventDefault();
+      setPendingFiles(prev => {
+        const newFiles = [...prev, ...files];
+        return newFiles.slice(0, 10);
+      });
+    }
+  };
+
   return (
     <div style={{ display: 'flex', height: '100%', overflow: 'hidden' }}>
       {/* Main Chat Column */}
@@ -437,6 +448,7 @@ export default function ChatPage({
                 value={input}
                 onChange={e => setInput(e.target.value)}
                 onKeyDown={handleKey}
+                onPaste={handlePaste}
                 placeholder="Ask ORYN to analyze data, write code, or search the web..."
                 style={{
                   flex: 1, 

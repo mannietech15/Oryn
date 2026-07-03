@@ -181,48 +181,68 @@ export function useChat() {
 
     try {
       let fullText = '';
+      let retryCount = 0;
+      const MAX_RETRIES = 2;
 
-      if (files.length > 0) {
-        // File analysis route
-        // We only analyze the first file for now if there are multiple, to match backend API limit
-        const analysis = await analyzeFile(files[0], text || undefined);
-        const { clean, tasks: extracted } = extractTasks(analysis);
-        fullText = clean;
-        if (features.taskExtract) extracted.forEach(addTask);
-        setMessages(prev => prev.map(m =>
-          m.id === assistantId ? { ...m, content: fullText } : m
-        ));
-      } else {
-        // Streaming chat route
-        const history = [...messages, userMsg]
-          .filter(m => m.content)
-          .map(m => ({ role: m.role, content: m.content }));
+      while (retryCount <= MAX_RETRIES) {
+        try {
+          if (files.length > 0) {
+            // File analysis route
+            // We only analyze the first file for now if there are multiple, to match backend API limit
+            const analysis = await analyzeFile(files[0], text || undefined);
+            const { clean, tasks: extracted } = extractTasks(analysis);
+            fullText = clean;
+            if (features.taskExtract) extracted.forEach(addTask);
+            setMessages(prev => prev.map(m =>
+              m.id === assistantId ? { ...m, content: fullText } : m
+            ));
+          } else {
+            // Streaming chat route
+            const history = [...messages, userMsg]
+              .filter(m => m.content)
+              .map(m => ({ role: m.role, content: m.content }));
 
-        const stream = streamChat(history, features.webSearch, features.taskExtract);
-        let hasReceivedData = false;
-        
-
-          for await (const chunk of stream) {
-            if (abortRef.current) break;
-            if (chunk.type === 'text' && chunk.text) {
-              if (!hasReceivedData) {
-                hasReceivedData = true;
-                fullText = ''; // Ensure text starts clean
+            const stream = streamChat(history, features.webSearch, features.taskExtract);
+            let hasReceivedData = false;
+            
+            for await (const chunk of stream) {
+              if (abortRef.current) break;
+              if (chunk.type === 'text' && chunk.text) {
+                if (!hasReceivedData) {
+                  hasReceivedData = true;
+                  fullText = ''; // Ensure text starts clean
+                }
+                fullText += chunk.text;
+                setMessages(prev => prev.map(m =>
+                  m.id === assistantId ? { ...m, content: fullText } : m
+                ));
+              } else if (chunk.type === 'error') {
+                throw new Error(chunk.message || 'Unknown stream error');
               }
-              fullText += chunk.text;
+            }
+            const { clean, tasks: extracted } = extractTasks(fullText);
+            if (features.taskExtract) extracted.forEach(addTask);
+            if (clean !== fullText) {
               setMessages(prev => prev.map(m =>
-                m.id === assistantId ? { ...m, content: fullText } : m
+                m.id === assistantId ? { ...m, content: clean } : m
               ));
-            } else if (chunk.type === 'error') {
-              throw new Error(chunk.message || 'Unknown stream error');
             }
           }
-        const { clean, tasks: extracted } = extractTasks(fullText);
-        if (features.taskExtract) extracted.forEach(addTask);
-        if (clean !== fullText) {
-          setMessages(prev => prev.map(m =>
-            m.id === assistantId ? { ...m, content: clean } : m
-          ));
+          break; // Success! Break out of the retry loop.
+        } catch (error: any) {
+          const errMsg = error.message || '';
+          const isTransient = errMsg.includes('terminated') || errMsg.includes('Connection') || errMsg.includes('upstream') || errMsg.includes('fetch');
+          
+          if (isTransient && retryCount < MAX_RETRIES) {
+            retryCount++;
+            console.log(`[Chat] Transient error, retrying (${retryCount}/${MAX_RETRIES})...`);
+            await new Promise(r => setTimeout(r, 1500 * retryCount)); // Backoff
+            setMessages(prev => prev.map(m =>
+              m.id === assistantId ? { ...m, content: '' } : m // Reset message content for retry
+            ));
+            continue;
+          }
+          throw error; // Rethrow if we exceeded retries or it's not transient
         }
       }
 
@@ -236,6 +256,8 @@ export function useChat() {
         errorContent = '***⚠ API AUTHENTICATION ERROR***<br/><br/>OpenRouter is reporting that your **API Key is invalid**. Please check your `.env` file in `ORYN-AI-SERVER`, ensure there are no trailing spaces, and **restart the server**.';
       } else if (isRateLimit) {
         errorContent = '***⏳ RATE LIMITED***<br/><br/>The free AI model is temporarily rate-limited. Please **wait 30 seconds** and try again. This is normal for free-tier models.';
+      } else if (err.message?.includes('terminated')) {
+        errorContent = '***⚠ CONNECTION DROPPED***<br/><br/>The connection to the AI provider was dropped unexpectedly after multiple retries. Please try sending your message again.';
       } else if (err.message && !err.message.includes('fetch')) {
         errorContent = `***⚠ AI ERROR***<br/><br/>${err.message}`;
       } else {
