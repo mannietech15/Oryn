@@ -13,6 +13,7 @@
     "@types/three": "^0.183.1",
     "framer-motion": "^12.37.0",
     "lucide-react": "^0.383.0",
+    "ogl": "^1.0.11",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-router-dom": "^6.23.1",

@@ -1,0 +1,17 @@
+src/components/ConversationalMode.tsx(1,8): error TS6133: 'React' is declared but its value is never read.
+src/components/ConversationalMode.tsx(7,3): error TS6133: 'userName' is declared but its value is never read.
+src/components/ConversationalMode.tsx(47,46): error TS2345: Argument of type 'Uint8Array<ArrayBufferLike>' is not assignable to parameter of type 'Uint8Array<ArrayBuffer>'.
+  Type 'ArrayBufferLike' is not assignable to type 'ArrayBuffer'.
+    Type 'SharedArrayBuffer' is not assignable to type 'ArrayBuffer'.
+      Types of property '[Symbol.toStringTag]' are incompatible.
+        Type '"SharedArrayBuffer"' is not assignable to type '"ArrayBuffer"'.
+src/components/CustomDatePicker.tsx(1,8): error TS6133: 'React' is declared but its value is never read.
+src/components/ui/Toaster.tsx(1,1): error TS6133: 'React' is declared but its value is never read.
+src/components/ui/use-toast.ts(1,31): error TS6133: 'useCallback' is declared but its value is never read.
+src/pages/ChatPage.tsx(34,68): error TS6133: 'match' is declared but its value is never read.
+src/pages/ChatPage.tsx(59,39): error TS6133: 'match' is declared but its value is never read.
+src/pages/FinancialsPage.tsx(6,19): error TS6133: 'setEntries' is declared but its value is never read.
+src/pages/OrganizationPage.tsx(5,19): error TS6133: 'setCompany' is declared but its value is never read.
+src/pages/OrganizationPage.tsx(12,21): error TS6133: 'setEmployees' is declared but its value is never read.
+src/pages/OrganizationPage.tsx(18,17): error TS6133: 'setTeams' is declared but its value is never read.
+src/pages/SettingsPage.tsx(278,24): error TS6133: 'id' is declared but its value is never read.

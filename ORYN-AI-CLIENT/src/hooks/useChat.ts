@@ -230,6 +230,7 @@ export function useChat() {
       }
 
       setStats(prev => ({ ...prev, messages: prev.messages + 1 }));
+      return fullText;
     } catch (err: any) {
       const isAuthError = err.message?.includes('API key not valid') || err.message?.includes('INVALID_ARGUMENT') || err.message?.includes('401');
       const isRateLimit = err.message?.includes('rate-limit') || err.message?.includes('429');
@@ -250,13 +251,19 @@ export function useChat() {
       setMessages(prev => prev.map(m =>
         m.id === assistantId ? { ...m, content: errorContent } : m
       ));
+      return errorContent;
     } finally {
       setIsStreaming(false);
     }
   }, [isStreaming, messages, pendingFiles, features, addTask, activeSessionId]);
 
+  const stopGeneration = useCallback(() => {
+    abortRef.current = true;
+    setIsStreaming(false);
+  }, []);
+
   return {
     messages, tasks, stats, features, isStreaming, pendingFiles, sessions, activeSessionId,
-    sendMessage, toggleTask, toggleFeature, setPendingFiles, resetChat, startNewSession, setActiveSessionId
+    sendMessage, stopGeneration, toggleTask, toggleFeature, setPendingFiles, resetChat, startNewSession, setActiveSessionId
   };
 }

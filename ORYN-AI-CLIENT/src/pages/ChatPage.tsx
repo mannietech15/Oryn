@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { useChat } from '../hooks/useChat';
 import type { Message } from '../types';
+import { ConversationalMode } from '../components/ConversationalMode';
 
 function formatContent(text: string) {
   const codeBlocks: string[] = [];
@@ -54,8 +55,17 @@ function formatContent(text: string) {
 
   processedText = processedText
     .replace(/`([^`]+)`/g, '<code style="background: var(--glass-bg-subtle); border: 1px solid var(--card-border); padding: 2px 6px; border-radius: 6px; font-family: monospace; font-size: 13px; color: var(--accent-primary);">$1</code>')
-    .replace(/\*\*ORYN\*\*/g, '<span style="font-family: var(--font-script); font-size: 1.3em; font-weight: 400; color: var(--accent-primary); padding-right: 2px;">Oryn</span>')
-    .replace(/\*\*(.*?)\*\*/g, '<strong style="color:var(--text-primary); font-weight: 600;">$1</strong>')
+    .replace(/\b(ORYN|Oryn)\b/g, '__ORYN_PLACEHOLDER__')
+    .replace(/\*\*([^*]+)\*\*(:?)/g, (match, p1, p2) => {
+      const text = p1.trim();
+      const hasColon = p2 === ':' || text.endsWith(':');
+      if (hasColon) {
+        return `<strong style="color: var(--accent-primary); font-weight: 700;">${p1}${p2}</strong>`;
+      }
+      return `<strong style="color: var(--text-primary); font-weight: 600;">${p1}</strong>`;
+    })
+    .replace(/__ORYN_PLACEHOLDER__/g, '<span style="font-family: var(--font-script); font-size: 1.35em; font-weight: bold; color: var(--accent-primary); padding-right: 2px;">Oryn</span>')
+    .replace(/### (.*?)(<br\/>|\n|$)/g, '<h3 style="color: var(--accent-primary); font-weight: 700; margin: 16px 0 8px;">$1</h3>$2')
     .replace(/\n/g, '<br/>');
 
   codeBlocks.forEach((block, i) => {
@@ -137,18 +147,180 @@ function CopyButton({ text }: { text: string }) {
   );
 }
 
-function MessageBubble({ msg }: { msg: Message }) {
+function SpeakButton({ text }: { text: string }) {
+  const [isSpeaking, setIsSpeaking] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+
+  const stopSpeaking = () => {
+    if (audioRef.current) {
+      audioRef.current.pause();
+      audioRef.current = null;
+    }
+    window.speechSynthesis.cancel();
+    setIsSpeaking(false);
+    setIsLoading(false);
+  };
+
+  const handleSpeak = async () => {
+    if (isSpeaking || isLoading) {
+      stopSpeaking();
+      return;
+    }
+
+    setIsLoading(true);
+    // Remove markdown formatting for cleaner reading
+    const cleanText = text.replace(/[*#`]/g, '').replace(/__CODE_BLOCK_\d+__/g, 'Code block snippet.');
+    const voiceId = "UgBBYS2sOqTuMpoF3BR0"; // Requested ElevenLabs Voice ID
+    // Try ElevenLabs API if the environment variable is configured
+    const apiKey = (import.meta as any).env.VITE_ELEVENLABS_API_KEY || '';
+
+    if (apiKey) {
+      try {
+        const res = await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${voiceId}`, {
+          method: 'POST',
+          headers: {
+            'Accept': 'audio/mpeg',
+            'Content-Type': 'application/json',
+            'xi-api-key': apiKey
+          },
+          body: JSON.stringify({
+            text: cleanText,
+            model_id: "eleven_monolingual_v1",
+            voice_settings: { stability: 0.5, similarity_boost: 0.5 }
+          })
+        });
+
+        if (res.ok) {
+          const blob = await res.blob();
+          const url = URL.createObjectURL(blob);
+          const audio = new Audio(url);
+          audioRef.current = audio;
+          audio.onended = () => setIsSpeaking(false);
+          audio.play();
+          setIsSpeaking(true);
+          setIsLoading(false);
+          return;
+        }
+      } catch (e) {
+        console.error("ElevenLabs TTS failed", e);
+      }
+    }
+
+    // Fallback to Native TTS if ElevenLabs fails or is not configured
+    const utterance = new SpeechSynthesisUtterance(cleanText);
+    utterance.onend = () => setIsSpeaking(false);
+    utterance.onerror = () => setIsSpeaking(false);
+    window.speechSynthesis.speak(utterance);
+    setIsSpeaking(true);
+    setIsLoading(false);
+  };
+
+  return (
+    <button
+      onClick={handleSpeak}
+      title={isSpeaking ? 'Stop speaking' : 'Read aloud'}
+      style={{
+        flexShrink: 0, alignSelf: 'center',
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+        width: 32, height: 32, borderRadius: 8, cursor: 'pointer',
+        background: 'none', border: '1px solid transparent',
+        color: isSpeaking ? 'var(--accent-primary)' : 'var(--text-secondary)',
+        transition: 'all 0.2s', padding: 0,
+        opacity: isLoading ? 0.5 : 1
+      }}
+      onMouseEnter={e => {
+        if (!isSpeaking) {
+          (e.currentTarget as HTMLButtonElement).style.color = 'var(--text-primary)';
+          (e.currentTarget as HTMLButtonElement).style.borderColor = 'var(--card-border)';
+          (e.currentTarget as HTMLButtonElement).style.background = 'var(--glass-bg-hover)';
+        }
+      }}
+      onMouseLeave={e => {
+        if (!isSpeaking) {
+          (e.currentTarget as HTMLButtonElement).style.color = 'var(--text-secondary)';
+          (e.currentTarget as HTMLButtonElement).style.borderColor = 'transparent';
+          (e.currentTarget as HTMLButtonElement).style.background = 'none';
+        }
+      }}
+    >
+      {isSpeaking ? (
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+          <rect x="6" y="6" width="12" height="12" rx="2" ry="2"></rect>
+        </svg>
+      ) : (
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+          <path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path>
+          <path d="M19.07 4.93a10 10 0 0 1 0 14.14"></path>
+        </svg>
+      )}
+    </button>
+  );
+}
+
+function MessageBubble({ msg, isMobile }: { msg: Message, isMobile?: boolean }) {
   const isUser = msg.role === 'user';
+  
+  if (isUser) {
+    return (
+      <div style={{
+        display: 'flex', gap: 16, flexDirection: 'row-reverse',
+        alignItems: 'flex-start',
+        animation: 'rise 0.3s ease both',
+      }}>
+        {/* User Bubble */}
+        <div style={{
+          maxWidth: isMobile ? '95%' : '80%', padding: '16px 24px', fontSize: 16, fontWeight: 400, lineHeight: 1.7, color: 'var(--text-primary)',
+          borderRadius: '16px 16px 4px 16px',
+          background: 'rgba(249, 115, 22, 0.12)',
+          border: '1px solid rgba(249, 115, 22, 0.2)',
+          textAlign: 'left',
+        }}>
+          <span style={{ whiteSpace: 'pre-wrap' }}>{msg.content}</span>
+          
+          {msg.attachedFiles && msg.attachedFiles.length > 0 && (() => {
+            const imageCount = msg.attachedFiles.filter(f => f.isImage && f.url).length;
+            return (
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginTop: 12, maxWidth: imageCount > 1 ? 320 : 'auto' }}>
+                {msg.attachedFiles.map((f, i) => f.isImage && f.url ? (
+                  <div key={i} style={{ 
+                    borderRadius: 12, overflow: 'hidden', border: '1px solid rgba(249,115,22,0.3)', 
+                    width: imageCount > 1 ? 'calc(25% - 6px)' : '100%', 
+                    maxWidth: 320, 
+                    aspectRatio: imageCount > 1 ? '1 / 1' : 'auto'
+                  }}>
+                    <img src={f.url} alt="Uploaded" style={{ width: '100%', height: '100%', display: 'block', objectFit: imageCount > 1 ? 'cover' : 'contain' }} />
+                  </div>
+                ) : (
+                  <div key={i} style={{
+                    display: 'inline-flex', alignItems: 'center', gap: 8, padding: '8px 12px',
+                    background: 'rgba(249,115,22,0.1)', border: '1px solid rgba(249,115,22,0.2)', borderRadius: 8, fontSize: 13,
+                    color: 'var(--text-primary)'
+                  }}>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
+                    {f.name}
+                  </div>
+                ))}
+              </div>
+            );
+          })()}
+        </div>
+      </div>
+    );
+  }
+
+  // AI Bubble
   return (
     <div style={{
-      display: 'flex', gap: 16, flexDirection: isUser ? 'row-reverse' : 'row',
-      alignItems: 'flex-start',
+      display: 'flex', flexDirection: 'column', gap: 8,
+      alignItems: 'flex-start', width: '100%',
       animation: 'rise 0.3s ease both',
     }}>
-      {/* Avatar */}
-      {!isUser && (
-        <div style={{ width: 40, height: 40, flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--glass-bg-subtle)', borderRadius: '50%', border: '1px solid var(--card-border)' }}>
-          <svg width="24" height="24" viewBox="0 0 32 32" fill="none">
+      {/* Header: Avatar + Name */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+        <div style={{ width: 32, height: 32, flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--glass-bg-subtle)', borderRadius: '50%', border: '1px solid var(--card-border)' }}>
+          <svg width="20" height="20" viewBox="0 0 32 32" fill="none">
             <polygon points="16,1 31,9 31,23 16,31 1,23 1,9" stroke="var(--accent-primary)" strokeWidth="1.2" fill="rgba(249, 115, 22,0.1)" />
             <circle cx="16" cy="16" r="3" fill="var(--accent-primary)" />
             <line x1="16" y1="7" x2="16" y2="13" stroke="var(--accent-primary)" strokeWidth="0.8" opacity="0.6" />
@@ -159,87 +331,54 @@ function MessageBubble({ msg }: { msg: Message }) {
             <line x1="13" y1="17" x2="7" y2="20" stroke="var(--accent-primary)" strokeWidth="0.8" opacity="0.6" />
           </svg>
         </div>
-      )}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          <span style={{ fontFamily: 'var(--font-script)', fontSize: 20, color: 'var(--text-primary)', fontWeight: 400, marginTop: -2 }}>Oryn AI</span>
+          <span style={{ fontSize: 10, background: 'var(--glass-bg-hover)', padding: '2px 6px', borderRadius: 4, fontWeight: 500, color: 'var(--text-secondary)' }}>v2.0</span>
+        </div>
+      </div>
 
-      {/* Bubble */}
+      {/* Content */}
       <div style={{
-        maxWidth: '80%', padding: isUser ? '16px 24px' : '8px 0', fontSize: 16, fontWeight: 400, lineHeight: 1.7, color: 'var(--text-primary)',
-        borderRadius: isUser ? '16px 16px 4px 16px' : 0,
-        background: isUser ? 'rgba(249, 115, 22, 0.12)' : 'transparent',
-        border: isUser ? '1px solid rgba(249, 115, 22, 0.2)' : 'none',
+        width: '100%', padding: '4px 0', fontSize: 16, fontWeight: 400, lineHeight: 1.7, color: 'var(--text-primary)',
         textAlign: 'left',
       }}>
-        {!isUser && (
-          <div style={{ fontFamily: 'var(--font-display)', fontSize: 12, fontWeight: 700, color: 'var(--text-secondary)', marginBottom: 8, display: 'flex', alignItems: 'center', gap: 8 }}>
-            <span style={{ fontFamily: 'var(--font-script)', fontSize: 20, color: 'var(--text-primary)', fontWeight: 400, marginTop: -2 }}>Oryn AI</span>
-            <span style={{ fontSize: 10, background: 'var(--glass-bg-hover)', padding: '2px 6px', borderRadius: 4, fontWeight: 500 }}>v2.0</span>
-          </div>
-        )}
-
         {msg.content ? (
           <Typewriter text={msg.content} timestamp={msg.timestamp} />
-        ) : !isUser ? (
+        ) : (
           <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '8px 0' }}>
             <div style={{ display: 'flex', gap: 4, alignItems: 'center' }}>
               {[0, 0.15, 0.3].map((d, i) => (
-                <div key={i} style={{
-                  width: 6, height: 6, borderRadius: '50%', background: 'var(--accent-primary)',
-                  animation: `tdBounce 1s ease ${d}s infinite`,
-                }} />
+                <div key={i} style={{ width: 6, height: 6, borderRadius: '50%', background: 'var(--accent-primary)', animation: `tdBounce 1s ease ${d}s infinite` }} />
               ))}
             </div>
-            <div style={{
-              fontFamily: 'var(--font-display)', fontSize: 12, fontWeight: 600,
-              color: 'var(--text-secondary)', animation: 'pulse 2s ease infinite',
-            }}>
+            <div style={{ fontFamily: 'var(--font-display)', fontSize: 12, fontWeight: 600, color: 'var(--text-secondary)', animation: 'pulse 2s ease infinite' }}>
               Analyzing...
             </div>
           </div>
-        ) : null}
-
-        {msg.attachedFiles && msg.attachedFiles.length > 0 && (() => {
-          const imageCount = msg.attachedFiles.filter(f => f.isImage && f.url).length;
-          return (
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginTop: 12, maxWidth: imageCount > 1 ? 320 : 'auto' }}>
-              {msg.attachedFiles.map((f, i) => f.isImage && f.url ? (
-                <div key={i} style={{ 
-                  borderRadius: 12, overflow: 'hidden', border: '1px solid var(--glass-bg-strong)', 
-                  width: imageCount > 1 ? 'calc(25% - 6px)' : '100%', 
-                  maxWidth: 320, 
-                  aspectRatio: imageCount > 1 ? '1 / 1' : 'auto'
-                }}>
-                  <img src={f.url} alt="Uploaded" style={{ width: '100%', height: '100%', display: 'block', objectFit: imageCount > 1 ? 'cover' : 'contain' }} />
-                </div>
-              ) : (
-                <div key={i} style={{
-                  display: 'inline-flex', alignItems: 'center', gap: 8, padding: '8px 12px',
-                  background: 'var(--glass-bg-subtle)', border: '1px solid var(--card-border)', borderRadius: 8, fontSize: 13,
-                  color: 'var(--text-primary)'
-                }}>
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
-                  {f.name}
-                </div>
-              ))}
-            </div>
-          );
-        })()}
+        )}
       </div>
 
-      {/* Copy button — AI only */}
-      {!isUser && msg.content && <CopyButton text={msg.content} />}
+      {/* Footer: Actions */}
+      {msg.content && (
+        <div style={{ alignSelf: 'flex-start', marginTop: 4, display: 'flex', gap: 4 }}>
+          <SpeakButton text={msg.content} />
+          <CopyButton text={msg.content} />
+        </div>
+      )}
     </div>
   );
 }
 
 export default function ChatPage({ 
   messages, isStreaming, pendingFiles, sessions, activeSessionId,
-  sendMessage, setPendingFiles, startNewSession, setActiveSessionId 
+  sendMessage, stopGeneration, setPendingFiles, startNewSession, setActiveSessionId 
 }: ReturnType<typeof useChat>) {
   const [input, setInput] = useState('');
   const [isRecording, setIsRecording] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isHistoryOpen, setIsHistoryOpen] = useState(false);
   const [activeCodePreview, setActiveCodePreview] = useState<{code: string, lang: string} | null>(null);
+  const [isConversationalMode, setIsConversationalMode] = useState(false);
 
   useEffect(() => {
     const handlePreview = (e: any) => {
@@ -252,6 +391,7 @@ export default function ChatPage({
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const recognitionRef = useRef<any>(null);
 
   const [windowWidth, setWindowWidth] = useState(typeof window !== 'undefined' ? window.innerWidth : 1024);
   useEffect(() => {
@@ -276,16 +416,50 @@ export default function ChatPage({
   };
 
   const handleMic = () => {
-    setIsRecording(r => {
-      if (!r) {
-        setTimeout(() => {
-          setIsRecording(false);
-          setInput('Summarize the top business priorities for this week');
-        }, 500);
-        return true;
+    if (isRecording) {
+      recognitionRef.current?.stop();
+      setIsRecording(false);
+      return;
+    }
+
+    const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+    if (!SpeechRecognition) {
+      alert("Your browser does not support voice input. Please try using Chrome or Edge.");
+      return;
+    }
+
+    const recognition = new SpeechRecognition();
+    recognition.continuous = true;
+    recognition.interimResults = true;
+
+    let sessionTranscript = '';
+    const startingInput = input.trim() ? input.trim() + ' ' : '';
+
+    recognition.onstart = () => setIsRecording(true);
+    
+    recognition.onresult = (event: any) => {
+      let interim = '';
+      let final = '';
+      for (let i = event.resultIndex; i < event.results.length; ++i) {
+        if (event.results[i].isFinal) {
+          final += event.results[i][0].transcript;
+        } else {
+          interim += event.results[i][0].transcript;
+        }
       }
-      return false;
-    });
+      sessionTranscript += final;
+      setInput(startingInput + sessionTranscript + interim);
+    };
+
+    recognition.onerror = (e: any) => {
+      console.error('Speech recognition error:', e.error);
+      setIsRecording(false);
+    };
+    
+    recognition.onend = () => setIsRecording(false);
+
+    recognitionRef.current = recognition;
+    recognition.start();
   };
 
   const handleFile = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -311,7 +485,9 @@ export default function ChatPage({
   };
 
   return (
-    <div style={{ display: 'flex', height: '100%', overflow: 'hidden' }}>
+    <>
+      {isConversationalMode && <ConversationalMode onClose={() => setIsConversationalMode(false)} onSendMessage={sendMessage} />}
+      <div style={{ display: 'flex', height: '100%', overflow: 'hidden' }}>
       {/* Main Chat Column */}
       <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden', position: 'relative' }}>
         
@@ -342,7 +518,7 @@ export default function ChatPage({
         {messages.length > 0 && (
           <div style={{ flex: 1, overflowY: 'auto', padding: isMobile ? '24px 16px' : '32px 48px', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
             <div style={{ width: '100%', maxWidth: '850px', display: 'flex', flexDirection: 'column', gap: 32 }}>
-              {messages.map(m => <MessageBubble key={m.id} msg={m} />)}
+              {messages.map(m => <MessageBubble key={m.id} msg={m} isMobile={isMobile} />)}
               <div ref={messagesEndRef} style={{ height: 40, flexShrink: 0 }} />
             </div>
           </div>
@@ -504,37 +680,69 @@ export default function ChatPage({
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="22"/></svg>
                 </button>
 
-                {/* Send Button */}
+                {/* Voice Mode Button */}
                 <button 
-                  onClick={handleSend} 
-                  disabled={isStreaming || (!input.trim() && pendingFiles.length === 0)} 
+                  onClick={() => setIsConversationalMode(true)}
+                  style={{
+                    width: 36, height: 36, borderRadius: 18, 
+                    border: 'none',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    background: 'transparent',
+                    transition: 'all 0.2s', 
+                    cursor: 'pointer',
+                    color: 'var(--text-secondary)'
+                  }}
+                  onMouseEnter={e => e.currentTarget.style.color = 'var(--text-primary)'}
+                  onMouseLeave={e => e.currentTarget.style.color = 'var(--text-secondary)'}
+                  title="Conversational Voice Mode"
+                >
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M2 10v4"></path>
+                    <path d="M6 6v12"></path>
+                    <path d="M10 3v18"></path>
+                    <path d="M14 8v8"></path>
+                    <path d="M18 5v14"></path>
+                    <path d="M22 10v4"></path>
+                  </svg>
+                </button>
+
+                {/* Send/Stop Button */}
+                <button 
+                  onClick={isStreaming ? stopGeneration : handleSend} 
+                  disabled={!isStreaming && !input.trim() && pendingFiles.length === 0} 
                   style={{
                     width: 36, height: 36, flexShrink: 0, borderRadius: 18,
-                    background: (!input.trim() && pendingFiles.length === 0) ? 'transparent' : 'var(--accent-primary)',
-                    color: (!input.trim() && pendingFiles.length === 0) ? 'transparent' : 'white',
+                    background: (!isStreaming && !input.trim() && pendingFiles.length === 0) ? 'transparent' : 'var(--accent-primary)',
+                    color: (!isStreaming && !input.trim() && pendingFiles.length === 0) ? 'transparent' : 'white',
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    opacity: (!input.trim() && pendingFiles.length === 0) ? 0 : (isStreaming ? 0.6 : 1), 
+                    opacity: (!isStreaming && !input.trim() && pendingFiles.length === 0) ? 0 : 1, 
                     transition: 'all 0.2s', 
-                    boxShadow: (!input.trim() && pendingFiles.length === 0) ? 'none' : '0 0 15px rgba(249,115,22,0.3)',
-                    cursor: isStreaming || (!input.trim() && pendingFiles.length === 0) ? 'default' : 'pointer',
+                    boxShadow: (!isStreaming && !input.trim() && pendingFiles.length === 0) ? 'none' : '0 0 15px rgba(249,115,22,0.3)',
+                    cursor: (!isStreaming && !input.trim() && pendingFiles.length === 0) ? 'default' : 'pointer',
                     border: 'none',
-                    transform: (!input.trim() && pendingFiles.length === 0) ? 'scale(0.8)' : 'scale(1)'
+                    transform: (!isStreaming && !input.trim() && pendingFiles.length === 0) ? 'scale(0.8)' : 'scale(1)'
                   }}
                   onMouseEnter={e => {
-                    if (input.trim() || pendingFiles.length > 0) {
+                    if (isStreaming || input.trim() || pendingFiles.length > 0) {
                       e.currentTarget.style.transform = 'translateY(-1px) scale(1)';
                     }
                   }}
                   onMouseLeave={e => {
-                    if (input.trim() || pendingFiles.length > 0) {
+                    if (isStreaming || input.trim() || pendingFiles.length > 0) {
                       e.currentTarget.style.transform = 'translateY(0) scale(1)';
                     }
                   }}
                 >
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ transform: 'translateX(-1px)' }}>
-                    <line x1="22" y1="2" x2="11" y2="13"></line>
-                    <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
-                  </svg>
+                  {isStreaming ? (
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+                      <rect x="7" y="7" width="10" height="10" rx="1" ry="1"></rect>
+                    </svg>
+                  ) : (
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ transform: 'translateX(-1px)' }}>
+                      <line x1="22" y1="2" x2="11" y2="13"></line>
+                      <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                    </svg>
+                  )}
                 </button>
               </div>
             </div>
@@ -717,5 +925,6 @@ export default function ChatPage({
         </div>
       )}
     </div>
+    </>
   );
 }

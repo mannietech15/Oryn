@@ -9,6 +9,7 @@ import ExplorePage from './pages/ExplorePage';
 import SettingsPage from './pages/SettingsPage';
 import type { Page } from './types';
 import { useChat } from './hooks/useChat';
+import { Toaster } from './components/ui/Toaster';
 
 export default function App() {
   const [page, setPage] = useState<Page>('chat');
@@ -37,6 +38,7 @@ export default function App() {
 
   return (
     <>
+      <Toaster />
       {page !== 'chat' && <BackgroundOrbs />}
       <div style={{ display: 'flex', flexDirection: 'column', height: '100%', position: 'relative', zIndex: 10 }}>
         
