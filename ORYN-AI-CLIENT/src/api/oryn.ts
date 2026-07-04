@@ -6,12 +6,13 @@ export async function* streamChat(
   messages: { role: 'user' | 'assistant'; content: string }[],
   webSearch: boolean,
   taskExtract: boolean,
-  model: string
+  model: string,
+  language: string
 ): AsyncGenerator<{ type: string; text?: string; message?: string }> {
   const res = await fetch(`${BASE}/chat`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ messages, webSearch, taskExtract, model }),
+    body: JSON.stringify({ messages, webSearch, taskExtract, model, language }),
   });
 
   if (!res.ok) {
@@ -46,11 +47,12 @@ export async function* streamChat(
   }
 }
 
-export async function analyzeFile(file: File, prompt?: string, model?: string): Promise<string> {
+export async function analyzeFile(file: File, prompt?: string, model?: string, language?: string): Promise<string> {
   const form = new FormData();
   form.append('file', file);
   if (prompt) form.append('prompt', prompt);
   if (model) form.append('model', model);
+  if (language) form.append('language', language);
   const res = await fetch(`${BASE}/analyze`, { method: 'POST', body: form });
   const data = await res.json() as { analysis?: string; error?: string };
   if (!res.ok) throw new Error(data.error ?? 'Analysis failed');

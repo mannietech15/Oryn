@@ -14,6 +14,7 @@ const upload = multer({ storage: multer.memoryStorage() });
 const openai = new OpenAI({
   apiKey: process.env.NVIDIA_API_KEY || '',
   baseURL: 'https://integrate.api.nvidia.com/v1',
+  timeout: 30000, // 30 second timeout to fail fast on hangs
 });
 
 // Dynamic model selection via API now
@@ -34,11 +35,12 @@ app.get('/api/health', (_req, res) => {
 
 // ── Chat (streaming) ──────────────────────────────────────
 app.post('/api/chat', async (req, res) => {
-  const { messages, webSearch, taskExtract, model } = req.body as {
+  const { messages, webSearch, taskExtract, model, language } = req.body as {
     messages: { role: 'user' | 'assistant'; content: string }[];
     webSearch: boolean;
     taskExtract: boolean;
     model?: string;
+    language?: string;
   };
 
   const activeModel = model === 'pro' ? 'meta/llama-3.2-90b-vision-instruct' : 'meta/llama-3.1-8b-instruct';
@@ -47,7 +49,8 @@ app.post('/api/chat', async (req, res) => {
 You help with business strategy, productivity, data analysis, drafting, and decision-making.
 ${webSearch ? 'You have web search capabilities — mention relevant current data when helpful.' : ''}
 ${taskExtract ? 'After your response, if there are clear action items, append a JSON block on a new line: {"tasks":["task1","task2"]} — only if tasks genuinely exist.' : ''}
-Keep responses focused and powerful. Use **bold** for key numbers or insights. Max 3-4 sentences unless detail is needed.`;
+Keep responses focused and powerful. Use **bold** for key numbers or insights. Max 3-4 sentences unless detail is needed.
+IMPORTANT: You MUST respond entirely in the following language: ${language || 'English'}.`;
 
   const lastMsgContent = messages[messages.length - 1].content.trim();
   const lowerMsg = lastMsgContent.toLowerCase();
@@ -145,8 +148,8 @@ app.post('/api/analyze', upload.single('file'), async (req, res) => {
     return;
   }
 
-  const { prompt, model } = req.body as { prompt?: string, model?: string };
-  const userPrompt = prompt || 'Analyze this file and provide a concise business summary with key insights and action items.';
+  const { prompt, model, language } = req.body as { prompt?: string, model?: string, language?: string };
+  const userPrompt = prompt || `Analyze this file and provide a concise business summary with key insights and action items. Respond in ${language || 'English'}.`;
   const isImage = req.file.mimetype.startsWith('image/');
   
   // If it's an image, force the vision model (pro), otherwise use the requested model

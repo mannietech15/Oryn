@@ -69,6 +69,7 @@ export function useChat() {
   const [stats, setStats] = useState<SessionStats>({ messages: 1, tasks: 3, files: 0 });
   const [features, setFeatures] = useState<ChatFeatures>({ voice: true, taskExtract: true, webSearch: true });
   const [model, setModel] = useState<'fast' | 'pro'>('fast');
+  const [language, setLanguage] = useState<string>('English');
   const [isStreaming, setIsStreaming] = useState(false);
   const [pendingFiles, setPendingFiles] = useState<File[]>([]);
   const abortRef = useRef(false);
@@ -220,7 +221,7 @@ export function useChat() {
           if (files.length > 0) {
             // File analysis route
             // We only analyze the first file for now if there are multiple, to match backend API limit
-            const analysis = await analyzeFile(files[0], text || undefined, model);
+            const analysis = await analyzeFile(files[0], text || undefined, model, language);
             const { clean, tasks: extracted } = extractTasks(analysis);
             fullText = clean;
             if (features.taskExtract) extracted.forEach(addTask);
@@ -233,7 +234,7 @@ export function useChat() {
               .filter(m => m.content)
               .map(m => ({ role: m.role, content: m.content }));
 
-            const stream = streamChat(history, features.webSearch, features.taskExtract, model);
+            const stream = streamChat(history, features.webSearch, features.taskExtract, model, language);
             let hasReceivedData = false;
             
             for await (const chunk of stream) {
@@ -268,7 +269,7 @@ export function useChat() {
           break; // Success! Break out of the retry loop.
         } catch (error: any) {
           const errMsg = error.message || '';
-          const isTransient = errMsg.includes('terminated') || errMsg.includes('Connection') || errMsg.includes('upstream') || errMsg.includes('fetch');
+          const isTransient = errMsg.includes('terminated') || errMsg.includes('Connection') || errMsg.includes('upstream') || errMsg.includes('fetch') || errMsg.toLowerCase().includes('time');
           
           if (isTransient && retryCount < MAX_RETRIES) {
             retryCount++;
@@ -309,7 +310,7 @@ export function useChat() {
     } finally {
       setIsStreaming(false);
     }
-  }, [isStreaming, messages, pendingFiles, features, addTask, activeSessionId]);
+  }, [isStreaming, messages, pendingFiles, features, addTask, activeSessionId, language]);
 
   const stopGeneration = useCallback(() => {
     abortRef.current = true;
@@ -317,8 +318,8 @@ export function useChat() {
   }, []);
 
   return {
-    messages, tasks, stats, features, isStreaming, pendingFiles, sessions, activeSessionId, model,
+    messages, tasks, stats, features, isStreaming, pendingFiles, sessions, activeSessionId, model, language,
     sendMessage, stopGeneration, toggleTask, toggleFeature, setPendingFiles, resetChat, startNewSession, setActiveSessionId,
-    deleteSession, renameSession, setSessions, setModel
+    deleteSession, renameSession, setSessions, setModel, setLanguage
   };
 }
