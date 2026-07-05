@@ -7,11 +7,13 @@ import SplashCursor from './SplashCursor';
 export function ConversationalMode({ 
   onClose,
   onSendMessage,
-  onStopGeneration
+  onStopGeneration,
+  language
 }: { 
   onClose: () => void,
   onSendMessage: (text: string, files: any[]) => Promise<string | undefined>,
-  onStopGeneration: () => void
+  onStopGeneration: () => void,
+  language: string
 }) {
   const [mode, setMode] = useState<'idle' | 'listening' | 'thinking' | 'speaking'>('idle');
   const [transcript, setTranscript] = useState('');
@@ -132,7 +134,12 @@ export function ConversationalMode({
       const responseText = await onSendMessage(finalText, []);
       if (isCancelledRef.current) return;
       if (responseText) {
-        startSpeaking(responseText);
+        // Prevent the AI from reading out raw markdown error strings
+        if (responseText.includes('⚠') || responseText.includes('ERROR***')) {
+           startSpeaking("I'm sorry, I'm having trouble connecting to my core servers right now. Please check your connection.");
+        } else {
+           startSpeaking(responseText);
+        }
       } else {
         startSpeaking("I'm sorry, I didn't get a valid response. Let's try again.");
       }
@@ -208,17 +215,35 @@ export function ConversationalMode({
   };
 
   const simulateSpeakingVisuals = (text: string) => {
+     window.speechSynthesis.cancel(); // clear queue
+     
      const utterance = new SpeechSynthesisUtterance(text);
+     
+     const langMap: Record<string, string> = {
+       'Spanish': 'es-ES', 'French': 'fr-FR', 'Yoruba': 'yo-NG',
+       'Igbo': 'ig-NG', 'Hausa': 'ha-NG', 'Pidgin': 'en-NG', 'English': 'en-US'
+     };
+     utterance.lang = langMap[language] || 'en-US';
+     
      const interval = setInterval(() => {
          setAudioLevel(0.1 + Math.random() * 0.7);
      }, 100);
+     
      utterance.onend = () => {
          clearInterval(interval);
          cleanupAudio();
          startListening(); // seamlessly loop back
      };
+     
+     utterance.onerror = (e) => {
+         console.error("SpeechSynthesis error", e);
+         clearInterval(interval);
+         cleanupAudio();
+         startListening();
+     };
+     
      window.speechSynthesis.speak(utterance);
-  }
+  };
 
   return (
     <motion.div 

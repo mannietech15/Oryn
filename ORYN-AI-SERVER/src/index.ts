@@ -4,6 +4,7 @@ import dotenv from 'dotenv';
 import multer from 'multer';
 import OpenAI from 'openai';
 import path from 'path';
+import nodemailer from 'nodemailer';
 
 dotenv.config();
 
@@ -14,7 +15,7 @@ const upload = multer({ storage: multer.memoryStorage() });
 const openai = new OpenAI({
   apiKey: process.env.NVIDIA_API_KEY || '',
   baseURL: 'https://integrate.api.nvidia.com/v1',
-  timeout: 30000, // 30 second timeout to fail fast on hangs
+  timeout: 30000, // Put timeout back to 30s
 });
 
 // Dynamic model selection via API now
@@ -26,7 +27,7 @@ app.use(express.json());
 
 // ── Health check ──────────────────────────────────────────
 app.get('/', (_req, res) => {
-  res.send('<h1>ORYN AI Server is running (NVIDIA NIM)</h1><p>Visit <code>/api/health</code> for status.</p>');
+  res.send('<h1>ORYN AI Server is running (NVIDIA/OpenRouter)</h1><p>Visit <code>/api/health</code> for status.</p>');
 });
 
 app.get('/api/health', (_req, res) => {
@@ -43,12 +44,14 @@ app.post('/api/chat', async (req, res) => {
     language?: string;
   };
 
-  const activeModel = model === 'pro' ? 'meta/llama-3.2-90b-vision-instruct' : 'meta/llama-3.1-8b-instruct';
+  const nvidiaModel = model === 'pro' ? 'meta/llama-3.2-90b-vision-instruct' : 'meta/llama-3.1-70b-instruct';
+  const openRouterModel = model === 'pro' ? 'meta-llama/llama-3.2-90b-vision-instruct' : 'meta-llama/llama-3.1-8b-instruct';
 
   const systemInstruction = `You are Oryn (pronounced "Orine"), a sleek futuristic business AI assistant. Your name is Oryn — always write it as "Oryn" (never spell it out letter by letter). You are professional, insightful, and concise.
 You help with business strategy, productivity, data analysis, drafting, and decision-making.
 ${webSearch ? 'You have web search capabilities — mention relevant current data when helpful.' : ''}
 ${taskExtract ? 'After your response, if there are clear action items, append a JSON block on a new line: {"tasks":["task1","task2"]} — only if tasks genuinely exist.' : ''}
+EMAIL SENDING PROTOCOL: If the user asks you to send an email, YOU MUST FIRST draft the email and ask the user for permission to send it. DO NOT send it immediately. Wait for the user to explicitly say 'yes', 'send it', or confirm in some way. NEVER output the JSON block until the user has explicitly confirmed. Do not even show them the JSON block as an example. ONLY AFTER the user confirms, you should trigger the email sending by appending a JSON block on a new line at the very end of your response: {"email_action": "send", "to": ["email@example.com"], "subject": "...", "body": "..."}
 Keep responses focused and powerful. Use **bold** for key numbers or insights. Max 3-4 sentences unless detail is needed.
 IMPORTANT: You MUST respond entirely in the following language: ${language || 'English'}.`;
 
@@ -98,10 +101,23 @@ IMPORTANT: You MUST respond entirely in the following language: ${language || 'E
     try {
       console.log(`💬 Chat request: "${messages[messages.length - 1].content.slice(0, 30)}..." (attempt ${attempt + 1})`);
 
+      const msgs: any[] = [{ role: 'system', content: systemInstruction }];
+      
+      if (language && language !== 'English') {
+        let langInstruction = `Please reply entirely in ${language}.`;
+        if (language.toLowerCase() === 'yoruba' || language.toLowerCase() === 'pidgin') {
+          langInstruction += ` Ensure the tone and vocabulary sound highly native, conversational, and culturally fluent to a Nigerian speaker.`;
+        }
+        msgs.push({
+          role: 'system',
+          content: langInstruction
+        });
+      }
+
       const response = await openai.chat.completions.create({
-        model: activeModel,
+        model: nvidiaModel,
         messages: [
-          { role: 'system', content: systemInstruction },
+          ...msgs,
           ...messages.map(m => ({
             role: (m.role === 'assistant' ? 'assistant' : 'user') as 'assistant' | 'user',
             content: m.content
@@ -153,7 +169,7 @@ app.post('/api/analyze', upload.single('file'), async (req, res) => {
   const isImage = req.file.mimetype.startsWith('image/');
   
   // If it's an image, force the vision model (pro), otherwise use the requested model
-  const activeModel = (isImage || model === 'pro') ? 'meta/llama-3.2-90b-vision-instruct' : 'meta/llama-3.1-8b-instruct';
+  const activeModel = (isImage || model === 'pro') ? 'meta/llama-3.2-90b-vision-instruct' : 'meta/llama-3.1-70b-instruct';
   let contentPayload: any;
 
   if (isImage) {
@@ -229,22 +245,7 @@ Respond with a JSON object in this exact format (no markdown, just JSON):
 }`;
 
   try {
-    const response = await openai.chat.completions.create({
-      model: MODEL_NAME,
-      messages: [
-        { role: 'system', content: systemInstruction },
-        { role: 'user', content: query }
-      ]
-    });
-    const raw = (response.choices[0]?.message?.content || '').trim();
-    try {
-      // Strip possible markdown fences
-      const cleaned = raw.replace(/^```json\s*/i, '').replace(/```\s*$/i, '').trim();
-      const parsed = JSON.parse(cleaned);
-      res.json(parsed);
-    } catch {
-      res.json({ answer: raw, type: 'analysis', metric: 'general', action: null });
-    }
+    throw new Error("Rate limit protection: Dashboard AI disabled");
   } catch (err: any) {
     console.error('❌ Dashboard Command Error:', err.message);
     // Fallback insight when Gemini unavailable
@@ -287,19 +288,7 @@ Respond ONLY with a JSON object (no markdown fences):
 }`;
 
   try {
-    const response = await openai.chat.completions.create({
-      model: MODEL_NAME,
-      messages: [{ role: 'user', content: prompt }]
-    });
-    const raw = (response.choices[0]?.message?.content || '').trim();
-    try {
-      const cleaned = raw.replace(/^```json\s*/i, '').replace(/```\s*$/i, '').trim();
-      const parsed = JSON.parse(cleaned);
-      briefingCache = { data: parsed, ts: now };
-      res.json(parsed);
-    } catch {
-      res.json({ headline: 'Business is Growing Strong', summary: raw, highlight: '$284K MTD', mood: 'growing', tip: 'Follow up on open deals today.' });
-    }
+    throw new Error("Rate limit protection: Dashboard AI disabled");
   } catch (err: any) {
     console.error('❌ Briefing Error:', err.message);
     // Fallback briefing when Gemini unavailable
@@ -332,24 +321,7 @@ Return ONLY a JSON array of exactly 5 alert objects (no markdown fences):
 ]`;
 
   try {
-    const response = await openai.chat.completions.create({
-      model: MODEL_NAME,
-      messages: [{ role: 'user', content: prompt }]
-    });
-    const raw = (response.choices[0]?.message?.content || '').trim();
-    try {
-      const cleaned = raw.replace(/^```json\s*/i, '').replace(/```\s*$/i, '').trim();
-      const parsed = JSON.parse(cleaned);
-      res.json(Array.isArray(parsed) ? parsed : (parsed.alerts ?? []));
-    } catch {
-      res.json([
-        { id: '1', type: 'warning', icon: '⚠️', title: '3 Enterprise Accounts Inactive', detail: '3 accounts have not logged in for 14+ days — churn risk is high.', action: 'Send re-engagement email', time: '12m ago' },
-        { id: '2', type: 'critical', icon: '🚨', title: 'Support Tickets Surge +40%', detail: '17 new tickets in 2 hours — potential product issue.', action: 'Review open tickets now', time: '1h ago' },
-        { id: '3', type: 'opportunity', icon: '💡', title: 'Best Sales Day — Act Now', detail: 'Tuesday is your historically highest-converting sales day.', action: 'Send outreach campaign', time: '2h ago' },
-        { id: '4', type: 'warning', icon: '🔌', title: 'Notion & Zapier Disconnected', detail: 'Two integrations went offline — automations may be failing.', action: 'Reconnect integrations', time: '3h ago' },
-        { id: '5', type: 'info', icon: '🎯', title: '2 Clients Flagged At-Risk', detail: 'Retention model flagged 2 enterprise clients with declining engagement.', action: 'Schedule QBR calls', time: '4h ago' },
-      ]);
-    }
+    throw new Error("Rate limit protection: Dashboard AI disabled");
   } catch (err: any) {
     console.error('❌ Alerts Error:', err.message);
     // Fallback alerts when Gemini unavailable
@@ -385,15 +357,7 @@ app.post('/api/dashboard/goals/:id/action', async (req, res) => {
   if (!goal) { res.status(404).json({ error: 'Goal not found' }); return; }
 
   try {
-    const response = await openai.chat.completions.create({
-      model: MODEL_NAME,
-      messages: [
-        { role: 'system', content: 'You are ORYN, a sharp business AI. Give one highly specific, actionable recommendation in 2 sentences. Be direct and data-driven.' },
-        { role: 'user', content: `Goal: ${goal.label}. Target: ${goal.target}. Progress: ${goal.current}. What is the single most impactful action to accelerate progress toward this goal?` }
-      ],
-    });
-    const text = (response.choices[0]?.message?.content || '').trim();
-    res.json({ recommendation: text, goalId: id });
+    throw new Error("Rate limit protection: Dashboard AI disabled");
   } catch (err: any) {
     res.status(500).json({ error: err.message });
   }
@@ -414,6 +378,63 @@ app.get('/api/dashboard/health-score', (_req, res) => {
     trend: '+4 pts from last month',
     summary: 'Your business is performing well. Integration connectivity is the key area to improve.',
   });
+});
+
+// ── Send Email Endpoint ───────────────────────────────────
+app.post('/api/send-email', async (req, res) => {
+  const { to, subject, body } = req.body;
+  if (!to || !subject || !body) {
+    res.status(400).json({ error: 'Missing to, subject, or body fields' });
+    return;
+  }
+
+  try {
+    let transporter;
+    if (process.env.SMTP_HOST && process.env.SMTP_USER && process.env.SMTP_PASS) {
+      transporter = nodemailer.createTransport({
+        host: process.env.SMTP_HOST,
+        port: Number(process.env.SMTP_PORT) || 587,
+        secure: Number(process.env.SMTP_PORT) === 465,
+        auth: {
+          user: process.env.SMTP_USER,
+          pass: process.env.SMTP_PASS,
+        },
+      });
+    } else {
+      // Fallback to ethereal if no SMTP credentials provided
+      const testAccount = await nodemailer.createTestAccount();
+      transporter = nodemailer.createTransport({
+        host: "smtp.ethereal.email",
+        port: 587,
+        secure: false, // true for 465, false for other ports
+        auth: {
+          user: testAccount.user, // generated ethereal user
+          pass: testAccount.pass, // generated ethereal password
+        },
+      });
+    }
+
+    const info = await transporter.sendMail({
+      from: '"Oryn AI" <ai@oryn.com>', // sender address
+      to: Array.isArray(to) ? to.join(', ') : to, // list of receivers
+      subject: subject, // Subject line
+      text: body, // plain text body
+      html: body.replace(/\n/g, '<br>'), // html body
+    });
+
+    console.log("Message sent: %s", info.messageId);
+    
+    // Preview only available when sending through an Ethereal account
+    const previewUrl = nodemailer.getTestMessageUrl(info);
+    if (previewUrl) {
+      console.log("Preview URL: %s", previewUrl);
+    }
+
+    res.json({ success: true, messageId: info.messageId, previewUrl });
+  } catch (error: any) {
+    console.error("Error sending email:", error);
+    res.status(500).json({ error: error.message });
+  }
 });
 
 // ── Proxy Image Download ──────────────────────────────────

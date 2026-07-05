@@ -7,12 +7,14 @@ export async function* streamChat(
   webSearch: boolean,
   taskExtract: boolean,
   model: string,
-  language: string
+  language: string,
+  signal?: AbortSignal
 ): AsyncGenerator<{ type: string; text?: string; message?: string }> {
   const res = await fetch(`${BASE}/chat`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ messages, webSearch, taskExtract, model, language }),
+    signal,
   });
 
   if (!res.ok) {

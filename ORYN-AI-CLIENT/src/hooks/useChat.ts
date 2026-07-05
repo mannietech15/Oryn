@@ -19,6 +19,22 @@ function extractTasks(text: string): { clean: string; tasks: string[] } {
   }
 }
 
+function extractEmailAction(text: string): { clean: string; email: any | null } {
+  const match = text.match(/(?:\n|^)?(?:```(?:json)?\s*)?\{"email_action":\s*"send"[\s\S]*?\}(?:\s*```)?/is);
+  if (!match) return { clean: text, email: null };
+  try {
+    const jsonStr = match[0].replace(/```json/ig, '').replace(/```/g, '').trim();
+    const parsed = JSON.parse(jsonStr);
+    if (parsed.email_action === 'send') {
+      return { clean: text.replace(match[0], '').trim(), email: parsed };
+    }
+    return { clean: text, email: null };
+  } catch (e) {
+    console.error("Failed to parse email action", e);
+    return { clean: text, email: null };
+  }
+}
+
 export function useChat() {
   const [sessions, setSessions] = useState<{ id: string, title: string, date: Date }[]>(() => {
     const saved = localStorage.getItem('oryn_sessions');
@@ -234,7 +250,17 @@ export function useChat() {
               .filter(m => m.content)
               .map(m => ({ role: m.role, content: m.content }));
 
-            const stream = streamChat(history, features.webSearch, features.taskExtract, model, language);
+            const abortController = new AbortController();
+            abortRef.current = false;
+            // Hook up the global stop button to this fetch controller
+            // Note: We use a hacky way to override the abortRef dynamically
+            // because we need to cancel the actual fetch.
+            (window as any).__abortChat = () => {
+              abortRef.current = true;
+              abortController.abort();
+            };
+
+            const stream = streamChat(history, features.webSearch, features.taskExtract, model, language, abortController.signal);
             let hasReceivedData = false;
             
             for await (const chunk of stream) {
@@ -260,14 +286,49 @@ export function useChat() {
             }
             const { clean, tasks: extracted } = extractTasks(fullText);
             if (features.taskExtract) extracted.forEach(addTask);
-            if (clean !== fullText) {
+            
+            const { clean: cleanEmail, email } = extractEmailAction(clean);
+            let finalContent = cleanEmail;
+
+            if (email) {
+              try {
+                const res = await fetch('/api/send-email', {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify(email)
+                });
+                if (res.ok) {
+                  finalContent += '\n\n📧 **Email successfully sent!**';
+                } else {
+                  finalContent += '\n\n❌ **Failed to send email.**';
+                }
+              } catch (e) {
+                finalContent += '\n\n❌ **Failed to send email.**';
+              }
+            }
+            
+            if (abortRef.current) {
+              finalContent = finalContent ? `${finalContent}\n\n_[Request cancelled]_` : "_Request cancelled by the user._";
+            }
+            
+            if (finalContent !== fullText || abortRef.current) {
               setMessages(prev => prev.map(m =>
-                m.id === assistantId ? { ...m, content: clean } : m
+                m.id === assistantId ? { ...m, content: finalContent } : m
               ));
             }
+            fullText = finalContent;
           }
           break; // Success! Break out of the retry loop.
         } catch (error: any) {
+          if (error.name === 'AbortError' || error.message?.includes('aborted')) {
+            // Let the outer loop finish since we already handled abort logic
+            let finalContent = fullText ? `${fullText}\n\n_[Request cancelled]_` : "_Request cancelled by the user._";
+            setMessages(prev => prev.map(m =>
+              m.id === assistantId ? { ...m, content: finalContent } : m
+            ));
+            return finalContent;
+          }
+          
           const errMsg = error.message || '';
           const isTransient = errMsg.includes('terminated') || errMsg.includes('Connection') || errMsg.includes('upstream') || errMsg.includes('fetch') || errMsg.toLowerCase().includes('time');
           
@@ -298,7 +359,14 @@ export function useChat() {
       } else if (err.message?.includes('terminated')) {
         errorContent = '***⚠ CONNECTION DROPPED***<br/><br/>The connection to the AI provider was dropped unexpectedly after multiple retries. Please try sending your message again.';
       } else if (err.message && !err.message.includes('fetch')) {
-        errorContent = `***⚠ AI ERROR***<br/><br/>${err.message}`;
+        // Hide internal ReferenceErrors or server-side variable leaks from the user
+        const isInternalError = err.message.includes('is not defined') || err.message.includes('Cannot read properties of') || err.message.includes('Unexpected token');
+        
+        if (isInternalError) {
+          errorContent = `***⚠ SYSTEM ERROR***<br/><br/>An internal server error occurred while processing your request. Our engineering team has been notified. Please try again later.`;
+        } else {
+          errorContent = `***⚠ AI ERROR***<br/><br/>${err.message}`;
+        }
       } else {
         errorContent = '***⚠ CONNECTION ERROR***<br/><br/>I am currently unable to reach my core servers. Please ensure that the **ORYN-AI-SERVER** is running on your local machine.';
       }
@@ -315,6 +383,11 @@ export function useChat() {
   const stopGeneration = useCallback(() => {
     abortRef.current = true;
     setIsStreaming(false);
+    if ((window as any).__abortChat) {
+      try {
+        (window as any).__abortChat();
+      } catch (e) {}
+    }
   }, []);
 
   return {

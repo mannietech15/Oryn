@@ -147,7 +147,7 @@ function CopyButton({ text }: { text: string }) {
   );
 }
 
-function SpeakButton({ text }: { text: string }) {
+function SpeakButton({ text, language }: { text: string, language?: string }) {
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
@@ -207,10 +207,26 @@ function SpeakButton({ text }: { text: string }) {
       }
     }
 
-    // Fallback to Native TTS if ElevenLabs fails or is not configured
+    // Fallback to native SpeechSynthesis
+    const langMap: Record<string, string> = {
+      'Spanish': 'es-ES', 'French': 'fr-FR', 'Yoruba': 'yo-NG',
+      'Igbo': 'ig-NG', 'Hausa': 'ha-NG', 'Pidgin': 'en-NG', 'English': 'en-US'
+    };
+    
+    window.speechSynthesis.cancel();
     const utterance = new SpeechSynthesisUtterance(cleanText);
-    utterance.onend = () => setIsSpeaking(false);
-    utterance.onerror = () => setIsSpeaking(false);
+    utterance.lang = (language && langMap[language]) || 'en-US';
+    
+    utterance.onend = () => {
+      setIsSpeaking(false);
+      setIsLoading(false);
+    };
+    
+    utterance.onerror = () => {
+      setIsSpeaking(false);
+      setIsLoading(false);
+    };
+    
     window.speechSynthesis.speak(utterance);
     setIsSpeaking(true);
     setIsLoading(false);
@@ -259,7 +275,7 @@ function SpeakButton({ text }: { text: string }) {
   );
 }
 
-function MessageBubble({ msg, isMobile, onImageClick }: { msg: Message, isMobile?: boolean, onImageClick?: (url: string) => void }) {
+function MessageBubble({ msg, isMobile, onImageClick, language }: { msg: Message, isMobile?: boolean, onImageClick?: (url: string) => void, language?: string }) {
   const isUser = msg.role === 'user';
   
   if (isUser) {
@@ -346,9 +362,33 @@ function MessageBubble({ msg, isMobile, onImageClick }: { msg: Message, isMobile
           <Typewriter text={msg.content} timestamp={msg.timestamp} />
         ) : (
           <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '8px 0' }}>
-            <div style={{ display: 'flex', gap: 4, alignItems: 'center' }}>
+            <style>
+              {`
+                @keyframes geminiWave {
+                  0% {
+                    transform: scale(0.4) translateY(0px);
+                    opacity: 0.2;
+                  }
+                  50% {
+                    transform: scale(1) translateY(-3px);
+                    opacity: 1;
+                    box-shadow: 0 0 10px rgba(249, 115, 22, 0.6);
+                    background: linear-gradient(135deg, var(--accent-primary), #ffb84d);
+                  }
+                  100% {
+                    transform: scale(0.4) translateY(0px);
+                    opacity: 0.2;
+                  }
+                }
+              `}
+            </style>
+            <div style={{ display: 'flex', gap: 6, alignItems: 'center', marginLeft: 4 }}>
               {[0, 0.15, 0.3].map((d, i) => (
-                <div key={i} style={{ width: 6, height: 6, borderRadius: '50%', background: 'var(--accent-primary)', animation: `tdBounce 1s ease ${d}s infinite` }} />
+                <div key={i} style={{ 
+                  width: 8, height: 8, borderRadius: '50%', 
+                  background: 'var(--accent-primary)', 
+                  animation: `geminiWave 1.2s cubic-bezier(0.4, 0, 0.2, 1) ${d}s infinite` 
+                }} />
               ))}
             </div>
             <div style={{ fontFamily: 'var(--font-display)', fontSize: 12, fontWeight: 600, color: 'var(--text-secondary)', animation: 'pulse 2s ease infinite' }}>
@@ -361,7 +401,7 @@ function MessageBubble({ msg, isMobile, onImageClick }: { msg: Message, isMobile
       {/* Footer: Actions */}
       {msg.content && (
         <div style={{ alignSelf: 'flex-start', marginTop: 4, display: 'flex', gap: 4 }}>
-          <SpeakButton text={msg.content} />
+          <SpeakButton text={msg.content} language={language} />
           <CopyButton text={msg.content} />
         </div>
       )}
@@ -509,7 +549,7 @@ export default function ChatPage({
 
   return (
     <>
-      {isConversationalMode && <ConversationalMode onClose={() => setIsConversationalMode(false)} onSendMessage={sendMessage} onStopGeneration={stopGeneration} />}
+      {isConversationalMode && <ConversationalMode onClose={() => setIsConversationalMode(false)} onSendMessage={sendMessage} onStopGeneration={stopGeneration} language={language} />}
       <div style={{ display: 'flex', height: '100%', overflow: 'hidden' }}>
       {/* Main Chat Column */}
       <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden', position: 'relative' }}>
@@ -541,7 +581,7 @@ export default function ChatPage({
         {messages.length > 0 && (
           <div style={{ flex: 1, overflowY: 'auto', padding: isMobile ? '24px 16px' : '32px 48px', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
             <div style={{ width: '100%', maxWidth: '850px', display: 'flex', flexDirection: 'column', gap: 32 }}>
-              {messages.map(m => <MessageBubble key={m.id} msg={m} isMobile={isMobile} onImageClick={setPreviewImage} />)}
+              {messages.map(m => <MessageBubble key={m.id} msg={m} isMobile={isMobile} onImageClick={setPreviewImage} language={language} />)}
               <div ref={messagesEndRef} style={{ height: 40, flexShrink: 0 }} />
             </div>
           </div>
