@@ -389,9 +389,13 @@ app.post('/api/send-email', async (req, res) => {
   }
 
   try {
-    let transporter;
-    if (process.env.SMTP_HOST && process.env.SMTP_USER && process.env.SMTP_PASS) {
-      transporter = nodemailer.createTransport({
+    if (
+      process.env.SMTP_HOST && 
+      process.env.SMTP_USER && 
+      process.env.SMTP_PASS && 
+      process.env.SMTP_USER !== 'your_email@gmail.com'
+    ) {
+      const transporter = nodemailer.createTransport({
         host: process.env.SMTP_HOST,
         port: Number(process.env.SMTP_PORT) || 587,
         secure: Number(process.env.SMTP_PORT) === 465,
@@ -400,37 +404,27 @@ app.post('/api/send-email', async (req, res) => {
           pass: process.env.SMTP_PASS,
         },
       });
-    } else {
-      // Fallback to ethereal if no SMTP credentials provided
-      const testAccount = await nodemailer.createTestAccount();
-      transporter = nodemailer.createTransport({
-        host: "smtp.ethereal.email",
-        port: 587,
-        secure: false, // true for 465, false for other ports
-        auth: {
-          user: testAccount.user, // generated ethereal user
-          pass: testAccount.pass, // generated ethereal password
-        },
+
+      const info = await transporter.sendMail({
+        from: '"Oryn AI" <ai@oryn.com>',
+        to: Array.isArray(to) ? to.join(', ') : to,
+        subject: subject,
+        text: body,
+        html: body.replace(/\n/g, '<br>'),
       });
+
+      console.log("Message sent: %s", info.messageId);
+      res.json({ success: true, messageId: info.messageId });
+    } else {
+      // Mock email sending without hitting network
+      console.log('--- MOCK EMAIL SENT ---');
+      console.log(`To: ${Array.isArray(to) ? to.join(', ') : to}`);
+      console.log(`Subject: ${subject}`);
+      console.log(`Body:\n${body}`);
+      console.log('-----------------------');
+      
+      res.json({ success: true, messageId: 'mock-' + Date.now(), previewUrl: null });
     }
-
-    const info = await transporter.sendMail({
-      from: '"Oryn AI" <ai@oryn.com>', // sender address
-      to: Array.isArray(to) ? to.join(', ') : to, // list of receivers
-      subject: subject, // Subject line
-      text: body, // plain text body
-      html: body.replace(/\n/g, '<br>'), // html body
-    });
-
-    console.log("Message sent: %s", info.messageId);
-    
-    // Preview only available when sending through an Ethereal account
-    const previewUrl = nodemailer.getTestMessageUrl(info);
-    if (previewUrl) {
-      console.log("Preview URL: %s", previewUrl);
-    }
-
-    res.json({ success: true, messageId: info.messageId, previewUrl });
   } catch (error: any) {
     console.error("Error sending email:", error);
     res.status(500).json({ error: error.message });

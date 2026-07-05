@@ -298,7 +298,12 @@ export function useChat() {
                   body: JSON.stringify(email)
                 });
                 if (res.ok) {
-                  finalContent += '\n\n📧 **Email successfully sent!**';
+                  const data = await res.json();
+                  if (data.previewUrl) {
+                    finalContent += `\n\n📧 **Email successfully sent!** ([View Preview](${data.previewUrl}))`;
+                  } else {
+                    finalContent += '\n\n📧 **Email successfully sent!**';
+                  }
                 } else {
                   finalContent += '\n\n❌ **Failed to send email.**';
                 }
