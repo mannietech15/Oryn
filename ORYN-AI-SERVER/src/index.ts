@@ -24,6 +24,12 @@ const openaiLogic = new OpenAI({
   timeout: 30000,
 });
 
+const openaiApex = new OpenAI({
+  apiKey: process.env.NVIDIA_APEX_API_KEY || process.env.NVIDIA_API_KEY || '',
+  baseURL: 'https://integrate.api.nvidia.com/v1',
+  timeout: 30000,
+});
+
 // Dynamic model selection via API now
 
 console.log('🔑 NVIDIA API Key:', process.env.NVIDIA_API_KEY ? `Loaded (${process.env.NVIDIA_API_KEY.slice(0, 9)}...)` : 'MISSING');
@@ -51,15 +57,27 @@ app.post('/api/chat', async (req, res) => {
   };
 
   const isLogic = model === 'logic';
-  const nvidiaModel = isLogic ? '01-ai/yi-large' : model === 'pro' ? 'meta/llama-3.2-90b-vision-instruct' : 'meta/llama-3.1-70b-instruct';
-  const openRouterModel = model === 'pro' ? 'meta-llama/llama-3.2-90b-vision-instruct' : 'meta-llama/llama-3.1-8b-instruct';
+  const isApex = model === 'apex';
+  
+  let currentModelName = isLogic ? '01-ai/yi-large' : 
+                         isApex ? 'squ11z1/Mythos-nano' : 
+                         model === 'pro' ? 'meta/llama-3.2-90b-vision-instruct' : 
+                         'meta/llama-3.1-70b-instruct';
+                         
+  let currentClient = isLogic ? openaiLogic : isApex ? openaiApex : openai;
 
   const systemInstruction = `You are Oryn (pronounced "Orine"), a sleek futuristic business AI assistant. Your name is Oryn — always write it as "Oryn" (never spell it out letter by letter). You are professional, insightful, and concise.
 You help with business strategy, productivity, data analysis, drafting, and decision-making.
 ${webSearch ? 'You have web search capabilities — mention relevant current data when helpful.' : ''}
 ${taskExtract ? 'After your response, if there are clear action items, append a JSON block on a new line: {"tasks":["task1","task2"]} — only if tasks genuinely exist.' : ''}
 EMAIL SENDING PROTOCOL: If the user asks you to send an email, YOU MUST FIRST draft the email and ask the user for permission to send it. DO NOT send it immediately. Wait for the user to explicitly say 'yes', 'send it', or confirm in some way. NEVER output the JSON block until the user has explicitly confirmed. Do not even show them the JSON block as an example. ONLY AFTER the user confirms, you should trigger the email sending by appending a JSON block on a new line at the very end of your response: {"email_action": "send", "to": ["email@example.com"], "subject": "...", "body": "..."}
-Keep responses focused and powerful. Use **bold** for key numbers or insights. Max 3-4 sentences unless detail is needed.
+CODING PROTOCOL: When asked to write code, build UI, or create components:
+1. ALWAYS write production-ready, highly functional code.
+2. For UIs, prefer writing a single standalone React component (JSX/JS) using Tailwind CSS for styling. The system automatically compiles React, JSX, and Tailwind. 
+3. Include real functional state management (React.useState, useEffect) and interactive elements (working buttons, forms, dynamic data) so the UI is fully operational.
+4. Do not just build static mocks. Handle state, clicks, and basic logic.
+5. Ensure the code is complete and handles edge cases elegantly. Use modern, sleek, and premium design patterns (vibrant colors, smooth transitions, subtle shadows, clean typography).
+Keep responses focused and powerful. Use **bold** for key numbers or insights. Max 3-4 sentences unless detail is needed (except for code blocks).
 IMPORTANT: You MUST respond entirely in the following language: ${language || 'English'}.`;
 
   const lastMsgContent = messages[messages.length - 1].content.trim();
@@ -121,9 +139,8 @@ IMPORTANT: You MUST respond entirely in the following language: ${language || 'E
         });
       }
 
-      const client = isLogic ? openaiLogic : openai;
-      const response = await client.chat.completions.create({
-        model: nvidiaModel,
+      const response = await currentClient.chat.completions.create({
+        model: currentModelName,
         messages: [
           ...msgs,
           ...messages.map(m => ({
@@ -146,6 +163,15 @@ IMPORTANT: You MUST respond entirely in the following language: ${language || 'E
       return; // Success — exit
     } catch (err: any) {
       const is429 = err.message?.includes('429') || err.status === 429 || err.message?.includes('rate-limit') || err.message?.includes('rate_limit');
+      
+      if (is429 && isApex && currentModelName === 'squ11z1/Mythos-nano') {
+        console.log(`⏳ Oryn Apex rate limited, falling back to standard model seamlessly...`);
+        // Fallback to standard fast model without throwing error to frontend
+        currentModelName = 'meta/llama-3.1-70b-instruct';
+        currentClient = openai;
+        continue; // Retry immediately with the new model without increasing attempt count, or let it retry in next loop iteration
+      }
+
       if (is429 && attempt < maxRetries) {
         console.log(`⏳ Rate limited, retrying in ${retryDelays[attempt] / 1000}s... (attempt ${attempt + 1}/${maxRetries})`);
         res.write(`data: ${JSON.stringify({ type: 'status', text: `Thinking...` })}\n\n`);

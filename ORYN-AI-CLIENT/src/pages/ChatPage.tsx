@@ -24,10 +24,55 @@ function formatContent(text: string) {
     }
   });
 
-  // Create a merged document with default container if HTML is missing
-  let mergedDoc = combinedHtml || '<div id="app"></div>';
-  if (combinedCss) mergedDoc += `\n<style>\n${combinedCss}\n</style>`;
-  if (combinedJs) mergedDoc += `\n<script>\n${combinedJs}\n</script>`;
+  // Create a merged document with a peak environment
+  let mergedDoc = '';
+  const isFullHtml = combinedHtml.toLowerCase().includes('<html');
+
+  if (isFullHtml) {
+    mergedDoc = combinedHtml;
+    if (combinedCss) mergedDoc = mergedDoc.replace('</head>', `\n<style>\n${combinedCss}\n</style>\n</head>`);
+    if (combinedJs) mergedDoc = mergedDoc.replace('</body>', `\n<script>\n${combinedJs}\n</script>\n</body>`);
+  } else {
+    mergedDoc = `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script>
+    tailwind.config = { theme: { extend: { fontFamily: { sans: ['Inter', 'sans-serif'] } } } }
+  </script>
+  <style>
+    body { font-family: 'Inter', sans-serif; -webkit-font-smoothing: antialiased; }
+    ${combinedCss}
+  </style>
+</head>
+<body class="bg-gray-50 text-gray-900 min-h-screen">
+  ${combinedHtml || '<div id="root"></div>'}
+`;
+
+    if (combinedJs) {
+      if (combinedJs.includes('import ') || combinedJs.includes('export ') || combinedJs.includes('/>') || combinedJs.includes('</') || combinedJs.includes('React')) {
+        let cleanJs = combinedJs.replace(/import\s+.*?['"].*?['"];?/g, '').replace(/export\s+default\s+/g, 'const App = ').replace(/export\s+/g, '');
+        mergedDoc += `\n<script type="text/babel">\n${cleanJs}
+\nif (document.getElementById('root') && !cleanJs.includes('createRoot') && typeof App !== 'undefined') {
+  const root = ReactDOM.createRoot(document.getElementById('root'));
+  root.render(<App />);
+}
+</script>`;
+      } else {
+        mergedDoc += `\n<script>\n${combinedJs}\n</script>`;
+      }
+    }
+    
+    mergedDoc += `\n<script>lucide.createIcons();</script>\n</body>\n</html>`;
+  }
   
   const mergedBase64 = btoa(encodeURIComponent(mergedDoc));
 
@@ -763,7 +808,7 @@ export default function ChatPage({
                     onMouseEnter={e => e.currentTarget.style.color = 'var(--text-primary)'} 
                     onMouseLeave={e => { if (!isModelMenuOpen) e.currentTarget.style.color = 'var(--text-secondary)' }}
                   >
-                    <span>ORYN 1.0 <span style={{ opacity: 0.6 }}>{model === 'fast' ? 'Fast' : model === 'pro' ? 'Pro' : 'Logic'}</span></span>
+                    <span>ORYN 1.0 <span style={{ opacity: 0.6 }}>{model === 'fast' ? 'Fast' : model === 'pro' ? 'Pro' : model === 'apex' ? 'Apex' : 'Logic'}</span></span>
                     <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
                   </div>
                   
@@ -810,6 +855,18 @@ export default function ChatPage({
                           <span style={{ fontSize: 11, color: 'var(--text-secondary)' }}>Reasoning • Code • Analytics</span>
                         </div>
                         {model === 'logic' && <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--accent-primary)" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>}
+                      </div>
+                      <div 
+                        onClick={() => { setModel('apex'); setIsModelMenuOpen(false); }}
+                        style={{ padding: '12px 16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', cursor: 'pointer', background: model === 'apex' ? 'var(--glass-bg-strong)' : 'transparent', borderTop: '1px solid var(--card-border)' }}
+                        onMouseEnter={e => e.currentTarget.style.background = 'var(--glass-bg-hover)'}
+                        onMouseLeave={e => { if(model !== 'apex') e.currentTarget.style.background = 'transparent'; else e.currentTarget.style.background = 'var(--glass-bg-strong)'; }}
+                      >
+                        <div style={{ display: 'flex', flexDirection: 'column' }}>
+                          <span style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-primary)' }}>ORYN Apex</span>
+                          <span style={{ fontSize: 11, color: 'var(--text-secondary)' }}>Mythos Nano • Fallback Safe</span>
+                        </div>
+                        {model === 'apex' && <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--accent-primary)" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>}
                       </div>
                     </div>
                   )}
