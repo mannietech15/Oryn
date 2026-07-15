@@ -18,6 +18,12 @@ const openai = new OpenAI({
   timeout: 30000, // Put timeout back to 30s
 });
 
+const openaiLogic = new OpenAI({
+  apiKey: process.env.NVIDIA_LOGIC_API_KEY || process.env.NVIDIA_API_KEY || '',
+  baseURL: 'https://integrate.api.nvidia.com/v1',
+  timeout: 30000,
+});
+
 // Dynamic model selection via API now
 
 console.log('🔑 NVIDIA API Key:', process.env.NVIDIA_API_KEY ? `Loaded (${process.env.NVIDIA_API_KEY.slice(0, 9)}...)` : 'MISSING');
@@ -44,7 +50,8 @@ app.post('/api/chat', async (req, res) => {
     language?: string;
   };
 
-  const nvidiaModel = model === 'pro' ? 'meta/llama-3.2-90b-vision-instruct' : 'meta/llama-3.1-70b-instruct';
+  const isLogic = model === 'logic';
+  const nvidiaModel = isLogic ? '01-ai/yi-large' : model === 'pro' ? 'meta/llama-3.2-90b-vision-instruct' : 'meta/llama-3.1-70b-instruct';
   const openRouterModel = model === 'pro' ? 'meta-llama/llama-3.2-90b-vision-instruct' : 'meta-llama/llama-3.1-8b-instruct';
 
   const systemInstruction = `You are Oryn (pronounced "Orine"), a sleek futuristic business AI assistant. Your name is Oryn — always write it as "Oryn" (never spell it out letter by letter). You are professional, insightful, and concise.
@@ -114,7 +121,8 @@ IMPORTANT: You MUST respond entirely in the following language: ${language || 'E
         });
       }
 
-      const response = await openai.chat.completions.create({
+      const client = isLogic ? openaiLogic : openai;
+      const response = await client.chat.completions.create({
         model: nvidiaModel,
         messages: [
           ...msgs,

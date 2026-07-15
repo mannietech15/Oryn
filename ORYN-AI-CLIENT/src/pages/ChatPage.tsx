@@ -763,7 +763,7 @@ export default function ChatPage({
                     onMouseEnter={e => e.currentTarget.style.color = 'var(--text-primary)'} 
                     onMouseLeave={e => { if (!isModelMenuOpen) e.currentTarget.style.color = 'var(--text-secondary)' }}
                   >
-                    <span>ORYN 1.0 <span style={{ opacity: 0.6 }}>{model === 'fast' ? 'Fast' : 'Pro'}</span></span>
+                    <span>ORYN 1.0 <span style={{ opacity: 0.6 }}>{model === 'fast' ? 'Fast' : model === 'pro' ? 'Pro' : 'Logic'}</span></span>
                     <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
                   </div>
                   
@@ -798,6 +798,18 @@ export default function ChatPage({
                           <span style={{ fontSize: 11, color: 'var(--text-secondary)' }}>Vision enabled • Deep Think</span>
                         </div>
                         {model === 'pro' && <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--accent-primary)" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>}
+                      </div>
+                      <div 
+                        onClick={() => { setModel('logic'); setIsModelMenuOpen(false); }}
+                        style={{ padding: '12px 16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', cursor: 'pointer', background: model === 'logic' ? 'var(--glass-bg-strong)' : 'transparent', borderTop: '1px solid var(--card-border)' }}
+                        onMouseEnter={e => e.currentTarget.style.background = 'var(--glass-bg-hover)'}
+                        onMouseLeave={e => { if(model !== 'logic') e.currentTarget.style.background = 'transparent'; else e.currentTarget.style.background = 'var(--glass-bg-strong)'; }}
+                      >
+                        <div style={{ display: 'flex', flexDirection: 'column' }}>
+                          <span style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-primary)' }}>ORYN 1.0 Logic</span>
+                          <span style={{ fontSize: 11, color: 'var(--text-secondary)' }}>Reasoning • Code • Analytics</span>
+                        </div>
+                        {model === 'logic' && <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--accent-primary)" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>}
                       </div>
                     </div>
                   )}
