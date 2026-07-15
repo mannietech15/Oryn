@@ -343,6 +343,83 @@ function PerformanceChart() {
   );
 }
 
+function LiveActivityFeed() {
+  const [activities, setActivities] = useState<any[]>([]);
+
+  useEffect(() => {
+    const pool = [
+      { text: 'Agent X completed Data Synthesis task', type: 'success', icon: <Activity size={16} /> },
+      { text: 'API Latency spiked to 1.2s — Auto-scaling triggered', type: 'warning', icon: <Zap size={16} /> },
+      { text: 'New user onboarded in Neural Search', type: 'info', icon: <BrainCircuit size={16} /> },
+      { text: 'Model re-trained on Q2 sales dataset', type: 'info', icon: <Target size={16} /> },
+      { text: 'Security scan detected zero anomalies', type: 'success', icon: <ShieldCheck size={16} /> },
+      { text: 'System memory optimization complete', type: 'success', icon: <Sparkles size={16} /> },
+    ];
+
+    setActivities([
+      { id: 1, ...pool[0], time: '2m ago' },
+      { id: 2, ...pool[2], time: '5m ago' },
+      { id: 3, ...pool[4], time: '12m ago' },
+      { id: 4, ...pool[3], time: '18m ago' },
+    ]);
+
+    const interval = setInterval(() => {
+      setActivities(prev => {
+        const randomEvent = pool[Math.floor(Math.random() * pool.length)];
+        const newEvent = { 
+          id: Date.now(), 
+          ...randomEvent,
+          time: 'Just now'
+        };
+        return [newEvent, ...prev].slice(0, 4);
+      });
+    }, 4500);
+
+    return () => clearInterval(interval);
+  }, []);
+
+  return (
+    <AnCard title="Live Activity Feed" style={{ height: '100%', minHeight: 320 }} delay={0.4}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 16, position: 'relative', marginTop: 12 }}>
+        <AnimatePresence>
+          {activities.map((act, i) => (
+            <motion.div 
+              key={act.id}
+              initial={{ opacity: 0, x: -20, height: 0 }}
+              animate={{ opacity: 1, x: 0, height: 'auto' }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              transition={{ duration: 0.4 }}
+              style={{ 
+                display: 'flex', gap: 16, alignItems: 'flex-start',
+                paddingBottom: 16, borderBottom: i === activities.length - 1 ? 'none' : '1px solid var(--glass-border-subtle)',
+                overflow: 'hidden'
+              }}
+            >
+              <div style={{ 
+                width: 32, height: 32, borderRadius: '50%', flexShrink: 0,
+                background: act.type === 'success' ? 'rgba(16, 185, 129, 0.1)' : 
+                            act.type === 'warning' ? 'rgba(249, 115, 22, 0.1)' : 'var(--glass-bg-hover)',
+                color: act.type === 'success' ? 'var(--success)' : 
+                       act.type === 'warning' ? 'var(--accent-primary)' : 'var(--text-primary)',
+                display: 'flex', alignItems: 'center', justifyContent: 'center'
+              }}>
+                {act.icon}
+              </div>
+              <div style={{ flex: 1 }}>
+                <div style={{ fontSize: 14, color: 'var(--text-primary)', fontWeight: 500, lineHeight: 1.4 }}>{act.text}</div>
+                <div style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 4, fontFamily: 'var(--font-display)', letterSpacing: 0.5 }}>{act.time}</div>
+              </div>
+            </motion.div>
+          ))}
+        </AnimatePresence>
+        
+        {/* Fading overlay at bottom */}
+        <div style={{ position: 'absolute', bottom: -16, left: 0, right: 0, height: 60, background: 'linear-gradient(to bottom, transparent, var(--card-bg))', pointerEvents: 'none' }} />
+      </div>
+    </AnCard>
+  );
+}
+
 export default function AnalyticsPage() {
   return (
     <motion.div 
@@ -496,37 +573,46 @@ export default function AnalyticsPage() {
           </AnCard>
         </div>
 
-        {/* Bottom Insights */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 24 }}>
-          {[
-            { title: "Agent Efficiency", value: "98.2%", sub: "Optimized Workflows", icon: <Zap size={32} />, color: "var(--text-primary)" },
-            { title: "Data Integrity", value: "100.0%", sub: "Zero Anomalies", icon: <ShieldCheck size={32} />, color: "var(--accent-primary)" },
-            { title: "Model Health", value: "Excellent", sub: "ORYN-Core-v4", icon: <BrainCircuit size={32} />, color: "var(--text-secondary)" }
-          ].map((item, i) => (
-            <motion.div 
-              key={item.title}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.4 + i * 0.1 }}
-              whileHover={{ scale: 1.02 }}
-              style={{ 
-                background: 'var(--card-bg)', border: '1px solid var(--card-border)', 
-                borderRadius: 24, padding: 24, display: 'flex', alignItems: 'center', gap: 20,
-                boxShadow: 'var(--shadow-subtle)', backdropFilter: 'blur(20px)',
-                position: 'relative', overflow: 'hidden'
-              }}
-            >
-              <div style={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: 4, background: item.color }} />
-              <div style={{ width: 56, height: 56, borderRadius: 16, background: `color-mix(in srgb, ${item.color} 15%, transparent)`, color: item.color, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                {item.icon}
-              </div>
-              <div>
-                <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: 1, marginBottom: 4 }}>{item.title}</div>
-                <div style={{ fontFamily: 'var(--font-display)', fontSize: 24, fontWeight: 800, color: 'var(--white)' }}>{item.value}</div>
-                <div style={{ fontSize: 13, color: 'var(--text-secondary)', marginTop: 2 }}>{item.sub}</div>
-              </div>
-            </motion.div>
-          ))}
+        {/* Bottom Section: Insights & Activity */}
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 32 }}>
+          
+          {/* Left: Bottom Insights Cards */}
+          <div style={{ flex: '2 1 600px', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: 24, alignContent: 'start' }}>
+            {[
+              { title: "Agent Efficiency", value: "98.2%", sub: "Optimized Workflows", icon: <Zap size={32} />, color: "var(--text-primary)" },
+              { title: "Data Integrity", value: "100.0%", sub: "Zero Anomalies", icon: <ShieldCheck size={32} />, color: "var(--accent-primary)" },
+              { title: "Model Health", value: "Excellent", sub: "ORYN-Core-v4", icon: <BrainCircuit size={32} />, color: "var(--text-secondary)" }
+            ].map((item, i) => (
+              <motion.div 
+                key={item.title}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.4 + i * 0.1 }}
+                whileHover={{ scale: 1.02 }}
+                style={{ 
+                  background: 'var(--card-bg)', border: '1px solid var(--card-border)', 
+                  borderRadius: 24, padding: 24, display: 'flex', alignItems: 'center', gap: 20,
+                  boxShadow: 'var(--shadow-subtle)', backdropFilter: 'blur(20px)',
+                  position: 'relative', overflow: 'hidden'
+                }}
+              >
+                <div style={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: 4, background: item.color }} />
+                <div style={{ width: 56, height: 56, borderRadius: 16, background: `color-mix(in srgb, ${item.color} 15%, transparent)`, color: item.color, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  {item.icon}
+                </div>
+                <div>
+                  <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: 1, marginBottom: 4 }}>{item.title}</div>
+                  <div style={{ fontFamily: 'var(--font-display)', fontSize: 24, fontWeight: 800, color: 'var(--white)' }}>{item.value}</div>
+                  <div style={{ fontSize: 13, color: 'var(--text-secondary)', marginTop: 2 }}>{item.sub}</div>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+
+          {/* Right: Live Activity Feed */}
+          <div style={{ flex: '1 1 340px' }}>
+            <LiveActivityFeed />
+          </div>
         </div>
       </div>
     </motion.div>
