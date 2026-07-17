@@ -417,10 +417,12 @@ app.get('/api/dashboard/health-score', (_req, res) => {
 // ── Send Email Endpoint ───────────────────────────────────
 app.post('/api/send-email', async (req, res) => {
   const { to, subject, body } = req.body;
-  if (!to || !subject || !body) {
-    res.status(400).json({ error: 'Missing to, subject, or body fields' });
+  if (!to) {
+    res.status(400).json({ error: 'Missing to field' });
     return;
   }
+  const emailBody = req.body.body || req.body.message || req.body.content || '';
+  const emailSubject = subject || 'Message from Oryn AI';
 
   try {
     if (
@@ -442,9 +444,9 @@ app.post('/api/send-email', async (req, res) => {
       const info = await transporter.sendMail({
         from: `"Oryn AI" <${process.env.SMTP_USER}>`,
         to: Array.isArray(to) ? to.join(', ') : to,
-        subject: subject || 'Message from Oryn AI',
-        text: body || '',
-        html: (body || '').replace(/\n/g, '<br>'),
+        subject: emailSubject,
+        text: emailBody,
+        html: emailBody.replace(/\n/g, '<br>'),
       });
 
       console.log("Message sent: %s", info.messageId);
@@ -453,8 +455,8 @@ app.post('/api/send-email', async (req, res) => {
       // Mock email sending without hitting network
       console.log('--- MOCK EMAIL SENT ---');
       console.log(`To: ${Array.isArray(to) ? to.join(', ') : to}`);
-      console.log(`Subject: ${subject}`);
-      console.log(`Body:\n${body}`);
+      console.log(`Subject: ${emailSubject}`);
+      console.log(`Body:\n${emailBody}`);
       console.log('-----------------------');
       
       res.json({ success: true, messageId: 'mock-' + Date.now(), previewUrl: null });
