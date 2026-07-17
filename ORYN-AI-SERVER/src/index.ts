@@ -279,10 +279,21 @@ Respond with a JSON object in this exact format (no markdown, just JSON):
 }`;
 
   try {
-    throw new Error("Rate limit protection: Dashboard AI disabled");
+    const completion = await openai.chat.completions.create({
+      model: "meta/llama-3.1-70b-instruct",
+      messages: [
+        { role: 'system', content: systemInstruction },
+        { role: 'user', content: query }
+      ],
+      response_format: { type: "json_object" }
+    });
+    const content = completion.choices[0]?.message?.content;
+    if (!content) throw new Error("Empty response");
+    const json = JSON.parse(content);
+    res.json(json);
   } catch (err: any) {
     console.error('❌ Dashboard Command Error:', err.message);
-    // Fallback insight when Gemini unavailable
+    // Fallback insight when API is unavailable
     const lc = query.toLowerCase();
     if (lc.includes('user') || lc.includes('churn')) {
       res.json({ answer: 'Three enterprise accounts have been inactive for 14+ days — representing ~22% of MRR at risk. Proactive re-engagement at this stage has a 60% recovery rate in B2B SaaS.', type: 'warning', metric: 'Active Users 1,842', action: 'Send a personalized re-engagement sequence to the 3 inactive accounts today.' });
@@ -322,7 +333,16 @@ Respond ONLY with a JSON object (no markdown fences):
 }`;
 
   try {
-    throw new Error("Rate limit protection: Dashboard AI disabled");
+    const completion = await openai.chat.completions.create({
+      model: "meta/llama-3.1-70b-instruct",
+      messages: [{ role: 'user', content: prompt }],
+      response_format: { type: "json_object" }
+    });
+    const content = completion.choices[0]?.message?.content;
+    if (!content) throw new Error("Empty response");
+    const json = JSON.parse(content);
+    briefingCache = { data: json, ts: now };
+    res.json(json);
   } catch (err: any) {
     console.error('❌ Briefing Error:', err.message);
     // Fallback briefing when Gemini unavailable
@@ -349,13 +369,23 @@ app.get('/api/dashboard/alerts', async (_req, res) => {
 - Zapier & Notion integrations disconnected
 - Best sales day historically is Tuesday — today is Tuesday
 
-Return ONLY a JSON array of exactly 5 alert objects (no markdown fences):
-[
-  { "id": "1", "type": "warning|opportunity|info|critical", "icon": "emoji", "title": "short alert title", "detail": "one sentence detail", "action": "recommended action", "time": "relative time string like '5m ago'" }
-]`;
+Return a JSON object with a single key 'alerts' containing an array of exactly 5 alert objects:
+{
+  "alerts": [
+    { "id": "1", "type": "warning|opportunity|info|critical", "icon": "emoji", "title": "short alert title", "detail": "one sentence detail", "action": "recommended action", "time": "relative time string like '5m ago'" }
+  ]
+}`;
 
   try {
-    throw new Error("Rate limit protection: Dashboard AI disabled");
+    const completion = await openai.chat.completions.create({
+      model: "meta/llama-3.1-70b-instruct",
+      messages: [{ role: 'user', content: prompt }],
+      response_format: { type: "json_object" }
+    });
+    const content = completion.choices[0]?.message?.content;
+    if (!content) throw new Error("Empty response");
+    const json = JSON.parse(content);
+    res.json(json.alerts || []);
   } catch (err: any) {
     console.error('❌ Alerts Error:', err.message);
     // Fallback alerts when Gemini unavailable
@@ -391,7 +421,23 @@ app.post('/api/dashboard/goals/:id/action', async (req, res) => {
   if (!goal) { res.status(404).json({ error: 'Goal not found' }); return; }
 
   try {
-    throw new Error("Rate limit protection: Dashboard AI disabled");
+    const prompt = `You are ORYN, an elite business strategist. The user is asking for advice on how to hit their business goal.
+Goal: ${goal.label}
+Target: ${goal.target}
+Current: ${goal.current}
+
+Provide a 2-3 sentence strategic recommendation on what they should do next. Respond ONLY with a JSON object:
+{ "recommendation": "your advice here" }
+`;
+    const completion = await openai.chat.completions.create({
+      model: "meta/llama-3.1-70b-instruct",
+      messages: [{ role: 'user', content: prompt }],
+      response_format: { type: "json_object" }
+    });
+    const content = completion.choices[0]?.message?.content;
+    if (!content) throw new Error("Empty response");
+    const json = JSON.parse(content);
+    res.json({ recommendation: json.recommendation, goalId: id });
   } catch (err: any) {
     res.status(500).json({ error: err.message });
   }
