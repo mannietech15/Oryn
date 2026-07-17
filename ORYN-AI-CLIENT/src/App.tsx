@@ -14,7 +14,10 @@ import { Toaster } from './components/ui/Toaster';
 
 export default function App() {
   const [page, setPage] = useState<Page>('chat');
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(() => {
+    if (typeof window !== 'undefined') return window.innerWidth > 768;
+    return true;
+  });
   const [orgProfile, setOrgProfile] = useState<any>(() => {
     if (typeof window !== 'undefined') {
       const saved = localStorage.getItem('oryn_orgProfile');
@@ -99,10 +102,23 @@ export default function App() {
             flexDirection: 'column',
             position: 'relative'
           }}>
+            {/* Desktop Sidebar Toggle */}
+            <div className="desktop-only hide-on-mobile" style={{ position: 'absolute', top: 24, left: 24, zIndex: 100 }}>
+              {!isSidebarOpen && (
+                <button onClick={toggleSidebar} style={{ width: 40, height: 40, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--glass-bg-subtle)', borderRadius: 10, border: '1px solid var(--card-border)', color: 'var(--text-primary)', cursor: 'pointer', backdropFilter: 'blur(10px)', transition: 'all 0.2s' }} onMouseEnter={e => { e.currentTarget.style.background = 'var(--glass-bg-hover)'; e.currentTarget.style.color = 'var(--accent-primary)'; }} onMouseLeave={e => { e.currentTarget.style.background = 'var(--glass-bg-subtle)'; e.currentTarget.style.color = 'var(--text-primary)'; }}>
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+                </button>
+              )}
+            </div>
             {renderPage()}
           </main>
         </div>
       </div>
+      <style>{`
+        @media (max-width: 768px) {
+          .hide-on-mobile { display: none !important; }
+        }
+      `}</style>
     </>
   );
 }

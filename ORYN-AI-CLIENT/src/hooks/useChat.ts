@@ -184,12 +184,14 @@ export function useChat() {
     setPendingFiles([]);
   }, []);
 
-  const sendMessage = useCallback(async (text: string) => {
+  const sendMessage = useCallback(async (text: string, overrideMessages?: Message[]) => {
     if (isStreaming) return;
     if (!text.trim() && pendingFiles.length === 0) return;
 
     const files = [...pendingFiles];
     setPendingFiles([]);
+    
+    const baseMessages = overrideMessages || messages;
 
     // Rename session if it's new
     setSessions(prev => prev.map(s => {
@@ -213,7 +215,11 @@ export function useChat() {
         url: f.type.startsWith('image/') ? URL.createObjectURL(f) : undefined
       }))
     };
-    setMessages(prev => [...prev, userMsg]);
+    if (overrideMessages) {
+      setMessages([...overrideMessages, userMsg]);
+    } else {
+      setMessages(prev => [...prev, userMsg]);
+    }
     setStats(prev => ({ ...prev, messages: prev.messages + 1, files: prev.files + files.length }));
 
     // Add streaming assistant message
@@ -246,7 +252,7 @@ export function useChat() {
             ));
           } else {
             // Streaming chat route
-            const history = [...messages, userMsg]
+            const history = [...baseMessages, userMsg]
               .filter(m => m.content)
               .map(m => ({ role: m.role, content: m.content }));
 
@@ -395,9 +401,32 @@ export function useChat() {
     }
   }, []);
 
+  const editMessage = useCallback((messageId: string, newText: string) => {
+    if (isStreaming) return;
+    const index = messages.findIndex(m => m.id === messageId);
+    if (index === -1 || messages[index].role !== 'user') return;
+    const newHistory = messages.slice(0, index);
+    sendMessage(newText, newHistory);
+  }, [messages, isStreaming, sendMessage]);
+
+  const regenerateResponse = useCallback(() => {
+    if (isStreaming) return;
+    let lastUserIndex = -1;
+    for (let i = messages.length - 1; i >= 0; i--) {
+      if (messages[i].role === 'user') {
+        lastUserIndex = i;
+        break;
+      }
+    }
+    if (lastUserIndex === -1) return;
+    const userMsg = messages[lastUserIndex];
+    const newHistory = messages.slice(0, lastUserIndex);
+    sendMessage(userMsg.content, newHistory);
+  }, [messages, isStreaming, sendMessage]);
+
   return {
     messages, tasks, stats, features, isStreaming, pendingFiles, sessions, activeSessionId, model, language,
     sendMessage, stopGeneration, toggleTask, toggleFeature, setPendingFiles, resetChat, startNewSession, setActiveSessionId,
-    deleteSession, renameSession, setSessions, setModel, setLanguage
+    deleteSession, renameSession, setSessions, setModel, setLanguage, editMessage, regenerateResponse
   };
 }

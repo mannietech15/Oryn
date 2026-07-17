@@ -320,8 +320,11 @@ function SpeakButton({ text, language }: { text: string, language?: string }) {
   );
 }
 
-function MessageBubble({ msg, isMobile, onImageClick, language }: { msg: Message, isMobile?: boolean, onImageClick?: (url: string) => void, language?: string }) {
+function MessageBubble({ msg, isMobile, onImageClick, language, onEdit, onRegenerate, isLastAiMessage, isLastUserMessage }: { msg: Message, isMobile?: boolean, onImageClick?: (url: string) => void, language?: string, onEdit?: (id: string, text: string) => void, onRegenerate?: () => void, isLastAiMessage?: boolean, isLastUserMessage?: boolean }) {
   const isUser = msg.role === 'user';
+  const [isEditing, setIsEditing] = useState(false);
+  const [editValue, setEditValue] = useState(msg.content);
+  const [isHovered, setIsHovered] = useState(false);
   
   if (isUser) {
     return (
@@ -331,14 +334,43 @@ function MessageBubble({ msg, isMobile, onImageClick, language }: { msg: Message
         animation: 'rise 0.3s ease both',
       }}>
         {/* User Bubble */}
-        <div style={{
+        <div 
+          onMouseEnter={() => setIsHovered(true)}
+          onMouseLeave={() => setIsHovered(false)}
+          style={{
           maxWidth: isMobile ? '95%' : '80%', padding: '16px 24px', fontSize: 16, fontWeight: 400, lineHeight: 1.7, color: 'var(--text-primary)',
           borderRadius: '16px 16px 4px 16px',
           background: 'rgba(249, 115, 22, 0.12)',
           border: '1px solid rgba(249, 115, 22, 0.2)',
           textAlign: 'left',
+          position: 'relative'
         }}>
-          <span style={{ whiteSpace: 'pre-wrap' }}>{msg.content}</span>
+          {isEditing ? (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 8, minWidth: isMobile ? 250 : 350 }}>
+              <textarea 
+                value={editValue} 
+                onChange={e => setEditValue(e.target.value)} 
+                style={{ width: '100%', minHeight: 80, background: 'var(--card-bg)', color: 'var(--text-primary)', border: '1px solid var(--card-border)', borderRadius: 8, padding: 8, fontSize: 15, fontFamily: 'var(--font-body)', outline: 'none' }}
+              />
+              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 8 }}>
+                <button onClick={() => { setIsEditing(false); setEditValue(msg.content); }} style={{ padding: '6px 12px', background: 'transparent', border: 'none', color: 'var(--text-secondary)', cursor: 'pointer', fontSize: 13, fontWeight: 500 }}>Cancel</button>
+                <button onClick={() => { setIsEditing(false); onEdit?.(msg.id, editValue); }} style={{ padding: '6px 12px', background: 'var(--accent-primary)', border: 'none', color: '#fff', borderRadius: 6, cursor: 'pointer', fontSize: 13, fontWeight: 500 }}>Save & Resend</button>
+              </div>
+            </div>
+          ) : (
+            <>
+              <span style={{ whiteSpace: 'pre-wrap' }}>{msg.content}</span>
+              {isHovered && onEdit && (
+                <button 
+                  onClick={() => setIsEditing(true)}
+                  style={{ position: 'absolute', top: -12, right: 16, background: 'var(--card-bg)', border: '1px solid var(--card-border)', borderRadius: '50%', width: 28, height: 28, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-secondary)', cursor: 'pointer', boxShadow: '0 2px 5px rgba(0,0,0,0.2)' }}
+                  title="Edit message"
+                >
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+                </button>
+              )}
+            </>
+          )}
           
           {msg.attachedFiles && msg.attachedFiles.length > 0 && (() => {
             const imageCount = msg.attachedFiles.filter(f => f.isImage && f.url).length;
@@ -448,6 +480,32 @@ function MessageBubble({ msg, isMobile, onImageClick, language }: { msg: Message
         <div style={{ alignSelf: 'flex-start', marginTop: 4, display: 'flex', gap: 4 }}>
           <SpeakButton text={msg.content} language={language} />
           <CopyButton text={msg.content} />
+          {isLastAiMessage && onRegenerate && (
+            <button
+              onClick={onRegenerate}
+              title="Regenerate response"
+              style={{
+                flexShrink: 0, alignSelf: 'center',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                width: 32, height: 32, borderRadius: 8, cursor: 'pointer',
+                background: 'none', border: '1px solid transparent',
+                color: 'var(--text-secondary)',
+                transition: 'all 0.2s', padding: 0,
+              }}
+              onMouseEnter={e => {
+                (e.currentTarget as HTMLButtonElement).style.color = 'var(--text-primary)';
+                (e.currentTarget as HTMLButtonElement).style.borderColor = 'var(--card-border)';
+                (e.currentTarget as HTMLButtonElement).style.background = 'var(--glass-bg-hover)';
+              }}
+              onMouseLeave={e => {
+                (e.currentTarget as HTMLButtonElement).style.color = 'var(--text-secondary)';
+                (e.currentTarget as HTMLButtonElement).style.borderColor = 'transparent';
+                (e.currentTarget as HTMLButtonElement).style.background = 'none';
+              }}
+            >
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="1 4 1 10 7 10"></polyline><polyline points="23 20 23 14 17 14"></polyline><path d="M20.49 9A9 9 0 0 0 5.64 5.64L1 10m22 4l-4.64 4.36A9 9 0 0 1 3.51 15"></path></svg>
+            </button>
+          )}
         </div>
       )}
     </div>
@@ -457,7 +515,7 @@ function MessageBubble({ msg, isMobile, onImageClick, language }: { msg: Message
 export default function ChatPage({ 
   messages, isStreaming, pendingFiles, sessions, activeSessionId, model, language,
   sendMessage, stopGeneration, setPendingFiles, startNewSession, setActiveSessionId,
-  deleteSession, renameSession, setModel, setLanguage
+  deleteSession, renameSession, setModel, setLanguage, editMessage, regenerateResponse
 }: ReturnType<typeof useChat>) {
   const [input, setInput] = useState('');
   const [isRecording, setIsRecording] = useState(false);
@@ -626,7 +684,7 @@ export default function ChatPage({
         {messages.length > 0 && (
           <div style={{ flex: 1, overflowY: 'auto', padding: isMobile ? '24px 16px' : '32px 48px', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
             <div style={{ width: '100%', maxWidth: '850px', display: 'flex', flexDirection: 'column', gap: 32 }}>
-              {messages.map(m => <MessageBubble key={m.id} msg={m} isMobile={isMobile} onImageClick={setPreviewImage} language={language} />)}
+              {messages.map((m, i) => <MessageBubble key={m.id} msg={m} isMobile={isMobile} onImageClick={setPreviewImage} language={language} onEdit={editMessage} onRegenerate={regenerateResponse} isLastAiMessage={i === messages.length - 1 && m.role === 'assistant'} />)}
               <div ref={messagesEndRef} style={{ height: 40, flexShrink: 0 }} />
             </div>
           </div>
@@ -921,15 +979,15 @@ export default function ChatPage({
                   disabled={!isStreaming && !input.trim() && pendingFiles.length === 0} 
                   style={{
                     width: 36, height: 36, flexShrink: 0, borderRadius: 18,
-                    background: (!isStreaming && !input.trim() && pendingFiles.length === 0) ? 'transparent' : 'var(--accent-primary)',
-                    color: (!isStreaming && !input.trim() && pendingFiles.length === 0) ? 'transparent' : 'white',
+                    background: (!isStreaming && !input.trim() && pendingFiles.length === 0) ? 'var(--glass-bg-strong)' : 'var(--accent-primary)',
+                    color: (!isStreaming && !input.trim() && pendingFiles.length === 0) ? 'var(--text-muted)' : 'white',
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    opacity: (!isStreaming && !input.trim() && pendingFiles.length === 0) ? 0 : 1, 
+                    opacity: 1, 
                     transition: 'all 0.2s', 
                     boxShadow: (!isStreaming && !input.trim() && pendingFiles.length === 0) ? 'none' : '0 0 15px rgba(249,115,22,0.3)',
-                    cursor: (!isStreaming && !input.trim() && pendingFiles.length === 0) ? 'default' : 'pointer',
+                    cursor: (!isStreaming && !input.trim() && pendingFiles.length === 0) ? 'not-allowed' : 'pointer',
                     border: 'none',
-                    transform: (!isStreaming && !input.trim() && pendingFiles.length === 0) ? 'scale(0.8)' : 'scale(1)'
+                    transform: 'scale(1)'
                   }}
                   onMouseEnter={e => {
                     if (isStreaming || input.trim() || pendingFiles.length > 0) {
