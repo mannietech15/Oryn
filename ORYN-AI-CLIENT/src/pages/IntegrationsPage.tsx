@@ -1,21 +1,48 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
 const mockIntegrations = [
+  { id: 'smtp', name: 'Custom SMTP', desc: 'Send emails directly through your own mail server via Oryn.', icon: '📧', connected: true },
+  { id: 'google_calendar', name: 'Google Calendar', desc: 'Manage your schedule and prepare for upcoming meetings.', icon: '📅', connected: false },
   { id: 'slack', name: 'Slack', desc: 'Send automated insights and chat directly from Slack channels.', icon: '💬', connected: true },
-  { id: 'stripe', name: 'Stripe', desc: 'Analyze live financial metrics and revenue health.', icon: '💳', connected: true },
+  { id: 'stripe', name: 'Stripe', desc: 'Analyze live financial metrics and revenue health.', icon: '💳', connected: false },
   { id: 'github', name: 'GitHub', desc: 'Monitor repository activity and audit code automatically.', icon: '🐙', connected: false },
   { id: 'notion', name: 'Notion', desc: 'Sync AI-generated tasks and docs directly to your workspace.', icon: '📝', connected: false },
   { id: 'zendesk', name: 'Zendesk', desc: 'Automate support ticket sentiment analysis and escalation.', icon: '🎫', connected: false },
   { id: 'hubspot', name: 'HubSpot', desc: 'Enrich lead data automatically and draft personalized emails.', icon: '🎯', connected: false },
-  { id: 'google_calendar', name: 'Google Calendar', desc: 'Manage your schedule and prepare for upcoming meetings.', icon: '📅', connected: false },
-  { id: 'linear', name: 'Linear', desc: 'Sync engineering tasks and track project velocity.', icon: '📈', connected: false },
 ];
 
 export default function IntegrationsPage() {
-  const [integrations, setIntegrations] = useState(mockIntegrations);
+  const [integrations, setIntegrations] = useState(() => {
+    // Attempt to load from localStorage if available
+    const saved = localStorage.getItem('oryn_integrations');
+    if (saved) {
+      try { return JSON.parse(saved); } catch (e) { return mockIntegrations; }
+    }
+    return mockIntegrations;
+  });
 
-  const toggleConnection = (id: string) => {
-    setIntegrations(prev => prev.map(i => i.id === id ? { ...i, connected: !i.connected } : i));
+  const [activeModalId, setActiveModalId] = useState<string | null>(null);
+
+  useEffect(() => {
+    localStorage.setItem('oryn_integrations', JSON.stringify(integrations));
+  }, [integrations]);
+
+  const handleConnectClick = (id: string) => {
+    const integration = integrations.find(i => i.id === id);
+    if (integration?.connected) {
+      // Disconnect
+      setIntegrations(prev => prev.map(i => i.id === id ? { ...i, connected: false } : i));
+    } else {
+      // Open modal to configure
+      setActiveModalId(id);
+    }
+  };
+
+  const handleSaveConfig = (id: string, config: any) => {
+    // In a real app, send config to backend
+    console.log(`Saving config for ${id}:`, config);
+    setIntegrations(prev => prev.map(i => i.id === id ? { ...i, connected: true } : i));
+    setActiveModalId(null);
   };
 
   return (
@@ -52,11 +79,19 @@ export default function IntegrationsPage() {
         <div style={{ maxWidth: 1200, margin: '0 auto' }}>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: 24 }}>
             {integrations.map(integration => (
-              <IntegrationCard key={integration.id} {...integration} onToggle={() => toggleConnection(integration.id)} />
+              <IntegrationCard key={integration.id} {...integration} onToggle={() => handleConnectClick(integration.id)} />
             ))}
           </div>
         </div>
       </div>
+      
+      {activeModalId && (
+        <IntegrationModal 
+          integration={integrations.find(i => i.id === activeModalId)!} 
+          onClose={() => setActiveModalId(null)} 
+          onSave={(config) => handleSaveConfig(activeModalId, config)} 
+        />
+      )}
     </div>
   );
 }
@@ -101,6 +136,67 @@ function IntegrationCard({ name, desc, icon, connected, onToggle }: { name: stri
       >
         {connected ? 'Disconnect' : 'Connect'}
       </button>
+    </div>
+  );
+}
+
+function IntegrationModal({ integration, onClose, onSave }: { integration: any, onClose: () => void, onSave: (data: any) => void }) {
+  const [formData, setFormData] = useState<any>({});
+
+  const isSmtp = integration.id === 'smtp';
+
+  return (
+    <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(4px)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, padding: 24 }}>
+      <div style={{ width: '100%', maxWidth: 480, background: 'var(--card-bg)', border: '1px solid var(--card-border)', borderRadius: 24, boxShadow: '0 24px 48px rgba(0,0,0,0.5)', overflow: 'hidden', animation: 'rise 0.3s ease' }}>
+        
+        <div style={{ padding: '24px 32px', borderBottom: '1px solid var(--card-border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+            <div style={{ fontSize: 24 }}>{integration.icon}</div>
+            <h2 style={{ fontSize: 20, fontWeight: 700, margin: 0, color: 'var(--text-primary)' }}>Connect {integration.name}</h2>
+          </div>
+          <button onClick={onClose} style={{ background: 'transparent', border: 'none', color: 'var(--text-secondary)', cursor: 'pointer', display: 'flex' }}>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+          </button>
+        </div>
+
+        <div style={{ padding: '32px', display: 'flex', flexDirection: 'column', gap: 20 }}>
+          {isSmtp ? (
+            <>
+              <div>
+                <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: 'var(--text-secondary)', marginBottom: 8 }}>SMTP Host</label>
+                <input type="text" placeholder="smtp.gmail.com" onChange={e => setFormData({ ...formData, host: e.target.value })} style={{ width: '100%', padding: '12px 16px', background: 'var(--glass-bg-subtle)', border: '1px solid var(--card-border)', borderRadius: 12, color: 'var(--text-primary)', outline: 'none' }} />
+              </div>
+              <div style={{ display: 'flex', gap: 16 }}>
+                <div style={{ flex: 1 }}>
+                  <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: 'var(--text-secondary)', marginBottom: 8 }}>SMTP Port</label>
+                  <input type="text" placeholder="587" onChange={e => setFormData({ ...formData, port: e.target.value })} style={{ width: '100%', padding: '12px 16px', background: 'var(--glass-bg-subtle)', border: '1px solid var(--card-border)', borderRadius: 12, color: 'var(--text-primary)', outline: 'none' }} />
+                </div>
+                <div style={{ flex: 2 }}>
+                  <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: 'var(--text-secondary)', marginBottom: 8 }}>Email User</label>
+                  <input type="text" placeholder="you@example.com" onChange={e => setFormData({ ...formData, user: e.target.value })} style={{ width: '100%', padding: '12px 16px', background: 'var(--glass-bg-subtle)', border: '1px solid var(--card-border)', borderRadius: 12, color: 'var(--text-primary)', outline: 'none' }} />
+                </div>
+              </div>
+              <div>
+                <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: 'var(--text-secondary)', marginBottom: 8 }}>App Password</label>
+                <input type="password" placeholder="••••••••••••" onChange={e => setFormData({ ...formData, pass: e.target.value })} style={{ width: '100%', padding: '12px 16px', background: 'var(--glass-bg-subtle)', border: '1px solid var(--card-border)', borderRadius: 12, color: 'var(--text-primary)', outline: 'none' }} />
+              </div>
+            </>
+          ) : (
+            <>
+              <div>
+                <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: 'var(--text-secondary)', marginBottom: 8 }}>API Key / Access Token</label>
+                <input type="password" placeholder="sk_live_••••••••" onChange={e => setFormData({ ...formData, key: e.target.value })} style={{ width: '100%', padding: '12px 16px', background: 'var(--glass-bg-subtle)', border: '1px solid var(--card-border)', borderRadius: 12, color: 'var(--text-primary)', outline: 'none' }} />
+                <p style={{ fontSize: 12, color: 'var(--text-tertiary)', marginTop: 8 }}>Your keys are encrypted end-to-end and never stored in plain text.</p>
+              </div>
+            </>
+          )}
+        </div>
+
+        <div style={{ padding: '24px 32px', borderTop: '1px solid var(--card-border)', display: 'flex', justifyContent: 'flex-end', gap: 12, background: 'var(--glass-bg-subtle)' }}>
+          <button onClick={onClose} style={{ padding: '10px 20px', background: 'transparent', color: 'var(--text-secondary)', border: 'none', borderRadius: 8, fontWeight: 600, fontSize: 13, cursor: 'pointer' }}>Cancel</button>
+          <button onClick={() => onSave(formData)} style={{ padding: '10px 20px', background: 'var(--accent-primary)', color: 'white', border: 'none', borderRadius: 8, fontWeight: 600, fontSize: 13, cursor: 'pointer', boxShadow: '0 4px 12px rgba(249,115,22,0.3)' }}>Save & Connect</button>
+        </div>
+      </div>
     </div>
   );
 }
