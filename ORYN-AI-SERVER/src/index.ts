@@ -440,11 +440,11 @@ app.post('/api/send-email', async (req, res) => {
       });
 
       const info = await transporter.sendMail({
-        from: '"Oryn AI" <ai@oryn.com>',
+        from: `"Oryn AI" <${process.env.SMTP_USER}>`,
         to: Array.isArray(to) ? to.join(', ') : to,
-        subject: subject,
-        text: body,
-        html: body.replace(/\n/g, '<br>'),
+        subject: subject || 'Message from Oryn AI',
+        text: body || '',
+        html: (body || '').replace(/\n/g, '<br>'),
       });
 
       console.log("Message sent: %s", info.messageId);
