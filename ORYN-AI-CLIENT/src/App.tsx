@@ -8,6 +8,7 @@ import FinancialsPage from './pages/FinancialsPage';
 import ExplorePage from './pages/ExplorePage';
 import SettingsPage from './pages/SettingsPage';
 import AddOrganizationPage from './pages/AddOrganizationPage';
+import AutomationPage from './pages/AutomationPage';
 import type { Page } from './types';
 import { useChat } from './hooks/useChat';
 import { Toaster } from './components/ui/Toaster';
@@ -50,7 +51,7 @@ export default function App() {
       case 'financials':   return <FinancialsPage />;
       case 'explore':      return <ExplorePage />;
       case 'settings':     return <SettingsPage />;
-      case 'automation':   return <AutomationPlaceholder />;
+      case 'automation':   return <AutomationPage />;
       case 'add-organization': return <AddOrganizationPage onComplete={handleCompleteOrg} />;
       default:             return <DashboardPage orgProfile={orgProfile} />;
     }
@@ -120,17 +121,6 @@ export default function App() {
         }
       `}</style>
     </>
-  );
-}
-
-function AutomationPlaceholder() {
-  return (
-    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100%', gap: 24, opacity: 0.5 }}>
-      <div style={{ fontSize: 48, color: 'var(--accent)' }}>⟁</div>
-      <div style={{ fontFamily: 'var(--font-display)', fontSize: 13, fontWeight: 600, letterSpacing: 4, color: 'var(--muted)', textTransform: 'uppercase' }}>
-        Automation · Coming Soon
-      </div>
-    </div>
   );
 }
 
