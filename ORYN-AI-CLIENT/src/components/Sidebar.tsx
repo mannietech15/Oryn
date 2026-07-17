@@ -53,9 +53,9 @@ const sections: { label: string; items: SideItem[] }[] = [
     label: 'Tools',
     items: [
       { icon: icons.automation, label: 'Automation', page: 'automation' },
-      { icon: icons.integrations, label: 'Integrations' },
-      { icon: icons.documents, label: 'Documents' },
-      { icon: icons.calendar, label: 'Calendar' },
+      { icon: icons.integrations, label: 'Integrations', page: 'integrations' },
+      { icon: icons.documents, label: 'Documents', page: 'documents' },
+      { icon: icons.calendar, label: 'Calendar', page: 'calendar' },
     ],
   }
 ];

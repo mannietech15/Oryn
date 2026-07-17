@@ -9,6 +9,9 @@ import ExplorePage from './pages/ExplorePage';
 import SettingsPage from './pages/SettingsPage';
 import AddOrganizationPage from './pages/AddOrganizationPage';
 import AutomationPage from './pages/AutomationPage';
+import IntegrationsPage from './pages/IntegrationsPage';
+import DocumentsPage from './pages/DocumentsPage';
+import CalendarPage from './pages/CalendarPage';
 import type { Page } from './types';
 import { useChat } from './hooks/useChat';
 import { Toaster } from './components/ui/Toaster';
@@ -52,6 +55,9 @@ export default function App() {
       case 'explore':      return <ExplorePage />;
       case 'settings':     return <SettingsPage />;
       case 'automation':   return <AutomationPage />;
+      case 'integrations': return <IntegrationsPage />;
+      case 'documents':    return <DocumentsPage />;
+      case 'calendar':     return <CalendarPage />;
       case 'add-organization': return <AddOrganizationPage onComplete={handleCompleteOrg} />;
       default:             return <DashboardPage orgProfile={orgProfile} />;
     }
