@@ -31,10 +31,17 @@ const openaiApex = new OpenAI({
 });
 
 // Dynamic model selection via API now
+const DEFAULT_MODEL = 'meta/llama-3.2-11b-vision-instruct';
+const PRO_MODEL = 'meta/llama-3.2-90b-vision-instruct';
 
 console.log('🔑 NVIDIA API Key:', process.env.NVIDIA_API_KEY ? `Loaded (${process.env.NVIDIA_API_KEY.slice(0, 9)}...)` : 'MISSING');
 
-app.use(cors({ origin: 'http://localhost:5173' }));
+const allowedOrigins = [
+  'http://localhost:5173',
+  'http://localhost:3000',
+  ...(process.env.CLIENT_URL ? [process.env.CLIENT_URL] : [])
+];
+app.use(cors({ origin: allowedOrigins, credentials: true }));
 app.use(express.json());
 
 // ── Health check ──────────────────────────────────────────
@@ -59,10 +66,7 @@ app.post('/api/chat', async (req, res) => {
   const isLogic = model === 'logic';
   const isApex = model === 'apex';
   
-  let currentModelName = isLogic ? '01-ai/yi-large' : 
-                         isApex ? 'squ11z1/Mythos-nano' : 
-                         model === 'pro' ? 'meta/llama-3.2-90b-vision-instruct' : 
-                         'meta/llama-3.1-70b-instruct';
+  let currentModelName = model === 'pro' ? PRO_MODEL : DEFAULT_MODEL;
                          
   let currentClient = isLogic ? openaiLogic : isApex ? openaiApex : openai;
 
@@ -162,14 +166,16 @@ IMPORTANT: You MUST respond entirely in the following language: ${language || 'E
       res.end();
       return; // Success — exit
     } catch (err: any) {
+      const is410 = err.message?.includes('410') || err.status === 410;
+      const is404 = err.message?.includes('404') || err.status === 404;
       const is429 = err.message?.includes('429') || err.status === 429 || err.message?.includes('rate-limit') || err.message?.includes('rate_limit');
       
-      if (is429 && isApex && currentModelName === 'squ11z1/Mythos-nano') {
-        console.log(`⏳ Oryn Apex rate limited, falling back to standard model seamlessly...`);
-        // Fallback to standard fast model without throwing error to frontend
-        currentModelName = 'meta/llama-3.1-70b-instruct';
+      // Auto-fallback to default stable model if requested model is deprecated, missing, or rate-limited
+      if ((is410 || is404 || is429) && currentModelName !== DEFAULT_MODEL) {
+        console.log(`⏳ Model ${currentModelName} unavailable (${err.message}), falling back to ${DEFAULT_MODEL}...`);
+        currentModelName = DEFAULT_MODEL;
         currentClient = openai;
-        continue; // Retry immediately with the new model without increasing attempt count, or let it retry in next loop iteration
+        continue;
       }
 
       if (is429 && attempt < maxRetries) {
@@ -181,9 +187,11 @@ IMPORTANT: You MUST respond entirely in the following language: ${language || 'E
       console.error('❌ Chat Error:', err.message);
       const userMessage = is429
         ? 'The AI model is temporarily rate-limited on the free tier. Please wait a moment and try again.'
-        : err.message?.includes('Connection error') || err.message?.includes('upstream')
-          ? 'The AI provider is temporarily unavailable. Please wait a few seconds and try again.'
-          : err.message;
+        : is410 || is404
+          ? 'The requested model endpoint was updated. Please refresh and try again.'
+          : err.message?.includes('Connection error') || err.message?.includes('upstream')
+            ? 'The AI provider is temporarily unavailable. Please wait a few seconds and try again.'
+            : 'An unexpected error occurred while generating the response. Please try again.';
       res.write(`data: ${JSON.stringify({ type: 'error', message: userMessage })}\n\n`);
       res.end();
       return;
@@ -202,8 +210,8 @@ app.post('/api/analyze', upload.single('file'), async (req, res) => {
   const userPrompt = prompt || `Analyze this file and provide a concise business summary with key insights and action items. Respond in ${language || 'English'}.`;
   const isImage = req.file.mimetype.startsWith('image/');
   
-  // If it's an image, force the vision model (pro), otherwise use the requested model
-  const activeModel = (isImage || model === 'pro') ? 'meta/llama-3.2-90b-vision-instruct' : 'meta/llama-3.1-70b-instruct';
+  // Both 11b and 90b have vision capabilities
+  const activeModel = (isImage || model === 'pro') ? PRO_MODEL : DEFAULT_MODEL;
   let contentPayload: any;
 
   if (isImage) {
@@ -280,7 +288,7 @@ Respond with a JSON object in this exact format (no markdown, just JSON):
 
   try {
     const completion = await openai.chat.completions.create({
-      model: "meta/llama-3.1-70b-instruct",
+      model: DEFAULT_MODEL,
       messages: [
         { role: 'system', content: systemInstruction },
         { role: 'user', content: query }
@@ -334,7 +342,7 @@ Respond ONLY with a JSON object (no markdown fences):
 
   try {
     const completion = await openai.chat.completions.create({
-      model: "meta/llama-3.1-70b-instruct",
+      model: DEFAULT_MODEL,
       messages: [{ role: 'user', content: prompt }],
       response_format: { type: "json_object" }
     });
@@ -378,7 +386,7 @@ Return a JSON object with a single key 'alerts' containing an array of exactly 5
 
   try {
     const completion = await openai.chat.completions.create({
-      model: "meta/llama-3.1-70b-instruct",
+      model: DEFAULT_MODEL,
       messages: [{ role: 'user', content: prompt }],
       response_format: { type: "json_object" }
     });
@@ -430,7 +438,7 @@ Provide a 2-3 sentence strategic recommendation on what they should do next. Res
 { "recommendation": "your advice here" }
 `;
     const completion = await openai.chat.completions.create({
-      model: "meta/llama-3.1-70b-instruct",
+      model: DEFAULT_MODEL,
       messages: [{ role: 'user', content: prompt }],
       response_format: { type: "json_object" }
     });
