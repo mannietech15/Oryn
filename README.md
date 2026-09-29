@@ -128,3 +128,14 @@ graph TD
 | **Runtime Code Sandbox** | [Babel Standalone](https://babeljs.io/), [Tailwind CSS CDN](https://tailwindcss.com/) |
 
 ---
+
+## 📋 System Requirements
+
+Before running ORYN, ensure you have:
+
+* **Node.js**: `v18.0.0` or higher (Node 20+ recommended)
+* **Package Manager**: `npm` (v9+) or `pnpm`
+* **NVIDIA NIM API Key**: Free trial keys available at [build.nvidia.com](https://build.nvidia.com)
+* **SMTP Credentials** *(Optional)*: For live email sending (Gmail App Password, Resend, or SendGrid)
+
+---
