@@ -139,3 +139,39 @@ Before running ORYN, ensure you have:
 * **SMTP Credentials** *(Optional)*: For live email sending (Gmail App Password, Resend, or SendGrid)
 
 ---
+
+## 🚀 Quickstart Guide
+
+### 1. Clone the Repository
+```bash
+git clone https://github.com/mannietech15/Oryn.git
+cd Oryn
+```
+
+### 2. Configure Environment Variables
+
+Navigate to the server directory and create your `.env` file:
+```bash
+cd ORYN-AI-SERVER
+cp .env.example .env
+```
+
+Edit `.env` with your preferred credentials:
+```env
+PORT=3001
+NODE_ENV=development
+CLIENT_URL=http://localhost:5173
+
+# NVIDIA NIM Inference API Key
+NVIDIA_API_KEY=nvapi-your-key-here
+
+# Optional: Dedicated Keys for Multi-Model Routing
+NVIDIA_LOGIC_API_KEY=
+NVIDIA_APEX_API_KEY=
+
+# Optional: SMTP Configuration for Email Automation
+SMTP_HOST=smtp.gmail.com
+SMTP_PORT=587
+SMTP_USER=your_email@gmail.com
+SMTP_PASS=your_app_specific_password
+```
