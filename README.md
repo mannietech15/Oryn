@@ -33,3 +33,46 @@ Traditional BI dashboards are static, retrospective, and passive. ORYN inverts t
 Whether diagnosing pipeline churn, compiling live React dashboards on the fly inside the conversation, or querying complex financial models across global markets, ORYN delivers enterprise-grade reasoning with lightning-fast low-latency execution.
 
 ---
+
+## 🔮 System Architecture
+
+```mermaid
+graph TD
+    subgraph Client ["Client Layer (React 18 + Vite + WebGL)"]
+        UI["Hyper-Aesthetic Glassmorphic UI"]
+        Orb["3D Interactive WebGL Orb (Three.js/OGL)"]
+        Voice["Conversational Voice Engine (STT/TTS)"]
+        Sandbox["In-Chat Babel Sandbox & Tailwind Canvas"]
+        Feed["Executive KPI & Smart Alert Feed"]
+    end
+
+    subgraph Server ["Server Orchestration Layer (Node.js + Express + TypeScript)"]
+        Router["Dynamic Model Router & Resilience Gateway"]
+        SSE["Server-Sent Events (SSE) Streaming Engine"]
+        Analysis["Multimodal Vision & File Extraction Engine"]
+        Safety["HITL Action Verifier (Human-in-the-Loop)"]
+        BriefingCache["In-Memory Executive Briefing Cache"]
+    end
+
+    subgraph Intelligence ["Inference & External Services"]
+        NvidiaDef["NVIDIA NIM: Llama-3.2-11B-Vision-Instruct"]
+        NvidiaPro["NVIDIA NIM: Llama-3.2-90B-Vision-Instruct"]
+        Pollinations["Generative Diffusion Engine (/imagine)"]
+        SMTP["Enterprise Mail Gateway (Nodemailer)"]
+    end
+
+    UI --> Voice
+    UI --> Sandbox
+    UI --> SSE
+    SSE <--> Router
+    Router --> NvidiaDef
+    Router --> NvidiaPro
+    Router --> Pollinations
+    Safety --> SMTP
+    Analysis --> NvidiaPro
+    BriefingCache --> Feed
+```
+
+---
+
+## ✨ Key Capabilities
