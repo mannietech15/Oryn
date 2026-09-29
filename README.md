@@ -77,6 +77,8 @@ graph TD
     BriefingCache --> Feed
 ```
 
+> **Runtime Execution Flow:** Client telemetry and queries stream through the server's Server-Sent Events (SSE) gateway. Requests requiring code compilation are compiled in-browser via Babel Standalone, while strategic and multimodal requests are load-balanced to NVIDIA NIM inference models.
+
 ---
 
 ## ✨ Key Capabilities
