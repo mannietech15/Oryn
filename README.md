@@ -208,3 +208,7 @@ npm run dev
 | `GET` | `/api/dashboard/alerts` | Proactive business threat, anomaly, and opportunity feed |
 | `GET` | `/api/dashboard/goals` | OKR milestone trackers with automated recommendation endpoints |
 | `GET` | `/api/dashboard/health-score` | Composite multi-factor business grade and metric breakdown |
+| `POST` | `/api/send-email` | Guardrailed SMTP email dispatch endpoint |
+| `GET` | `/api/download` | High-performance image proxy downloader |
+
+---
