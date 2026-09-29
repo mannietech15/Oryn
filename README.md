@@ -82,3 +82,8 @@ graph TD
 * **Smart Alert Feed:** Scans revenue pacing, stalled accounts, support spikes, and broken integrations with automated risk-level categorization (`critical`, `warning`, `opportunity`, `info`).
 * **Dynamic OKR Tracking:** Real-time progress monitoring against Q2 revenue, growth, and task milestones with on-demand strategic advice.
 * **Business Health Scoring:** Continuous multi-factor grading across revenue health, user retention, team throughput, and integration health.
+
+### 2. 💻 Live In-Chat Code Sandbox & Dynamic React Runner
+* **Instant Babel Standalone Compilation:** When ORYN generates React components, Tailwind layouts, HTML, or SVG, they compile and render directly inside an interactive sandboxed modal.
+* **Full State & Interactivity:** Test functional buttons, toggles, forms, and charts without leaving the chat thread.
+* **Zero Dependencies on Local Bundlers:** Renders dynamic JSX, Lucide icons, and Tailwind styles on the fly via client-side runtime injection.
