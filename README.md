@@ -262,6 +262,7 @@ ORYN-AI/
 1. **Explicit Confirmation for Side-Effects:** Emails are never dispatched without explicit user permission. The AI drafts the message, highlights recipient details, and waits for a confirming command before firing the SMTP protocol.
 2. **Sandboxed Code Execution:** Dynamic code previews execute inside an isolated DOM container, safeguarding user session state.
 3. **Resilient Failover Architecture:** Automatic fallback triggers ensure uninterrupted uptime if a model tier experiences rate limits (`HTTP 429`) or model deprecations.
+4. **Zero Ambient Data Ingestion:** User files and analysis buffers are processed in memory with zero permanent filesystem persistence unless explicitly archived by the administrator.
 
 ---
 
