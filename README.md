@@ -6,7 +6,7 @@
   <img src="assets/logo.png" alt="ORYN" width="220" align="middle" />
 </a>
 
-### **Autonomous Business Intelligence & Agentic Executive Operating System**
+### **The Autonomous AI Business Manager for Modern Enterprise Platforms**
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-orange.svg?style=for-the-badge)](https://opensource.org/licenses/MIT)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.4-blue.svg?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
@@ -221,9 +221,15 @@ ORYN-AI/
 │   │   └── index.css            # Dark cyberpunk design system
 │   └── vite.config.ts
 │
-├── ORYN-AI-SERVER/              # Backend Inference & Automation Server
+├── ORYN-AI-SERVER/              # Modular Backend Inference & Business Manager
 │   ├── src/
-│   │   └── index.ts             # Express server, SSE streaming & tools
+│   │   ├── config/              # Centralized environment & NVIDIA clients
+│   │   ├── controllers/         # HTTP request orchestration handlers
+│   │   ├── middleware/          # Multer memory storage & error handlers
+│   │   ├── routes/              # Modular Express routing tables
+│   │   ├── services/            # Inference, telemetry, alerts & SMTP logic
+│   │   ├── types/               # Server request & schema interfaces
+│   │   └── index.ts             # Clean server bootstrap & mounting
 │   ├── .env.example             # Documented environment templates
 │   ├── package.json             # Server dependencies
 │   └── tsconfig.json
