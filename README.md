@@ -175,3 +175,11 @@ SMTP_PORT=587
 SMTP_USER=your_email@gmail.com
 SMTP_PASS=your_app_specific_password
 ```
+
+### 3. Start the Backend Server
+```bash
+# In ORYN-AI-SERVER directory:
+npm install
+npm run dev
+```
+> The server will start on `http://localhost:3001` with active endpoints and SSE streaming.
