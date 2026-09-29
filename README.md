@@ -202,3 +202,9 @@ npm run dev
 | `GET` | `/api/health` | Healthcheck and active model status |
 | `POST` | `/api/chat` | Real-time SSE streaming chat with task extraction & email dispatch |
 | `POST` | `/api/analyze` | Multimodal file and vision inspection (images, documents, text) |
+| `GET` | `/api/analytics` | High-level business KPIs, timeline distribution, and team metrics |
+| `POST` | `/api/dashboard/command` | Natural language business analytics command processor |
+| `GET` | `/api/dashboard/briefing` | Hourly cached AI executive briefing |
+| `GET` | `/api/dashboard/alerts` | Proactive business threat, anomaly, and opportunity feed |
+| `GET` | `/api/dashboard/goals` | OKR milestone trackers with automated recommendation endpoints |
+| `GET` | `/api/dashboard/health-score` | Composite multi-factor business grade and metric breakdown |
