@@ -194,3 +194,11 @@ npm run dev
 > Open `http://localhost:5173` in your browser to enter the ORYN interface.
 
 ---
+
+## 📡 API Endpoints & Event Streams
+
+| Method | Endpoint | Description |
+| :--- | :--- | :--- |
+| `GET` | `/api/health` | Healthcheck and active model status |
+| `POST` | `/api/chat` | Real-time SSE streaming chat with task extraction & email dispatch |
+| `POST` | `/api/analyze` | Multimodal file and vision inspection (images, documents, text) |
