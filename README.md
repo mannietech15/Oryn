@@ -41,28 +41,28 @@ Whether diagnosing pipeline churn, compiling live React dashboards on the fly in
 ## 🔮 System Architecture
 
 ```mermaid
-graph TD
-    subgraph Client ["Client Layer (React 18 + Vite + WebGL)"]
-        UI["Hyper-Aesthetic Glassmorphic UI"]
-        Orb["3D Interactive WebGL Orb (Three.js/OGL)"]
-        Voice["Conversational Voice Engine (STT/TTS)"]
-        Sandbox["In-Chat Babel Sandbox & Tailwind Canvas"]
-        Feed["Executive KPI & Smart Alert Feed"]
+flowchart TD
+    subgraph Client [Client Layer - React 18 and Vite and WebGL]
+        UI[Hyper-Aesthetic Glassmorphic UI]
+        Orb[3D Interactive WebGL Orb - Three.js]
+        Voice[Conversational Voice Engine - STT and TTS]
+        Sandbox[In-Chat Babel Sandbox and Tailwind Canvas]
+        Feed[Executive KPI and Smart Alert Feed]
     end
 
-    subgraph Server ["Server Orchestration Layer (Node.js + Express + TypeScript)"]
-        Router["Dynamic Model Router & Resilience Gateway"]
-        SSE["Server-Sent Events (SSE) Streaming Engine"]
-        Analysis["Multimodal Vision & File Extraction Engine"]
-        Safety["HITL Action Verifier (Human-in-the-Loop)"]
-        BriefingCache["In-Memory Executive Briefing Cache"]
+    subgraph Server [Server Orchestration Layer - Node.js and Express]
+        Router[Dynamic Model Router and Resilience Gateway]
+        SSE[Server-Sent Events SSE Streaming Engine]
+        Analysis[Multimodal Vision and File Extraction Engine]
+        Safety[HITL Action Verifier - Human in the Loop]
+        BriefingCache[In-Memory Executive Briefing Cache]
     end
 
-    subgraph Intelligence ["Inference & External Services"]
-        NvidiaDef["NVIDIA NIM: Llama-3.2-11B-Vision-Instruct"]
-        NvidiaPro["NVIDIA NIM: Llama-3.2-90B-Vision-Instruct"]
-        Pollinations["Generative Diffusion Engine (/imagine)"]
-        SMTP["Enterprise Mail Gateway (Nodemailer)"]
+    subgraph Intelligence [Inference and External Services]
+        NvidiaDef[NVIDIA NIM - Llama 3.2 11B Vision]
+        NvidiaPro[NVIDIA NIM - Llama 3.2 90B Vision]
+        Pollinations[Generative Diffusion Engine]
+        SMTP[Enterprise Mail Gateway - Nodemailer]
     end
 
     UI --> Voice
