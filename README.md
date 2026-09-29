@@ -258,3 +258,17 @@ ORYN-AI/
 3. **Resilient Failover Architecture:** Automatic fallback triggers ensure uninterrupted uptime if a model tier experiences rate limits (`HTTP 429`) or model deprecations.
 
 ---
+
+## 🗺️ Roadmap
+
+- [x] Llama 3.2 11B & 90B Vision Multimodal Integration
+- [x] Live In-Chat Babel React / Tailwind Code Runner
+- [x] Real-time Speech-to-Speech Voice Mode
+- [x] Automated HITL Email Dispatch Engine
+- [x] Executive Dashboard Command Bar & Anomaly Alerts
+- [ ] Multi-Agent Consensus Architecture (Debate & Verification)
+- [ ] Direct PostgreSQL / Supabase Database Query Connector
+- [ ] Enterprise Slack & Microsoft Teams Bot Gateway
+- [ ] Local Offline Model Execution via Ollama & ONNX Runtime
+
+---
