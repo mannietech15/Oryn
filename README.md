@@ -212,3 +212,41 @@ npm run dev
 | `GET` | `/api/download` | High-performance image proxy downloader |
 
 ---
+
+## 📂 Project Structure
+
+```text
+ORYN-AI/
+├── ORYN-AI-CLIENT/              # Frontend Web Application
+│   ├── public/                  # Static assets & SVG icons
+│   ├── src/
+│   │   ├── api/                 # API client & fetch wrappers
+│   │   ├── components/          # Reusable UI & 3D WebGL modules
+│   │   │   ├── ConversationalMode.tsx  # Voice assistant mode
+│   │   │   ├── DashboardScene.tsx      # Three.js 3D canvas
+│   │   │   ├── Orb.tsx                 # Interactive 3D shader orb
+│   │   │   ├── SplashCursor.tsx        # WebGL fluid physics cursor
+│   │   │   └── Sidebar.tsx             # Collapsible session nav
+│   │   ├── hooks/               # Custom hooks (useChat, useVoice)
+│   │   ├── pages/               # 12 Specialized executive views
+│   │   │   ├── ChatPage.tsx            # Live sandbox & chat timeline
+│   │   │   ├── DashboardPage.tsx       # Command bar & health metrics
+│   │   │   ├── AnalyticsPage.tsx       # Deep telemetry charts
+│   │   │   ├── AutomationPage.tsx      # Workflow pipeline manager
+│   │   │   └── ...
+│   │   ├── types/               # TypeScript interfaces
+│   │   ├── App.tsx              # Root router & layout
+│   │   └── index.css            # Dark cyberpunk design system
+│   └── vite.config.ts
+│
+├── ORYN-AI-SERVER/              # Backend Inference & Automation Server
+│   ├── src/
+│   │   └── index.ts             # Express server, SSE streaming & tools
+│   ├── .env.example             # Documented environment templates
+│   ├── package.json             # Server dependencies
+│   └── tsconfig.json
+│
+└── README.md                    # Project documentation
+```
+
+---
