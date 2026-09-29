@@ -103,3 +103,6 @@ graph TD
 ### 6. 🛡️ Human-in-the-Loop (HITL) Email Automation
 * **Autonomous Drafting, Guardrailed Dispatch:** ORYN drafts context-rich transactional or cold-outreach emails, requests explicit confirmation, and dispatches only upon user approval.
 * **Nodemailer SMTP Integration:** Works seamlessly with Gmail, Outlook, Amazon SES, or local development mock modes.
+
+### 7. 🌐 Global Multilingual & Multi-Market Intelligence
+* **Cross-Border Enterprise Fluency:** Native understanding across global languages with deep context retention for international market expansion, regional business compliance, and multilingual executive communications.
