@@ -76,3 +76,9 @@ graph TD
 ---
 
 ## ✨ Key Capabilities
+
+### 1. 🧠 Proactive Executive Intelligence & Anomaly Engine
+* **Natural Language Business Query Bar:** Ask questions like *"Why is customer churn spiking?"* or *"Analyze Tuesday deal velocity"* and get structured strategic JSON insights with concrete recommendations.
+* **Smart Alert Feed:** Scans revenue pacing, stalled accounts, support spikes, and broken integrations with automated risk-level categorization (`critical`, `warning`, `opportunity`, `info`).
+* **Dynamic OKR Tracking:** Real-time progress monitoring against Q2 revenue, growth, and task milestones with on-demand strategic advice.
+* **Business Health Scoring:** Continuous multi-factor grading across revenue health, user retention, team throughput, and integration health.
