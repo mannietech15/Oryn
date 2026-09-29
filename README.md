@@ -95,3 +95,7 @@ graph TD
 ### 4. 👁️ Multimodal Vision & Document Forensics
 * **Powered by Llama 3.2 Vision:** Upload financial statements, product wireframes, receipts, UI screenshots, or CSV dumps up to 8,000 characters.
 * **Deep Structural Extraction:** Auto-parses balance sheets, extracts tabular datasets, and surfaces actionable business summaries in seconds.
+
+### 5. 🎨 Generative Creative Studio (`/imagine`)
+* **Instant High-Fidelity Diffusion:** Trigger image creation via `/imagine <prompt>` or conversational requests like *"Generate a sleek 3D logo for a fintech brand"*.
+* **Streaming Previews & Shimmer Loaders:** Real-time visual feedback with direct one-click high-resolution asset downloads through a backend proxy.
