@@ -113,3 +113,18 @@ graph TD
 * **Custom Dark Theme:** Specially tuned dark-mode palette (`#09090b`), translucent glass cards, and glowing amber-orange highlights.
 
 ---
+
+## 🛠️ Technology Stack
+
+| Layer | Technologies |
+| :--- | :--- |
+| **Frontend Framework** | [React 18.3](https://react.dev/), [TypeScript 5.4](https://www.typescriptlang.org/), [Vite 5.2](https://vitejs.dev/) |
+| **Styling & Motion** | Vanilla CSS Design Tokens, [Framer Motion 12](https://www.framer.com/motion/), [Lucide React](https://lucide.dev/) |
+| **3D & Visual FX** | [Three.js](https://threejs.org/), [@react-three/fiber](https://r3f.docs.pmnd.rs/), [@react-three/drei](https://github.com/pmndrs/drei), [OGL](https://github.com/oframe/ogl) |
+| **Data Visualization** | [Recharts 3.9](https://recharts.org/) |
+| **Backend Runtime** | [Node.js 20+](https://nodejs.org/), [Express 4.19](https://expressjs.com/), [TypeScript 5.4](https://www.typescriptlang.org/) |
+| **Inference Engine** | [NVIDIA NIM](https://build.nvidia.com) (`meta/llama-3.2-11b-vision-instruct`, `meta/llama-3.2-90b-vision-instruct`) |
+| **Communication & Streaming** | Server-Sent Events (SSE), [Multer](https://github.com/expressjs/multer), [Nodemailer](https://nodemailer.com/) |
+| **Runtime Code Sandbox** | [Babel Standalone](https://babeljs.io/), [Tailwind CSS CDN](https://tailwindcss.com/) |
+
+---
