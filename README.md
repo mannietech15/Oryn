@@ -297,7 +297,7 @@ Distributed under the **MIT License**. See `LICENSE` for more information.
 
 <div align="center">
 
-Built with precision by **[Emmanuel (MannieTech)](https://github.com/mannietech15)**
+Built with precision by **[Manasseh (MannieTech)](https://github.com/mannietech15)**
 
 *If you find ORYN insightful, give this repository a ⭐ star to show your support!*
 
