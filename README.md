@@ -183,3 +183,14 @@ npm install
 npm run dev
 ```
 > The server will start on `http://localhost:3001` with active endpoints and SSE streaming.
+
+### 4. Start the Client Application
+Open a new terminal tab:
+```bash
+cd ORYN-AI-CLIENT
+npm install
+npm run dev
+```
+> Open `http://localhost:5173` in your browser to enter the ORYN interface.
+
+---
