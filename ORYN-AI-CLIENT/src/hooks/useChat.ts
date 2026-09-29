@@ -84,7 +84,7 @@ export function useChat() {
   ]);
   const [stats, setStats] = useState<SessionStats>({ messages: 1, tasks: 3, files: 0 });
   const [features, setFeatures] = useState<ChatFeatures>({ voice: true, taskExtract: true, webSearch: true });
-  const [model, setModel] = useState<'fast' | 'pro'>('fast');
+  const [model, setModel] = useState<'fast' | 'pro' | 'logic' | 'apex'>('fast');
   const [language, setLanguage] = useState<string>('English');
   const [isStreaming, setIsStreaming] = useState(false);
   const [pendingFiles, setPendingFiles] = useState<File[]>([]);
