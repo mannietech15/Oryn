@@ -1,9 +1,9 @@
 <div align="center">
 
-<a href="https://github.com/mannietech15/Oryn">
+<a href="https://github.com/mannietech15/Oryn" style="text-decoration: none;">
+  <img src="assets/favicon.svg" alt="ORYN Emblem" width="56" height="56" align="middle" />
+  &nbsp;&nbsp;
   <img src="assets/logo.png" alt="ORYN" width="220" align="middle" />
-  &nbsp;
-  <img src="assets/favicon.svg" alt="ORYN Emblem" width="52" height="52" align="middle" />
 </a>
 
 ### **Autonomous Business Intelligence & Agentic Executive Operating System**
