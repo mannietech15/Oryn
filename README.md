@@ -250,3 +250,11 @@ ORYN-AI/
 ```
 
 ---
+
+## 🔒 Security & Human-In-The-Loop Guarantees
+
+1. **Explicit Confirmation for Side-Effects:** Emails are never dispatched without explicit user permission. The AI drafts the message, highlights recipient details, and waits for a confirming command before firing the SMTP protocol.
+2. **Sandboxed Code Execution:** Dynamic code previews execute inside an isolated DOM container, safeguarding user session state.
+3. **Resilient Failover Architecture:** Automatic fallback triggers ensure uninterrupted uptime if a model tier experiences rate limits (`HTTP 429`) or model deprecations.
+
+---
