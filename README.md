@@ -197,7 +197,7 @@ cd ORYN-AI-CLIENT
 npm install
 npm run dev
 ```
-> Open `http://localhost:5173` in your browser to enter the ORYN interface.
+> Open `http://localhost:5173` in your browser to enter the ORYN interface. The client automatically connects to the server at `http://localhost:3001`.
 
 ---
 
