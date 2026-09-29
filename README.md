@@ -91,3 +91,7 @@ graph TD
 ### 3. 🎙️ Real-Time Conversational Voice Mode
 * **Hands-Free Ambient Audio Loop:** Built-in speech recognition and vocal synthesis engine for fluid voice conversations.
 * **Live Acoustic Waveform Visualizer:** Dynamic audio feedback with intuitive status indicators for listening, processing, and speaking.
+
+### 4. 👁️ Multimodal Vision & Document Forensics
+* **Powered by Llama 3.2 Vision:** Upload financial statements, product wireframes, receipts, UI screenshots, or CSV dumps up to 8,000 characters.
+* **Deep Structural Extraction:** Auto-parses balance sheets, extracts tabular datasets, and surfaces actionable business summaries in seconds.
