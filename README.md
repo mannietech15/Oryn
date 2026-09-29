@@ -106,3 +106,10 @@ graph TD
 
 ### 7. 🌐 Global Multilingual & Multi-Market Intelligence
 * **Cross-Border Enterprise Fluency:** Native understanding across global languages with deep context retention for international market expansion, regional business compliance, and multilingual executive communications.
+
+### 8. 🎨 Hyper-Aesthetic Neo-Dark Workspace
+* **3D Neural Orb:** Built with React Three Fiber, Three.js, and OGL shaders for reactive ambient visual feedback.
+* **Interactive Fluid Splash Cursor:** 60fps WebGL particle cursor trails and refined physics.
+* **Custom Dark Theme:** Specially tuned dark-mode palette (`#09090b`), translucent glass cards, and glowing amber-orange highlights.
+
+---
