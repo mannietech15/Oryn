@@ -87,3 +87,7 @@ graph TD
 * **Instant Babel Standalone Compilation:** When ORYN generates React components, Tailwind layouts, HTML, or SVG, they compile and render directly inside an interactive sandboxed modal.
 * **Full State & Interactivity:** Test functional buttons, toggles, forms, and charts without leaving the chat thread.
 * **Zero Dependencies on Local Bundlers:** Renders dynamic JSX, Lucide icons, and Tailwind styles on the fly via client-side runtime injection.
+
+### 3. 🎙️ Real-Time Conversational Voice Mode
+* **Hands-Free Ambient Audio Loop:** Built-in speech recognition and vocal synthesis engine for fluid voice conversations.
+* **Live Acoustic Waveform Visualizer:** Dynamic audio feedback with intuitive status indicators for listening, processing, and speaking.
