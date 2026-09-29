@@ -302,6 +302,6 @@ Distributed under the **MIT License**. See `LICENSE` for more information.
 
 Built with precision by **[Manasseh (MannieTech)](https://github.com/mannietech15)**
 
-*If you find ORYN insightful, give this repository a ⭐ star to show your support!*
+**Designed & Engineered by Manasseh** • *If you find ORYN insightful, star this repository to show support!*
 
 </div>
