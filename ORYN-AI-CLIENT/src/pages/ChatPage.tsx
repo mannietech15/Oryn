@@ -320,7 +320,7 @@ function SpeakButton({ text, language }: { text: string, language?: string }) {
   );
 }
 
-function MessageBubble({ msg, isMobile, onImageClick, language, onEdit, onRegenerate, isLastAiMessage }: { msg: Message, isMobile?: boolean, onImageClick?: (url: string) => void, language?: string, onEdit?: (id: string, text: string) => void, onRegenerate?: () => void, isLastAiMessage?: boolean, isLastUserMessage?: boolean }) {
+function MessageBubble({ msg, isMobile, onImageClick, language, onEdit, onRegenerate, isLastAiMessage, onConfirmEmail, onDiscardEmail }: { msg: Message, isMobile?: boolean, onImageClick?: (url: string) => void, language?: string, onEdit?: (id: string, text: string) => void, onRegenerate?: () => void, isLastAiMessage?: boolean, isLastUserMessage?: boolean, onConfirmEmail?: (messageId: string, draftId: string) => void, onDiscardEmail?: (messageId: string) => void }) {
   const isUser = msg.role === 'user';
   const [isEditing, setIsEditing] = useState(false);
   const [editValue, setEditValue] = useState(msg.content);
@@ -478,6 +478,70 @@ function MessageBubble({ msg, isMobile, onImageClick, language, onEdit, onRegene
             </div>
           </div>
         )}
+        {msg.emailDraft && (
+          <div style={{
+            width: '100%', maxWidth: 640, marginTop: 14, padding: 18,
+            borderRadius: 12, background: 'var(--card-bg)',
+            border: '1px solid var(--accent-primary)',
+            boxShadow: '0 4px 16px rgba(249, 115, 22, 0.15)',
+            display: 'flex', flexDirection: 'column', gap: 12
+          }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                <span style={{ fontSize: 16 }}>📧</span>
+                <span style={{ fontSize: 12, fontWeight: 700, fontFamily: 'monospace', color: 'var(--accent-primary)' }}>
+                  HUMAN-IN-THE-LOOP ACTION PROPOSAL
+                </span>
+              </div>
+              <span style={{
+                fontSize: 10, fontWeight: 700, fontFamily: 'monospace',
+                padding: '2px 8px', borderRadius: 4,
+                background: msg.emailDraft.status === 'sent' ? 'rgba(34, 197, 94, 0.1)' : msg.emailDraft.status === 'failed' ? 'rgba(239, 68, 68, 0.1)' : 'rgba(249, 115, 22, 0.1)',
+                color: msg.emailDraft.status === 'sent' ? 'var(--success)' : msg.emailDraft.status === 'failed' ? 'var(--danger)' : 'var(--accent-primary)',
+                border: `1px solid ${msg.emailDraft.status === 'sent' ? 'rgba(34, 197, 94, 0.3)' : msg.emailDraft.status === 'failed' ? 'rgba(239, 68, 68, 0.3)' : 'rgba(249, 115, 22, 0.3)'}`
+              }}>
+                {msg.emailDraft.status === 'awaiting_approval' ? 'AWAITING APPROVAL' : msg.emailDraft.status === 'sent' ? 'SENT VIA SMTP' : 'DISPATCH FAILED'}
+              </span>
+            </div>
+
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 6, fontSize: 13, background: 'var(--glass-bg-subtle)', padding: 12, borderRadius: 8 }}>
+              <div><strong style={{ color: 'var(--text-muted)' }}>To:</strong> <span style={{ color: 'var(--text-primary)', fontFamily: 'monospace' }}>{msg.emailDraft.to}</span></div>
+              <div><strong style={{ color: 'var(--text-muted)' }}>Subject:</strong> <span style={{ color: 'var(--text-primary)' }}>{msg.emailDraft.subject}</span></div>
+              <div style={{ borderTop: '1px solid var(--card-border)', paddingTop: 8, marginTop: 4, color: 'var(--text-secondary)', whiteSpace: 'pre-wrap', lineHeight: 1.5 }}>
+                {msg.emailDraft.body}
+              </div>
+            </div>
+
+            {msg.emailDraft.status === 'awaiting_approval' && (
+              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 10 }}>
+                <button
+                  onClick={() => onDiscardEmail?.(msg.id)}
+                  style={{ padding: '6px 14px', borderRadius: 6, background: 'transparent', border: '1px solid var(--card-border)', color: 'var(--text-muted)', fontSize: 12, cursor: 'pointer' }}
+                >
+                  Discard Draft
+                </button>
+                <button
+                  onClick={() => onConfirmEmail?.(msg.id, msg.emailDraft!.id)}
+                  style={{ padding: '6px 16px', borderRadius: 6, background: 'var(--accent-primary)', border: 'none', color: '#fff', fontSize: 12, fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6 }}
+                >
+                  <span>🚀</span> Confirm & Send via SMTP
+                </button>
+              </div>
+            )}
+
+            {msg.emailDraft.status === 'sent' && (
+              <div style={{ fontSize: 11, color: 'var(--success)', fontFamily: 'monospace' }}>
+                ✓ Message dispatched via configured SMTP relay. Reference ID: {msg.emailDraft.messageId || 'N/A'}
+              </div>
+            )}
+
+            {msg.emailDraft.status === 'failed' && (
+              <div style={{ fontSize: 11, color: 'var(--danger)', fontFamily: 'monospace' }}>
+                ✕ {msg.emailDraft.error || 'Failed to dispatch email.'}
+              </div>
+            )}
+          </div>
+        )}
       </div>
 
       {/* Footer: Actions & Model Provenance */}
@@ -525,7 +589,8 @@ function MessageBubble({ msg, isMobile, onImageClick, language, onEdit, onRegene
 export default function ChatPage({ 
   messages, isStreaming, pendingFiles, sessions, activeSessionId, model, language,
   sendMessage, stopGeneration, setPendingFiles, startNewSession, setActiveSessionId,
-  deleteSession, renameSession, setModel, setLanguage, editMessage, regenerateResponse
+  deleteSession, renameSession, setModel, setLanguage, editMessage, regenerateResponse,
+  confirmEmail, discardEmail
 }: ReturnType<typeof useChat>) {
   const [input, setInput] = useState('');
   const [isRecording, setIsRecording] = useState(false);
@@ -694,7 +759,20 @@ export default function ChatPage({
         {messages.length > 0 && (
           <div style={{ flex: 1, overflowY: 'auto', padding: isMobile ? '24px 16px' : '32px 48px', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
             <div style={{ width: '100%', maxWidth: '850px', display: 'flex', flexDirection: 'column', gap: 32 }}>
-              {messages.map((m, i) => <MessageBubble key={m.id} msg={m} isMobile={isMobile} onImageClick={setPreviewImage} language={language} onEdit={editMessage} onRegenerate={regenerateResponse} isLastAiMessage={i === messages.length - 1 && m.role === 'assistant'} />)}
+              {messages.map((m, i) => (
+                <MessageBubble
+                  key={m.id}
+                  msg={m}
+                  isMobile={isMobile}
+                  onImageClick={setPreviewImage}
+                  language={language}
+                  onEdit={editMessage}
+                  onRegenerate={regenerateResponse}
+                  isLastAiMessage={i === messages.length - 1 && m.role === 'assistant'}
+                  onConfirmEmail={confirmEmail}
+                  onDiscardEmail={discardEmail}
+                />
+              ))}
               <div ref={messagesEndRef} style={{ height: 40, flexShrink: 0 }} />
             </div>
           </div>

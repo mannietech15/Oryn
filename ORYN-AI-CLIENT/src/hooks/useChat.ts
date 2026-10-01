@@ -1,5 +1,5 @@
 import { useState, useCallback, useRef, useEffect } from 'react';
-import { streamChat, analyzeFile } from '../api/oryn';
+import { streamChat, analyzeFile, stageEmailDraft, confirmEmailDraft } from '../api/oryn';
 import type { Message, Task, SessionStats, ChatFeatures } from '../types';
 
 function genId() {
@@ -295,26 +295,17 @@ export function useChat() {
             
             const { clean: cleanEmail, email } = extractEmailAction(clean);
             let finalContent = cleanEmail;
+            let stagedDraft: any = null;
 
             if (email) {
               try {
-                const res = await fetch('/api/send-email', {
-                  method: 'POST',
-                  headers: { 'Content-Type': 'application/json' },
-                  body: JSON.stringify(email)
+                stagedDraft = await stageEmailDraft({
+                  to: Array.isArray(email.to) ? email.to.join(', ') : (email.to || ''),
+                  subject: email.subject || 'Message from Oryn AI',
+                  body: email.body || email.message || ''
                 });
-                if (res.ok) {
-                  const data = await res.json();
-                  if (data.previewUrl) {
-                    finalContent += `\n\n📧 **Email successfully sent!** ([View Preview](${data.previewUrl}))`;
-                  } else {
-                    finalContent += '\n\n📧 **Email successfully sent!**';
-                  }
-                } else {
-                  finalContent += '\n\n❌ **Failed to send email.**';
-                }
               } catch (e) {
-                finalContent += '\n\n❌ **Failed to send email.**';
+                console.error("Failed to stage email draft", e);
               }
             }
             
@@ -322,9 +313,19 @@ export function useChat() {
               finalContent = finalContent ? `${finalContent}\n\n_[Request cancelled]_` : "_Request cancelled by the user._";
             }
             
-            if (finalContent !== fullText || abortRef.current) {
+            if (finalContent !== fullText || abortRef.current || stagedDraft) {
               setMessages(prev => prev.map(m =>
-                m.id === assistantId ? { ...m, content: finalContent } : m
+                m.id === assistantId ? {
+                  ...m,
+                  content: finalContent,
+                  emailDraft: stagedDraft ? {
+                    id: stagedDraft.id,
+                    to: stagedDraft.to,
+                    subject: stagedDraft.subject,
+                    body: stagedDraft.body,
+                    status: 'awaiting_approval'
+                  } : undefined
+                } : m
               ));
             }
             fullText = finalContent;
@@ -424,9 +425,53 @@ export function useChat() {
     sendMessage(userMsg.content, newHistory);
   }, [messages, isStreaming, sendMessage]);
 
+  const confirmEmail = useCallback(async (messageId: string, draftId: string) => {
+    try {
+      const res = await confirmEmailDraft(draftId);
+      setMessages(prev => prev.map(m => {
+        if (m.id === messageId && m.emailDraft) {
+          return {
+            ...m,
+            emailDraft: {
+              ...m.emailDraft,
+              status: 'sent',
+              messageId: res.messageId
+            }
+          };
+        }
+        return m;
+      }));
+    } catch (err: any) {
+      setMessages(prev => prev.map(m => {
+        if (m.id === messageId && m.emailDraft) {
+          return {
+            ...m,
+            emailDraft: {
+              ...m.emailDraft,
+              status: 'failed',
+              error: err.message || 'SMTP dispatch failed'
+            }
+          };
+        }
+        return m;
+      }));
+    }
+  }, []);
+
+  const discardEmail = useCallback((messageId: string) => {
+    setMessages(prev => prev.map(m => {
+      if (m.id === messageId) {
+        const { emailDraft: _, ...rest } = m;
+        return rest as Message;
+      }
+      return m;
+    }));
+  }, []);
+
   return {
     messages, tasks, stats, features, isStreaming, pendingFiles, sessions, activeSessionId, model, language,
     sendMessage, stopGeneration, toggleTask, toggleFeature, setPendingFiles, resetChat, startNewSession, setActiveSessionId,
-    deleteSession, renameSession, setSessions, setModel, setLanguage, editMessage, regenerateResponse
+    deleteSession, renameSession, setSessions, setModel, setLanguage, editMessage, regenerateResponse,
+    confirmEmail, discardEmail
   };
 }
