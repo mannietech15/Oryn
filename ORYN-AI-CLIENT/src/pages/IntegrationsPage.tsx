@@ -1,164 +1,75 @@
 import { useState, useEffect } from 'react';
+import { fetchIntegrations, testIntegration } from '../api/oryn';
 
-type IntegrationStatus = 'connected' | 'active_workflow' | 'available' | 'failed';
-
-interface Integration {
+interface IntegrationItem {
   id: string;
   name: string;
-  category: 'Communication' | 'Payments & Billing' | 'Ops & Monitoring' | 'CRM & Productivity';
-  desc: string;
-  icon: string;
-  status: IntegrationStatus;
-  usedInWorkflows?: string[];
-  lastActivity?: string;
-  errorDetail?: string;
-  technicalMetadata?: string;
+  category: string;
+  status: 'connected' | 'available' | 'disconnected' | 'failed';
+  host?: string;
+  port?: number;
+  user?: string;
+  model?: string;
+  statusMessage: string;
+  lastSync: string;
+  usedByCount: number;
 }
 
-const infrastructureIntegrations: Integration[] = [
-  {
-    id: 'smtp',
-    name: 'Custom SMTP Mail Transport',
-    category: 'Communication',
-    desc: 'Dispatches staged operational emails through configured host credentials using Nodemailer transport.',
-    icon: '📧',
-    status: 'connected',
-    usedInWorkflows: ['Weekly Executive Sales Synthesis', 'Client Re-engagement Campaign'],
-    lastActivity: '14 minutes ago · Code 250 OK (Delivered)',
-    technicalMetadata: 'Port 587 TLS · Authenticated transport'
-  },
-  {
-    id: 'slack',
-    name: 'Slack Incoming Webhooks',
-    category: 'Communication',
-    desc: 'Broadcasts anomaly alerts and strategic operational notifications into dedicated team channels.',
-    icon: '💬',
-    status: 'connected',
-    usedInWorkflows: ['Support Ticket Sentiment Escalation'],
-    lastActivity: '28 minutes ago · Code 200 OK',
-    technicalMetadata: 'Target: #ops-briefings channel'
-  },
-  {
-    id: 'zendesk',
-    name: 'Zendesk Ticket Webhook',
-    category: 'Ops & Monitoring',
-    desc: 'Ingests real-time support ticket events for automated sentiment scoring and escalation.',
-    icon: '🎫',
-    status: 'failed',
-    lastActivity: 'Failed 14m ago',
-    errorDetail: 'Webhook endpoint timed out after 5,000ms. Last successful sync: 14 minutes ago.',
-    technicalMetadata: 'Endpoint: /api/webhooks/support/tickets'
-  },
-  {
-    id: 'stripe',
-    name: 'Stripe Billing Ingress',
-    category: 'Payments & Billing',
-    desc: 'Ingests subscription telemetry, invoice events, and churn indicators into the ORYN financial engine.',
-    icon: '💳',
-    status: 'available',
-    technicalMetadata: 'Requires STRIPE_WEBHOOK_SECRET'
-  },
-  {
-    id: 'github',
-    name: 'GitHub Webhook Auditor',
-    category: 'Ops & Monitoring',
-    desc: 'Monitors pull request activity and releases for developer workflow tracking.',
-    icon: '🐙',
-    status: 'available',
-    technicalMetadata: 'Webhook: pull_request, release events'
-  },
-  {
-    id: 'notion',
-    name: 'Notion Workspace Sync',
-    category: 'CRM & Productivity',
-    desc: 'Exports structured AI briefings and OKR progress reports directly to team knowledge bases.',
-    icon: '📝',
-    status: 'available',
-    technicalMetadata: 'OAuth2 / Internal Integration Token'
-  },
-  {
-    id: 'hubspot',
-    name: 'HubSpot CRM Connector',
-    category: 'CRM & Productivity',
-    desc: 'Enriches inbound leads with AI domain intelligence and writes scores back into CRM properties.',
-    icon: '🎯',
-    status: 'available',
-    technicalMetadata: 'REST API v3 / Private App Token'
-  },
-  {
-    id: 'google_calendar',
-    name: 'Google Calendar API',
-    category: 'CRM & Productivity',
-    desc: 'Syncs executive schedule to contextualize daily briefings around upcoming meetings.',
-    icon: '📅',
-    status: 'available',
-    technicalMetadata: 'Google Cloud Service Account'
-  },
-];
-
 export default function IntegrationsPage() {
-  const [integrations, setIntegrations] = useState<Integration[]>(() => {
-    const saved = localStorage.getItem('oryn_integrations');
-    if (saved) {
-      try { return JSON.parse(saved); } catch { return infrastructureIntegrations; }
-    }
-    return infrastructureIntegrations;
-  });
+  const [integrations, setIntegrations] = useState<IntegrationItem[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [testingId, setTestingId] = useState<string | null>(null);
+  const [testResult, setTestResult] = useState<{ id: string; connected: boolean; message: string } | null>(null);
 
-  const [activeModalId, setActiveModalId] = useState<string | null>(null);
-  const [filter, setFilter] = useState<'all' | 'connected' | 'available' | 'failed'>('all');
-  const [retryStatus, setRetryStatus] = useState<string | null>(null);
+  const loadData = async () => {
+    try {
+      const data = await fetchIntegrations();
+      setIntegrations(data);
+    } catch (err) {
+      console.error('Failed to load integrations', err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    localStorage.setItem('oryn_integrations', JSON.stringify(integrations));
-  }, [integrations]);
+    loadData();
+  }, []);
 
-  const handleToggle = (id: string) => {
-    setIntegrations(prev => prev.map(item => {
-      if (item.id === id) {
-        const nextStatus: IntegrationStatus = item.status === 'connected' ? 'available' : 'connected';
-        return { ...item, status: nextStatus, errorDetail: undefined };
-      }
-      return item;
-    }));
+  const handleTest = async (id: string) => {
+    setTestingId(id);
+    setTestResult(null);
+    try {
+      const res = await testIntegration(id);
+      setTestResult(res);
+      await loadData();
+    } catch (err: any) {
+      setTestResult({ id, connected: false, message: `Handshake failed: ${err.message}` });
+    } finally {
+      setTestingId(null);
+    }
   };
 
-  const handleRetry = (id: string) => {
-    setRetryStatus(`Pinging endpoint for ${id}...`);
-    setTimeout(() => {
-      setRetryStatus(null);
-      setIntegrations(prev => prev.map(item => {
-        if (item.id === id) {
-          return {
-            ...item,
-            status: 'connected',
-            errorDetail: undefined,
-            lastActivity: 'Just now · Handshake verified (Status 200 OK)'
-          };
-        }
-        return item;
-      }));
-    }, 1200);
+  const getIcon = (id: string) => {
+    switch (id) {
+      case 'smtp': return '📧';
+      case 'nvidia': return '⚡';
+      case 'datastore': return '💾';
+      case 'stripe': return '💳';
+      case 'zendesk': return '🎫';
+      case 'slack': return '💬';
+      default: return '🔌';
+    }
   };
-
-  const filtered = integrations.filter(item => {
-    if (filter === 'connected') return item.status === 'connected' || item.status === 'active_workflow';
-    if (filter === 'available') return item.status === 'available';
-    if (filter === 'failed') return item.status === 'failed';
-    return true;
-  });
-
-  const connectedCount = integrations.filter(i => i.status === 'connected' || i.status === 'active_workflow').length;
-  const failedCount = integrations.filter(i => i.status === 'failed').length;
 
   return (
-    <div style={{ flex: 1, display: 'flex', flexDirection: 'column', height: '100%', overflow: 'hidden', background: 'transparent' }}>
-      
-      {/* Header */}
-      <div style={{ padding: '36px 40px 20px', borderBottom: '1px solid var(--card-border)', flexShrink: 0 }}>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12, flexWrap: 'wrap', gap: 16 }}>
+    <div style={{ flex: 1, overflowY: 'auto', padding: '36px 40px', background: 'var(--bg)', position: 'relative' }}>
+      <div style={{ maxWidth: 1200, margin: '0 auto', display: 'flex', flexDirection: 'column', gap: 28 }}>
+        
+        {/* Header */}
+        <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between' }}>
           <div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 6 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 8 }}>
               <div style={{
                 display: 'inline-flex', alignItems: 'center', gap: 6,
                 padding: '3px 10px', borderRadius: 6,
@@ -166,197 +77,155 @@ export default function IntegrationsPage() {
                 fontSize: 11, fontWeight: 600, color: 'var(--success)', fontFamily: 'monospace'
               }}>
                 <span style={{ width: 6, height: 6, borderRadius: '50%', background: 'var(--success)', display: 'inline-block' }} />
-                INFRASTRUCTURE GATEWAY: ONLINE
+                INFRASTRUCTURE PROBE: ACTIVE
               </div>
-              <div style={{ fontSize: 11, color: 'var(--text-muted)', fontFamily: 'monospace' }}>
-                GATEWAYS: {connectedCount} CONNECTED · {failedCount > 0 ? `${failedCount} DEGRADED` : '0 DEGRADED'}
+              <div style={{
+                padding: '3px 10px', borderRadius: 6,
+                background: 'var(--glass-bg-subtle)', border: '1px solid var(--card-border)',
+                fontSize: 11, color: 'var(--text-muted)', fontFamily: 'monospace'
+              }}>
+                TRUTHFUL SERVICE DISCOVERY
               </div>
             </div>
-            <h1 style={{ fontFamily: 'var(--font-display)', fontSize: 26, fontWeight: 700, margin: 0, color: 'var(--text-primary)', letterSpacing: '-0.5px' }}>
-              Connected Infrastructure & Gateways
-            </h1>
-            <p style={{ color: 'var(--text-secondary)', fontSize: 13.5, margin: '4px 0 0 0' }}>
-              Operational transport channels, webhook event listeners, and API connections operated by ORYN.
-            </p>
+
+            <div style={{ fontFamily: 'var(--font-display)', fontSize: 28, fontWeight: 700, color: 'var(--text-primary)', letterSpacing: -0.5 }}>
+              Connected Enterprise Infrastructure
+            </div>
+            <div style={{ fontSize: 13, color: 'var(--text-secondary)', marginTop: 2 }}>
+              Inspect live communication relays, inference endpoints, and external gateway connection states.
+            </div>
           </div>
 
-          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-            {(['all', 'connected', 'available', 'failed'] as const).map(tab => (
-              <button
-                key={tab}
-                onClick={() => setFilter(tab)}
-                style={{
-                  padding: '6px 12px', borderRadius: 6, fontSize: 12, textTransform: 'capitalize',
-                  background: filter === tab ? 'var(--glass-bg-hover)' : 'transparent',
-                  border: `1px solid ${filter === tab ? 'var(--card-border)' : 'transparent'}`,
-                  color: filter === tab ? 'var(--text-primary)' : 'var(--text-muted)',
-                  cursor: 'pointer'
-                }}
-              >
-                {tab} {tab === 'connected' && `(${connectedCount})`} {tab === 'failed' && failedCount > 0 && `(${failedCount})`}
-              </button>
-            ))}
-          </div>
+          <button
+            onClick={loadData}
+            disabled={loading}
+            style={{
+              padding: '8px 16px', borderRadius: 8,
+              background: 'var(--glass-bg-subtle)', border: '1px solid var(--card-border)',
+              color: 'var(--text-secondary)', fontSize: 12, fontWeight: 600,
+              cursor: 'pointer', transition: 'all 0.2s', display: 'flex', alignItems: 'center', gap: 6
+            }}
+          >
+            🔄 Re-probe Infrastructure
+          </button>
         </div>
 
-        {retryStatus && (
-          <div style={{ background: 'rgba(249, 115, 22, 0.1)', color: 'var(--accent-primary)', padding: '6px 12px', borderRadius: 6, fontSize: 12, fontFamily: 'monospace' }}>
-            {retryStatus}
+        {/* Handshake Result Alert */}
+        {testResult && (
+          <div style={{
+            padding: '14px 18px', borderRadius: 10,
+            background: testResult.connected ? 'rgba(34, 197, 94, 0.08)' : 'rgba(239, 68, 68, 0.08)',
+            border: `1px solid ${testResult.connected ? 'rgba(34, 197, 94, 0.25)' : 'rgba(239, 68, 68, 0.25)'}`,
+            display: 'flex', alignItems: 'center', justifyContent: 'space-between'
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+              <span style={{ fontSize: 16 }}>{testResult.connected ? '✅' : '❌'}</span>
+              <div>
+                <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-primary)' }}>
+                  {testResult.id.toUpperCase()} Handshake Diagnostic
+                </div>
+                <div style={{ fontSize: 12, color: 'var(--text-secondary)', marginTop: 2 }}>
+                  {testResult.message}
+                </div>
+              </div>
+            </div>
+            <button
+              onClick={() => setTestResult(null)}
+              style={{ background: 'transparent', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', fontSize: 14 }}
+            >
+              ✕
+            </button>
           </div>
         )}
-      </div>
 
-      {/* Grid Content */}
-      <div style={{ flex: 1, overflowY: 'auto', padding: '28px 40px' }}>
-        <div style={{ maxWidth: 1200, margin: '0 auto' }}>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(340px, 1fr))', gap: 20 }}>
-            {filtered.map(item => (
-              <div
-                key={item.id}
-                style={{
-                  background: 'var(--card-bg)', border: `1px solid ${item.status === 'failed' ? 'rgba(239, 68, 68, 0.3)' : 'var(--card-border)'}`,
-                  borderRadius: 14, padding: '20px', display: 'flex', flexDirection: 'column', gap: 14,
-                  boxShadow: 'var(--shadow-subtle)'
-                }}
-              >
-                {/* Header */}
-                <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 12 }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                    <div style={{ fontSize: 24, width: 36, height: 36, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--glass-bg-subtle)', borderRadius: 8 }}>
-                      {item.icon}
+        {/* Integrations Grid */}
+        {loading ? (
+          <div style={{ padding: 40, textAlign: 'center', color: 'var(--text-muted)', fontSize: 13 }}>
+            Probing connected infrastructure endpoints...
+          </div>
+        ) : (
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(360px, 1fr))', gap: 20 }}>
+            {integrations.map(intg => {
+              const isConn = intg.status === 'connected';
+              const isTesting = testingId === intg.id;
+
+              return (
+                <div key={intg.id} style={{
+                  background: 'var(--card-bg)', border: '1px solid var(--card-border)',
+                  borderRadius: 14, padding: '24px', display: 'flex', flexDirection: 'column', gap: 16,
+                  boxShadow: 'var(--shadow-subtle)', position: 'relative'
+                }}>
+                  <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                      <div style={{
+                        width: 40, height: 40, borderRadius: 10,
+                        background: 'var(--glass-bg-subtle)', border: '1px solid var(--card-border)',
+                        display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20
+                      }}>
+                        {getIcon(intg.id)}
+                      </div>
+                      <div>
+                        <div style={{ fontSize: 15, fontWeight: 700, color: 'var(--text-primary)', fontFamily: 'var(--font-display)' }}>
+                          {intg.name}
+                        </div>
+                        <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>
+                          {intg.category}
+                        </div>
+                      </div>
                     </div>
-                    <div>
-                      <div style={{ fontSize: 14.5, fontWeight: 600, color: 'var(--text-primary)' }}>{item.name}</div>
-                      <div style={{ fontSize: 10.5, color: 'var(--text-muted)', fontFamily: 'monospace' }}>{item.category}</div>
-                    </div>
+
+                    <span style={{
+                      padding: '2px 8px', borderRadius: 4, fontSize: 10, fontWeight: 700, fontFamily: 'monospace',
+                      background: isConn ? 'rgba(34, 197, 94, 0.1)' : 'rgba(156, 163, 175, 0.1)',
+                      color: isConn ? 'var(--success)' : 'var(--text-muted)',
+                      border: `1px solid ${isConn ? 'rgba(34, 197, 94, 0.2)' : 'var(--card-border)'}`
+                    }}>
+                      {intg.status.toUpperCase()}
+                    </span>
                   </div>
 
-                  {/* Status Badge */}
-                  <span style={{
-                    fontSize: 10, fontWeight: 700, fontFamily: 'monospace', padding: '3px 8px', borderRadius: 4,
-                    background: item.status === 'connected' ? 'rgba(34, 197, 94, 0.1)' :
-                                item.status === 'failed' ? 'rgba(239, 68, 68, 0.1)' : 'var(--glass-bg-subtle)',
-                    color: item.status === 'connected' ? 'var(--success)' :
-                           item.status === 'failed' ? 'var(--danger)' : 'var(--text-muted)',
-                    border: `1px solid ${item.status === 'connected' ? 'rgba(34, 197, 94, 0.25)' : item.status === 'failed' ? 'rgba(239, 68, 68, 0.25)' : 'var(--card-border)'}`
+                  <div style={{ fontSize: 12.5, color: 'var(--text-secondary)', lineHeight: 1.5 }}>
+                    {intg.statusMessage}
+                  </div>
+
+                  <div style={{
+                    padding: '10px 12px', background: 'var(--glass-bg-subtle)',
+                    borderRadius: 8, border: '1px solid var(--card-border)',
+                    display: 'flex', flexDirection: 'column', gap: 4, fontSize: 11
                   }}>
-                    {item.status.toUpperCase()}
-                  </span>
-                </div>
-
-                <div style={{ fontSize: 12.5, color: 'var(--text-secondary)', lineHeight: 1.45 }}>
-                  {item.desc}
-                </div>
-
-                {/* Connected / Active Workflow Details */}
-                {item.status === 'connected' && (
-                  <div style={{ background: 'var(--glass-bg-subtle)', borderRadius: 8, padding: '10px 12px', border: '1px solid var(--card-border)', display: 'flex', flexDirection: 'column', gap: 6 }}>
-                    {item.usedInWorkflows && item.usedInWorkflows.length > 0 && (
-                      <div>
-                        <div style={{ fontSize: 10, color: 'var(--text-muted)', fontFamily: 'monospace' }}>USED BY WORKFLOWS</div>
-                        <div style={{ fontSize: 11.5, color: 'var(--text-primary)', marginTop: 2 }}>
-                          {item.usedInWorkflows.join(', ')}
-                        </div>
-                      </div>
-                    )}
-                    {item.lastActivity && (
-                      <div>
-                        <div style={{ fontSize: 10, color: 'var(--text-muted)', fontFamily: 'monospace' }}>LAST DISPATCH ACTIVITY</div>
-                        <div style={{ fontSize: 11.5, color: 'var(--success)', marginTop: 2, fontFamily: 'monospace' }}>
-                          ● {item.lastActivity}
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                )}
-
-                {/* Failure / Actionable Error State */}
-                {item.status === 'failed' && (
-                  <div style={{ background: 'rgba(239, 68, 68, 0.05)', borderRadius: 8, padding: '12px', border: '1px solid rgba(239, 68, 68, 0.2)', display: 'flex', flexDirection: 'column', gap: 8 }}>
-                    <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--danger)', fontFamily: 'monospace' }}>
-                      GATEWAY TIMEOUT ERROR
+                    <div style={{ display: 'flex', justifyContent: 'space-between', color: 'var(--text-muted)' }}>
+                      <span>Audit Status</span>
+                      <span style={{ color: 'var(--text-primary)', fontFamily: 'monospace' }}>{intg.lastSync}</span>
                     </div>
-                    <div style={{ fontSize: 12, color: 'var(--text-primary)', lineHeight: 1.4 }}>
-                      {item.errorDetail}
-                    </div>
-                    <div style={{ display: 'flex', gap: 8, marginTop: 4 }}>
-                      <button
-                        onClick={() => handleRetry(item.id)}
-                        style={{
-                          background: 'var(--danger)', color: '#fff', border: 'none', borderRadius: 6,
-                          padding: '6px 12px', fontSize: 11.5, fontWeight: 600, cursor: 'pointer'
-                        }}
-                      >
-                        Retry Handshake
-                      </button>
-                      <button
-                        onClick={() => setActiveModalId(item.id)}
-                        style={{
-                          background: 'transparent', color: 'var(--text-secondary)', border: '1px solid var(--card-border)',
-                          borderRadius: 6, padding: '6px 12px', fontSize: 11.5, cursor: 'pointer'
-                        }}
-                      >
-                        Inspect Config
-                      </button>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', color: 'var(--text-muted)' }}>
+                      <span>Workflows Utilizing</span>
+                      <span style={{ color: 'var(--text-primary)', fontWeight: 600 }}>{intg.usedByCount} pipelines</span>
                     </div>
                   </div>
-                )}
 
-                {/* Available Status Requirements */}
-                {item.status === 'available' && (
-                  <div style={{ fontSize: 11, color: 'var(--text-muted)', fontFamily: 'monospace', background: 'var(--glass-bg-subtle)', padding: '6px 10px', borderRadius: 6 }}>
-                    Requirements: {item.technicalMetadata}
-                  </div>
-                )}
-
-                {/* Bottom Actions */}
-                <div style={{ borderTop: '1px solid var(--card-border)', paddingTop: 10, marginTop: 'auto', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <span style={{ fontSize: 10.5, color: 'var(--text-muted)', fontFamily: 'monospace' }}>
-                    {item.technicalMetadata}
-                  </span>
-                  {item.status !== 'failed' && (
+                  <div style={{ marginTop: 'auto', paddingTop: 10, display: 'flex', justifyContent: 'flex-end' }}>
                     <button
-                      onClick={() => handleToggle(item.id)}
+                      onClick={() => handleTest(intg.id)}
+                      disabled={isTesting}
                       style={{
-                        background: 'transparent', border: '1px solid var(--card-border)', borderRadius: 6,
-                        padding: '4px 10px', fontSize: 11.5, color: item.status === 'connected' ? 'var(--text-muted)' : 'var(--text-primary)',
-                        cursor: 'pointer'
+                        padding: '6px 14px', borderRadius: 6,
+                        background: 'transparent', border: '1px solid var(--card-border)',
+                        color: 'var(--text-primary)', fontSize: 11.5, fontWeight: 600,
+                        cursor: isTesting ? 'wait' : 'pointer', transition: 'all 0.2s'
                       }}
+                      onMouseEnter={e => { e.currentTarget.style.borderColor = 'var(--accent-primary)'; e.currentTarget.style.color = 'var(--accent-primary)'; }}
+                      onMouseLeave={e => { e.currentTarget.style.borderColor = 'var(--card-border)'; e.currentTarget.style.color = 'var(--text-primary)'; }}
                     >
-                      {item.status === 'connected' ? 'Disconnect' : 'Connect Gateway'}
+                      {isTesting ? 'Verifying...' : '⚡ Test Handshake'}
                     </button>
-                  )}
+                  </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
-        </div>
-      </div>
+        )}
 
-      {activeModalId && (
-        <div style={{
-          position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.7)', backdropFilter: 'blur(8px)',
-          display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 100
-        }}>
-          <div style={{
-            background: 'var(--card-bg)', border: '1px solid var(--card-border)', borderRadius: 14,
-            padding: '24px', width: '100%', maxWidth: 460, display: 'flex', flexDirection: 'column', gap: 16
-          }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <h3 style={{ margin: 0, fontSize: 16, color: 'var(--text-primary)' }}>Gateway Diagnostics: {activeModalId}</h3>
-              <button onClick={() => setActiveModalId(null)} style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', fontSize: 16 }}>✕</button>
-            </div>
-            <div style={{ fontSize: 12.5, color: 'var(--text-secondary)', lineHeight: 1.5 }}>
-              Review the connection parameters and webhook signing secrets in your <code>.env</code> file or cluster secrets manager.
-            </div>
-            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 8, marginTop: 8 }}>
-              <button onClick={() => setActiveModalId(null)} style={{ padding: '6px 14px', borderRadius: 6, background: 'var(--accent-primary)', color: '#fff', border: 'none', fontSize: 12.5, cursor: 'pointer' }}>
-                Done
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      </div>
     </div>
   );
 }

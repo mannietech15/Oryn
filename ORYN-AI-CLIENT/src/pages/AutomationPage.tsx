@@ -1,124 +1,99 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { fetchWorkflows, fetchWorkflowLogs, toggleWorkflow, runWorkflow } from '../api/oryn';
 
-type AutomationStatus = 'active' | 'paused' | 'draft';
+type AutomationStatus = 'active' | 'paused' | 'disabled';
 
-interface PipelineStep {
-  name: string;
-  type: string;
-  source: string;
-}
-
-interface Automation {
+interface WorkflowRecord {
   id: string;
   name: string;
   description: string;
-  trigger: { type: string; detail: string; schedule: string };
-  steps: PipelineStep[];
+  trigger: string;
+  steps: string[];
   status: AutomationStatus;
-  runs: number;
-  successRate: string;
-  lastRun: { time: string; status: 'success' | 'failed' | 'running'; duration: string };
-  nextRun: string;
+  runCount: number;
+  successCount: number;
+  failureCount: number;
+  lastRunAt: string | null;
+  nextRunAt: string | null;
 }
 
-interface ExecutionLog {
+interface WorkflowLog {
   id: string;
-  workflow: string;
-  timestamp: string;
-  status: 'success' | 'failed';
-  code: string;
-  duration: string;
+  workflowId: string;
+  workflowName: string;
+  trigger: string;
+  durationMs: number;
+  status: 'success' | 'failure' | 'running';
+  executedAt: string;
+  stepsCompleted: number;
+  totalSteps: number;
+  error: string | null;
 }
-
-const operationalAutomations: Automation[] = [
-  {
-    id: '1',
-    name: 'Weekly Executive Sales Synthesis',
-    description: 'Ingests trailing 7-day Stripe billing volume, analyzes cohort expansion, and dispatches an executive summary via Custom SMTP.',
-    trigger: { type: 'SCHEDULE', detail: 'CRON: 0 17 * * 5', schedule: 'Every Friday at 17:00 UTC' },
-    steps: [
-      { name: 'Stripe Billing', type: 'Ingress', source: 'Stripe Gateway' },
-      { name: 'Cohort Analysis', type: 'LLM Reasoning', source: 'NVIDIA Llama 3.2' },
-      { name: 'HTML Report Generation', type: 'Synthesis', source: 'Report Engine' },
-      { name: 'Mail Dispatch', type: 'Action', source: 'Custom SMTP Transport' },
-    ],
-    status: 'active',
-    runs: 24,
-    successRate: '100%',
-    lastRun: { time: 'Sep 25, 17:00:03 UTC', status: 'success', duration: '184ms' },
-    nextRun: 'Oct 2, 17:00:00 UTC',
-  },
-  {
-    id: '2',
-    name: 'Inbound Lead Enrichment & Scoring',
-    description: 'Triggers on CRM lead creation webhook, verifies company registry records via semantic search, and updates lead score.',
-    trigger: { type: 'WEBHOOK', detail: 'POST /api/webhooks/crm/leads', schedule: 'Real-time Event Ingress' },
-    steps: [
-      { name: 'CRM Webhook', type: 'Event Ingest', source: 'HubSpot / CRM' },
-      { name: 'Market Intelligence', type: 'Enrichment', source: 'Search Index' },
-      { name: 'ICP Fit Evaluation', type: 'Score Matrix', source: 'ORYN Rule Engine' },
-      { name: 'Record Update', type: 'Action', source: 'CRM Ingress API' },
-    ],
-    status: 'active',
-    runs: 142,
-    successRate: '99.3%',
-    lastRun: { time: 'Today, 14:18:22 UTC', status: 'success', duration: '312ms' },
-    nextRun: 'Awaiting webhook ingress',
-  },
-  {
-    id: '3',
-    name: 'Support Ticket Sentiment Escalation',
-    description: 'Inspects incoming Zendesk tickets for negative sentiment patterns (>0.75 score) and immediately notifies the #urgent-support Slack channel.',
-    trigger: { type: 'WEBHOOK', detail: 'POST /api/webhooks/support/tickets', schedule: 'Real-time Event Ingress' },
-    steps: [
-      { name: 'Ticket Webhook', type: 'Event Ingest', source: 'Zendesk Gateway' },
-      { name: 'Sentiment Extraction', type: 'Analysis', source: 'NVIDIA NIM Fast Tier' },
-      { name: 'Threshold Evaluation', type: 'Logic Gate', source: 'Rule Engine' },
-      { name: 'Slack Alert', type: 'Notification', source: 'Slack Webhook' },
-    ],
-    status: 'paused',
-    runs: 89,
-    successRate: '98.8%',
-    lastRun: { time: 'Sep 28, 09:12:10 UTC', status: 'success', duration: '240ms' },
-    nextRun: 'Paused by operator',
-  },
-];
-
-const sampleExecutionLogs: ExecutionLog[] = [
-  { id: 'exec_7f8a91b', workflow: 'Inbound Lead Enrichment & Scoring', timestamp: '14:18:22 UTC', status: 'success', code: '200 OK', duration: '312ms' },
-  { id: 'exec_3d1e29c', workflow: 'Inbound Lead Enrichment & Scoring', timestamp: '13:05:44 UTC', status: 'success', code: '200 OK', duration: '280ms' },
-  { id: 'exec_9b4e72a', workflow: 'Weekly Executive Sales Synthesis', timestamp: 'Sep 25 17:00:03', status: 'success', code: '250 Mail Sent', duration: '184ms' },
-  { id: 'exec_1a8c45f', workflow: 'Support Ticket Sentiment Escalation', timestamp: 'Sep 28 09:12:10', status: 'success', code: '200 OK', duration: '240ms' },
-  { id: 'exec_6c3b88e', workflow: 'Support Ticket Sentiment Escalation', timestamp: 'Sep 28 08:44:19', status: 'failed', code: '504 Timeout', duration: '5002ms' },
-];
 
 export default function AutomationPage() {
-  const [automations, setAutomations] = useState<Automation[]>(operationalAutomations);
-  const [statusFilter, setStatusFilter] = useState<'all' | 'active' | 'paused'>('all');
-  const [selectedLogs, setSelectedLogs] = useState(false);
+  const [workflows, setWorkflows] = useState<WorkflowRecord[]>([]);
+  const [stats, setStats] = useState<any>(null);
+  const [logs, setLogs] = useState<WorkflowLog[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [runningId, setRunningId] = useState<string | null>(null);
+  const [actionMessage, setActionMessage] = useState<string | null>(null);
 
-  const toggleStatus = (id: string) => {
-    setAutomations(prev => prev.map(a => {
-      if (a.id === id) {
-        return { ...a, status: a.status === 'active' ? 'paused' : 'active' };
-      }
-      return a;
-    }));
+  const loadData = async () => {
+    try {
+      const [wfRes, logsRes] = await Promise.all([
+        fetchWorkflows(),
+        fetchWorkflowLogs(20)
+      ]);
+      setWorkflows(wfRes.workflows || []);
+      setStats(wfRes.stats || null);
+      setLogs(logsRes || []);
+    } catch (err) {
+      console.error('Failed to load workflows', err);
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const filteredAutomations = automations.filter(a => {
-    if (statusFilter === 'all') return true;
-    return a.status === statusFilter;
-  });
+  useEffect(() => {
+    loadData();
+  }, []);
+
+  const handleToggle = async (id: string) => {
+    try {
+      const updated = await toggleWorkflow(id);
+      setWorkflows(prev => prev.map(w => w.id === id ? { ...w, status: updated.status } : w));
+      setActionMessage(`Workflow status updated to ${updated.status}.`);
+      setTimeout(() => setActionMessage(null), 3000);
+    } catch {
+      setActionMessage('Failed to toggle workflow state.');
+      setTimeout(() => setActionMessage(null), 3000);
+    }
+  };
+
+  const handleRunNow = async (id: string) => {
+    setRunningId(id);
+    setActionMessage(null);
+    try {
+      const res = await runWorkflow(id);
+      setActionMessage(res.message || 'Workflow executed successfully.');
+      await loadData();
+      setTimeout(() => setActionMessage(null), 4000);
+    } catch (err: any) {
+      setActionMessage(`Workflow execution failed: ${err.message}`);
+      setTimeout(() => setActionMessage(null), 4000);
+    } finally {
+      setRunningId(null);
+    }
+  };
 
   return (
-    <div style={{ flex: 1, display: 'flex', flexDirection: 'column', height: '100%', overflow: 'hidden', background: 'transparent' }}>
-      
-      {/* Engine Status Header */}
-      <div style={{ padding: '36px 40px 20px', borderBottom: '1px solid var(--card-border)', flexShrink: 0 }}>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12, flexWrap: 'wrap', gap: 16 }}>
+    <div style={{ flex: 1, overflowY: 'auto', padding: '36px 40px', background: 'var(--bg)', position: 'relative' }}>
+      <div style={{ maxWidth: 1200, margin: '0 auto', display: 'flex', flexDirection: 'column', gap: 28 }}>
+        
+        {/* Header */}
+        <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between' }}>
           <div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 6 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 8 }}>
               <div style={{
                 display: 'inline-flex', alignItems: 'center', gap: 6,
                 padding: '3px 10px', borderRadius: 6,
@@ -126,233 +101,278 @@ export default function AutomationPage() {
                 fontSize: 11, fontWeight: 600, color: 'var(--success)', fontFamily: 'monospace'
               }}>
                 <span style={{ width: 6, height: 6, borderRadius: '50%', background: 'var(--success)', display: 'inline-block' }} />
-                WORKFLOW RUNNER DAEMON: ONLINE
+                WORKFLOW RUNNER ENGINE: READY
               </div>
-              <div style={{ fontSize: 11, color: 'var(--text-muted)', fontFamily: 'monospace' }}>
-                QUEUE LATENCY: 12ms · CONCURRENT WORKERS: 4
+              <div style={{
+                padding: '3px 10px', borderRadius: 6,
+                background: 'var(--glass-bg-subtle)', border: '1px solid var(--card-border)',
+                fontSize: 11, color: 'var(--text-muted)', fontFamily: 'monospace'
+              }}>
+                PERSISTENT DAEMON REGISTRY
               </div>
             </div>
-            <h1 style={{ fontFamily: 'var(--font-display)', fontSize: 26, fontWeight: 700, margin: 0, color: 'var(--text-primary)', letterSpacing: '-0.5px' }}>
-              Workflow Automation Engine
-            </h1>
-            <p style={{ color: 'var(--text-secondary)', fontSize: 13.5, margin: '4px 0 0 0' }}>
-              Event-driven pipeline orchestration, automated data enrichment, and guardrailed action execution.
-            </p>
+
+            <div style={{ fontFamily: 'var(--font-display)', fontSize: 28, fontWeight: 700, color: 'var(--text-primary)', letterSpacing: -0.5 }}>
+              Automated Pipelines & Execution Engine
+            </div>
+            <div style={{ fontSize: 13, color: 'var(--text-secondary)', marginTop: 2 }}>
+              Manage autonomous pipelines, triggers, and execution telemetry across connected services.
+            </div>
           </div>
 
-          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-            <button 
-              onClick={() => setSelectedLogs(!selectedLogs)}
+          <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
+            <button
+              onClick={loadData}
+              disabled={loading}
               style={{
-                padding: '8px 16px', background: selectedLogs ? 'rgba(249, 115, 22, 0.1)' : 'var(--card-bg)',
-                border: `1px solid ${selectedLogs ? 'var(--accent-primary)' : 'var(--card-border)'}`,
-                color: selectedLogs ? 'var(--accent-primary)' : 'var(--text-primary)',
-                borderRadius: 8, fontSize: 12.5, fontWeight: 500, cursor: 'pointer', transition: 'all 0.2s'
+                padding: '8px 16px', borderRadius: 8,
+                background: 'var(--glass-bg-subtle)', border: '1px solid var(--card-border)',
+                color: 'var(--text-secondary)', fontSize: 12, fontWeight: 600,
+                cursor: 'pointer', transition: 'all 0.2s', display: 'flex', alignItems: 'center', gap: 6
               }}
             >
-              {selectedLogs ? 'Hide Execution Logs' : 'View Execution Logs (5)'}
+              🔄 Refresh Telemetry
             </button>
-            <button style={{ 
-              padding: '8px 18px', background: 'var(--accent-primary)', color: '#fff', 
-              border: 'none', borderRadius: 8, fontWeight: 600, fontSize: 12.5, cursor: 'pointer', 
-              display: 'flex', alignItems: 'center', gap: 6
+          </div>
+        </div>
+
+        {/* Action feedback message */}
+        {actionMessage && (
+          <div style={{
+            padding: '12px 18px', borderRadius: 10,
+            background: 'rgba(249, 115, 22, 0.08)', border: '1px solid rgba(249, 115, 22, 0.25)',
+            color: 'var(--text-primary)', fontSize: 13, display: 'flex', alignItems: 'center', gap: 10
+          }}>
+            <span>⚡</span>
+            <span>{actionMessage}</span>
+          </div>
+        )}
+
+        {/* Operational Telemetry Summary */}
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 16 }}>
+          {[
+            { label: 'Registered Workflows', value: stats ? `${stats.totalWorkflows}` : '...', sub: `${stats?.activeWorkflows || 0} active daemons` },
+            { label: 'Total Executions', value: stats ? `${stats.totalExecutions}` : '...', sub: 'Historical runs recorded' },
+            { label: 'Execution Reliability', value: stats ? `${stats.successRate}%` : '...', sub: 'Success vs failure ratio' },
+            { label: 'Audit Trail Depth', value: stats ? `${stats.recentLogsCount}` : '...', sub: 'Logged execution cycles' },
+          ].map((st, i) => (
+            <div key={i} style={{
+              background: 'var(--card-bg)', border: '1px solid var(--card-border)',
+              borderRadius: 14, padding: '18px 20px', display: 'flex', flexDirection: 'column', gap: 6
             }}>
-              + Create Workflow
-            </button>
-          </div>
+              <div style={{ fontSize: 11, color: 'var(--text-muted)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.4px' }}>
+                {st.label}
+              </div>
+              <div style={{ fontSize: 26, fontFamily: 'var(--font-display)', fontWeight: 700, color: 'var(--text-primary)' }}>
+                {st.value}
+              </div>
+              <div style={{ fontSize: 11, color: 'var(--text-secondary)' }}>
+                {st.sub}
+              </div>
+            </div>
+          ))}
         </div>
 
-        {/* Engine Telemetry Strip */}
-        <div style={{ display: 'flex', gap: 24, marginTop: 12, borderTop: '1px solid var(--card-border)', paddingTop: 12, flexWrap: 'wrap' }}>
-          <div style={{ display: 'flex', gap: 6, fontSize: 12 }}>
-            <span style={{ color: 'var(--text-muted)' }}>Configured Pipelines:</span>
-            <strong style={{ color: 'var(--text-primary)' }}>{automations.length}</strong>
+        {/* Workflows List */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+          <div style={{ fontSize: 14, fontWeight: 700, color: 'var(--text-primary)', fontFamily: 'var(--font-display)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+            Registered Pipelines ({workflows.length})
           </div>
-          <div style={{ display: 'flex', gap: 6, fontSize: 12 }}>
-            <span style={{ color: 'var(--text-muted)' }}>Active Runners:</span>
-            <strong style={{ color: 'var(--success)' }}>{automations.filter(a => a.status === 'active').length}</strong>
-          </div>
-          <div style={{ display: 'flex', gap: 6, fontSize: 12 }}>
-            <span style={{ color: 'var(--text-muted)' }}>Total Executions (MTD):</span>
-            <strong style={{ color: 'var(--text-primary)', fontFamily: 'monospace' }}>255</strong>
-          </div>
-          <div style={{ display: 'flex', gap: 6, fontSize: 12 }}>
-            <span style={{ color: 'var(--text-muted)' }}>Overall Success Rate:</span>
-            <strong style={{ color: 'var(--success)', fontFamily: 'monospace' }}>99.3%</strong>
-          </div>
-        </div>
-      </div>
 
-      {/* Main Content Area */}
-      <div style={{ flex: 1, overflowY: 'auto', padding: '28px 40px' }}>
-        <div style={{ maxWidth: 1100, margin: '0 auto', display: 'flex', flexDirection: 'column', gap: 20 }}>
-          
-          {/* Filter Bar */}
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-            <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: 0.5, fontFamily: 'monospace' }}>
-              REGISTERED WORKFLOW PIPELINES
+          {loading ? (
+            <div style={{ padding: 40, textAlign: 'center', color: 'var(--text-muted)', fontSize: 13 }}>
+              Loading workflow pipeline definitions...
             </div>
-            <div style={{ display: 'flex', gap: 8 }}>
-              {(['all', 'active', 'paused'] as const).map(tab => (
-                <button
-                  key={tab}
-                  onClick={() => setStatusFilter(tab)}
-                  style={{
-                    padding: '4px 10px', borderRadius: 6, fontSize: 11.5, textTransform: 'capitalize',
-                    background: statusFilter === tab ? 'var(--glass-bg-hover)' : 'transparent',
-                    border: `1px solid ${statusFilter === tab ? 'var(--card-border)' : 'transparent'}`,
-                    color: statusFilter === tab ? 'var(--text-primary)' : 'var(--text-muted)',
-                    cursor: 'pointer'
-                  }}
-                >
-                  {tab}
-                </button>
-              ))}
+          ) : workflows.length === 0 ? (
+            <div style={{ padding: 40, textAlign: 'center', background: 'var(--card-bg)', borderRadius: 14, border: '1px solid var(--card-border)', color: 'var(--text-muted)' }}>
+              No workflows registered in daemon registry.
             </div>
-          </div>
+          ) : (
+            workflows.map(wf => {
+              const successRate = wf.runCount > 0
+                ? `${Math.round((wf.successCount / wf.runCount) * 100)}%`
+                : '100%';
+              const isRunning = runningId === wf.id;
 
-          {/* Workflow Cards */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-            {filteredAutomations.map(a => (
-              <div 
-                key={a.id} 
-                style={{
-                  background: 'var(--card-bg)', border: '1px solid var(--card-border)', borderRadius: 14,
-                  padding: '20px', display: 'flex', flexDirection: 'column', gap: 16,
-                  boxShadow: 'var(--shadow-subtle)'
-                }}
-              >
-                {/* Header row */}
-                <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 16 }}>
-                  <div>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                      <h3 style={{ margin: 0, fontSize: 16, fontWeight: 600, color: 'var(--text-primary)' }}>{a.name}</h3>
-                      <span style={{
-                        fontSize: 10, fontWeight: 700, fontFamily: 'monospace', padding: '2px 8px', borderRadius: 4,
-                        background: a.status === 'active' ? 'rgba(34, 197, 94, 0.1)' : 'rgba(234, 179, 8, 0.1)',
-                        color: a.status === 'active' ? 'var(--success)' : 'var(--warn)',
-                        border: `1px solid ${a.status === 'active' ? 'rgba(34, 197, 94, 0.25)' : 'rgba(234, 179, 8, 0.25)'}`
-                      }}>
-                        {a.status.toUpperCase()}
-                      </span>
-                    </div>
-                    <p style={{ margin: '6px 0 0 0', fontSize: 13, color: 'var(--text-secondary)', lineHeight: 1.45, maxWidth: 800 }}>
-                      {a.description}
-                    </p>
-                  </div>
-
-                  {/* Toggle Button */}
-                  <button
-                    onClick={() => toggleStatus(a.id)}
-                    style={{
-                      padding: '6px 14px', borderRadius: 6, fontSize: 12, fontWeight: 500,
-                      background: a.status === 'active' ? 'var(--glass-bg-subtle)' : 'rgba(34, 197, 94, 0.08)',
-                      border: `1px solid ${a.status === 'active' ? 'var(--card-border)' : 'rgba(34, 197, 94, 0.2)'}`,
-                      color: a.status === 'active' ? 'var(--text-secondary)' : 'var(--success)',
-                      cursor: 'pointer'
-                    }}
-                  >
-                    {a.status === 'active' ? 'Pause Pipeline' : 'Resume Pipeline'}
-                  </button>
-                </div>
-
-                {/* Pipeline Steps Architecture */}
-                <div style={{ background: 'var(--glass-bg-subtle)', borderRadius: 10, padding: '12px 16px', border: '1px solid var(--card-border)' }}>
-                  <div style={{ fontSize: 10, color: 'var(--text-muted)', fontWeight: 700, textTransform: 'uppercase', fontFamily: 'monospace', marginBottom: 8 }}>
-                    EXECUTION PIPELINE STEPS
-                  </div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
-                    {a.steps.map((step, idx) => (
-                      <div key={idx} style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                        <div style={{ background: 'var(--card-bg)', border: '1px solid var(--card-border)', borderRadius: 6, padding: '4px 10px', display: 'flex', flexDirection: 'column', gap: 2 }}>
-                          <span style={{ fontSize: 11.5, fontWeight: 600, color: 'var(--text-primary)' }}>{step.name}</span>
-                          <span style={{ fontSize: 9.5, color: 'var(--text-muted)', fontFamily: 'monospace' }}>{step.source}</span>
+              return (
+                <div key={wf.id} style={{
+                  background: 'var(--card-bg)', border: '1px solid var(--card-border)',
+                  borderRadius: 14, padding: '24px', display: 'flex', flexDirection: 'column', gap: 18,
+                  boxShadow: 'var(--shadow-subtle)', transition: 'all 0.2s'
+                }}>
+                  <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between' }}>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                        <div style={{
+                          fontSize: 16, fontWeight: 700, color: 'var(--text-primary)',
+                          fontFamily: 'var(--font-display)'
+                        }}>
+                          {wf.name}
                         </div>
-                        {idx < a.steps.length - 1 && (
-                          <span style={{ color: 'var(--accent-primary)', fontSize: 12, fontWeight: 700 }}>➔</span>
+                        <span style={{
+                          fontSize: 10, fontWeight: 700, fontFamily: 'monospace',
+                          padding: '2px 8px', borderRadius: 4,
+                          background: wf.status === 'active' ? 'rgba(34, 197, 94, 0.1)' : 'rgba(156, 163, 175, 0.1)',
+                          color: wf.status === 'active' ? 'var(--success)' : 'var(--text-muted)',
+                          border: `1px solid ${wf.status === 'active' ? 'rgba(34, 197, 94, 0.2)' : 'var(--card-border)'}`
+                        }}>
+                          {wf.status.toUpperCase()}
+                        </span>
+                      </div>
+                      <div style={{ fontSize: 13, color: 'var(--text-secondary)', maxWidth: 800, lineHeight: 1.5 }}>
+                        {wf.description}
+                      </div>
+                    </div>
+
+                    <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
+                      <button
+                        onClick={() => handleRunNow(wf.id)}
+                        disabled={isRunning}
+                        style={{
+                          padding: '8px 16px', borderRadius: 8,
+                          background: 'var(--accent-primary)', color: 'white',
+                          border: 'none', fontSize: 12, fontWeight: 600,
+                          cursor: isRunning ? 'wait' : 'pointer',
+                          display: 'flex', alignItems: 'center', gap: 6,
+                          boxShadow: '0 2px 8px rgba(249, 115, 22, 0.3)'
+                        }}
+                      >
+                        {isRunning ? 'Executing...' : '▶ Run Now'}
+                      </button>
+
+                      <button
+                        onClick={() => handleToggle(wf.id)}
+                        style={{
+                          padding: '8px 14px', borderRadius: 8,
+                          background: 'var(--glass-bg-subtle)', border: '1px solid var(--card-border)',
+                          color: wf.status === 'active' ? 'var(--warn)' : 'var(--success)',
+                          fontSize: 12, fontWeight: 600, cursor: 'pointer'
+                        }}
+                      >
+                        {wf.status === 'active' ? 'Pause' : 'Activate'}
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Pipeline Steps Flow */}
+                  <div style={{
+                    display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap',
+                    padding: '12px 16px', background: 'var(--glass-bg-subtle)',
+                    borderRadius: 10, border: '1px solid var(--card-border)'
+                  }}>
+                    <span style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-muted)', marginRight: 6 }}>
+                      PIPELINE:
+                    </span>
+                    {wf.steps.map((st, sIdx) => (
+                      <div key={sIdx} style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                        <span style={{
+                          padding: '4px 10px', borderRadius: 6,
+                          background: 'var(--card-bg)', border: '1px solid var(--card-border)',
+                          fontSize: 11.5, color: 'var(--text-primary)', fontWeight: 500
+                        }}>
+                          {st}
+                        </span>
+                        {sIdx < wf.steps.length - 1 && (
+                          <span style={{ color: 'var(--accent-primary)', fontSize: 12 }}>➔</span>
                         )}
                       </div>
                     ))}
                   </div>
-                </div>
 
-                {/* Metadata & Operational Metrics Grid */}
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 12, borderTop: '1px solid var(--card-border)', paddingTop: 12 }}>
-                  <div>
-                    <div style={{ fontSize: 10, color: 'var(--text-muted)', fontFamily: 'monospace' }}>TRIGGER SPECIFICATION</div>
-                    <div style={{ fontSize: 12, color: 'var(--text-primary)', marginTop: 2, fontWeight: 500 }}>{a.trigger.schedule}</div>
-                    <div style={{ fontSize: 10, color: 'var(--text-muted)', fontFamily: 'monospace' }}>{a.trigger.detail}</div>
-                  </div>
-
-                  <div>
-                    <div style={{ fontSize: 10, color: 'var(--text-muted)', fontFamily: 'monospace' }}>LAST EXECUTION</div>
-                    <div style={{ fontSize: 12, color: 'var(--success)', marginTop: 2, fontWeight: 500 }}>
-                      ● {a.lastRun.time}
+                  {/* Execution Metrics Metadata */}
+                  <div style={{
+                    display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 12,
+                    borderTop: '1px solid var(--card-border)', paddingTop: 14
+                  }}>
+                    <div>
+                      <div style={{ fontSize: 10, color: 'var(--text-muted)', textTransform: 'uppercase' }}>Trigger Definition</div>
+                      <div style={{ fontSize: 12, color: 'var(--text-primary)', fontWeight: 500, marginTop: 2, fontFamily: 'monospace' }}>
+                        {wf.trigger}
+                      </div>
                     </div>
-                    <div style={{ fontSize: 10, color: 'var(--text-muted)', fontFamily: 'monospace' }}>Latency: {a.lastRun.duration} · Status: 200 OK</div>
-                  </div>
-
-                  <div>
-                    <div style={{ fontSize: 10, color: 'var(--text-muted)', fontFamily: 'monospace' }}>NEXT SCHEDULED RUN</div>
-                    <div style={{ fontSize: 12, color: 'var(--text-primary)', marginTop: 2, fontWeight: 500 }}>{a.nextRun}</div>
-                    <div style={{ fontSize: 10, color: 'var(--text-muted)', fontFamily: 'monospace' }}>Worker: Dedicated Daemon</div>
-                  </div>
-
-                  <div>
-                    <div style={{ fontSize: 10, color: 'var(--text-muted)', fontFamily: 'monospace' }}>RELIABILITY METRICS</div>
-                    <div style={{ fontSize: 12, color: 'var(--text-primary)', marginTop: 2, fontWeight: 500 }}>{a.runs} total runs</div>
-                    <div style={{ fontSize: 10, color: 'var(--success)', fontFamily: 'monospace' }}>{a.successRate} success rate</div>
+                    <div>
+                      <div style={{ fontSize: 10, color: 'var(--text-muted)', textTransform: 'uppercase' }}>Total Executions</div>
+                      <div style={{ fontSize: 12, color: 'var(--text-primary)', fontWeight: 600, marginTop: 2 }}>
+                        {wf.runCount} runs ({successRate} success)
+                      </div>
+                    </div>
+                    <div>
+                      <div style={{ fontSize: 10, color: 'var(--text-muted)', textTransform: 'uppercase' }}>Last Dispatched</div>
+                      <div style={{ fontSize: 12, color: 'var(--text-primary)', marginTop: 2 }}>
+                        {wf.lastRunAt ? new Date(wf.lastRunAt).toLocaleString() : 'Never run'}
+                      </div>
+                    </div>
+                    <div>
+                      <div style={{ fontSize: 10, color: 'var(--text-muted)', textTransform: 'uppercase' }}>Next Schedule</div>
+                      <div style={{ fontSize: 12, color: 'var(--text-primary)', marginTop: 2 }}>
+                        {wf.nextRunAt ? new Date(wf.nextRunAt).toLocaleString() : 'Event-triggered'}
+                      </div>
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
+              );
+            })
+          )}
+        </div>
+
+        {/* Execution Log Table */}
+        <div style={{
+          background: 'var(--card-bg)', border: '1px solid var(--card-border)',
+          borderRadius: 14, padding: '24px', display: 'flex', flexDirection: 'column', gap: 16
+        }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <div style={{ fontSize: 14, fontWeight: 700, color: 'var(--text-primary)', fontFamily: 'var(--font-display)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+              Execution History & Telemetry Audit Log
+            </div>
+            <span style={{ fontSize: 11, color: 'var(--text-muted)', fontFamily: 'monospace' }}>
+              Showing {logs.length} most recent dispatches
+            </span>
           </div>
 
-          {/* Execution History Drawer */}
-          {selectedLogs && (
-            <div style={{
-              background: 'var(--card-bg)', border: '1px solid var(--card-border)', borderRadius: 14,
-              padding: '20px', display: 'flex', flexDirection: 'column', gap: 12, marginTop: 12
-            }}>
-              <div style={{ fontSize: 12, fontWeight: 700, fontFamily: 'monospace', color: 'var(--text-secondary)' }}>
-                RECENT DISPATCH LOGS (BUFFER: LAST 5 RUNS)
-              </div>
-              <div style={{ overflowX: 'auto' }}>
-                <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 12, textAlign: 'left' }}>
-                  <thead>
-                    <tr style={{ borderBottom: '1px solid var(--card-border)', color: 'var(--text-muted)', fontSize: 11, fontFamily: 'monospace' }}>
-                      <th style={{ padding: '8px 12px' }}>RUN ID</th>
-                      <th style={{ padding: '8px 12px' }}>WORKFLOW</th>
-                      <th style={{ padding: '8px 12px' }}>TIMESTAMP</th>
-                      <th style={{ padding: '8px 12px' }}>DURATION</th>
-                      <th style={{ padding: '8px 12px' }}>EXIT STATUS</th>
+          {logs.length === 0 ? (
+            <div style={{ padding: 24, textAlign: 'center', color: 'var(--text-muted)', fontSize: 13 }}>
+              No execution records in audit log.
+            </div>
+          ) : (
+            <div style={{ overflowX: 'auto' }}>
+              <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: 12 }}>
+                <thead>
+                  <tr style={{ borderBottom: '1px solid var(--card-border)', color: 'var(--text-muted)' }}>
+                    <th style={{ padding: '8px 12px', fontWeight: 600 }}>EXECUTION ID</th>
+                    <th style={{ padding: '8px 12px', fontWeight: 600 }}>WORKFLOW</th>
+                    <th style={{ padding: '8px 12px', fontWeight: 600 }}>TRIGGER</th>
+                    <th style={{ padding: '8px 12px', fontWeight: 600 }}>DURATION</th>
+                    <th style={{ padding: '8px 12px', fontWeight: 600 }}>STATUS</th>
+                    <th style={{ padding: '8px 12px', fontWeight: 600 }}>TIMESTAMP</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {logs.map(log => (
+                    <tr key={log.id} style={{ borderBottom: '1px solid var(--glass-bg-subtle)' }}>
+                      <td style={{ padding: '10px 12px', fontFamily: 'monospace', color: 'var(--text-secondary)' }}>{log.id}</td>
+                      <td style={{ padding: '10px 12px', fontWeight: 600, color: 'var(--text-primary)' }}>{log.workflowName}</td>
+                      <td style={{ padding: '10px 12px', color: 'var(--text-muted)', fontFamily: 'monospace' }}>{log.trigger}</td>
+                      <td style={{ padding: '10px 12px', fontFamily: 'monospace', color: 'var(--text-secondary)' }}>{log.durationMs}ms</td>
+                      <td style={{ padding: '10px 12px' }}>
+                        <span style={{
+                          padding: '2px 8px', borderRadius: 4, fontSize: 10, fontWeight: 700, fontFamily: 'monospace',
+                          background: log.status === 'success' ? 'rgba(34, 197, 94, 0.1)' : 'rgba(239, 68, 68, 0.1)',
+                          color: log.status === 'success' ? 'var(--success)' : 'var(--danger)'
+                        }}>
+                          {log.status.toUpperCase()}
+                        </span>
+                      </td>
+                      <td style={{ padding: '10px 12px', color: 'var(--text-muted)' }}>
+                        {new Date(log.executedAt).toLocaleString()}
+                      </td>
                     </tr>
-                  </thead>
-                  <tbody>
-                    {sampleExecutionLogs.map(log => (
-                      <tr key={log.id} style={{ borderBottom: '1px solid var(--glass-bg-subtle)' }}>
-                        <td style={{ padding: '8px 12px', fontFamily: 'monospace', color: 'var(--accent-primary)' }}>{log.id}</td>
-                        <td style={{ padding: '8px 12px', color: 'var(--text-primary)' }}>{log.workflow}</td>
-                        <td style={{ padding: '8px 12px', color: 'var(--text-muted)', fontFamily: 'monospace' }}>{log.timestamp}</td>
-                        <td style={{ padding: '8px 12px', color: 'var(--text-muted)', fontFamily: 'monospace' }}>{log.duration}</td>
-                        <td style={{ padding: '8px 12px' }}>
-                          <span style={{
-                            fontSize: 10, fontFamily: 'monospace', fontWeight: 700, padding: '2px 6px', borderRadius: 4,
-                            background: log.status === 'success' ? 'rgba(34, 197, 94, 0.1)' : 'rgba(239, 68, 68, 0.1)',
-                            color: log.status === 'success' ? 'var(--success)' : 'var(--danger)'
-                          }}>
-                            {log.code}
-                          </span>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
+                  ))}
+                </tbody>
+              </table>
             </div>
           )}
-
         </div>
+
       </div>
     </div>
   );
