@@ -2,20 +2,20 @@ import { useState } from 'react';
 import type { Company, Employee, Team } from '../types';
 
 export default function OrganizationPage() {
-  const [company, setCompany] = useState<Company>({
+  const [company] = useState<Company>({
     name: 'Oryn AI Corp',
     industry: 'Technology / AI',
     foundedDate: '2025-01-15',
     location: 'San Francisco, CA'
   });
 
-  const [employees, setEmployees] = useState<Employee[]>([
+  const [employees] = useState<Employee[]>([
     { id: '1', name: 'Alex Chen', role: 'Chief Strategist', email: 'alex@oryn.ai', status: 'active', joinedDate: '2025-01-20' },
     { id: '2', name: 'Jordan Lee', role: 'Lead Data Scientist', email: 'jordan@oryn.ai', status: 'remote', joinedDate: '2025-02-01' },
     { id: '3', name: 'Sarah Miller', role: 'Operations Manager', email: 'sarah@oryn.ai', status: 'active', joinedDate: '2025-02-15' },
   ]);
 
-  const [teams, setTeams] = useState<Team[]>([
+  const [teams] = useState<Team[]>([
     { id: 't1', name: 'Product Engineering', description: 'Core product development and AI integration.' },
     { id: 't2', name: 'Strategy & Growth', description: 'Business development and market expansion.' },
   ]);

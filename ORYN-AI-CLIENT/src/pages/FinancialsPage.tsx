@@ -17,6 +17,27 @@ export default function FinancialsPage() {
     date: new Date().toISOString().split('T')[0]
   });
 
+  const handleAddEntry = () => {
+    if (!newEntry.category || !newEntry.amount) return;
+    setEntries(prev => [
+      {
+        id: `e${Date.now()}`,
+        type: (newEntry.type as 'revenue' | 'expense') || 'revenue',
+        category: newEntry.category || 'General',
+        amount: newEntry.amount || 0,
+        date: newEntry.date || new Date().toISOString().split('T')[0],
+        note: 'Manual ledger entry'
+      },
+      ...prev
+    ]);
+    setNewEntry({
+      type: 'revenue',
+      category: '',
+      amount: 0,
+      date: new Date().toISOString().split('T')[0]
+    });
+  };
+
   const totals = entries.reduce((acc, curr) => {
     if (curr.type === 'revenue') acc.revenue += curr.amount;
     else acc.expenses += curr.amount;
@@ -85,7 +106,9 @@ export default function FinancialsPage() {
                 <CustomDatePicker value={newEntry.date || ''} onChange={val => setNewEntry({ ...newEntry, date: val })} />
               </div>
             </div>
-            <button style={{ 
+            <button 
+              onClick={handleAddEntry}
+              style={{ 
               marginTop: 10, padding: '16px', borderRadius: 12, background: 'var(--success)', color: 'var(--bg)', 
               fontFamily: 'var(--font-display)', fontWeight: 800, letterSpacing: 2, textTransform: 'uppercase',
               cursor: 'pointer', boxShadow: '0 0 20px rgba(0,255,170,0.4)', border: 'none'

@@ -1,4 +1,3 @@
-import React from 'react';
 import { useToast } from './use-toast';
 import { motion, AnimatePresence } from 'framer-motion';
 

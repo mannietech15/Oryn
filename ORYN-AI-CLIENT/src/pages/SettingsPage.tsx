@@ -275,7 +275,7 @@ function FormLabel({ children }: { children: React.ReactNode }) {
   return <div style={{ fontSize: 12, fontWeight: 600, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: 0.5 }}>{children}</div>;
 }
 
-function PersonaCard({ id, title, desc, active, onClick }: { id: string, title: string, desc: string, active: boolean, onClick: () => void }) {
+function PersonaCard({ id: _id, title, desc, active, onClick }: { id: string, title: string, desc: string, active: boolean, onClick: () => void }) {
   return (
     <div 
       onClick={onClick}
