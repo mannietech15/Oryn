@@ -12,7 +12,7 @@ import type {
 const barHeights = [40, 55, 48, 65, 72, 60, 78, 85, 100];
 
 /* ─── Shared Components ───────────────────────────────────── */
-function Card({ title, children, style = {}, delay = 0, action }: any) {
+function Card({ title, subtitle, children, style = {}, delay = 0, action }: any) {
   return (
     <motion.div
       initial={{ opacity: 0, y: 15 }}
@@ -30,9 +30,16 @@ function Card({ title, children, style = {}, delay = 0, action }: any) {
       }}
     >
       {title && (
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20 }}>
-          <div style={{ fontFamily: 'var(--font-display)', fontSize: 13, fontWeight: 600, color: 'var(--text-secondary)' }}>
-            {title}
+        <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 18 }}>
+          <div>
+            <div style={{ fontFamily: 'var(--font-display)', fontSize: 13, fontWeight: 600, color: 'var(--text-secondary)', letterSpacing: '0.3px' }}>
+              {title}
+            </div>
+            {subtitle && (
+              <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 2, fontFamily: 'var(--font-body)' }}>
+                {subtitle}
+              </div>
+            )}
           </div>
           {action}
         </div>
@@ -63,7 +70,6 @@ function SparkLine() {
       <path d={line} fill="none" stroke="var(--accent-primary)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
       {pts.map((p, i) => (
         <React.Fragment key={i}>
-          {/* Vertical grid lines */}
           <line x1={p.x} y1={pad} x2={p.x} y2={H - pad} stroke="var(--glass-bg-subtle)" strokeWidth="1" />
           {i === pts.length - 1 && (
             <circle cx={p.x} cy={p.y} r={4} fill="var(--bg)" stroke="var(--accent-primary)" strokeWidth="2" />
@@ -123,65 +129,96 @@ export default function DashboardPage({ orgProfile }: { orgProfile?: any }) {
   const greeting = hour < 12 ? 'Good Morning,' : hour < 18 ? 'Good Afternoon,' : 'Good Evening,';
 
   /* Workspace / Business context */
-  const businessName = orgProfile?.name || 'My Workspace';
-  const industry = (orgProfile?.industry || '').toLowerCase();
+  const businessName = orgProfile?.name || 'ORYN Core';
 
-  let dynamicKPIs = [
-    { label: 'Revenue MTD',    value: '$284K', change: '+18.4%', icon: '💰', prompt: 'Analyze my revenue drivers for this month.' },
-    { label: 'Active Users',   value: '1,842', change: '+9.2%',  icon: '👥', prompt: 'How can I grow active users faster?' },
-    { label: 'Time Saved by ORYN', value: '340 hrs', change: '+15%', icon: '⏳', prompt: 'Break down time saved by department.' },
-    { label: 'Automated Actions', value: '12,492', change: '+34%', icon: '⚡', prompt: 'Which AI workflows are most active?' },
+  // Contextual, explainable KPI metrics
+  const contextualKPIs = [
+    {
+      label: 'Monthly Recurring Revenue (MRR)',
+      value: '$284,000',
+      change: '+18.4% vs last 30 days',
+      trend: 'up',
+      period: 'Trailing 30-day billing volume',
+      source: 'Stripe Gateway (Live Sync)',
+      updated: 'Synced 4m ago',
+      prompt: 'Analyze revenue growth breakdown across customer tiers for this month.'
+    },
+    {
+      label: 'Active Workspace Users',
+      value: '1,842',
+      change: '+9.2% weekly active growth',
+      trend: 'up',
+      period: 'Last 7 days (Unique authenticated sessions)',
+      source: 'Activity Telemetry',
+      updated: 'Live stream',
+      prompt: 'Identify the primary usage drivers for new active users this week.'
+    },
+    {
+      label: 'Automated Action Throughput',
+      value: '3,291',
+      change: '+34.0% execution volume',
+      trend: 'up',
+      period: 'Current calendar month to date',
+      source: 'Workflow Runner Engine',
+      updated: 'Synced 1m ago',
+      prompt: 'Break down automated actions by workflow: email vs data synthesis.'
+    },
+    {
+      label: 'User Retention Rate',
+      value: '91.0%',
+      change: '+3.0 pts vs 90d baseline',
+      trend: 'up',
+      period: 'Cohort 30-day retention curve',
+      source: 'Cohort Analytics',
+      updated: 'Calculated at 00:00 UTC',
+      prompt: 'Show cohort churn risk analysis and clients nearing renewal.'
+    },
   ];
 
-  if (industry.includes('health') || industry.includes('medical')) {
-    dynamicKPIs[0] = { label: 'Patient Acquisitions', value: '412', change: '+12%', icon: '🩺', prompt: 'Analyze patient acquisition costs.' };
-    dynamicKPIs[1] = { label: 'Active Patients', value: '4,842', change: '+5%', icon: '👥', prompt: 'Show active patient demographic.' };
-  } else if (industry.includes('finance') || industry.includes('bank') || industry.includes('crypto')) {
-    dynamicKPIs[0] = { label: 'AUM', value: '$1.2B', change: '+4.2%', icon: '🏦', prompt: 'Analyze Assets Under Management trends.' };
-    dynamicKPIs[1] = { label: 'Active Clients', value: '842', change: '+2.1%', icon: '👥', prompt: 'Client retention risk factors.' };
-  } else if (industry.includes('tech') || industry.includes('software') || industry.includes('saas')) {
-    dynamicKPIs[0] = { label: 'MRR', value: '$84K', change: '+18.4%', icon: '📈', prompt: 'Analyze MRR growth drivers.' };
-    dynamicKPIs[1] = { label: 'Active Subscriptions', value: '2,842', change: '+12.2%', icon: '🔄', prompt: 'Show subscription churn risk.' };
-  } else if (industry.includes('ecommerce') || industry.includes('retail')) {
-    dynamicKPIs[0] = { label: 'Gross Sales', value: '$412K', change: '+22%', icon: '🛍️', prompt: 'Analyze best selling products.' };
-    dynamicKPIs[1] = { label: 'Conversion Rate', value: '4.8%', change: '+1.2%', icon: '🎯', prompt: 'How to improve cart conversion?' };
-  }
-
-  let dynamicAgents = [
-    { name: 'Sales Co-Pilot', status: 'Running', task: 'Qualifying 43 inbound leads', load: 85, color: 'var(--success)' },
-    { name: 'Data Analyst', status: 'Idle', task: 'Awaiting new datasets', load: 10, color: 'var(--accent-primary)' },
-    { name: 'Support Bot', status: 'Running', task: 'Handling 12 active tickets', load: 60, color: 'var(--warn)' },
-    { name: 'Marketing Agent', status: 'Optimizing', task: 'A/B testing ad copy', load: 45, color: '#ec4899' },
+  // Active Background Workflows (Real technical daemon feel)
+  const activeWorkflows = [
+    {
+      name: 'Inbound Lead Enrichment Worker',
+      status: 'Processing',
+      task: 'Enriching 14 pending CRM webhook records',
+      load: 75,
+      trigger: 'CRM Webhook',
+      color: 'var(--success)'
+    },
+    {
+      name: 'Support Sentiment Classifier',
+      status: 'Monitoring',
+      task: 'Scanning Zendesk ticket queue (p95 latency: 210ms)',
+      load: 35,
+      trigger: 'Ticket Event',
+      color: 'var(--accent-primary)'
+    },
+    {
+      name: 'Weekly Sales Report Generator',
+      status: 'Scheduled',
+      task: 'Next run: Friday at 17:00 UTC via Custom SMTP',
+      load: 10,
+      trigger: 'Cron (Weekly)',
+      color: 'var(--text-secondary)'
+    },
+    {
+      name: 'Enterprise Account Health Auditor',
+      status: 'Active',
+      task: 'Scanning 3 accounts flagged with zero 14-day activity',
+      load: 60,
+      trigger: 'Daily Check',
+      color: 'var(--warn)'
+    },
   ];
 
-  if (industry.includes('health') || industry.includes('medical')) {
-    dynamicAgents[0] = { name: 'Compliance Checker', status: 'Running', task: 'Auditing 412 patient records', load: 92, color: 'var(--success)' };
-    dynamicAgents[3] = { name: 'Triage Bot', status: 'Running', task: 'Processing inbound symptoms', load: 78, color: '#ec4899' };
-  } else if (industry.includes('finance') || industry.includes('bank') || industry.includes('crypto')) {
-    dynamicAgents[0] = { name: 'Risk Analyst', status: 'Running', task: 'Running Monte Carlo simulations', load: 95, color: 'var(--success)' };
-    dynamicAgents[3] = { name: 'Fraud Detector', status: 'Monitoring', task: 'Scanning recent transactions', load: 30, color: '#ec4899' };
-  } else if (industry.includes('tech') || industry.includes('software') || industry.includes('saas')) {
-    dynamicAgents[0] = { name: 'Code Reviewer', status: 'Running', task: 'Reviewing 4 PRs', load: 65, color: 'var(--success)' };
-    dynamicAgents[3] = { name: 'DevOps Monitor', status: 'Monitoring', task: 'Watching server health', load: 20, color: '#ec4899' };
-  } else if (industry.includes('ecommerce') || industry.includes('retail')) {
-    dynamicAgents[0] = { name: 'Inventory Bot', status: 'Running', task: 'Forecasting Q3 stock levels', load: 45, color: 'var(--success)' };
-    dynamicAgents[3] = { name: 'Cart Recovery Agent', status: 'Running', task: 'Sending 214 reminder emails', load: 80, color: '#ec4899' };
-  }
-
-  const baseIntegrations = [
-    { icon: '📧', name: 'Gmail',    connected: true  },
-    { icon: '📅', name: 'Calendar', connected: true  },
-    { icon: '💬', name: 'Slack',    connected: false },
-    { icon: '⚡', name: 'Zapier',  connected: false },
-  ];
-
-  const userIntegrations = orgProfile?.integrations || [];
-  const dynamicIntegrations = [
-    ...baseIntegrations,
-    ...(userIntegrations.includes('Google Analytics') ? [{ icon: '📊', name: 'Google Analytics', connected: true }] : []),
-    ...(userIntegrations.includes('Stripe') ? [{ icon: '💳', name: 'Stripe', connected: true }] : []),
-    ...(userIntegrations.includes('Salesforce') ? [{ icon: '☁️', name: 'Salesforce', connected: true }] : []),
-    ...(userIntegrations.includes('Notion') ? [{ icon: '📝', name: 'Notion', connected: true }] : []),
+  // Operational Integrations
+  const operationalIntegrations = [
+    { name: 'Custom SMTP', status: 'Connected', badge: 'Active in 2 workflows', detail: 'Port 587 TLS verified', icon: '📧', isConnected: true },
+    { name: 'Stripe Billing', status: 'Connected', badge: 'Telemetry active', detail: 'customer.subscription.* events', icon: '💳', isConnected: true },
+    { name: 'Slack Alerts', status: 'Connected', badge: 'Channel #ops-briefings', detail: 'Incoming webhook configured', icon: '💬', isConnected: true },
+    { name: 'Google Calendar', status: 'Available', badge: 'Requires OAuth', detail: 'Meeting briefing sync', icon: '📅', isConnected: false },
+    { name: 'Zendesk Support', status: 'Degraded', badge: 'Timeout Warning', detail: 'Webhook latency > 4000ms', icon: '🎫', isConnected: false },
+    { name: 'Notion Workspace', status: 'Available', badge: 'Token required', detail: 'Automated executive doc export', icon: '📝', isConnected: false },
   ];
 
   /* ── Feature state ── */
@@ -224,7 +261,7 @@ export default function DashboardPage({ orgProfile }: { orgProfile?: any }) {
       const result = await runCommand(query);
       setCmdResult(result);
     } catch {
-      setCmdError('Could not reach ORYN server. Make sure the backend is running.');
+      setCmdError('Telemetry service unreachable. Please ensure the ORYN backend daemon is running.');
     } finally {
       setCmdLoading(false);
     }
@@ -246,59 +283,78 @@ export default function DashboardPage({ orgProfile }: { orgProfile?: any }) {
       const { recommendation } = await fetchGoalAction(id);
       setGoalAdvice(p => ({ ...p, [id]: recommendation }));
     } catch {
-      setGoalAdvice(p => ({ ...p, [id]: 'Could not load AI advice.' }));
+      setGoalAdvice(p => ({ ...p, [id]: 'Could not generate strategic target analysis.' }));
     } finally {
       setGoalLoading(p => ({ ...p, [id]: false }));
     }
   };
 
-  const alertTheme: Record<string, { color: string, badge: string }> = {
-    critical: { color: 'var(--danger)', badge: 'CRITICAL' },
-    warning: { color: 'var(--warn)', badge: 'WARNING' },
-    opportunity: { color: 'var(--success)', badge: 'OPPORTUNITY' },
-    info: { color: 'var(--accent-primary)', badge: 'INFO' },
+  const alertBadgeTheme: Record<string, { color: string, bg: string, label: string }> = {
+    critical: { color: 'var(--danger)', bg: 'rgba(239, 68, 68, 0.1)', label: 'CRITICAL ANOMALY' },
+    warning: { color: 'var(--warn)', bg: 'rgba(234, 179, 8, 0.1)', label: 'ATTENTION REQUIRED' },
+    opportunity: { color: 'var(--success)', bg: 'rgba(34, 197, 94, 0.1)', label: 'OPPORTUNITY' },
+    info: { color: 'var(--accent-primary)', bg: 'rgba(249, 115, 22, 0.1)', label: 'SYSTEM ADVISORY' },
   };
 
   return (
-    <div className="dashboard-container" style={{ flex: 1, overflowY: 'auto', padding: '40px', background: 'var(--bg)', position: 'relative' }}>
-      {/* ── Background Grid & Glows ── */}
-      <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, pointerEvents: 'none', backgroundImage: 'radial-gradient(var(--glass-bg-subtle) 1px, transparent 1px)', backgroundSize: '32px 32px', zIndex: 0 }} />
-      <div style={{ position: 'fixed', top: -300, right: -100, width: 800, height: 800, background: 'var(--accent-primary)', filter: 'blur(250px)', opacity: 0.04, borderRadius: '50%', pointerEvents: 'none', zIndex: 0 }} />
-      <div style={{ position: 'fixed', bottom: -200, left: -200, width: 600, height: 600, background: 'var(--accent-primary)', filter: 'blur(200px)', opacity: 0.03, borderRadius: '50%', pointerEvents: 'none', zIndex: 0 }} />
+    <div className="dashboard-container" style={{ flex: 1, overflowY: 'auto', padding: '36px 40px', background: 'var(--bg)', position: 'relative' }}>
+      {/* Background Subtle Technical Grid */}
+      <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, pointerEvents: 'none', backgroundImage: 'radial-gradient(var(--glass-bg-subtle) 1px, transparent 1px)', backgroundSize: '28px 28px', zIndex: 0 }} />
 
-      <div style={{ maxWidth: 1280, margin: '0 auto', position: 'relative', zIndex: 1, display: 'flex', flexDirection: 'column', gap: 32 }}>
+      <div style={{ maxWidth: 1280, margin: '0 auto', position: 'relative', zIndex: 1, display: 'flex', flexDirection: 'column', gap: 28 }}>
         
-        {/* ── Header ── */}
+        {/* ── Credible Header with Workspace Status ── */}
         <div className="mobile-stack" style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between' }}>
           <div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 12 }}>
-              <div className="dashboard-header-sub" style={{ fontFamily: 'var(--font-display)', fontSize: 13, fontWeight: 600, color: 'var(--accent-primary)', letterSpacing: 1 }}>WORKSPACE</div>
-              <div style={{ padding: '6px 14px', background: 'var(--glass-bg-hover)', borderRadius: 20, border: '1px solid var(--glass-border-subtle)', fontSize: 13, fontWeight: 600, color: 'var(--text-primary)', display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer', transition: 'all 0.2s', boxShadow: '0 2px 8px rgba(0,0,0,0.2)' }}>
-                {businessName} <span style={{ fontSize: 10, color: 'var(--text-muted)' }}>▼</span>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 8 }}>
+              {/* Subtle System Status Pill */}
+              <div style={{
+                display: 'inline-flex', alignItems: 'center', gap: 6,
+                padding: '3px 10px', borderRadius: 6,
+                background: 'rgba(34, 197, 94, 0.08)', border: '1px solid rgba(34, 197, 94, 0.2)',
+                fontSize: 11, fontWeight: 600, color: 'var(--success)', fontFamily: 'monospace'
+              }}>
+                <span style={{ width: 6, height: 6, borderRadius: '50%', background: 'var(--success)', display: 'inline-block' }} />
+                TELEMETRY ENGINE: ONLINE
+              </div>
+
+              {/* Sample Workspace Tag */}
+              <div style={{
+                display: 'inline-flex', alignItems: 'center', gap: 6,
+                padding: '3px 10px', borderRadius: 6,
+                background: 'var(--glass-bg-subtle)', border: '1px solid var(--card-border)',
+                fontSize: 11, color: 'var(--text-muted)', fontFamily: 'monospace'
+              }}>
+                DEMO DATASET · SAMPLE WORKSPACE
               </div>
             </div>
+
             <div className="dashboard-header-text" style={{ display: 'flex', alignItems: 'baseline', gap: 10 }}>
-              <span style={{ fontFamily: 'var(--font-script)', fontSize: 44, fontWeight: 400, color: 'var(--text-primary)' }}>{greeting}</span>
-              <span style={{ fontFamily: 'var(--font-display)', fontSize: 32, fontWeight: 700, color: 'var(--text-primary)', letterSpacing: -0.5 }}>{businessName}</span>
+              <span style={{ fontFamily: 'var(--font-script)', fontSize: 36, fontWeight: 400, color: 'var(--text-primary)' }}>{greeting}</span>
+              <span style={{ fontFamily: 'var(--font-display)', fontSize: 28, fontWeight: 700, color: 'var(--text-primary)', letterSpacing: -0.5 }}>{businessName}</span>
+            </div>
+            <div style={{ fontSize: 13, color: 'var(--text-secondary)', marginTop: 2 }}>
+              Enterprise Operations & Financial Telemetry Center
             </div>
           </div>
+
           <div style={{ textAlign: 'right' }}>
-            <div style={{ fontFamily: 'var(--font-display)', fontSize: 24, fontWeight: 600, color: 'var(--text-primary)', fontVariantNumeric: 'tabular-nums' }}>{clockStr}</div>
-            <div style={{ fontFamily: 'var(--font-body)', fontSize: 13, color: 'var(--text-secondary)', marginTop: 4 }}>{dateStr}</div>
+            <div style={{ fontFamily: 'var(--font-display)', fontSize: 22, fontWeight: 600, color: 'var(--text-primary)', fontVariantNumeric: 'tabular-nums' }}>{clockStr}</div>
+            <div style={{ fontFamily: 'var(--font-body)', fontSize: 12, color: 'var(--text-secondary)', marginTop: 2 }}>{dateStr} · UTC+1</div>
           </div>
         </div>
 
-        {/* ── Command Bar (Massive & Centered) ── */}
+        {/* ── Command Bar ── */}
         <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} style={{ position: 'relative' }}>
           <div className="mobile-command-bar" style={{ 
             background: 'var(--card-bg)', backdropFilter: 'blur(16px)', 
-            border: '1px solid var(--glass-border)', borderRadius: 16, 
-            padding: '12px 20px', display: 'flex', alignItems: 'center', gap: 16,
+            border: '1px solid var(--glass-border)', borderRadius: 14, 
+            padding: '10px 18px', display: 'flex', alignItems: 'center', gap: 14,
             boxShadow: 'var(--shadow-subtle)'
           }}>
-            <div style={{ width: 32, height: 32, borderRadius: 10, background: 'rgba(249, 115, 22, 0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--accent-primary)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"></path>
+            <div style={{ width: 30, height: 30, borderRadius: 8, background: 'rgba(249, 115, 22, 0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--accent-primary)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line>
               </svg>
             </div>
             <input
@@ -307,57 +363,55 @@ export default function DashboardPage({ orgProfile }: { orgProfile?: any }) {
               value={cmdInput}
               onChange={e => setCmdInput(e.target.value)}
               onKeyDown={e => e.key === 'Enter' && handleCommand()}
-              placeholder={`Ask ORYN to analyze ${businessName}'s revenue, churn, or AI tasks...`}
+              placeholder="Query enterprise telemetry (e.g. 'Analyze Q2 MRR churn risk' or 'Show late payments')..."
               style={{
                 flex: 1, background: 'transparent', border: 'none', outline: 'none',
-                color: 'var(--text-primary)', fontFamily: 'var(--font-body)', fontSize: 16,
+                color: 'var(--text-primary)', fontFamily: 'var(--font-body)', fontSize: 14,
                 padding: '4px 0', minWidth: 0
               }}
             />
-            <div className="hide-on-mobile" style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-              <div style={{ fontSize: 11, fontFamily: 'var(--font-body)', color: 'var(--text-muted)', background: 'var(--glass-bg-hover)', padding: '4px 8px', borderRadius: 6 }}>Press Enter ↵</div>
+            <div className="hide-on-mobile" style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+              <kbd style={{ fontSize: 11, fontFamily: 'monospace', color: 'var(--text-muted)', background: 'var(--glass-bg-hover)', padding: '2px 6px', borderRadius: 4, border: '1px solid var(--card-border)' }}>Enter ↵</kbd>
             </div>
             <button
-                onClick={() => handleCommand()}
-                disabled={cmdLoading || !cmdInput.trim()}
-                style={{
-                  background: 'var(--accent-primary)', color: 'white', border: 'none',
-                  borderRadius: 10, padding: '10px 24px', fontFamily: 'var(--font-display)', 
-                  fontSize: 14, fontWeight: 600, cursor: cmdLoading || !cmdInput.trim() ? 'not-allowed' : 'pointer',
-                  opacity: cmdInput.trim() ? 1 : 0.5, transition: 'all 0.2s', display: 'flex', alignItems: 'center', gap: 8
-                }}
-              >
-                {cmdLoading ? (
-                  <><div style={{ width: 14, height: 14, border: '2px solid rgba(255,255,255,0.3)', borderTopColor: 'white', borderRadius: '50%', animation: 'spin 0.8s linear infinite' }} /> <span className="mobile-button-text">Thinking</span></>
-                ) : (
-                  <>
-                    <svg className="mobile-hide" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
-                    <span className="mobile-button-text">Ask ORYN</span>
-                    <svg className="hide-on-desktop" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
-                  </>
-                )}
-              </button>
+              onClick={() => handleCommand()}
+              disabled={cmdLoading || !cmdInput.trim()}
+              style={{
+                background: 'var(--accent-primary)', color: 'white', border: 'none',
+                borderRadius: 8, padding: '8px 18px', fontFamily: 'var(--font-display)', 
+                fontSize: 13, fontWeight: 600, cursor: cmdLoading || !cmdInput.trim() ? 'not-allowed' : 'pointer',
+                opacity: cmdInput.trim() ? 1 : 0.6, transition: 'all 0.2s', display: 'flex', alignItems: 'center', gap: 8
+              }}
+            >
+              {cmdLoading ? (
+                <><div style={{ width: 12, height: 12, border: '2px solid rgba(255,255,255,0.3)', borderTopColor: 'white', borderRadius: '50%', animation: 'spin 0.8s linear infinite' }} /> <span>Processing</span></>
+              ) : (
+                <span>Execute Query</span>
+              )}
+            </button>
           </div>
 
           <AnimatePresence>
             {(cmdResult || cmdError) && (
-              <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }} style={{ overflow: 'hidden', marginTop: 16 }}>
-                <div style={{ padding: '24px', borderRadius: 16, background: cmdError ? 'rgba(239, 68, 68, 0.1)' : 'rgba(249, 115, 22, 0.05)', border: `1px solid ${cmdError ? 'rgba(239, 68, 68, 0.2)' : 'rgba(249, 115, 22, 0.2)'}`, backdropFilter: 'blur(12px)' }}>
+              <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }} style={{ overflow: 'hidden', marginTop: 12 }}>
+                <div style={{ padding: '20px', borderRadius: 12, background: cmdError ? 'rgba(239, 68, 68, 0.08)' : 'rgba(249, 115, 22, 0.04)', border: `1px solid ${cmdError ? 'rgba(239, 68, 68, 0.25)' : 'rgba(249, 115, 22, 0.2)'}` }}>
                   {cmdError ? (
-                    <div style={{ color: 'var(--danger)', fontSize: 14 }}>{cmdError}</div>
+                    <div style={{ color: 'var(--danger)', fontSize: 13 }}>{cmdError}</div>
                   ) : cmdResult && (
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                        <div style={{ fontFamily: 'var(--font-display)', fontSize: 11, fontWeight: 600, color: 'var(--accent-primary)', background: 'rgba(249, 115, 22, 0.1)', padding: '4px 10px', borderRadius: 6 }}>{cmdResult.type.toUpperCase()}</div>
-                        <div style={{ fontSize: 13, color: 'var(--text-secondary)' }}>Analyzed: {cmdResult.metric}</div>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                        <span style={{ fontFamily: 'monospace', fontSize: 11, fontWeight: 700, color: 'var(--accent-primary)', background: 'rgba(249, 115, 22, 0.12)', padding: '2px 8px', borderRadius: 4 }}>
+                          {cmdResult.type.toUpperCase()}
+                        </span>
+                        <span style={{ fontSize: 12, color: 'var(--text-muted)' }}>Target: {cmdResult.metric}</span>
                       </div>
-                      <div style={{ fontSize: 15, color: 'var(--text-primary)', lineHeight: 1.6 }}>{cmdResult.answer}</div>
+                      <div style={{ fontSize: 14, color: 'var(--text-primary)', lineHeight: 1.6 }}>{cmdResult.answer}</div>
                       {cmdResult.action && (
-                        <div style={{ display: 'flex', alignItems: 'flex-start', gap: 10, background: 'var(--glass-bg-subtle)', padding: '12px 16px', borderRadius: 10, border: '1px solid var(--glass-bg-hover)' }}>
-                          <span style={{ marginTop: 2 }}>⚡</span>
+                        <div style={{ display: 'flex', alignItems: 'flex-start', gap: 10, background: 'var(--glass-bg-subtle)', padding: '10px 14px', borderRadius: 8, border: '1px solid var(--glass-bg-hover)' }}>
+                          <span style={{ fontSize: 14 }}>⚡</span>
                           <div>
-                            <div style={{ fontSize: 11, color: 'var(--text-secondary)', marginBottom: 4 }}>Recommended Action</div>
-                            <div style={{ fontSize: 14, color: 'var(--accent-primary)', fontWeight: 500 }}>{cmdResult.action}</div>
+                            <div style={{ fontSize: 11, color: 'var(--text-muted)', fontWeight: 600 }}>RECOMMENDED ACTION</div>
+                            <div style={{ fontSize: 13, color: 'var(--accent-primary)', fontWeight: 500, marginTop: 2 }}>{cmdResult.action}</div>
                           </div>
                         </div>
                       )}
@@ -369,27 +423,27 @@ export default function DashboardPage({ orgProfile }: { orgProfile?: any }) {
           </AnimatePresence>
         </motion.div>
 
-        {/* ── Bento Box Grid ── */}
-        <div className="dashboard-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(12, 1fr)', gap: 24 }}>
+        {/* ── Bento Grid ── */}
+        <div className="dashboard-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(12, 1fr)', gap: 20 }}>
           
-          {/* Row 1: Briefing & Health */}
+          {/* Row 1: Executive Briefing & Health Score */}
           <div className="span-8" style={{ gridColumn: 'span 8' }}>
-            <Card delay={0.1} title="Executive Briefing" style={{ height: '100%' }}>
+            <Card delay={0.05} title="Operational Briefing" subtitle="Synthesized from active Stripe billing & telemetry events (Cached: 1h)" style={{ height: '100%' }}>
             {briefingLoading ? (
-              <div style={{ color: 'var(--text-secondary)', fontSize: 14 }}>Generating briefing for {businessName}...</div>
+              <div style={{ color: 'var(--text-secondary)', fontSize: 13 }}>Synthesizing telemetry data for {businessName}...</div>
             ) : briefing ? (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 16, height: '100%' }}>
-                <div style={{ fontSize: 22, fontWeight: 500, color: 'var(--text-primary)', fontFamily: 'var(--font-display)', lineHeight: 1.3 }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 14, height: '100%' }}>
+                <div style={{ fontSize: 18, fontWeight: 600, color: 'var(--text-primary)', fontFamily: 'var(--font-display)', lineHeight: 1.35 }}>
                   {briefing.headline}
                 </div>
-                <div style={{ fontSize: 14, color: 'var(--text-secondary)', lineHeight: 1.6, flex: 1 }}>
+                <div style={{ fontSize: 13.5, color: 'var(--text-secondary)', lineHeight: 1.65, flex: 1 }}>
                   {briefingText}
                 </div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 12, background: 'rgba(249, 115, 22, 0.05)', padding: '16px', borderRadius: 12, border: '1px dashed rgba(249, 115, 22, 0.2)' }}>
-                  <div style={{ width: 32, height: 32, borderRadius: 8, background: 'rgba(249, 115, 22, 0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--accent-primary)' }}>💡</div>
+                <div style={{ display: 'flex', alignItems: 'flex-start', gap: 10, background: 'rgba(249, 115, 22, 0.04)', padding: '12px 14px', borderRadius: 10, border: '1px solid rgba(249, 115, 22, 0.15)' }}>
+                  <div style={{ fontSize: 14, color: 'var(--accent-primary)', marginTop: 2 }}>💡</div>
                   <div style={{ flex: 1 }}>
-                    <div style={{ fontSize: 11, color: 'var(--accent-primary)', fontWeight: 600, marginBottom: 2 }}>TOP PRIORITY</div>
-                    <div style={{ fontSize: 13, color: 'var(--text-primary)' }}>{briefing.tip}</div>
+                    <div style={{ fontSize: 11, color: 'var(--accent-primary)', fontWeight: 700, letterSpacing: '0.3px' }}>RECOMMENDED IMMEDIATE ACTION</div>
+                    <div style={{ fontSize: 12.5, color: 'var(--text-primary)', marginTop: 2, lineHeight: 1.45 }}>{briefing.tip}</div>
                   </div>
                 </div>
               </div>
@@ -398,18 +452,18 @@ export default function DashboardPage({ orgProfile }: { orgProfile?: any }) {
           </div>
 
           <div className="span-4" style={{ gridColumn: 'span 4' }}>
-            <Card delay={0.15} title="Business Operations Health" style={{ alignItems: 'center', height: '100%' }}>
+            <Card delay={0.1} title="System Operations Health" subtitle="Composite index across 5 subsystem telemetry feeds" style={{ alignItems: 'center', height: '100%' }}>
              {healthLoading ? (
-                <div style={{ color: 'var(--text-secondary)', fontSize: 14 }}>Analyzing...</div>
+                <div style={{ color: 'var(--text-secondary)', fontSize: 13 }}>Calculating telemetry vectors...</div>
              ) : health ? (
-                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%', gap: 24, marginTop: 10 }}>
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%', gap: 18, marginTop: 4 }}>
                   <HealthGauge score={health.score} grade={health.grade} />
-                  <div style={{ width: '100%', display: 'flex', flexDirection: 'column', gap: 12 }}>
+                  <div style={{ width: '100%', display: 'flex', flexDirection: 'column', gap: 8 }}>
                     {health.breakdown.map(b => (
                       <div key={b.label} style={{ width: '100%' }}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 6 }}>
-                          <span style={{ fontSize: 12, color: 'var(--text-secondary)' }}>{b.label}</span>
-                          <span style={{ fontSize: 12, color: 'var(--text-primary)', fontWeight: 500 }}>{b.value}%</span>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4 }}>
+                          <span style={{ fontSize: 11, color: 'var(--text-secondary)' }}>{b.label}</span>
+                          <span style={{ fontSize: 11, color: 'var(--text-primary)', fontWeight: 600, fontFamily: 'monospace' }}>{b.value}%</span>
                         </div>
                         <div style={{ height: 4, background: 'var(--glass-bg-hover)', borderRadius: 2, overflow: 'hidden' }}>
                           <div style={{ height: '100%', width: `${b.value}%`, background: b.color, borderRadius: 2 }} />
@@ -417,58 +471,66 @@ export default function DashboardPage({ orgProfile }: { orgProfile?: any }) {
                       </div>
                     ))}
                   </div>
+                  <div style={{ fontSize: 11, color: 'var(--text-muted)', textAlign: 'center' }}>
+                    {health.summary}
+                  </div>
                  </div>
               ) : null}
             </Card>
           </div>
 
-          {/* Row 2: KPIs */}
-          {dynamicKPIs.map((k, i) => (
+          {/* Row 2: Contextual, Explainable KPIs */}
+          {contextualKPIs.map((k, i) => (
             <motion.div key={k.label}
               className="span-3"
-              initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, delay: 0.2 + (i * 0.05) }}
+              initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, delay: 0.15 + (i * 0.05) }}
               style={{ 
-                gridColumn: 'span 3', padding: '20px', borderRadius: 16,  
+                gridColumn: 'span 3', padding: '18px 20px', borderRadius: 14,  
                 background: 'var(--card-bg)', border: '1px solid var(--card-border)',
-                display: 'flex', flexDirection: 'column', gap: 16, cursor: 'pointer', transition: 'all 0.2s',
+                display: 'flex', flexDirection: 'column', gap: 10, cursor: 'pointer', transition: 'all 0.2s',
                 boxShadow: 'var(--shadow-subtle)'
               }}
-              onMouseEnter={e => { (e.currentTarget as HTMLDivElement).style.borderColor = 'var(--glass-border)'; (e.currentTarget as HTMLDivElement).style.transform = 'translateY(-2px)'; }}
+              onMouseEnter={e => { (e.currentTarget as HTMLDivElement).style.borderColor = 'rgba(249, 115, 22, 0.4)'; (e.currentTarget as HTMLDivElement).style.transform = 'translateY(-2px)'; }}
               onMouseLeave={e => { (e.currentTarget as HTMLDivElement).style.borderColor = 'var(--card-border)'; (e.currentTarget as HTMLDivElement).style.transform = 'translateY(0)'; }}
               onClick={() => prefillCommand(k.prompt)}
             >
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                <div style={{ fontSize: 13, color: 'var(--text-secondary)', fontWeight: 500 }}>{k.label}</div>
-                <div style={{ width: 28, height: 28, borderRadius: 8, background: 'var(--glass-bg-subtle)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14 }}>{k.icon}</div>
+              <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between' }}>
+                <div>
+                  <div style={{ fontSize: 12, color: 'var(--text-secondary)', fontWeight: 600 }}>{k.label}</div>
+                  <div style={{ fontSize: 10, color: 'var(--text-muted)', marginTop: 2 }}>{k.period}</div>
+                </div>
               </div>
+
               <div>
-                <div style={{ fontSize: 28, fontFamily: 'var(--font-display)', fontWeight: 600, color: 'var(--text-primary)', marginBottom: 4 }}>{k.value}</div>
-                <div style={{ fontSize: 12, color: 'var(--success)', fontWeight: 500 }}>{k.change} vs last month</div>
+                <div style={{ fontSize: 26, fontFamily: 'var(--font-display)', fontWeight: 700, color: 'var(--text-primary)', fontVariantNumeric: 'tabular-nums' }}>{k.value}</div>
+                <div style={{ fontSize: 11.5, color: 'var(--success)', fontWeight: 600, marginTop: 2 }}>{k.change}</div>
+              </div>
+
+              <div style={{ borderTop: '1px solid var(--card-border)', paddingTop: 8, marginTop: 'auto', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <span style={{ fontSize: 10, color: 'var(--text-muted)' }}>{k.source}</span>
+                <span style={{ fontSize: 10, color: 'var(--text-muted)', fontFamily: 'monospace' }}>{k.updated}</span>
               </div>
             </motion.div>
           ))}
 
-          {/* Row 3: Agent Swarm & Active Integrations */}
+          {/* Row 3: Active Background Workflows & Connected Infrastructure */}
           <div className="span-7" style={{ gridColumn: 'span 7' }}>
-            <Card delay={0.25} title="Active AI Agents" style={{ height: '100%' }}>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-                {dynamicAgents.map((agent, i) => (
-                  <div key={i} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 16px', background: 'var(--glass-bg-subtle)', borderRadius: 12, border: '1px solid var(--glass-border-subtle)' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                      <div style={{ position: 'relative', width: 10, height: 10 }}>
-                        {agent.status === 'Running' && <div style={{ position: 'absolute', inset: 0, borderRadius: '50%', background: agent.color, opacity: 0.5, animation: 'ping 1.5s cubic-bezier(0, 0, 0.2, 1) infinite' }} />}
-                        <div style={{ position: 'relative', width: 10, height: 10, borderRadius: '50%', background: agent.color }} />
-                      </div>
+            <Card delay={0.25} title="Active Background Workflows" subtitle="Autonomous tasks executing against connected data pipelines" style={{ height: '100%' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+                {activeWorkflows.map((agent, i) => (
+                  <div key={i} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '10px 14px', background: 'var(--glass-bg-subtle)', borderRadius: 10, border: '1px solid var(--card-border)' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                      <div style={{ width: 8, height: 8, borderRadius: '50%', background: agent.color }} />
                       <div>
-                        <div style={{ fontSize: 14, fontWeight: 600, color: 'var(--text-primary)', marginBottom: 2 }}>{agent.name}</div>
-                        <div style={{ fontSize: 12, color: 'var(--text-secondary)' }}>{agent.task}</div>
+                        <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-primary)' }}>{agent.name}</div>
+                        <div style={{ fontSize: 11, color: 'var(--text-secondary)', marginTop: 2 }}>{agent.task}</div>
                       </div>
                     </div>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 12, width: 120 }}>
-                      <div style={{ height: 6, flex: 1, background: 'var(--glass-bg-hover)', borderRadius: 3, overflow: 'hidden' }}>
-                        <div style={{ height: '100%', width: `${agent.load}%`, background: agent.color, borderRadius: 3 }} />
-                      </div>
-                      <span style={{ fontSize: 11, fontWeight: 500, color: 'var(--text-secondary)', width: 30, textAlign: 'right' }}>{agent.load}%</span>
+                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 4 }}>
+                      <span style={{ fontSize: 10, fontFamily: 'monospace', color: 'var(--accent-primary)', background: 'rgba(249, 115, 22, 0.08)', padding: '2px 6px', borderRadius: 4 }}>
+                        {agent.trigger}
+                      </span>
+                      <span style={{ fontSize: 10, color: 'var(--text-muted)' }}>Load: {agent.load}%</span>
                     </div>
                   </div>
                 ))}
@@ -477,24 +539,28 @@ export default function DashboardPage({ orgProfile }: { orgProfile?: any }) {
           </div>
 
           <div className="span-5" style={{ gridColumn: 'span 5' }}>
-            <Card delay={0.3} title="Data Pipeline Integrations" style={{ height: '100%' }}>
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', gap: 12 }}>
-              {dynamicIntegrations.map((g, i) => (
+            <Card delay={0.3} title="Data Pipeline Integrations" subtitle="Status of connected enterprise endpoints" style={{ height: '100%' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: 10 }}>
+              {operationalIntegrations.map((g, i) => (
                 <div key={i}
                   style={{ 
-                    padding: '16px', background: g.connected ? 'rgba(249, 115, 22, 0.03)' : 'var(--glass-bg-subtle)', 
-                    border: `1px solid ${g.connected ? 'rgba(249, 115, 22, 0.15)' : 'var(--glass-bg-subtle)'}`, 
-                    borderRadius: 12, display: 'flex', alignItems: 'center', gap: 12, transition: 'all 0.2s', cursor: 'pointer'
+                    padding: '12px', background: g.isConnected ? 'rgba(34, 197, 94, 0.03)' : 'var(--glass-bg-subtle)', 
+                    border: `1px solid ${g.isConnected ? 'rgba(34, 197, 94, 0.2)' : 'var(--card-border)'}`, 
+                    borderRadius: 10, display: 'flex', flexDirection: 'column', gap: 6, transition: 'all 0.2s'
                   }}
-                  onMouseEnter={e => { const d = e.currentTarget as HTMLDivElement; d.style.background = 'rgba(249, 115, 22, 0.08)'; d.style.borderColor = 'rgba(249, 115, 22, 0.3)'; }}
-                  onMouseLeave={e => { const d = e.currentTarget as HTMLDivElement; d.style.background = g.connected ? 'rgba(249, 115, 22, 0.03)' : 'var(--glass-bg-subtle)'; d.style.borderColor = g.connected ? 'rgba(249, 115, 22, 0.15)' : 'var(--glass-bg-subtle)'; }}
                 >
-                  <span style={{ fontSize: 20 }}>{g.icon}</span>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                    <span style={{ fontSize: 16 }}>{g.icon}</span>
+                    <span style={{
+                      fontSize: 9, fontWeight: 700, fontFamily: 'monospace',
+                      color: g.status === 'Connected' ? 'var(--success)' : g.status === 'Degraded' ? 'var(--danger)' : 'var(--text-muted)'
+                    }}>
+                      {g.status.toUpperCase()}
+                    </span>
+                  </div>
                   <div>
-                    <div style={{ fontSize: 13, fontWeight: 500, color: 'var(--text-primary)' }}>{g.name}</div>
-                    <div style={{ fontSize: 11, color: g.connected ? 'var(--accent-primary)' : 'var(--text-muted)', marginTop: 2 }}>
-                      {g.connected ? 'Connected' : 'Configure'}
-                    </div>
+                    <div style={{ fontSize: 12, fontWeight: 600, color: 'var(--text-primary)' }}>{g.name}</div>
+                    <div style={{ fontSize: 10, color: 'var(--text-secondary)', marginTop: 2 }}>{g.detail}</div>
                   </div>
                 </div>
               ))}
@@ -502,35 +568,37 @@ export default function DashboardPage({ orgProfile }: { orgProfile?: any }) {
             </Card>
           </div>
 
-          {/* Row 4: Chart & Alerts */}
+          {/* Row 4: Historical Volume & Evidence-Based Alerts */}
           <div className="span-8" style={{ gridColumn: 'span 8' }}>
-            <Card delay={0.35} title="Revenue Analytics" style={{ height: '100%' }}>
-            <div style={{ display: 'flex', alignItems: 'flex-end', gap: 16, marginBottom: 20 }}>
-              <div style={{ fontSize: 32, fontFamily: 'var(--font-display)', fontWeight: 600, color: 'var(--text-primary)', lineHeight: 1 }}>$284K</div>
-              <div style={{ fontSize: 13, color: 'var(--success)', fontWeight: 500, paddingBottom: 4 }}>+18.4%</div>
-            </div>
-            <SparkLine />
+            <Card delay={0.35} title="Revenue Telemetry Trajectory" subtitle="Trailing 9-period volume aggregate (Stripe sample dataset)">
+              <div style={{ display: 'flex', alignItems: 'flex-end', gap: 12, marginBottom: 12 }}>
+                <div style={{ fontSize: 28, fontFamily: 'var(--font-display)', fontWeight: 700, color: 'var(--text-primary)', lineHeight: 1 }}>$284,000</div>
+                <div style={{ fontSize: 12, color: 'var(--success)', fontWeight: 600, paddingBottom: 2 }}>+18.4% growth vs prior cycle</div>
+              </div>
+              <SparkLine />
             </Card>
           </div>
 
           <div className="span-4" style={{ gridColumn: 'span 4' }}>
-            <Card delay={0.4} title="Smart Alerts" style={{ height: '100%' }}>
+            <Card delay={0.4} title="Operational Anomaly Alerts" subtitle="Evaluated across live data feeds" style={{ height: '100%' }}>
             {alertsLoading ? (
-              <div style={{ color: 'var(--text-secondary)', fontSize: 14 }}>Scanning...</div>
+              <div style={{ color: 'var(--text-secondary)', fontSize: 13 }}>Scanning feeds...</div>
             ) : (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 12, overflowY: 'auto', paddingRight: 4 }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 10, overflowY: 'auto', paddingRight: 2 }}>
                 {alerts.map(a => {
-                  const th = alertTheme[a.type] ?? alertTheme.info;
+                  const th = alertBadgeTheme[a.type] ?? alertBadgeTheme.info;
                   return (
-                    <div key={a.id} style={{ display: 'flex', gap: 12, padding: '12px', background: 'var(--glass-bg-subtle)', borderRadius: 12, border: '1px solid var(--glass-bg-subtle)' }}>
-                      <div style={{ fontSize: 16, marginTop: 2 }}>{a.icon}</div>
-                      <div>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
-                          <span style={{ fontSize: 13, color: 'var(--text-primary)', fontWeight: 500 }}>{a.title}</span>
-                          <span style={{ fontSize: 10, color: 'var(--text-muted)' }}>{a.time}</span>
-                        </div>
-                        <div style={{ fontSize: 12, color: 'var(--text-secondary)', lineHeight: 1.4, marginBottom: 6 }}>{a.detail}</div>
-                        <div style={{ fontSize: 11, color: th.color, fontWeight: 500 }}>Action: {a.action}</div>
+                    <div key={a.id} style={{ display: 'flex', flexDirection: 'column', gap: 6, padding: '10px 12px', background: 'var(--glass-bg-subtle)', borderRadius: 10, border: '1px solid var(--card-border)' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                        <span style={{ fontSize: 10, fontWeight: 700, fontFamily: 'monospace', color: th.color, background: th.bg, padding: '2px 6px', borderRadius: 4 }}>
+                          {th.label}
+                        </span>
+                        <span style={{ fontSize: 10, color: 'var(--text-muted)' }}>{a.time}</span>
+                      </div>
+                      <div style={{ fontSize: 12.5, fontWeight: 600, color: 'var(--text-primary)' }}>{a.title}</div>
+                      <div style={{ fontSize: 11.5, color: 'var(--text-secondary)', lineHeight: 1.4 }}>{a.detail}</div>
+                      <div style={{ fontSize: 11, color: 'var(--accent-primary)', fontWeight: 500, borderTop: '1px solid var(--card-border)', paddingTop: 4, marginTop: 2 }}>
+                        Action: {a.action}
                       </div>
                     </div>
                   );
@@ -540,41 +608,45 @@ export default function DashboardPage({ orgProfile }: { orgProfile?: any }) {
             </Card>
           </div>
 
-          {/* Row 5: Strategic Goals */}
+          {/* Row 5: Strategic Milestones & Targets */}
           <div className="span-12" style={{ gridColumn: 'span 12' }}>
-            <Card delay={0.45} title="Strategic AI Goals">
+            <Card delay={0.45} title="Strategic Operational Milestones" subtitle="Target progression tracking with algorithmic gap analysis">
             {goalsLoading ? (
-              <div style={{ color: 'var(--text-secondary)', fontSize: 14 }}>Loading goals...</div>
+              <div style={{ color: 'var(--text-secondary)', fontSize: 13 }}>Loading targets...</div>
             ) : (
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: 24 }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 18 }}>
                 {goals.map(g => {
                   const pct = Math.round((g.current / g.target) * 100);
                   const fmt = (n: number) => g.unit === '$' ? `$${(n / 1000).toFixed(0)}K` : `${n.toLocaleString()}${g.unit}`;
                   return (
-                    <div key={g.id} style={{ background: 'var(--glass-bg-subtle)', padding: '20px', borderRadius: 16, border: '1px solid var(--glass-border-subtle)' }}>
-                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
+                    <div key={g.id} style={{ background: 'var(--glass-bg-subtle)', padding: '16px', borderRadius: 12, border: '1px solid var(--card-border)' }}>
+                      <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 12 }}>
                         <div>
-                          <div style={{ fontSize: 15, color: 'var(--text-primary)', fontWeight: 600, marginBottom: 4 }}>{g.label}</div>
-                          <div style={{ fontSize: 13, color: 'var(--text-secondary)' }}>{fmt(g.current)} / {fmt(g.target)}</div>
+                          <div style={{ fontSize: 13.5, color: 'var(--text-primary)', fontWeight: 600 }}>{g.label}</div>
+                          <div style={{ fontSize: 11.5, color: 'var(--text-muted)', marginTop: 2 }}>Current: {fmt(g.current)} · Target: {fmt(g.target)}</div>
                         </div>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
-                          <div style={{ fontSize: 20, fontFamily: 'var(--font-display)', fontWeight: 600, color: 'var(--text-primary)' }}>{pct}%</div>
+                        <div style={{ fontSize: 16, fontFamily: 'monospace', fontWeight: 700, color: pct >= 80 ? 'var(--success)' : 'var(--accent-primary)' }}>
+                          {pct}%
                         </div>
                       </div>
-                      <div style={{ height: 8, background: 'var(--glass-bg-hover)', borderRadius: 4, overflow: 'hidden', marginBottom: 16 }}>
-                        <div style={{ height: '100%', width: `${pct}%`, background: 'var(--accent-primary)', borderRadius: 4 }} />
+                      <div style={{ height: 6, background: 'var(--glass-bg-hover)', borderRadius: 3, overflow: 'hidden', marginBottom: 12 }}>
+                        <div style={{ height: '100%', width: `${pct}%`, background: 'var(--accent-primary)', borderRadius: 3 }} />
                       </div>
                       <button
                         onClick={() => handleGoalAction(g.id)}
                         disabled={goalLoading[g.id]}
-                        style={{ width: '100%', background: 'var(--card-bg)', border: '1px solid var(--glass-bg-hover)', borderRadius: 8, padding: '10px', color: 'var(--text-secondary)', fontSize: 13, fontWeight: 500, cursor: goalLoading[g.id] ? 'wait' : 'pointer', transition: 'all 0.2s' }}
-                        onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.background = 'rgba(249, 115, 22, 0.1)'; (e.currentTarget as HTMLButtonElement).style.color = 'var(--accent-primary)'; (e.currentTarget as HTMLButtonElement).style.borderColor = 'rgba(249, 115, 22, 0.2)'; }}
-                        onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.background = 'var(--card-bg)'; (e.currentTarget as HTMLButtonElement).style.color = 'var(--text-secondary)'; (e.currentTarget as HTMLButtonElement).style.borderColor = 'var(--glass-bg-hover)'; }}
+                        style={{
+                          width: '100%', background: 'transparent', border: '1px solid var(--card-border)', borderRadius: 6,
+                          padding: '6px 10px', color: 'var(--text-secondary)', fontSize: 11.5, fontWeight: 500,
+                          cursor: goalLoading[g.id] ? 'wait' : 'pointer', transition: 'all 0.2s'
+                        }}
+                        onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.borderColor = 'var(--accent-primary)'; (e.currentTarget as HTMLButtonElement).style.color = 'var(--accent-primary)'; }}
+                        onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.borderColor = 'var(--card-border)'; (e.currentTarget as HTMLButtonElement).style.color = 'var(--text-secondary)'; }}
                       >
-                        {goalLoading[g.id] ? '...' : goalAdvice[g.id] ? 'Hide Advice' : 'Ask AI for Advice'}
+                        {goalLoading[g.id] ? 'Synthesizing...' : goalAdvice[g.id] ? 'Hide Strategy Recommendation' : 'Run Gap Analysis'}
                       </button>
                       {goalAdvice[g.id] && (
-                        <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} style={{ marginTop: 12, padding: '12px 16px', background: 'rgba(249, 115, 22, 0.05)', border: '1px solid rgba(249, 115, 22, 0.1)', borderRadius: 8, fontSize: 13, color: 'var(--text-primary)', lineHeight: 1.5 }}>
+                        <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} style={{ marginTop: 10, padding: '10px 12px', background: 'rgba(249, 115, 22, 0.05)', border: '1px solid rgba(249, 115, 22, 0.15)', borderRadius: 6, fontSize: 12, color: 'var(--text-primary)', lineHeight: 1.5 }}>
                           {goalAdvice[g.id]}
                         </motion.div>
                       )}
