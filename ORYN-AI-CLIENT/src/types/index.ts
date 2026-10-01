@@ -40,6 +40,15 @@ export interface Message {
   timestamp: Date;
   attachedFiles?: { name: string; url?: string; isImage: boolean }[];
   tasks?: string[];
+  emailDraft?: {
+    id: string;
+    to: string;
+    subject: string;
+    body: string;
+    status: 'awaiting_approval' | 'sent' | 'failed';
+    error?: string;
+    messageId?: string;
+  };
 }
 
 export interface Task {
