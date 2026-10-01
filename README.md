@@ -79,6 +79,37 @@ flowchart TD
 
 > **Runtime Execution Flow:** Client telemetry and queries stream through the server's Server-Sent Events (SSE) gateway. Requests requiring code compilation are compiled in-browser via Babel Standalone, while strategic and multimodal requests are load-balanced to NVIDIA NIM inference models.
 
+### 🏛️ Backend Domain Architecture
+
+```mermaid
+flowchart TD
+    Client["ORYN Client (React / Vite / WebGL)"]
+    API["API Layer (Express App / Security / Request Tracing / Error Handling)"]
+    Modules["Application Modules (Chat / Analysis / Dashboard / Email / Download / Health)"]
+    Domain["Inference / Domain Logic (Model Router / Provider Interface / Strategies)"]
+    Infra["Infrastructure (SSE Streaming / Multi-Part Storage / Structured Logger)"]
+    Providers["External Providers (NVIDIA NIM / Pollinations AI / SMTP Gateway)"]
+
+    Client --> API
+    API --> Modules
+    Modules --> Domain
+    Modules --> Infra
+    Domain --> Providers
+    Infra --> Providers
+```
+
+#### Major Module Responsibilities
+- **`app`**: Express lifecycle configuration, CORS configuration, request ID tracing, centralized error interceptor, and root route registration.
+- **`config`**: Environment variable validation (`env.ts`) and AI model configuration registry (`ai.config.ts`).
+- **`infrastructure`**: SSE stream lifecycle management (`sse.ts`, `stream-manager.ts`), file upload storage abstractions (`upload.ts`), and structured JSON logging (`logger.ts`).
+- **`modules/chat`**: Conversational orchestration, streaming SSE responses, command detection, and LLM inference invocation.
+- **`modules/analysis`**: Multimodal text and image forensic extraction, document structure parsing, and executive synthesis.
+- **`modules/dashboard`**: Executive KPI analytics, proactive anomaly alerts, strategic briefings, and OKR goals management.
+- **`modules/email`**: Human-in-the-loop action staging and SMTP mail dispatch.
+- **`modules/download`**: Secure binary asset proxy and download streaming.
+- **`modules/inference`**: Decoupled AI provider interface, NVIDIA NIM provider, Pollinations fallback provider, and dynamic routing/fallback strategies.
+- **`shared`**: Standardized domain exceptions (`AppError`, `ValidationError`, `ProviderError`), status codes, and input validation schemas.
+
 ---
 
 ## ⚡ Core Capabilities
