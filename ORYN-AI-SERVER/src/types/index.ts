@@ -1,44 +1,11 @@
-export interface ChatMessage {
-  role: 'user' | 'assistant';
-  content: string;
-}
+export * from '../shared/types/common';
+export * from '../modules/chat/chat.types';
+export * from '../modules/dashboard/dashboard.types';
+export * from '../modules/email/email.types';
+export * from '../modules/analysis/analysis.types';
+export * from '../modules/inference/inference.types';
 
-export interface ChatRequestBody {
-  messages: ChatMessage[];
-  webSearch?: boolean;
-  taskExtract?: boolean;
-  model?: string;
-  language?: string;
-}
-
-export interface DashboardCommandBody {
-  query: string;
-  context?: string;
-}
-
-export interface EmailRequestBody {
-  to: string | string[];
-  subject?: string;
-  body?: string;
-  message?: string;
-  content?: string;
-}
-
-export interface AlertItem {
-  id: string;
-  type: 'warning' | 'opportunity' | 'info' | 'critical';
-  icon: string;
-  title: string;
-  detail: string;
-  action: string;
-  time: string;
-}
-
-export interface GoalItem {
-  id: string;
-  label: string;
-  target: number;
-  current: number;
-  unit: string;
-  color: string;
-}
+// Backward compatibility aliases
+export type ChatRequestBody = import('../modules/chat/chat.types').ChatRequestDto;
+export type DashboardCommandBody = import('../modules/dashboard/dashboard.schemas').DashboardCommandDto;
+export type EmailRequestBody = import('../modules/email/email.types').EmailRequestDto;
