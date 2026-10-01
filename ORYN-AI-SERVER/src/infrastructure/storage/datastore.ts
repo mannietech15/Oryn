@@ -1,0 +1,490 @@
+import fs from 'fs';
+import path from 'path';
+import { Logger } from '../logging/logger';
+
+const logger = new Logger('Datastore');
+
+export interface FinancialEntryRecord {
+  id: string;
+  type: 'revenue' | 'expense';
+  category: string;
+  amount: number;
+  date: string;
+  note: string;
+  createdAt: string;
+}
+
+export interface AiTaskRecord {
+  id: string;
+  type: 'chat' | 'analysis' | 'command' | 'automation';
+  model: string;
+  latencyMs: number;
+  tokensUsed: number;
+  status: 'success' | 'failure';
+  timestamp: string;
+}
+
+export interface WorkflowRecord {
+  id: string;
+  name: string;
+  description: string;
+  status: 'active' | 'paused' | 'disabled';
+  trigger: string;
+  steps: string[];
+  createdAt: string;
+  lastRunAt: string | null;
+  nextRunAt: string | null;
+  runCount: number;
+  successCount: number;
+  failureCount: number;
+}
+
+export interface WorkflowExecutionLogRecord {
+  id: string;
+  workflowId: string;
+  workflowName: string;
+  trigger: string;
+  durationMs: number;
+  status: 'success' | 'failure' | 'running';
+  executedAt: string;
+  stepsCompleted: number;
+  totalSteps: number;
+  error: string | null;
+}
+
+export interface DocumentRecord {
+  id: string;
+  name: string;
+  type: string;
+  size: string;
+  date: string;
+  tags: string[];
+  aiSummary: string;
+}
+
+export interface EmailLogRecord {
+  id: string;
+  to: string;
+  subject: string;
+  body: string;
+  status: 'draft' | 'awaiting_approval' | 'sent' | 'failed';
+  messageId: string | null;
+  error: string | null;
+  createdAt: string;
+  sentAt: string | null;
+}
+
+export interface CompanyRecord {
+  name: string;
+  industry: string;
+  foundedDate: string;
+  location: string;
+}
+
+export interface EmployeeRecord {
+  id: string;
+  name: string;
+  role: string;
+  email: string;
+  status: string;
+  joinedDate: string;
+}
+
+export interface TeamRecord {
+  id: string;
+  name: string;
+  description: string;
+}
+
+export interface OrganizationRecord {
+  company: CompanyRecord;
+  employees: EmployeeRecord[];
+  teams: TeamRecord[];
+}
+
+export interface DatabaseSchema {
+  financialEntries: FinancialEntryRecord[];
+  aiTaskLogs: AiTaskRecord[];
+  workflows: WorkflowRecord[];
+  workflowExecutionLogs: WorkflowExecutionLogRecord[];
+  documents: DocumentRecord[];
+  emailLogs: EmailLogRecord[];
+  organization: OrganizationRecord;
+}
+
+export class Datastore {
+  private dbPath: string;
+  private cache: DatabaseSchema | null = null;
+
+  constructor(customPath?: string) {
+    this.dbPath = customPath || path.resolve(__dirname, '../../../data/oryn-db.json');
+    this.ensureDatabase();
+  }
+
+  private getDefaultData(): DatabaseSchema {
+    return {
+      financialEntries: [
+        { id: 'f-1', type: 'revenue', category: 'Enterprise Subscriptions', amount: 84200, date: new Date(Date.now() - 86400000 * 5).toISOString().split('T')[0], note: 'Monthly Stripe recurring subscription tranche', createdAt: new Date(Date.now() - 86400000 * 5).toISOString() },
+        { id: 'f-2', type: 'revenue', category: 'API Usage & Tokens', amount: 40620, date: new Date(Date.now() - 86400000 * 3).toISOString().split('T')[0], note: 'Metered token consumption overages', createdAt: new Date(Date.now() - 86400000 * 3).toISOString() },
+        { id: 'f-3', type: 'expense', category: 'Cloud Infrastructure & GPU', amount: 18450, date: new Date(Date.now() - 86400000 * 7).toISOString().split('T')[0], note: 'NVIDIA NIM compute cluster & AWS relays', createdAt: new Date(Date.now() - 86400000 * 7).toISOString() },
+        { id: 'f-4', type: 'expense', category: 'Operational Engineering', amount: 12200, date: new Date(Date.now() - 86400000 * 12).toISOString().split('T')[0], note: 'Observability & third-party API licensing', createdAt: new Date(Date.now() - 86400000 * 12).toISOString() },
+      ],
+      aiTaskLogs: [
+        { id: 'task-init-1', type: 'chat', model: 'meta/llama-3.2-11b-vision-instruct', latencyMs: 245, tokensUsed: 420, status: 'success', timestamp: new Date(Date.now() - 600000).toISOString() },
+        { id: 'task-init-2', type: 'analysis', model: 'meta/llama-3.2-90b-vision-instruct', latencyMs: 512, tokensUsed: 890, status: 'success', timestamp: new Date(Date.now() - 300000).toISOString() },
+        { id: 'task-init-3', type: 'command', model: 'meta/llama-3.2-11b-vision-instruct', latencyMs: 182, tokensUsed: 210, status: 'success', timestamp: new Date(Date.now() - 60000).toISOString() }
+      ],
+      workflows: [
+        {
+          id: 'wf-1',
+          name: 'Weekly Executive Revenue Briefing',
+          description: 'Aggregates Stripe transactions, runs inference synthesis with Llama 3.2, and dispatches an executive brief.',
+          status: 'active',
+          trigger: 'Every Friday at 17:00 UTC',
+          steps: ['Stripe Ingestion', 'Inference Synthesis', 'Executive Report', 'SMTP Relay'],
+          createdAt: new Date(Date.now() - 86400000 * 30).toISOString(),
+          lastRunAt: new Date(Date.now() - 86400000 * 6).toISOString(),
+          nextRunAt: new Date(Date.now() + 86400000 * 1).toISOString(),
+          runCount: 24,
+          successCount: 24,
+          failureCount: 0
+        },
+        {
+          id: 'wf-2',
+          name: 'Stripe Churn Risk Detection & Escrow',
+          description: 'Monitors recurring subscription webhooks for failure signals and drafts retention actions.',
+          status: 'active',
+          trigger: 'Webhook Event: invoice.payment_failed',
+          steps: ['Webhook Listener', 'Account Health Check', 'Draft Retention Action', 'Admin Notification'],
+          createdAt: new Date(Date.now() - 86400000 * 20).toISOString(),
+          lastRunAt: new Date(Date.now() - 3600000 * 4).toISOString(),
+          nextRunAt: null,
+          runCount: 142,
+          successCount: 140,
+          failureCount: 2
+        },
+        {
+          id: 'wf-3',
+          name: 'High Latency Anomaly Alerting',
+          description: 'Samples inference gateway latency metrics every 5 minutes and flags telemetry drift.',
+          status: 'active',
+          trigger: 'Cron: */5 * * * *',
+          steps: ['Gateway Probe', 'Statistical Variance Check', 'PagerDuty Dispatch'],
+          createdAt: new Date(Date.now() - 86400000 * 15).toISOString(),
+          lastRunAt: new Date(Date.now() - 180000).toISOString(),
+          nextRunAt: new Date(Date.now() + 120000).toISOString(),
+          runCount: 1120,
+          successCount: 1118,
+          failureCount: 2
+        }
+      ],
+      workflowExecutionLogs: [
+        {
+          id: 'exec-1',
+          workflowId: 'wf-1',
+          workflowName: 'Weekly Executive Revenue Briefing',
+          trigger: 'Cron Schedule (17:00 UTC)',
+          durationMs: 420,
+          status: 'success',
+          executedAt: new Date(Date.now() - 86400000 * 6).toISOString(),
+          stepsCompleted: 4,
+          totalSteps: 4,
+          error: null
+        },
+        {
+          id: 'exec-2',
+          workflowId: 'wf-2',
+          workflowName: 'Stripe Churn Risk Detection & Escrow',
+          trigger: 'Webhook invoice.payment_failed',
+          durationMs: 184,
+          status: 'success',
+          executedAt: new Date(Date.now() - 3600000 * 4).toISOString(),
+          stepsCompleted: 4,
+          totalSteps: 4,
+          error: null
+        },
+        {
+          id: 'exec-3',
+          workflowId: 'wf-3',
+          workflowName: 'High Latency Anomaly Alerting',
+          trigger: 'Cron */5 * * * *',
+          durationMs: 95,
+          status: 'success',
+          executedAt: new Date(Date.now() - 180000).toISOString(),
+          stepsCompleted: 3,
+          totalSteps: 3,
+          error: null
+        }
+      ],
+      documents: [
+        {
+          id: 'doc-1',
+          name: 'Q3_Financial_Performance.pdf',
+          type: 'PDF',
+          size: '2.4 MB',
+          date: new Date(Date.now() - 86400000 * 2).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
+          tags: ['Finance', 'Ledger'],
+          aiSummary: 'Fiscal overview confirming $124.8K revenue baseline with strong recurring expansion across enterprise contracts.'
+        }
+      ],
+      emailLogs: [],
+      organization: {
+        company: {
+          name: 'Oryn AI Corp',
+          industry: 'Enterprise AI & Workflow Systems',
+          foundedDate: '2025-01-15',
+          location: 'San Francisco, CA'
+        },
+        employees: [
+          { id: 'emp-1', name: 'Alex Chen', role: 'Principal Architect', email: 'alex@oryn.ai', status: 'active', joinedDate: '2025-01-20' },
+          { id: 'emp-2', name: 'Jordan Lee', role: 'Staff Systems Engineer', email: 'jordan@oryn.ai', status: 'active', joinedDate: '2025-02-01' },
+          { id: 'emp-3', name: 'Sarah Miller', role: 'Operations Lead', email: 'sarah@oryn.ai', status: 'active', joinedDate: '2025-02-15' },
+        ],
+        teams: [
+          { id: 't1', name: 'Inference & Core Engineering', description: 'Core LLM routing, latency optimization, and streaming infrastructure.' },
+          { id: 't2', name: 'Enterprise Workflow Systems', description: 'Background job queues, event webhooks, and third-party integrations.' },
+        ]
+      }
+    };
+  }
+
+  private ensureDatabase(): void {
+    try {
+      const dir = path.dirname(this.dbPath);
+      if (!fs.existsSync(dir)) {
+        fs.mkdirSync(dir, { recursive: true });
+      }
+
+      if (!fs.existsSync(this.dbPath)) {
+        const defaultData = this.getDefaultData();
+        fs.writeFileSync(this.dbPath, JSON.stringify(defaultData, null, 2), 'utf-8');
+        this.cache = defaultData;
+        logger.info('Initialized local persistent database', { path: this.dbPath });
+      } else {
+        const raw = fs.readFileSync(this.dbPath, 'utf-8');
+        this.cache = JSON.parse(raw);
+        logger.info('Loaded persistent database', { path: this.dbPath });
+      }
+    } catch (err: any) {
+      logger.error('Failed to initialize database, falling back to memory', { error: err.message });
+      this.cache = this.getDefaultData();
+    }
+  }
+
+  private save(): void {
+    if (!this.cache) return;
+    try {
+      const tempPath = `${this.dbPath}.tmp`;
+      fs.writeFileSync(tempPath, JSON.stringify(this.cache, null, 2), 'utf-8');
+      fs.renameSync(tempPath, this.dbPath);
+    } catch (err: any) {
+      logger.error('Failed to persist database to disk', { error: err.message });
+    }
+  }
+
+  // --- Financial Ledger ---
+  getFinancialEntries(): FinancialEntryRecord[] {
+    return this.cache?.financialEntries || [];
+  }
+
+  addFinancialEntry(entry: Omit<FinancialEntryRecord, 'id' | 'createdAt'>): FinancialEntryRecord {
+    const newRecord: FinancialEntryRecord = {
+      ...entry,
+      id: `f-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
+      createdAt: new Date().toISOString()
+    };
+    if (!this.cache) this.cache = this.getDefaultData();
+    this.cache.financialEntries.unshift(newRecord);
+    this.save();
+    return newRecord;
+  }
+
+  getFinancialMetrics() {
+    const entries = this.getFinancialEntries();
+    let totalRevenue = 0;
+    let totalExpenses = 0;
+
+    for (const e of entries) {
+      if (e.type === 'revenue') totalRevenue += e.amount;
+      else totalExpenses += e.amount;
+    }
+
+    const netProfit = totalRevenue - totalExpenses;
+    const margin = totalRevenue > 0 ? (netProfit / totalRevenue) * 100 : 0;
+
+    return {
+      totalRevenue,
+      totalExpenses,
+      netProfit,
+      margin: Number(margin.toFixed(1)),
+      entryCount: entries.length,
+      lastUpdated: entries.length > 0 ? entries[0].createdAt : null
+    };
+  }
+
+  // --- AI Task Ingestion Telemetry ---
+  logTask(task: Omit<AiTaskRecord, 'id' | 'timestamp'>): AiTaskRecord {
+    const record: AiTaskRecord = {
+      ...task,
+      id: `task-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
+      timestamp: new Date().toISOString()
+    };
+    if (!this.cache) this.cache = this.getDefaultData();
+    this.cache.aiTaskLogs.unshift(record);
+    if (this.cache.aiTaskLogs.length > 500) {
+      this.cache.aiTaskLogs = this.cache.aiTaskLogs.slice(0, 500);
+    }
+    this.save();
+    return record;
+  }
+
+  getTaskLogs(limit: number = 50): AiTaskRecord[] {
+    return (this.cache?.aiTaskLogs || []).slice(0, limit);
+  }
+
+  getTaskMetrics() {
+    const logs = this.cache?.aiTaskLogs || [];
+    const totalCount = logs.length;
+    const successCount = logs.filter(l => l.status === 'success').length;
+    const avgLatency = totalCount > 0
+      ? Math.round(logs.reduce((acc, l) => acc + l.latencyMs, 0) / totalCount)
+      : 0;
+    const totalTokens = logs.reduce((acc, l) => acc + l.tokensUsed, 0);
+
+    return {
+      totalCount,
+      successCount,
+      successRate: totalCount > 0 ? Number(((successCount / totalCount) * 100).toFixed(1)) : 100,
+      avgLatencyMs: avgLatency,
+      totalTokens,
+      lastTaskAt: logs.length > 0 ? logs[0].timestamp : null
+    };
+  }
+
+  // --- Workflows ---
+  getWorkflows(): WorkflowRecord[] {
+    return this.cache?.workflows || [];
+  }
+
+  getWorkflow(id: string): WorkflowRecord | undefined {
+    return this.cache?.workflows.find(w => w.id === id);
+  }
+
+  updateWorkflow(id: string, patch: Partial<WorkflowRecord>): WorkflowRecord | null {
+    if (!this.cache) return null;
+    const idx = this.cache.workflows.findIndex(w => w.id === id);
+    if (idx === -1) return null;
+    this.cache.workflows[idx] = { ...this.cache.workflows[idx], ...patch };
+    this.save();
+    return this.cache.workflows[idx];
+  }
+
+  logWorkflowExecution(log: Omit<WorkflowExecutionLogRecord, 'id' | 'executedAt'>): WorkflowExecutionLogRecord {
+    const record: WorkflowExecutionLogRecord = {
+      ...log,
+      id: `exec-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
+      executedAt: new Date().toISOString()
+    };
+    if (!this.cache) this.cache = this.getDefaultData();
+    this.cache.workflowExecutionLogs.unshift(record);
+    if (this.cache.workflowExecutionLogs.length > 200) {
+      this.cache.workflowExecutionLogs = this.cache.workflowExecutionLogs.slice(0, 200);
+    }
+
+    // Update workflow stats
+    const wf = this.cache.workflows.find(w => w.id === log.workflowId);
+    if (wf) {
+      wf.runCount += 1;
+      wf.lastRunAt = record.executedAt;
+      if (log.status === 'success') wf.successCount += 1;
+      else wf.failureCount += 1;
+    }
+
+    this.save();
+    return record;
+  }
+
+  getWorkflowExecutionLogs(limit: number = 30): WorkflowExecutionLogRecord[] {
+    return (this.cache?.workflowExecutionLogs || []).slice(0, limit);
+  }
+
+  getWorkflowStats() {
+    const workflows = this.getWorkflows();
+    const activeCount = workflows.filter(w => w.status === 'active').length;
+    const logs = this.getWorkflowExecutionLogs(100);
+    const totalExecutions = workflows.reduce((acc, w) => acc + w.runCount, 0);
+    const totalSuccess = workflows.reduce((acc, w) => acc + w.successCount, 0);
+    const successRate = totalExecutions > 0 ? Number(((totalSuccess / totalExecutions) * 100).toFixed(1)) : 100;
+
+    return {
+      totalWorkflows: workflows.length,
+      activeWorkflows: activeCount,
+      totalExecutions,
+      successRate,
+      recentLogsCount: logs.length
+    };
+  }
+
+  // --- Documents ---
+  getDocuments(): DocumentRecord[] {
+    return this.cache?.documents || [];
+  }
+
+  addDocument(doc: Omit<DocumentRecord, 'id' | 'date'>): DocumentRecord {
+    const record: DocumentRecord = {
+      ...doc,
+      id: `doc-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
+      date: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+    };
+    if (!this.cache) this.cache = this.getDefaultData();
+    this.cache.documents.unshift(record);
+    this.save();
+    return record;
+  }
+
+  // --- Email Logs (Human in the loop) ---
+  stageEmailDraft(to: string, subject: string, body: string): EmailLogRecord {
+    const record: EmailLogRecord = {
+      id: `draft-${Date.now()}`,
+      to,
+      subject,
+      body,
+      status: 'awaiting_approval',
+      messageId: null,
+      error: null,
+      createdAt: new Date().toISOString(),
+      sentAt: null
+    };
+    if (!this.cache) this.cache = this.getDefaultData();
+    this.cache.emailLogs.unshift(record);
+    this.save();
+    return record;
+  }
+
+  updateEmailRecord(id: string, patch: Partial<EmailLogRecord>): EmailLogRecord | null {
+    if (!this.cache) return null;
+    const item = this.cache.emailLogs.find(e => e.id === id);
+    if (!item) return null;
+    Object.assign(item, patch);
+    this.save();
+    return item;
+  }
+
+  getEmailLogs(limit: number = 20): EmailLogRecord[] {
+    return (this.cache?.emailLogs || []).slice(0, limit);
+  }
+
+  // --- Organization ---
+  getOrganization(): OrganizationRecord {
+    return this.cache?.organization || this.getDefaultData().organization;
+  }
+
+  updateOrganization(org: Partial<OrganizationRecord>): OrganizationRecord {
+    if (!this.cache) this.cache = this.getDefaultData();
+    this.cache.organization = { ...this.cache.organization, ...org };
+    this.save();
+    return this.cache.organization;
+  }
+}
+
+export const defaultDatastore = new Datastore();
