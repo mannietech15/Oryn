@@ -1,49 +1,101 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 
 type AutomationStatus = 'active' | 'paused' | 'draft';
+
+interface PipelineStep {
+  name: string;
+  type: string;
+  source: string;
+}
 
 interface Automation {
   id: string;
   name: string;
   description: string;
-  trigger: { icon: string; name: string };
-  action: { icon: string; name: string };
+  trigger: { type: string; detail: string; schedule: string };
+  steps: PipelineStep[];
   status: AutomationStatus;
   runs: number;
+  successRate: string;
+  lastRun: { time: string; status: 'success' | 'failed' | 'running'; duration: string };
+  nextRun: string;
 }
 
-const mockAutomations: Automation[] = [
+interface ExecutionLog {
+  id: string;
+  workflow: string;
+  timestamp: string;
+  status: 'success' | 'failed';
+  code: string;
+  duration: string;
+}
+
+const operationalAutomations: Automation[] = [
   {
     id: '1',
-    name: 'Weekly Sales Report',
-    description: 'Summarizes Stripe data and emails the executive team every Friday at 5 PM.',
-    trigger: { icon: '📅', name: 'Schedule (Friday 5PM)' },
-    action: { icon: '📧', name: 'Draft & Send Email' },
+    name: 'Weekly Executive Sales Synthesis',
+    description: 'Ingests trailing 7-day Stripe billing volume, analyzes cohort expansion, and dispatches an executive summary via Custom SMTP.',
+    trigger: { type: 'SCHEDULE', detail: 'CRON: 0 17 * * 5', schedule: 'Every Friday at 17:00 UTC' },
+    steps: [
+      { name: 'Stripe Billing', type: 'Ingress', source: 'Stripe Gateway' },
+      { name: 'Cohort Analysis', type: 'LLM Reasoning', source: 'NVIDIA Llama 3.2' },
+      { name: 'HTML Report Generation', type: 'Synthesis', source: 'Report Engine' },
+      { name: 'Mail Dispatch', type: 'Action', source: 'Custom SMTP Transport' },
+    ],
     status: 'active',
-    runs: 24
+    runs: 24,
+    successRate: '100%',
+    lastRun: { time: 'Sep 25, 17:00:03 UTC', status: 'success', duration: '184ms' },
+    nextRun: 'Oct 2, 17:00:00 UTC',
   },
   {
     id: '2',
-    name: 'New Lead Enrichment',
-    description: 'Triggers when a new lead is added in CRM, uses AI to research their company, and updates the record.',
-    trigger: { icon: '🎯', name: 'CRM Webhook' },
-    action: { icon: '🧠', name: 'Oryn AI Research' },
+    name: 'Inbound Lead Enrichment & Scoring',
+    description: 'Triggers on CRM lead creation webhook, verifies company registry records via semantic search, and updates lead score.',
+    trigger: { type: 'WEBHOOK', detail: 'POST /api/webhooks/crm/leads', schedule: 'Real-time Event Ingress' },
+    steps: [
+      { name: 'CRM Webhook', type: 'Event Ingest', source: 'HubSpot / CRM' },
+      { name: 'Market Intelligence', type: 'Enrichment', source: 'Search Index' },
+      { name: 'ICP Fit Evaluation', type: 'Score Matrix', source: 'ORYN Rule Engine' },
+      { name: 'Record Update', type: 'Action', source: 'CRM Ingress API' },
+    ],
     status: 'active',
-    runs: 142
+    runs: 142,
+    successRate: '99.3%',
+    lastRun: { time: 'Today, 14:18:22 UTC', status: 'success', duration: '312ms' },
+    nextRun: 'Awaiting webhook ingress',
   },
   {
     id: '3',
-    name: 'Support Ticket Escalation',
-    description: 'Analyzes incoming Zendesk tickets for negative sentiment and alerts the Slack channel.',
-    trigger: { icon: '🎫', name: 'New Ticket' },
-    action: { icon: '💬', name: 'Slack Notification' },
+    name: 'Support Ticket Sentiment Escalation',
+    description: 'Inspects incoming Zendesk tickets for negative sentiment patterns (>0.75 score) and immediately notifies the #urgent-support Slack channel.',
+    trigger: { type: 'WEBHOOK', detail: 'POST /api/webhooks/support/tickets', schedule: 'Real-time Event Ingress' },
+    steps: [
+      { name: 'Ticket Webhook', type: 'Event Ingest', source: 'Zendesk Gateway' },
+      { name: 'Sentiment Extraction', type: 'Analysis', source: 'NVIDIA NIM Fast Tier' },
+      { name: 'Threshold Evaluation', type: 'Logic Gate', source: 'Rule Engine' },
+      { name: 'Slack Alert', type: 'Notification', source: 'Slack Webhook' },
+    ],
     status: 'paused',
-    runs: 89
-  }
+    runs: 89,
+    successRate: '98.8%',
+    lastRun: { time: 'Sep 28, 09:12:10 UTC', status: 'success', duration: '240ms' },
+    nextRun: 'Paused by operator',
+  },
+];
+
+const sampleExecutionLogs: ExecutionLog[] = [
+  { id: 'exec_7f8a91b', workflow: 'Inbound Lead Enrichment & Scoring', timestamp: '14:18:22 UTC', status: 'success', code: '200 OK', duration: '312ms' },
+  { id: 'exec_3d1e29c', workflow: 'Inbound Lead Enrichment & Scoring', timestamp: '13:05:44 UTC', status: 'success', code: '200 OK', duration: '280ms' },
+  { id: 'exec_9b4e72a', workflow: 'Weekly Executive Sales Synthesis', timestamp: 'Sep 25 17:00:03', status: 'success', code: '250 Mail Sent', duration: '184ms' },
+  { id: 'exec_1a8c45f', workflow: 'Support Ticket Sentiment Escalation', timestamp: 'Sep 28 09:12:10', status: 'success', code: '200 OK', duration: '240ms' },
+  { id: 'exec_6c3b88e', workflow: 'Support Ticket Sentiment Escalation', timestamp: 'Sep 28 08:44:19', status: 'failed', code: '504 Timeout', duration: '5002ms' },
 ];
 
 export default function AutomationPage() {
-  const [automations, setAutomations] = useState<Automation[]>(mockAutomations);
+  const [automations, setAutomations] = useState<Automation[]>(operationalAutomations);
+  const [statusFilter, setStatusFilter] = useState<'all' | 'active' | 'paused'>('all');
+  const [selectedLogs, setSelectedLogs] = useState(false);
 
   const toggleStatus = (id: string) => {
     setAutomations(prev => prev.map(a => {
@@ -54,172 +106,254 @@ export default function AutomationPage() {
     }));
   };
 
+  const filteredAutomations = automations.filter(a => {
+    if (statusFilter === 'all') return true;
+    return a.status === statusFilter;
+  });
+
   return (
     <div style={{ flex: 1, display: 'flex', flexDirection: 'column', height: '100%', overflow: 'hidden', background: 'transparent' }}>
       
-      {/* Header */}
-      <div style={{ padding: '40px 48px 24px', borderBottom: '1px solid var(--card-border)', flexShrink: 0 }}>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8, flexWrap: 'wrap', gap: 16 }}>
-          <div style={{ display: 'flex', alignItems: 'flex-end', gap: 12 }}>
-            <h1 style={{ fontFamily: 'var(--font-display)', fontSize: 32, fontWeight: 800, margin: 0, color: 'var(--text-primary)', letterSpacing: '-0.5px' }}>
-              Workflow
+      {/* Engine Status Header */}
+      <div style={{ padding: '36px 40px 20px', borderBottom: '1px solid var(--card-border)', flexShrink: 0 }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12, flexWrap: 'wrap', gap: 16 }}>
+          <div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 6 }}>
+              <div style={{
+                display: 'inline-flex', alignItems: 'center', gap: 6,
+                padding: '3px 10px', borderRadius: 6,
+                background: 'rgba(34, 197, 94, 0.08)', border: '1px solid rgba(34, 197, 94, 0.2)',
+                fontSize: 11, fontWeight: 600, color: 'var(--success)', fontFamily: 'monospace'
+              }}>
+                <span style={{ width: 6, height: 6, borderRadius: '50%', background: 'var(--success)', display: 'inline-block' }} />
+                WORKFLOW RUNNER DAEMON: ONLINE
+              </div>
+              <div style={{ fontSize: 11, color: 'var(--text-muted)', fontFamily: 'monospace' }}>
+                QUEUE LATENCY: 12ms · CONCURRENT WORKERS: 4
+              </div>
+            </div>
+            <h1 style={{ fontFamily: 'var(--font-display)', fontSize: 26, fontWeight: 700, margin: 0, color: 'var(--text-primary)', letterSpacing: '-0.5px' }}>
+              Workflow Automation Engine
             </h1>
-            <span style={{ fontFamily: 'var(--font-script)', fontSize: 36, color: 'var(--accent-primary)', lineHeight: 0.8, transform: 'translateY(-4px)' }}>
-              Automations
-            </span>
+            <p style={{ color: 'var(--text-secondary)', fontSize: 13.5, margin: '4px 0 0 0' }}>
+              Event-driven pipeline orchestration, automated data enrichment, and guardrailed action execution.
+            </p>
           </div>
-          <button style={{ 
-            padding: '10px 20px', background: 'var(--text-primary)', color: 'var(--bg)', 
-            border: 'none', borderRadius: 8, fontWeight: 600, fontSize: 13, cursor: 'pointer', 
-            display: 'flex', alignItems: 'center', gap: 8, transition: 'all 0.2s', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' 
-          }} onMouseEnter={e => e.currentTarget.style.transform = 'translateY(-2px)'} onMouseLeave={e => e.currentTarget.style.transform = 'translateY(0)'}>
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-            Create Automation
-          </button>
+
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+            <button 
+              onClick={() => setSelectedLogs(!selectedLogs)}
+              style={{
+                padding: '8px 16px', background: selectedLogs ? 'rgba(249, 115, 22, 0.1)' : 'var(--card-bg)',
+                border: `1px solid ${selectedLogs ? 'var(--accent-primary)' : 'var(--card-border)'}`,
+                color: selectedLogs ? 'var(--accent-primary)' : 'var(--text-primary)',
+                borderRadius: 8, fontSize: 12.5, fontWeight: 500, cursor: 'pointer', transition: 'all 0.2s'
+              }}
+            >
+              {selectedLogs ? 'Hide Execution Logs' : 'View Execution Logs (5)'}
+            </button>
+            <button style={{ 
+              padding: '8px 18px', background: 'var(--accent-primary)', color: '#fff', 
+              border: 'none', borderRadius: 8, fontWeight: 600, fontSize: 12.5, cursor: 'pointer', 
+              display: 'flex', alignItems: 'center', gap: 6
+            }}>
+              + Create Workflow
+            </button>
+          </div>
         </div>
-        <p style={{ color: 'var(--text-secondary)', fontSize: 14, margin: 0 }}>
-          Connect your tools and let Oryn handle repetitive tasks intelligently.
-        </p>
+
+        {/* Engine Telemetry Strip */}
+        <div style={{ display: 'flex', gap: 24, marginTop: 12, borderTop: '1px solid var(--card-border)', paddingTop: 12, flexWrap: 'wrap' }}>
+          <div style={{ display: 'flex', gap: 6, fontSize: 12 }}>
+            <span style={{ color: 'var(--text-muted)' }}>Configured Pipelines:</span>
+            <strong style={{ color: 'var(--text-primary)' }}>{automations.length}</strong>
+          </div>
+          <div style={{ display: 'flex', gap: 6, fontSize: 12 }}>
+            <span style={{ color: 'var(--text-muted)' }}>Active Runners:</span>
+            <strong style={{ color: 'var(--success)' }}>{automations.filter(a => a.status === 'active').length}</strong>
+          </div>
+          <div style={{ display: 'flex', gap: 6, fontSize: 12 }}>
+            <span style={{ color: 'var(--text-muted)' }}>Total Executions (MTD):</span>
+            <strong style={{ color: 'var(--text-primary)', fontFamily: 'monospace' }}>255</strong>
+          </div>
+          <div style={{ display: 'flex', gap: 6, fontSize: 12 }}>
+            <span style={{ color: 'var(--text-muted)' }}>Overall Success Rate:</span>
+            <strong style={{ color: 'var(--success)', fontFamily: 'monospace' }}>99.3%</strong>
+          </div>
+        </div>
       </div>
 
-      {/* Content Area */}
-      <div style={{ flex: 1, overflowY: 'auto', padding: '40px 48px' }}>
-        <div style={{ maxWidth: 1000, margin: '0 auto' }}>
+      {/* Main Content Area */}
+      <div style={{ flex: 1, overflowY: 'auto', padding: '28px 40px' }}>
+        <div style={{ maxWidth: 1100, margin: '0 auto', display: 'flex', flexDirection: 'column', gap: 20 }}>
           
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 24 }}>
-            <h2 style={{ fontSize: 18, fontWeight: 700, color: 'var(--text-primary)', margin: 0 }}>Active Workflows</h2>
+          {/* Filter Bar */}
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: 0.5, fontFamily: 'monospace' }}>
+              REGISTERED WORKFLOW PIPELINES
+            </div>
             <div style={{ display: 'flex', gap: 8 }}>
-              <select style={{ padding: '6px 12px', background: 'var(--glass-bg-subtle)', color: 'var(--text-primary)', border: '1px solid var(--card-border)', borderRadius: 8, outline: 'none', fontSize: 13, fontFamily: 'var(--font-body)' }}>
-                <option>All Statuses</option>
-                <option>Active</option>
-                <option>Paused</option>
-              </select>
+              {(['all', 'active', 'paused'] as const).map(tab => (
+                <button
+                  key={tab}
+                  onClick={() => setStatusFilter(tab)}
+                  style={{
+                    padding: '4px 10px', borderRadius: 6, fontSize: 11.5, textTransform: 'capitalize',
+                    background: statusFilter === tab ? 'var(--glass-bg-hover)' : 'transparent',
+                    border: `1px solid ${statusFilter === tab ? 'var(--card-border)' : 'transparent'}`,
+                    color: statusFilter === tab ? 'var(--text-primary)' : 'var(--text-muted)',
+                    cursor: 'pointer'
+                  }}
+                >
+                  {tab}
+                </button>
+              ))}
             </div>
           </div>
 
+          {/* Workflow Cards */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-            {automations.map(auto => (
-              <AutomationCard key={auto.id} automation={auto} onToggle={() => toggleStatus(auto.id)} />
+            {filteredAutomations.map(a => (
+              <div 
+                key={a.id} 
+                style={{
+                  background: 'var(--card-bg)', border: '1px solid var(--card-border)', borderRadius: 14,
+                  padding: '20px', display: 'flex', flexDirection: 'column', gap: 16,
+                  boxShadow: 'var(--shadow-subtle)'
+                }}
+              >
+                {/* Header row */}
+                <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 16 }}>
+                  <div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                      <h3 style={{ margin: 0, fontSize: 16, fontWeight: 600, color: 'var(--text-primary)' }}>{a.name}</h3>
+                      <span style={{
+                        fontSize: 10, fontWeight: 700, fontFamily: 'monospace', padding: '2px 8px', borderRadius: 4,
+                        background: a.status === 'active' ? 'rgba(34, 197, 94, 0.1)' : 'rgba(234, 179, 8, 0.1)',
+                        color: a.status === 'active' ? 'var(--success)' : 'var(--warn)',
+                        border: `1px solid ${a.status === 'active' ? 'rgba(34, 197, 94, 0.25)' : 'rgba(234, 179, 8, 0.25)'}`
+                      }}>
+                        {a.status.toUpperCase()}
+                      </span>
+                    </div>
+                    <p style={{ margin: '6px 0 0 0', fontSize: 13, color: 'var(--text-secondary)', lineHeight: 1.45, maxWidth: 800 }}>
+                      {a.description}
+                    </p>
+                  </div>
+
+                  {/* Toggle Button */}
+                  <button
+                    onClick={() => toggleStatus(a.id)}
+                    style={{
+                      padding: '6px 14px', borderRadius: 6, fontSize: 12, fontWeight: 500,
+                      background: a.status === 'active' ? 'var(--glass-bg-subtle)' : 'rgba(34, 197, 94, 0.08)',
+                      border: `1px solid ${a.status === 'active' ? 'var(--card-border)' : 'rgba(34, 197, 94, 0.2)'}`,
+                      color: a.status === 'active' ? 'var(--text-secondary)' : 'var(--success)',
+                      cursor: 'pointer'
+                    }}
+                  >
+                    {a.status === 'active' ? 'Pause Pipeline' : 'Resume Pipeline'}
+                  </button>
+                </div>
+
+                {/* Pipeline Steps Architecture */}
+                <div style={{ background: 'var(--glass-bg-subtle)', borderRadius: 10, padding: '12px 16px', border: '1px solid var(--card-border)' }}>
+                  <div style={{ fontSize: 10, color: 'var(--text-muted)', fontWeight: 700, textTransform: 'uppercase', fontFamily: 'monospace', marginBottom: 8 }}>
+                    EXECUTION PIPELINE STEPS
+                  </div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+                    {a.steps.map((step, idx) => (
+                      <div key={idx} style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                        <div style={{ background: 'var(--card-bg)', border: '1px solid var(--card-border)', borderRadius: 6, padding: '4px 10px', display: 'flex', flexDirection: 'column', gap: 2 }}>
+                          <span style={{ fontSize: 11.5, fontWeight: 600, color: 'var(--text-primary)' }}>{step.name}</span>
+                          <span style={{ fontSize: 9.5, color: 'var(--text-muted)', fontFamily: 'monospace' }}>{step.source}</span>
+                        </div>
+                        {idx < a.steps.length - 1 && (
+                          <span style={{ color: 'var(--accent-primary)', fontSize: 12, fontWeight: 700 }}>➔</span>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Metadata & Operational Metrics Grid */}
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 12, borderTop: '1px solid var(--card-border)', paddingTop: 12 }}>
+                  <div>
+                    <div style={{ fontSize: 10, color: 'var(--text-muted)', fontFamily: 'monospace' }}>TRIGGER SPECIFICATION</div>
+                    <div style={{ fontSize: 12, color: 'var(--text-primary)', marginTop: 2, fontWeight: 500 }}>{a.trigger.schedule}</div>
+                    <div style={{ fontSize: 10, color: 'var(--text-muted)', fontFamily: 'monospace' }}>{a.trigger.detail}</div>
+                  </div>
+
+                  <div>
+                    <div style={{ fontSize: 10, color: 'var(--text-muted)', fontFamily: 'monospace' }}>LAST EXECUTION</div>
+                    <div style={{ fontSize: 12, color: 'var(--success)', marginTop: 2, fontWeight: 500 }}>
+                      ● {a.lastRun.time}
+                    </div>
+                    <div style={{ fontSize: 10, color: 'var(--text-muted)', fontFamily: 'monospace' }}>Latency: {a.lastRun.duration} · Status: 200 OK</div>
+                  </div>
+
+                  <div>
+                    <div style={{ fontSize: 10, color: 'var(--text-muted)', fontFamily: 'monospace' }}>NEXT SCHEDULED RUN</div>
+                    <div style={{ fontSize: 12, color: 'var(--text-primary)', marginTop: 2, fontWeight: 500 }}>{a.nextRun}</div>
+                    <div style={{ fontSize: 10, color: 'var(--text-muted)', fontFamily: 'monospace' }}>Worker: Dedicated Daemon</div>
+                  </div>
+
+                  <div>
+                    <div style={{ fontSize: 10, color: 'var(--text-muted)', fontFamily: 'monospace' }}>RELIABILITY METRICS</div>
+                    <div style={{ fontSize: 12, color: 'var(--text-primary)', marginTop: 2, fontWeight: 500 }}>{a.runs} total runs</div>
+                    <div style={{ fontSize: 10, color: 'var(--success)', fontFamily: 'monospace' }}>{a.successRate} success rate</div>
+                  </div>
+                </div>
+              </div>
             ))}
           </div>
 
-          <h2 style={{ fontSize: 18, fontWeight: 700, color: 'var(--text-primary)', margin: '48px 0 24px' }}>Recommended Templates</h2>
-          
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: 20 }}>
-            <TemplateCard 
-              title="Daily Standup Summary"
-              desc="Summarizes team updates from Slack and drops them into a Notion document."
-              icons={['💬', '🧠', '📝']}
-            />
-            <TemplateCard 
-              title="Invoice Extraction"
-              desc="Watches an email inbox for PDF invoices, extracts data using Vision API, and logs to a spreadsheet."
-              icons={['📧', '👁️', '📊']}
-            />
-            <TemplateCard 
-              title="Social Media Auto-Draft"
-              desc="Takes new blog posts via RSS, drafts 3 variations of social posts, and sends for review."
-              icons={['🌐', '✍️', '📱']}
-            />
-          </div>
-
-        </div>
-      </div>
-    </div>
-  );
-}
-
-// --- Subcomponents ---
-
-function AutomationCard({ automation, onToggle }: { automation: Automation, onToggle: () => void }) {
-  const isActive = automation.status === 'active';
-  
-  return (
-    <div style={{ 
-      display: 'flex', flexDirection: 'column', padding: '24px', 
-      background: 'var(--glass-bg-subtle)', border: '1px solid var(--card-border)', 
-      borderRadius: 16, transition: 'all 0.3s', boxShadow: 'var(--shadow-subtle)',
-      position: 'relative', overflow: 'hidden'
-    }}>
-      {isActive && (
-        <div style={{ position: 'absolute', top: 0, left: 0, width: 4, height: '100%', background: 'var(--accent-primary)' }} />
-      )}
-      
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 16 }}>
-        <div style={{ flex: 1 }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 8 }}>
-            <h3 style={{ fontSize: 16, fontWeight: 700, color: 'var(--text-primary)', margin: 0 }}>{automation.name}</h3>
-            {isActive ? (
-              <span style={{ padding: '2px 8px', background: 'rgba(16, 185, 129, 0.1)', color: 'var(--success)', fontSize: 10, fontWeight: 700, borderRadius: 12, textTransform: 'uppercase' }}>Active</span>
-            ) : (
-              <span style={{ padding: '2px 8px', background: 'var(--glass-bg-strong)', color: 'var(--text-secondary)', fontSize: 10, fontWeight: 700, borderRadius: 12, textTransform: 'uppercase' }}>Paused</span>
-            )}
-          </div>
-          <p style={{ fontSize: 14, color: 'var(--text-secondary)', margin: '0 0 16px', lineHeight: 1.5, maxWidth: 600 }}>
-            {automation.description}
-          </p>
-          
-          <div style={{ display: 'flex', alignItems: 'center', gap: 16, flexWrap: 'wrap' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8, background: 'var(--card-bg)', padding: '6px 12px', borderRadius: 8, border: '1px solid var(--card-border)' }}>
-              <span style={{ fontSize: 14 }}>{automation.trigger.icon}</span>
-              <span style={{ fontSize: 12, fontWeight: 600, color: 'var(--text-secondary)' }}>Trigger: {automation.trigger.name}</span>
+          {/* Execution History Drawer */}
+          {selectedLogs && (
+            <div style={{
+              background: 'var(--card-bg)', border: '1px solid var(--card-border)', borderRadius: 14,
+              padding: '20px', display: 'flex', flexDirection: 'column', gap: 12, marginTop: 12
+            }}>
+              <div style={{ fontSize: 12, fontWeight: 700, fontFamily: 'monospace', color: 'var(--text-secondary)' }}>
+                RECENT DISPATCH LOGS (BUFFER: LAST 5 RUNS)
+              </div>
+              <div style={{ overflowX: 'auto' }}>
+                <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 12, textAlign: 'left' }}>
+                  <thead>
+                    <tr style={{ borderBottom: '1px solid var(--card-border)', color: 'var(--text-muted)', fontSize: 11, fontFamily: 'monospace' }}>
+                      <th style={{ padding: '8px 12px' }}>RUN ID</th>
+                      <th style={{ padding: '8px 12px' }}>WORKFLOW</th>
+                      <th style={{ padding: '8px 12px' }}>TIMESTAMP</th>
+                      <th style={{ padding: '8px 12px' }}>DURATION</th>
+                      <th style={{ padding: '8px 12px' }}>EXIT STATUS</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {sampleExecutionLogs.map(log => (
+                      <tr key={log.id} style={{ borderBottom: '1px solid var(--glass-bg-subtle)' }}>
+                        <td style={{ padding: '8px 12px', fontFamily: 'monospace', color: 'var(--accent-primary)' }}>{log.id}</td>
+                        <td style={{ padding: '8px 12px', color: 'var(--text-primary)' }}>{log.workflow}</td>
+                        <td style={{ padding: '8px 12px', color: 'var(--text-muted)', fontFamily: 'monospace' }}>{log.timestamp}</td>
+                        <td style={{ padding: '8px 12px', color: 'var(--text-muted)', fontFamily: 'monospace' }}>{log.duration}</td>
+                        <td style={{ padding: '8px 12px' }}>
+                          <span style={{
+                            fontSize: 10, fontFamily: 'monospace', fontWeight: 700, padding: '2px 6px', borderRadius: 4,
+                            background: log.status === 'success' ? 'rgba(34, 197, 94, 0.1)' : 'rgba(239, 68, 68, 0.1)',
+                            color: log.status === 'success' ? 'var(--success)' : 'var(--danger)'
+                          }}>
+                            {log.code}
+                          </span>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
             </div>
-            
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
-            
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8, background: 'var(--card-bg)', padding: '6px 12px', borderRadius: 8, border: '1px solid var(--card-border)' }}>
-              <span style={{ fontSize: 14 }}>{automation.action.icon}</span>
-              <span style={{ fontSize: 12, fontWeight: 600, color: 'var(--text-secondary)' }}>Action: {automation.action.name}</span>
-            </div>
-          </div>
-        </div>
-        
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 16 }}>
-          <Toggle isOn={isActive} onToggle={onToggle} />
-          <div style={{ fontSize: 12, color: 'var(--text-tertiary)', fontWeight: 500 }}>
-            Runs: <span style={{ color: 'var(--text-primary)' }}>{automation.runs.toLocaleString()}</span>
-          </div>
+          )}
+
         </div>
       </div>
-    </div>
-  );
-}
-
-function TemplateCard({ title, desc, icons }: { title: string, desc: string, icons: string[] }) {
-  return (
-    <div style={{ 
-      padding: '24px', background: 'var(--glass-bg-subtle)', border: '1px dashed var(--card-border)', 
-      borderRadius: 16, cursor: 'pointer', transition: 'all 0.2s', display: 'flex', flexDirection: 'column'
-    }} onMouseEnter={e => { e.currentTarget.style.borderColor = 'var(--accent-primary)'; e.currentTarget.style.background = 'rgba(249,115,22,0.02)'; }} onMouseLeave={e => { e.currentTarget.style.borderColor = 'var(--card-border)'; e.currentTarget.style.background = 'var(--glass-bg-subtle)'; }}>
-      <div style={{ display: 'flex', gap: -8, marginBottom: 16 }}>
-        {icons.map((icon, i) => (
-          <div key={i} style={{ width: 32, height: 32, borderRadius: '50%', background: 'var(--card-bg)', border: '2px solid var(--glass-bg-subtle)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16, zIndex: 10 - i, transform: i > 0 ? `translateX(-${i * 10}px)` : 'none' }}>
-            {icon}
-          </div>
-        ))}
-      </div>
-      <h3 style={{ fontSize: 15, fontWeight: 700, color: 'var(--text-primary)', margin: '0 0 8px' }}>{title}</h3>
-      <p style={{ fontSize: 13, color: 'var(--text-secondary)', margin: 0, lineHeight: 1.5, flex: 1 }}>{desc}</p>
-      <div style={{ marginTop: 16, fontSize: 13, fontWeight: 600, color: 'var(--accent-primary)', display: 'flex', alignItems: 'center', gap: 4 }}>
-        Use Template <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
-      </div>
-    </div>
-  );
-}
-
-function Toggle({ isOn, onToggle }: { isOn: boolean; onToggle: () => void }) {
-  return (
-    <div 
-      onClick={onToggle}
-      style={{
-        width: 44, height: 24, borderRadius: 12, background: isOn ? 'var(--accent-primary)' : 'var(--glass-bg-strong)',
-        position: 'relative', cursor: 'pointer', transition: 'background 0.3s'
-      }}
-    >
-      <div style={{
-        position: 'absolute', top: 2, left: isOn ? 22 : 2, width: 20, height: 20, borderRadius: '50%',
-        background: 'var(--inverted-bg)', transition: 'left 0.3s', boxShadow: '0 2px 4px rgba(0,0,0,0.2)'
-      }} />
     </div>
   );
 }
