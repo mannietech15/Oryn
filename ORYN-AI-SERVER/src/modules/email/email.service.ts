@@ -2,13 +2,17 @@ import nodemailer from 'nodemailer';
 import { ENV } from '../../config/env';
 import { EmailResultDto } from './email.types';
 import { Logger } from '../../infrastructure/logging/logger';
+import { defaultDatastore, Datastore } from '../../infrastructure/storage/datastore';
+import { AppError } from '../../shared/errors/app-error';
+import { ErrorCode } from '../../shared/errors/error-codes';
 
 const logger = new Logger('EmailService');
 
 export class EmailService {
   private transporter: nodemailer.Transporter | null = null;
+  private isConfigured: boolean = false;
 
-  constructor() {
+  constructor(private datastore: Datastore = defaultDatastore) {
     this.initTransporter();
   }
 
@@ -17,52 +21,118 @@ export class EmailService {
       ENV.SMTP_HOST &&
       ENV.SMTP_USER &&
       ENV.SMTP_PASS &&
-      ENV.SMTP_USER !== 'your_email@gmail.com'
+      ENV.SMTP_USER !== 'your_email@gmail.com' &&
+      !ENV.SMTP_USER.includes('example.com')
     ) {
-      this.transporter = nodemailer.createTransport({
-        host: ENV.SMTP_HOST,
-        port: ENV.SMTP_PORT,
-        secure: ENV.SMTP_PORT === 465,
-        auth: {
-          user: ENV.SMTP_USER,
-          pass: ENV.SMTP_PASS,
-        },
-      });
-      logger.info('Configured active SMTP transport', { host: ENV.SMTP_HOST, port: ENV.SMTP_PORT });
+      try {
+        this.transporter = nodemailer.createTransport({
+          host: ENV.SMTP_HOST,
+          port: ENV.SMTP_PORT,
+          secure: ENV.SMTP_PORT === 465,
+          auth: {
+            user: ENV.SMTP_USER,
+            pass: ENV.SMTP_PASS,
+          },
+        });
+        this.isConfigured = true;
+        logger.info('Configured active SMTP transport', { host: ENV.SMTP_HOST, port: ENV.SMTP_PORT, user: ENV.SMTP_USER });
+      } catch (err: any) {
+        logger.error('Failed to configure SMTP transport', { error: err.message });
+        this.isConfigured = false;
+      }
     } else {
-      logger.info('Using Mock email dispatcher (SMTP credentials not configured)');
+      this.isConfigured = false;
+      logger.warn('SMTP transport not configured: missing valid credentials in environment');
     }
   }
 
-  async sendMail(to: string | string[], subject: string, body: string): Promise<EmailResultDto> {
+  async verifyTransport(): Promise<{ connected: boolean; message: string; host?: string; port?: number }> {
+    if (!this.isConfigured || !this.transporter) {
+      return {
+        connected: false,
+        message: 'SMTP credentials not configured in server environment (.env)',
+        host: ENV.SMTP_HOST,
+        port: ENV.SMTP_PORT
+      };
+    }
+
+    try {
+      await this.transporter.verify();
+      return {
+        connected: true,
+        message: `SMTP connection established successfully to ${ENV.SMTP_HOST}:${ENV.SMTP_PORT}`,
+        host: ENV.SMTP_HOST,
+        port: ENV.SMTP_PORT
+      };
+    } catch (err: any) {
+      logger.warn('SMTP verification handshake failed', { error: err.message });
+      return {
+        connected: false,
+        message: `SMTP handshake failure: ${err.message}`,
+        host: ENV.SMTP_HOST,
+        port: ENV.SMTP_PORT
+      };
+    }
+  }
+
+  stageDraft(to: string | string[], subject: string, body: string) {
+    const recipient = Array.isArray(to) ? to.join(', ') : to;
+    const finalSubject = subject || 'Message from Oryn AI';
+    const draft = this.datastore.stageEmailDraft(recipient, finalSubject, body);
+    logger.info('Staged email draft awaiting approval', { draftId: draft.id, to: recipient, subject: finalSubject });
+    return draft;
+  }
+
+  async sendMail(to: string | string[], subject: string, body: string, draftId?: string): Promise<EmailResultDto> {
     const recipient = Array.isArray(to) ? to.join(', ') : to;
     const finalSubject = subject || 'Message from Oryn AI';
 
-    if (this.transporter) {
-      try {
-        const info = await this.transporter.sendMail({
-          from: `"Oryn AI" <${ENV.SMTP_USER}>`,
-          to: recipient,
-          subject: finalSubject,
-          text: body,
-          html: body.replace(/\n/g, '<br>'),
-        });
-
-        logger.info('Email dispatched via SMTP', { messageId: info.messageId, to: recipient });
-        return { success: true, messageId: info.messageId };
-      } catch (err: any) {
-        logger.error('Failed to send email via SMTP', { error: err.message });
-        throw err;
+    if (!this.transporter || !this.isConfigured) {
+      const errorMsg = 'SMTP transport unavailable: Host credentials not configured in server environment.';
+      if (draftId) {
+        this.datastore.updateEmailRecord(draftId, { status: 'failed', error: errorMsg });
       }
+      logger.error('Rejecting email dispatch: unconfigured transport', { recipient });
+      throw new AppError(errorMsg, 503, ErrorCode.SMTP_UNCONFIGURED);
     }
 
-    // Mock dispatch mode
-    logger.info('Mock email sent', { to: recipient, subject: finalSubject, length: body.length });
-    return {
-      success: true,
-      messageId: `mock-${Date.now()}`,
-      previewUrl: null,
-    };
+    try {
+      const info = await this.transporter.sendMail({
+        from: `"Oryn AI" <${ENV.SMTP_USER}>`,
+        to: recipient,
+        subject: finalSubject,
+        text: body,
+        html: body.replace(/\n/g, '<br>'),
+      });
+
+      logger.info('Email dispatched via verified SMTP transport', { messageId: info.messageId, to: recipient });
+      
+      if (draftId) {
+        this.datastore.updateEmailRecord(draftId, {
+          status: 'sent',
+          messageId: info.messageId,
+          sentAt: new Date().toISOString()
+        });
+      }
+
+      return {
+        success: true,
+        messageId: info.messageId,
+      };
+    } catch (err: any) {
+      const errorMsg = `SMTP dispatch failed: ${err.message}`;
+      logger.error('Failed to send email via SMTP', { error: err.message, recipient });
+      
+      if (draftId) {
+        this.datastore.updateEmailRecord(draftId, { status: 'failed', error: errorMsg });
+      }
+      
+      throw new AppError(errorMsg, 502, ErrorCode.SMTP_DISPATCH_FAILURE);
+    }
+  }
+
+  getEmailLogs(limit: number = 20) {
+    return this.datastore.getEmailLogs(limit);
   }
 }
 
