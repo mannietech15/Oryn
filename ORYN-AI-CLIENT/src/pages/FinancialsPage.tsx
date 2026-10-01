@@ -1,14 +1,14 @@
-import { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import type { FinancialEntry } from '../types';
 import CustomDatePicker from '../components/CustomDatePicker';
+import { fetchFinancials, postFinancialEntry } from '../api/oryn';
 
 export default function FinancialsPage() {
-  const [entries, setEntries] = useState<FinancialEntry[]>([
-    { id: 'e1', type: 'revenue', category: 'SaaS Subscription', amount: 42000, date: '2025-03-15', note: 'Monthly recurring revenue' },
-    { id: 'e2', type: 'expense', category: 'Infrastructure', amount: 8500, date: '2025-03-14', note: 'AWS & GPU compute costs' },
-    { id: 'e3', type: 'revenue', category: 'Consulting', amount: 15000, date: '2025-03-12', note: 'Enterprise strategy workshop' },
-    { id: 'e4', type: 'expense', category: 'Marketing', amount: 4200, date: '2025-03-10', note: 'LinkedIn ad campaign' },
-  ]);
+  const [entries, setEntries] = useState<FinancialEntry[]>([]);
+  const [metrics, setMetrics] = useState<{ totalRevenue: number; totalExpenses: number; netProfit: number; margin: number } | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   const [newEntry, setNewEntry] = useState<Partial<FinancialEntry>>({
     type: 'revenue',
@@ -17,35 +17,55 @@ export default function FinancialsPage() {
     date: new Date().toISOString().split('T')[0]
   });
 
-  const handleAddEntry = () => {
-    if (!newEntry.category || !newEntry.amount) return;
-    setEntries(prev => [
-      {
-        id: `e${Date.now()}`,
-        type: (newEntry.type as 'revenue' | 'expense') || 'revenue',
-        category: newEntry.category || 'General',
-        amount: newEntry.amount || 0,
-        date: newEntry.date || new Date().toISOString().split('T')[0],
-        note: 'Manual ledger entry'
-      },
-      ...prev
-    ]);
-    setNewEntry({
-      type: 'revenue',
-      category: '',
-      amount: 0,
-      date: new Date().toISOString().split('T')[0]
-    });
+  const loadData = async () => {
+    try {
+      const data = await fetchFinancials();
+      setEntries(data.entries || []);
+      setMetrics(data.metrics || null);
+    } catch (err: any) {
+      console.error(err);
+      setErrorMsg('Failed to load financial ledger from server.');
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const totals = entries.reduce((acc, curr) => {
-    if (curr.type === 'revenue') acc.revenue += curr.amount;
-    else acc.expenses += curr.amount;
-    return acc;
-  }, { revenue: 0, expenses: 0, margin: 0 });
+  useEffect(() => {
+    loadData();
+  }, []);
 
-  const netProfit = totals.revenue - totals.expenses;
-  const margin = (netProfit / totals.revenue) * 100;
+  const handleAddEntry = async () => {
+    if (!newEntry.category || !newEntry.amount) return;
+    setIsSubmitting(true);
+    setErrorMsg(null);
+
+    try {
+      const res = await postFinancialEntry({
+        type: (newEntry.type as 'revenue' | 'expense') || 'revenue',
+        category: newEntry.category,
+        amount: Number(newEntry.amount),
+        date: newEntry.date || new Date().toISOString().split('T')[0],
+        note: 'Manual fiscal ledger entry'
+      });
+
+      setEntries(prev => [res.entry, ...prev]);
+      setMetrics(res.metrics);
+      setNewEntry({
+        type: 'revenue',
+        category: '',
+        amount: 0,
+        date: new Date().toISOString().split('T')[0]
+      });
+    } catch (err: any) {
+      setErrorMsg(err.message || 'Failed to post transaction.');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const revenue = metrics?.totalRevenue ?? 0;
+  const netProfit = metrics?.netProfit ?? 0;
+  const margin = metrics?.margin ?? 0;
 
   return (
     <div style={{ flex: 1, overflowY: 'auto', padding: 40, display: 'flex', flexDirection: 'column', gap: 32 }}>
@@ -58,13 +78,23 @@ export default function FinancialsPage() {
           </div>
         </div>
         <div style={{ display: 'flex', gap: 16, background: 'rgba(6,17,36,0.6)', padding: '10px 20px', borderRadius: 12, border: '1px solid var(--border)' }}>
-          <StatMini label="Gross Revenue" value={`$${(totals.revenue / 1000).toFixed(1)}K`} color="var(--cyan)" />
+          <StatMini label="Gross Revenue" value={`$${(revenue / 1000).toFixed(1)}K`} color="var(--cyan)" />
           <div style={{ width: 1, height: 30, background: 'var(--glass-bg-strong)' }} />
           <StatMini label="Net Profit" value={`$${(netProfit / 1000).toFixed(1)}K`} color="var(--success)" />
           <div style={{ width: 1, height: 30, background: 'var(--glass-bg-strong)' }} />
           <StatMini label="Profit Margin" value={`${margin.toFixed(1)}%`} color="var(--violet)" />
         </div>
       </div>
+
+      {errorMsg && (
+        <div style={{
+          padding: '12px 18px', borderRadius: 10,
+          background: 'rgba(239, 68, 68, 0.1)', border: '1px solid rgba(239, 68, 68, 0.3)',
+          color: 'var(--danger)', fontSize: 13
+        }}>
+          {errorMsg}
+        </div>
+      )}
 
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1.5fr', gap: 24 }}>
         {/* Entry Form */}
@@ -94,12 +124,12 @@ export default function FinancialsPage() {
             </div>
             <div>
               <FormLabel>Category</FormLabel>
-              <Input placeholder="e.g. SaaS, Infrastructure, Salary" value={newEntry.category} onChange={e => setNewEntry({ ...newEntry, category: e.target.value })} />
+              <Input placeholder="e.g. SaaS, Infrastructure, Consulting" value={newEntry.category} onChange={e => setNewEntry({ ...newEntry, category: e.target.value })} />
             </div>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
               <div>
                 <FormLabel>Amount ($)</FormLabel>
-                <Input type="number" placeholder="0.00" value={newEntry.amount} onChange={e => setNewEntry({ ...newEntry, amount: Number(e.target.value) })} />
+                <Input type="number" placeholder="0.00" value={newEntry.amount || ''} onChange={e => setNewEntry({ ...newEntry, amount: Number(e.target.value) })} />
               </div>
               <div>
                 <FormLabel>Date</FormLabel>
@@ -108,46 +138,60 @@ export default function FinancialsPage() {
             </div>
             <button 
               onClick={handleAddEntry}
+              disabled={isSubmitting || !newEntry.category || !newEntry.amount}
               style={{ 
-              marginTop: 10, padding: '16px', borderRadius: 12, background: 'var(--success)', color: 'var(--bg)', 
-              fontFamily: 'var(--font-display)', fontWeight: 800, letterSpacing: 2, textTransform: 'uppercase',
-              cursor: 'pointer', boxShadow: '0 0 20px rgba(0,255,170,0.4)', border: 'none'
-            }}>
-              POST TRANSACTION
+                marginTop: 10, padding: '16px', borderRadius: 12, background: 'var(--success)', color: 'var(--bg)', 
+                fontFamily: 'var(--font-display)', fontWeight: 800, letterSpacing: 2, textTransform: 'uppercase',
+                cursor: isSubmitting ? 'wait' : 'pointer', boxShadow: '0 0 20px rgba(0,255,170,0.4)', border: 'none',
+                opacity: (!newEntry.category || !newEntry.amount) ? 0.6 : 1
+              }}
+            >
+              {isSubmitting ? 'POSTING TO LEDGER...' : 'POST TRANSACTION'}
             </button>
           </div>
         </div>
 
         {/* Ledger */}
         <div style={{ background: 'var(--card)', border: '1px solid var(--border)', borderRadius: 20, padding: 32, backdropFilter: 'blur(20px)' }}>
-          <div style={{ fontFamily: 'var(--font-display)', fontSize: 10, fontWeight: 700, letterSpacing: 2.5, color: 'var(--violet)', textTransform: 'uppercase', marginBottom: 24 }}><span className="color-circle"></span>Transaction History</div>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-            {entries.map(e => (
-              <div key={e.id} style={{ display: 'flex', alignItems: 'center', gap: 20, padding: '16px 20px', background: 'var(--glass-bg-subtle)', border: '1px solid var(--glass-bg-hover)', borderRadius: 12 }}>
-                <div style={{ 
-                  width: 44, height: 44, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20,
-                  background: e.type === 'revenue' ? 'rgba(0,255,170,0.1)' : 'rgba(255,51,102,0.1)',
-                  color: e.type === 'revenue' ? 'var(--success)' : 'var(--danger)'
-                }}>
-                  {e.type === 'revenue' ? '↙' : '↗'}
-                </div>
-                <div style={{ flex: 1 }}>
-                  <div style={{ fontSize: 14, fontWeight: 600, color: 'white' }}>{e.category}</div>
-                  <div style={{ fontSize: 11, color: 'var(--muted)', marginTop: 2 }}>{e.note}</div>
-                </div>
-                <div style={{ textAlign: 'right' }}>
+          <div style={{ fontFamily: 'var(--font-display)', fontSize: 10, fontWeight: 700, letterSpacing: 2.5, color: 'var(--violet)', textTransform: 'uppercase', marginBottom: 24 }}><span className="color-circle"></span>Transaction History ({entries.length})</div>
+          
+          {loading ? (
+            <div style={{ color: 'var(--muted)', fontSize: 13, textAlign: 'center', padding: 30 }}>
+              Querying persistent financial ledger...
+            </div>
+          ) : entries.length === 0 ? (
+            <div style={{ color: 'var(--muted)', fontSize: 13, textAlign: 'center', padding: 30 }}>
+              No transactions recorded in ledger. Use the form on the left to record your first transaction.
+            </div>
+          ) : (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+              {entries.map(e => (
+                <div key={e.id} style={{ display: 'flex', alignItems: 'center', gap: 20, padding: '16px 20px', background: 'var(--glass-bg-subtle)', border: '1px solid var(--glass-bg-hover)', borderRadius: 12 }}>
                   <div style={{ 
-                    fontFamily: 'var(--font-display)', fontSize: 16, fontWeight: 700, 
-                    color: e.type === 'revenue' ? 'var(--success)' : 'var(--danger)',
-                    textShadow: `0 0 10px ${e.type === 'revenue' ? 'rgba(0,255,170,0.3)' : 'rgba(255,51,102,0.3)'}`
+                    width: 44, height: 44, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20,
+                    background: e.type === 'revenue' ? 'rgba(0,255,170,0.1)' : 'rgba(255,51,102,0.1)',
+                    color: e.type === 'revenue' ? 'var(--success)' : 'var(--danger)'
                   }}>
-                    {e.type === 'revenue' ? '+' : '-'}${e.amount.toLocaleString()}
+                    {e.type === 'revenue' ? '↙' : '↗'}
                   </div>
-                  <div style={{ fontSize: 10, color: 'var(--muted)', marginTop: 2 }}>{e.date}</div>
+                  <div style={{ flex: 1 }}>
+                    <div style={{ fontSize: 14, fontWeight: 600, color: 'white' }}>{e.category}</div>
+                    <div style={{ fontSize: 11, color: 'var(--muted)', marginTop: 2 }}>{e.note}</div>
+                  </div>
+                  <div style={{ textAlign: 'right' }}>
+                    <div style={{ 
+                      fontFamily: 'var(--font-display)', fontSize: 16, fontWeight: 700, 
+                      color: e.type === 'revenue' ? 'var(--success)' : 'var(--danger)',
+                      textShadow: `0 0 10px ${e.type === 'revenue' ? 'rgba(0,255,170,0.3)' : 'rgba(255,51,102,0.3)'}`
+                    }}>
+                      {e.type === 'revenue' ? '+' : '-'}${e.amount.toLocaleString()}
+                    </div>
+                    <div style={{ fontSize: 10, color: 'var(--muted)', marginTop: 2 }}>{e.date}</div>
+                  </div>
                 </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
         </div>
       </div>
     </div>
