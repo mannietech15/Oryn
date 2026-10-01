@@ -76,7 +76,7 @@ function formatContent(text: string) {
   
   const mergedBase64 = btoa(encodeURIComponent(mergedDoc));
 
-  let processedText = text.replace(/```([\w-]*)\n([\s\S]*?)```/g, (match, lang, code) => {
+  let processedText = text.replace(/```([\w-]*)\n([\s\S]*?)```/g, (_match, lang, code) => {
     const escapedCode = code.replace(/</g, '&lt;').replace(/>/g, '&gt;');
     const blockBase64 = btoa(encodeURIComponent(code));
     const isPreviewable = ['html', 'svg', 'xml', 'javascript', 'js', 'css'].includes(lang.toLowerCase()) || code.includes('<html') || code.includes('<svg') || code.includes('<div');
@@ -101,7 +101,7 @@ function formatContent(text: string) {
   processedText = processedText
     .replace(/`([^`]+)`/g, '<code style="background: var(--glass-bg-subtle); border: 1px solid var(--card-border); padding: 2px 6px; border-radius: 6px; font-family: monospace; font-size: 13px; color: var(--accent-primary);">$1</code>')
     .replace(/\b(ORYN|Oryn)\b/g, '__ORYN_PLACEHOLDER__')
-    .replace(/\*\*([^*]+)\*\*(:?)/g, (match, p1, p2) => {
+    .replace(/\*\*([^*]+)\*\*(:?)/g, (_match, p1, p2) => {
       const text = p1.trim();
       const hasColon = p2 === ':' || text.endsWith(':');
       if (hasColon) {
@@ -320,7 +320,7 @@ function SpeakButton({ text, language }: { text: string, language?: string }) {
   );
 }
 
-function MessageBubble({ msg, isMobile, onImageClick, language, onEdit, onRegenerate, isLastAiMessage, isLastUserMessage }: { msg: Message, isMobile?: boolean, onImageClick?: (url: string) => void, language?: string, onEdit?: (id: string, text: string) => void, onRegenerate?: () => void, isLastAiMessage?: boolean, isLastUserMessage?: boolean }) {
+function MessageBubble({ msg, isMobile, onImageClick, language, onEdit, onRegenerate, isLastAiMessage }: { msg: Message, isMobile?: boolean, onImageClick?: (url: string) => void, language?: string, onEdit?: (id: string, text: string) => void, onRegenerate?: () => void, isLastAiMessage?: boolean, isLastUserMessage?: boolean }) {
   const isUser = msg.role === 'user';
   const [isEditing, setIsEditing] = useState(false);
   const [editValue, setEditValue] = useState(msg.content);
@@ -468,44 +468,54 @@ function MessageBubble({ msg, isMobile, onImageClick, language, onEdit, onRegene
                 }} />
               ))}
             </div>
-            <div style={{ fontFamily: 'var(--font-display)', fontSize: 12, fontWeight: 600, color: 'var(--text-secondary)', animation: 'pulse 2s ease infinite' }}>
-              Analyzing...
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+              <div style={{ fontFamily: 'monospace', fontSize: 12, fontWeight: 600, color: 'var(--accent-primary)' }}>
+                Evaluating query & context...
+              </div>
+              <div style={{ fontSize: 10.5, color: 'var(--text-muted)', fontFamily: 'monospace' }}>
+                NVIDIA NIM Llama 3.2 · SSE Active
+              </div>
             </div>
           </div>
         )}
       </div>
 
-      {/* Footer: Actions */}
+      {/* Footer: Actions & Model Provenance */}
       {msg.content && (
-        <div style={{ alignSelf: 'flex-start', marginTop: 4, display: 'flex', gap: 4 }}>
-          <SpeakButton text={msg.content} language={language} />
-          <CopyButton text={msg.content} />
-          {isLastAiMessage && onRegenerate && (
-            <button
-              onClick={onRegenerate}
-              title="Regenerate response"
-              style={{
-                flexShrink: 0, alignSelf: 'center',
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                width: 32, height: 32, borderRadius: 8, cursor: 'pointer',
-                background: 'none', border: '1px solid transparent',
-                color: 'var(--text-secondary)',
-                transition: 'all 0.2s', padding: 0,
-              }}
-              onMouseEnter={e => {
-                (e.currentTarget as HTMLButtonElement).style.color = 'var(--text-primary)';
-                (e.currentTarget as HTMLButtonElement).style.borderColor = 'var(--card-border)';
-                (e.currentTarget as HTMLButtonElement).style.background = 'var(--glass-bg-hover)';
-              }}
-              onMouseLeave={e => {
-                (e.currentTarget as HTMLButtonElement).style.color = 'var(--text-secondary)';
-                (e.currentTarget as HTMLButtonElement).style.borderColor = 'transparent';
-                (e.currentTarget as HTMLButtonElement).style.background = 'none';
-              }}
-            >
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="1 4 1 10 7 10"></polyline><polyline points="23 20 23 14 17 14"></polyline><path d="M20.49 9A9 9 0 0 0 5.64 5.64L1 10m22 4l-4.64 4.36A9 9 0 0 1 3.51 15"></path></svg>
-            </button>
-          )}
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%', marginTop: 4, flexWrap: 'wrap', gap: 8 }}>
+          <div style={{ display: 'flex', gap: 4 }}>
+            <SpeakButton text={msg.content} language={language} />
+            <CopyButton text={msg.content} />
+            {isLastAiMessage && onRegenerate && (
+              <button
+                onClick={onRegenerate}
+                title="Regenerate response"
+                style={{
+                  flexShrink: 0, alignSelf: 'center',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  width: 32, height: 32, borderRadius: 8, cursor: 'pointer',
+                  background: 'none', border: '1px solid transparent',
+                  color: 'var(--text-secondary)',
+                  transition: 'all 0.2s', padding: 0,
+                }}
+                onMouseEnter={e => {
+                  (e.currentTarget as HTMLButtonElement).style.color = 'var(--text-primary)';
+                  (e.currentTarget as HTMLButtonElement).style.borderColor = 'var(--card-border)';
+                  (e.currentTarget as HTMLButtonElement).style.background = 'var(--glass-bg-hover)';
+                }}
+                onMouseLeave={e => {
+                  (e.currentTarget as HTMLButtonElement).style.color = 'var(--text-secondary)';
+                  (e.currentTarget as HTMLButtonElement).style.borderColor = 'transparent';
+                  (e.currentTarget as HTMLButtonElement).style.background = 'none';
+                }}
+              >
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="1 4 1 10 7 10"></polyline><polyline points="23 20 23 14 17 14"></polyline><path d="M20.49 9A9 9 0 0 0 5.64 5.64L1 10m22 4l-4.64 4.36A9 9 0 0 1 3.51 15"></path></svg>
+              </button>
+            )}
+          </div>
+          <div style={{ fontSize: 10.5, color: 'var(--text-muted)', fontFamily: 'monospace' }}>
+            NVIDIA NIM (Llama 3.2 Vision) · Verified Stream
+          </div>
         </div>
       )}
     </div>
