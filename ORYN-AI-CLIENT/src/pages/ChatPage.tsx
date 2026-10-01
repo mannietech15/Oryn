@@ -320,7 +320,7 @@ function SpeakButton({ text, language }: { text: string, language?: string }) {
   );
 }
 
-function MessageBubble({ msg, isMobile, onImageClick, language, onEdit, onRegenerate, isLastAiMessage, onConfirmEmail, onDiscardEmail }: { msg: Message, isMobile?: boolean, onImageClick?: (url: string) => void, language?: string, onEdit?: (id: string, text: string) => void, onRegenerate?: () => void, isLastAiMessage?: boolean, isLastUserMessage?: boolean, onConfirmEmail?: (messageId: string, draftId: string) => void, onDiscardEmail?: (messageId: string) => void }) {
+function MessageBubble({ msg, isMobile, onImageClick, language, onEdit, onRegenerate, isLastAiMessage, isStreaming, onConfirmEmail, onDiscardEmail }: { msg: Message, isMobile?: boolean, onImageClick?: (url: string) => void, language?: string, onEdit?: (id: string, text: string) => void, onRegenerate?: () => void, isLastAiMessage?: boolean, isLastUserMessage?: boolean, isStreaming?: boolean, onConfirmEmail?: (messageId: string, draftId: string) => void, onDiscardEmail?: (messageId: string) => void }) {
   const isUser = msg.role === 'user';
   const [isEditing, setIsEditing] = useState(false);
   const [editValue, setEditValue] = useState(msg.content);
@@ -437,7 +437,7 @@ function MessageBubble({ msg, isMobile, onImageClick, language, onEdit, onRegene
       }}>
         {msg.content ? (
           <Typewriter text={msg.content} timestamp={msg.timestamp} />
-        ) : (
+        ) : (isStreaming && isLastAiMessage) ? (
           <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '8px 0' }}>
             <style>
               {`
@@ -476,6 +476,10 @@ function MessageBubble({ msg, isMobile, onImageClick, language, onEdit, onRegene
                 NVIDIA NIM Llama 3.2 · SSE Active
               </div>
             </div>
+          </div>
+        ) : (
+          <div style={{ fontStyle: 'italic', color: 'var(--text-muted)', fontSize: 14, padding: '4px 0' }}>
+            Response interrupted. Click the retry button below to regenerate.
           </div>
         )}
         {msg.emailDraft && (
@@ -769,6 +773,7 @@ export default function ChatPage({
                   onEdit={editMessage}
                   onRegenerate={regenerateResponse}
                   isLastAiMessage={i === messages.length - 1 && m.role === 'assistant'}
+                  isStreaming={isStreaming}
                   onConfirmEmail={confirmEmail}
                   onDiscardEmail={discardEmail}
                 />

@@ -311,6 +311,8 @@ export function useChat() {
             
             if (abortRef.current) {
               finalContent = finalContent ? `${finalContent}\n\n_[Request cancelled]_` : "_Request cancelled by the user._";
+            } else if (!finalContent && !stagedDraft) {
+              finalContent = "_No response content was received from the model. Please verify your network or try again._";
             }
             
             if (finalContent !== fullText || abortRef.current || stagedDraft) {

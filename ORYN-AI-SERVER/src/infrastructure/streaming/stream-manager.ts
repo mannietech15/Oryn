@@ -13,12 +13,11 @@ export class StreamManager {
     this.abortController = new AbortController();
     this.sse = new SSEStream(res);
 
-    req.on('close', () => {
+    res.on('close', () => {
       if (!this.sse.closed) {
         logger.info('Client closed connection prematurely');
         this.abortController.abort();
         this.cleanup();
-        this.sse.close();
       }
     });
 
