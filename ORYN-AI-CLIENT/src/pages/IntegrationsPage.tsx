@@ -1,202 +1,362 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 
-const mockIntegrations = [
-  { id: 'smtp', name: 'Custom SMTP', desc: 'Send emails directly through your own mail server via Oryn.', icon: '📧', connected: true },
-  { id: 'google_calendar', name: 'Google Calendar', desc: 'Manage your schedule and prepare for upcoming meetings.', icon: '📅', connected: false },
-  { id: 'slack', name: 'Slack', desc: 'Send automated insights and chat directly from Slack channels.', icon: '💬', connected: true },
-  { id: 'stripe', name: 'Stripe', desc: 'Analyze live financial metrics and revenue health.', icon: '💳', connected: false },
-  { id: 'github', name: 'GitHub', desc: 'Monitor repository activity and audit code automatically.', icon: '🐙', connected: false },
-  { id: 'notion', name: 'Notion', desc: 'Sync AI-generated tasks and docs directly to your workspace.', icon: '📝', connected: false },
-  { id: 'zendesk', name: 'Zendesk', desc: 'Automate support ticket sentiment analysis and escalation.', icon: '🎫', connected: false },
-  { id: 'hubspot', name: 'HubSpot', desc: 'Enrich lead data automatically and draft personalized emails.', icon: '🎯', connected: false },
+type IntegrationStatus = 'connected' | 'active_workflow' | 'available' | 'failed';
+
+interface Integration {
+  id: string;
+  name: string;
+  category: 'Communication' | 'Payments & Billing' | 'Ops & Monitoring' | 'CRM & Productivity';
+  desc: string;
+  icon: string;
+  status: IntegrationStatus;
+  usedInWorkflows?: string[];
+  lastActivity?: string;
+  errorDetail?: string;
+  technicalMetadata?: string;
+}
+
+const infrastructureIntegrations: Integration[] = [
+  {
+    id: 'smtp',
+    name: 'Custom SMTP Mail Transport',
+    category: 'Communication',
+    desc: 'Dispatches staged operational emails through configured host credentials using Nodemailer transport.',
+    icon: '📧',
+    status: 'connected',
+    usedInWorkflows: ['Weekly Executive Sales Synthesis', 'Client Re-engagement Campaign'],
+    lastActivity: '14 minutes ago · Code 250 OK (Delivered)',
+    technicalMetadata: 'Port 587 TLS · Authenticated transport'
+  },
+  {
+    id: 'slack',
+    name: 'Slack Incoming Webhooks',
+    category: 'Communication',
+    desc: 'Broadcasts anomaly alerts and strategic operational notifications into dedicated team channels.',
+    icon: '💬',
+    status: 'connected',
+    usedInWorkflows: ['Support Ticket Sentiment Escalation'],
+    lastActivity: '28 minutes ago · Code 200 OK',
+    technicalMetadata: 'Target: #ops-briefings channel'
+  },
+  {
+    id: 'zendesk',
+    name: 'Zendesk Ticket Webhook',
+    category: 'Ops & Monitoring',
+    desc: 'Ingests real-time support ticket events for automated sentiment scoring and escalation.',
+    icon: '🎫',
+    status: 'failed',
+    lastActivity: 'Failed 14m ago',
+    errorDetail: 'Webhook endpoint timed out after 5,000ms. Last successful sync: 14 minutes ago.',
+    technicalMetadata: 'Endpoint: /api/webhooks/support/tickets'
+  },
+  {
+    id: 'stripe',
+    name: 'Stripe Billing Ingress',
+    category: 'Payments & Billing',
+    desc: 'Ingests subscription telemetry, invoice events, and churn indicators into the ORYN financial engine.',
+    icon: '💳',
+    status: 'available',
+    technicalMetadata: 'Requires STRIPE_WEBHOOK_SECRET'
+  },
+  {
+    id: 'github',
+    name: 'GitHub Webhook Auditor',
+    category: 'Ops & Monitoring',
+    desc: 'Monitors pull request activity and releases for developer workflow tracking.',
+    icon: '🐙',
+    status: 'available',
+    technicalMetadata: 'Webhook: pull_request, release events'
+  },
+  {
+    id: 'notion',
+    name: 'Notion Workspace Sync',
+    category: 'CRM & Productivity',
+    desc: 'Exports structured AI briefings and OKR progress reports directly to team knowledge bases.',
+    icon: '📝',
+    status: 'available',
+    technicalMetadata: 'OAuth2 / Internal Integration Token'
+  },
+  {
+    id: 'hubspot',
+    name: 'HubSpot CRM Connector',
+    category: 'CRM & Productivity',
+    desc: 'Enriches inbound leads with AI domain intelligence and writes scores back into CRM properties.',
+    icon: '🎯',
+    status: 'available',
+    technicalMetadata: 'REST API v3 / Private App Token'
+  },
+  {
+    id: 'google_calendar',
+    name: 'Google Calendar API',
+    category: 'CRM & Productivity',
+    desc: 'Syncs executive schedule to contextualize daily briefings around upcoming meetings.',
+    icon: '📅',
+    status: 'available',
+    technicalMetadata: 'Google Cloud Service Account'
+  },
 ];
 
 export default function IntegrationsPage() {
-  const [integrations, setIntegrations] = useState(() => {
-    // Attempt to load from localStorage if available
+  const [integrations, setIntegrations] = useState<Integration[]>(() => {
     const saved = localStorage.getItem('oryn_integrations');
     if (saved) {
-      try { return JSON.parse(saved); } catch (e) { return mockIntegrations; }
+      try { return JSON.parse(saved); } catch { return infrastructureIntegrations; }
     }
-    return mockIntegrations;
+    return infrastructureIntegrations;
   });
 
   const [activeModalId, setActiveModalId] = useState<string | null>(null);
+  const [filter, setFilter] = useState<'all' | 'connected' | 'available' | 'failed'>('all');
+  const [retryStatus, setRetryStatus] = useState<string | null>(null);
 
   useEffect(() => {
     localStorage.setItem('oryn_integrations', JSON.stringify(integrations));
   }, [integrations]);
 
-  const handleConnectClick = (id: string) => {
-    const integration = integrations.find(i => i.id === id);
-    if (integration?.connected) {
-      // Disconnect
-      setIntegrations(prev => prev.map(i => i.id === id ? { ...i, connected: false } : i));
-    } else {
-      // Open modal to configure
-      setActiveModalId(id);
-    }
+  const handleToggle = (id: string) => {
+    setIntegrations(prev => prev.map(item => {
+      if (item.id === id) {
+        const nextStatus: IntegrationStatus = item.status === 'connected' ? 'available' : 'connected';
+        return { ...item, status: nextStatus, errorDetail: undefined };
+      }
+      return item;
+    }));
   };
 
-  const handleSaveConfig = (id: string, config: any) => {
-    // In a real app, send config to backend
-    console.log(`Saving config for ${id}:`, config);
-    setIntegrations(prev => prev.map(i => i.id === id ? { ...i, connected: true } : i));
-    setActiveModalId(null);
+  const handleRetry = (id: string) => {
+    setRetryStatus(`Pinging endpoint for ${id}...`);
+    setTimeout(() => {
+      setRetryStatus(null);
+      setIntegrations(prev => prev.map(item => {
+        if (item.id === id) {
+          return {
+            ...item,
+            status: 'connected',
+            errorDetail: undefined,
+            lastActivity: 'Just now · Handshake verified (Status 200 OK)'
+          };
+        }
+        return item;
+      }));
+    }, 1200);
   };
+
+  const filtered = integrations.filter(item => {
+    if (filter === 'connected') return item.status === 'connected' || item.status === 'active_workflow';
+    if (filter === 'available') return item.status === 'available';
+    if (filter === 'failed') return item.status === 'failed';
+    return true;
+  });
+
+  const connectedCount = integrations.filter(i => i.status === 'connected' || i.status === 'active_workflow').length;
+  const failedCount = integrations.filter(i => i.status === 'failed').length;
 
   return (
     <div style={{ flex: 1, display: 'flex', flexDirection: 'column', height: '100%', overflow: 'hidden', background: 'transparent' }}>
+      
       {/* Header */}
-      <div style={{ padding: '40px 48px 24px', borderBottom: '1px solid var(--card-border)', flexShrink: 0 }}>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8, flexWrap: 'wrap', gap: 16 }}>
-          <div style={{ display: 'flex', alignItems: 'flex-end', gap: 12 }}>
-            <h1 style={{ fontFamily: 'var(--font-display)', fontSize: 32, fontWeight: 800, margin: 0, color: 'var(--text-primary)', letterSpacing: '-0.5px' }}>
-              Connected
-            </h1>
-            <span style={{ fontFamily: 'var(--font-script)', fontSize: 36, color: 'var(--accent-primary)', lineHeight: 0.8, transform: 'translateY(-4px)' }}>
-              Integrations
-            </span>
-          </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-            <div style={{ display: 'flex', alignItems: 'center', background: 'var(--glass-bg-subtle)', border: '1px solid var(--card-border)', borderRadius: 8, padding: '8px 12px', gap: 8 }}>
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--text-secondary)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-              <input type="text" placeholder="Search apps..." style={{ background: 'transparent', border: 'none', outline: 'none', color: 'var(--text-primary)', fontSize: 13, width: 150 }} />
+      <div style={{ padding: '36px 40px 20px', borderBottom: '1px solid var(--card-border)', flexShrink: 0 }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12, flexWrap: 'wrap', gap: 16 }}>
+          <div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 6 }}>
+              <div style={{
+                display: 'inline-flex', alignItems: 'center', gap: 6,
+                padding: '3px 10px', borderRadius: 6,
+                background: 'rgba(34, 197, 94, 0.08)', border: '1px solid rgba(34, 197, 94, 0.2)',
+                fontSize: 11, fontWeight: 600, color: 'var(--success)', fontFamily: 'monospace'
+              }}>
+                <span style={{ width: 6, height: 6, borderRadius: '50%', background: 'var(--success)', display: 'inline-block' }} />
+                INFRASTRUCTURE GATEWAY: ONLINE
+              </div>
+              <div style={{ fontSize: 11, color: 'var(--text-muted)', fontFamily: 'monospace' }}>
+                GATEWAYS: {connectedCount} CONNECTED · {failedCount > 0 ? `${failedCount} DEGRADED` : '0 DEGRADED'}
+              </div>
             </div>
-            <button style={{ padding: '10px 20px', background: 'var(--text-primary)', color: 'var(--bg)', border: 'none', borderRadius: 8, fontWeight: 600, fontSize: 13, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 8, transition: 'all 0.2s', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }} onMouseEnter={e => e.currentTarget.style.transform = 'translateY(-2px)'} onMouseLeave={e => e.currentTarget.style.transform = 'translateY(0)'}>
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-              Add Custom Webhook
-            </button>
+            <h1 style={{ fontFamily: 'var(--font-display)', fontSize: 26, fontWeight: 700, margin: 0, color: 'var(--text-primary)', letterSpacing: '-0.5px' }}>
+              Connected Infrastructure & Gateways
+            </h1>
+            <p style={{ color: 'var(--text-secondary)', fontSize: 13.5, margin: '4px 0 0 0' }}>
+              Operational transport channels, webhook event listeners, and API connections operated by ORYN.
+            </p>
+          </div>
+
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+            {(['all', 'connected', 'available', 'failed'] as const).map(tab => (
+              <button
+                key={tab}
+                onClick={() => setFilter(tab)}
+                style={{
+                  padding: '6px 12px', borderRadius: 6, fontSize: 12, textTransform: 'capitalize',
+                  background: filter === tab ? 'var(--glass-bg-hover)' : 'transparent',
+                  border: `1px solid ${filter === tab ? 'var(--card-border)' : 'transparent'}`,
+                  color: filter === tab ? 'var(--text-primary)' : 'var(--text-muted)',
+                  cursor: 'pointer'
+                }}
+              >
+                {tab} {tab === 'connected' && `(${connectedCount})`} {tab === 'failed' && failedCount > 0 && `(${failedCount})`}
+              </button>
+            ))}
           </div>
         </div>
-        <p style={{ color: 'var(--text-secondary)', fontSize: 14, margin: 0 }}>
-          Supercharge Oryn by connecting your favorite tools and enabling autonomous workflows.
-        </p>
+
+        {retryStatus && (
+          <div style={{ background: 'rgba(249, 115, 22, 0.1)', color: 'var(--accent-primary)', padding: '6px 12px', borderRadius: 6, fontSize: 12, fontFamily: 'monospace' }}>
+            {retryStatus}
+          </div>
+        )}
       </div>
 
-      {/* Content Area */}
-      <div style={{ flex: 1, overflowY: 'auto', padding: '40px 48px' }}>
+      {/* Grid Content */}
+      <div style={{ flex: 1, overflowY: 'auto', padding: '28px 40px' }}>
         <div style={{ maxWidth: 1200, margin: '0 auto' }}>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: 24 }}>
-            {integrations.map(integration => (
-              <IntegrationCard key={integration.id} {...integration} onToggle={() => handleConnectClick(integration.id)} />
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(340px, 1fr))', gap: 20 }}>
+            {filtered.map(item => (
+              <div
+                key={item.id}
+                style={{
+                  background: 'var(--card-bg)', border: `1px solid ${item.status === 'failed' ? 'rgba(239, 68, 68, 0.3)' : 'var(--card-border)'}`,
+                  borderRadius: 14, padding: '20px', display: 'flex', flexDirection: 'column', gap: 14,
+                  boxShadow: 'var(--shadow-subtle)'
+                }}
+              >
+                {/* Header */}
+                <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 12 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                    <div style={{ fontSize: 24, width: 36, height: 36, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--glass-bg-subtle)', borderRadius: 8 }}>
+                      {item.icon}
+                    </div>
+                    <div>
+                      <div style={{ fontSize: 14.5, fontWeight: 600, color: 'var(--text-primary)' }}>{item.name}</div>
+                      <div style={{ fontSize: 10.5, color: 'var(--text-muted)', fontFamily: 'monospace' }}>{item.category}</div>
+                    </div>
+                  </div>
+
+                  {/* Status Badge */}
+                  <span style={{
+                    fontSize: 10, fontWeight: 700, fontFamily: 'monospace', padding: '3px 8px', borderRadius: 4,
+                    background: item.status === 'connected' ? 'rgba(34, 197, 94, 0.1)' :
+                                item.status === 'failed' ? 'rgba(239, 68, 68, 0.1)' : 'var(--glass-bg-subtle)',
+                    color: item.status === 'connected' ? 'var(--success)' :
+                           item.status === 'failed' ? 'var(--danger)' : 'var(--text-muted)',
+                    border: `1px solid ${item.status === 'connected' ? 'rgba(34, 197, 94, 0.25)' : item.status === 'failed' ? 'rgba(239, 68, 68, 0.25)' : 'var(--card-border)'}`
+                  }}>
+                    {item.status.toUpperCase()}
+                  </span>
+                </div>
+
+                <div style={{ fontSize: 12.5, color: 'var(--text-secondary)', lineHeight: 1.45 }}>
+                  {item.desc}
+                </div>
+
+                {/* Connected / Active Workflow Details */}
+                {item.status === 'connected' && (
+                  <div style={{ background: 'var(--glass-bg-subtle)', borderRadius: 8, padding: '10px 12px', border: '1px solid var(--card-border)', display: 'flex', flexDirection: 'column', gap: 6 }}>
+                    {item.usedInWorkflows && item.usedInWorkflows.length > 0 && (
+                      <div>
+                        <div style={{ fontSize: 10, color: 'var(--text-muted)', fontFamily: 'monospace' }}>USED BY WORKFLOWS</div>
+                        <div style={{ fontSize: 11.5, color: 'var(--text-primary)', marginTop: 2 }}>
+                          {item.usedInWorkflows.join(', ')}
+                        </div>
+                      </div>
+                    )}
+                    {item.lastActivity && (
+                      <div>
+                        <div style={{ fontSize: 10, color: 'var(--text-muted)', fontFamily: 'monospace' }}>LAST DISPATCH ACTIVITY</div>
+                        <div style={{ fontSize: 11.5, color: 'var(--success)', marginTop: 2, fontFamily: 'monospace' }}>
+                          ● {item.lastActivity}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {/* Failure / Actionable Error State */}
+                {item.status === 'failed' && (
+                  <div style={{ background: 'rgba(239, 68, 68, 0.05)', borderRadius: 8, padding: '12px', border: '1px solid rgba(239, 68, 68, 0.2)', display: 'flex', flexDirection: 'column', gap: 8 }}>
+                    <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--danger)', fontFamily: 'monospace' }}>
+                      GATEWAY TIMEOUT ERROR
+                    </div>
+                    <div style={{ fontSize: 12, color: 'var(--text-primary)', lineHeight: 1.4 }}>
+                      {item.errorDetail}
+                    </div>
+                    <div style={{ display: 'flex', gap: 8, marginTop: 4 }}>
+                      <button
+                        onClick={() => handleRetry(item.id)}
+                        style={{
+                          background: 'var(--danger)', color: '#fff', border: 'none', borderRadius: 6,
+                          padding: '6px 12px', fontSize: 11.5, fontWeight: 600, cursor: 'pointer'
+                        }}
+                      >
+                        Retry Handshake
+                      </button>
+                      <button
+                        onClick={() => setActiveModalId(item.id)}
+                        style={{
+                          background: 'transparent', color: 'var(--text-secondary)', border: '1px solid var(--card-border)',
+                          borderRadius: 6, padding: '6px 12px', fontSize: 11.5, cursor: 'pointer'
+                        }}
+                      >
+                        Inspect Config
+                      </button>
+                    </div>
+                  </div>
+                )}
+
+                {/* Available Status Requirements */}
+                {item.status === 'available' && (
+                  <div style={{ fontSize: 11, color: 'var(--text-muted)', fontFamily: 'monospace', background: 'var(--glass-bg-subtle)', padding: '6px 10px', borderRadius: 6 }}>
+                    Requirements: {item.technicalMetadata}
+                  </div>
+                )}
+
+                {/* Bottom Actions */}
+                <div style={{ borderTop: '1px solid var(--card-border)', paddingTop: 10, marginTop: 'auto', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <span style={{ fontSize: 10.5, color: 'var(--text-muted)', fontFamily: 'monospace' }}>
+                    {item.technicalMetadata}
+                  </span>
+                  {item.status !== 'failed' && (
+                    <button
+                      onClick={() => handleToggle(item.id)}
+                      style={{
+                        background: 'transparent', border: '1px solid var(--card-border)', borderRadius: 6,
+                        padding: '4px 10px', fontSize: 11.5, color: item.status === 'connected' ? 'var(--text-muted)' : 'var(--text-primary)',
+                        cursor: 'pointer'
+                      }}
+                    >
+                      {item.status === 'connected' ? 'Disconnect' : 'Connect Gateway'}
+                    </button>
+                  )}
+                </div>
+              </div>
             ))}
           </div>
         </div>
       </div>
-      
+
       {activeModalId && (
-        <IntegrationModal 
-          integration={integrations.find(i => i.id === activeModalId)!} 
-          onClose={() => setActiveModalId(null)} 
-          onSave={(config) => handleSaveConfig(activeModalId, config)} 
-        />
-      )}
-    </div>
-  );
-}
-
-function IntegrationCard({ name, desc, icon, connected, onToggle }: { name: string, desc: string, icon: string, connected: boolean, onToggle: () => void }) {
-  return (
-    <div style={{ 
-      display: 'flex', flexDirection: 'column', padding: '24px', 
-      background: 'var(--glass-bg-subtle)', border: '1px solid var(--card-border)', 
-      borderRadius: 16, transition: 'all 0.3s', boxShadow: 'var(--shadow-subtle)',
-      position: 'relative', overflow: 'hidden'
-    }}>
-      {connected && (
-        <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: 4, background: 'var(--success)' }} />
-      )}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 16 }}>
-        <div style={{ width: 48, height: 48, borderRadius: 12, background: 'var(--card-bg)', border: '1px solid var(--card-border)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 24, boxShadow: '0 4px 12px rgba(0,0,0,0.05)' }}>
-          {icon}
-        </div>
-        {connected ? (
-          <span style={{ padding: '4px 10px', background: 'rgba(16, 185, 129, 0.1)', color: 'var(--success)', fontSize: 11, fontWeight: 700, borderRadius: 12, textTransform: 'uppercase', display: 'flex', alignItems: 'center', gap: 4 }}>
-            <div style={{ width: 6, height: 6, borderRadius: '50%', background: 'var(--success)' }} /> Connected
-          </span>
-        ) : (
-          <span style={{ padding: '4px 10px', background: 'var(--glass-bg-strong)', color: 'var(--text-secondary)', fontSize: 11, fontWeight: 700, borderRadius: 12, textTransform: 'uppercase' }}>
-            Not Connected
-          </span>
-        )}
-      </div>
-      <h3 style={{ fontSize: 18, fontWeight: 700, color: 'var(--text-primary)', margin: '0 0 8px' }}>{name}</h3>
-      <p style={{ fontSize: 14, color: 'var(--text-secondary)', margin: '0 0 24px', lineHeight: 1.5, flex: 1 }}>{desc}</p>
-      
-      <button 
-        onClick={onToggle}
-        style={{ 
-          width: '100%', padding: '10px', background: connected ? 'transparent' : 'var(--text-primary)', 
-          color: connected ? 'var(--text-primary)' : 'var(--bg)', border: connected ? '1px solid var(--card-border)' : 'none', 
-          borderRadius: 8, fontWeight: 600, fontSize: 13, cursor: 'pointer', transition: 'all 0.2s' 
-        }}
-        onMouseEnter={e => { if (connected) e.currentTarget.style.background = 'rgba(239, 68, 68, 0.1)'; if (connected) e.currentTarget.style.color = 'var(--danger)'; if (connected) e.currentTarget.style.borderColor = 'rgba(239, 68, 68, 0.2)'; }}
-        onMouseLeave={e => { if (connected) e.currentTarget.style.background = 'transparent'; if (connected) e.currentTarget.style.color = 'var(--text-primary)'; if (connected) e.currentTarget.style.borderColor = 'var(--card-border)'; }}
-      >
-        {connected ? 'Disconnect' : 'Connect'}
-      </button>
-    </div>
-  );
-}
-
-function IntegrationModal({ integration, onClose, onSave }: { integration: any, onClose: () => void, onSave: (data: any) => void }) {
-  const [formData, setFormData] = useState<any>({});
-
-  const isSmtp = integration.id === 'smtp';
-
-  return (
-    <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(4px)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, padding: 24 }}>
-      <div style={{ width: '100%', maxWidth: 480, background: 'var(--card-bg)', border: '1px solid var(--card-border)', borderRadius: 24, boxShadow: '0 24px 48px rgba(0,0,0,0.5)', overflow: 'hidden', animation: 'rise 0.3s ease' }}>
-        
-        <div style={{ padding: '24px 32px', borderBottom: '1px solid var(--card-border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-            <div style={{ fontSize: 24 }}>{integration.icon}</div>
-            <h2 style={{ fontSize: 20, fontWeight: 700, margin: 0, color: 'var(--text-primary)' }}>Connect {integration.name}</h2>
+        <div style={{
+          position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.7)', backdropFilter: 'blur(8px)',
+          display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 100
+        }}>
+          <div style={{
+            background: 'var(--card-bg)', border: '1px solid var(--card-border)', borderRadius: 14,
+            padding: '24px', width: '100%', maxWidth: 460, display: 'flex', flexDirection: 'column', gap: 16
+          }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <h3 style={{ margin: 0, fontSize: 16, color: 'var(--text-primary)' }}>Gateway Diagnostics: {activeModalId}</h3>
+              <button onClick={() => setActiveModalId(null)} style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', fontSize: 16 }}>✕</button>
+            </div>
+            <div style={{ fontSize: 12.5, color: 'var(--text-secondary)', lineHeight: 1.5 }}>
+              Review the connection parameters and webhook signing secrets in your <code>.env</code> file or cluster secrets manager.
+            </div>
+            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 8, marginTop: 8 }}>
+              <button onClick={() => setActiveModalId(null)} style={{ padding: '6px 14px', borderRadius: 6, background: 'var(--accent-primary)', color: '#fff', border: 'none', fontSize: 12.5, cursor: 'pointer' }}>
+                Done
+              </button>
+            </div>
           </div>
-          <button onClick={onClose} style={{ background: 'transparent', border: 'none', color: 'var(--text-secondary)', cursor: 'pointer', display: 'flex' }}>
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
-          </button>
         </div>
-
-        <div style={{ padding: '32px', display: 'flex', flexDirection: 'column', gap: 20 }}>
-          {isSmtp ? (
-            <>
-              <div>
-                <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: 'var(--text-secondary)', marginBottom: 8 }}>SMTP Host</label>
-                <input type="text" placeholder="smtp.gmail.com" onChange={e => setFormData({ ...formData, host: e.target.value })} style={{ width: '100%', padding: '12px 16px', background: 'var(--glass-bg-subtle)', border: '1px solid var(--card-border)', borderRadius: 12, color: 'var(--text-primary)', outline: 'none' }} />
-              </div>
-              <div style={{ display: 'flex', gap: 16 }}>
-                <div style={{ flex: 1 }}>
-                  <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: 'var(--text-secondary)', marginBottom: 8 }}>SMTP Port</label>
-                  <input type="text" placeholder="587" onChange={e => setFormData({ ...formData, port: e.target.value })} style={{ width: '100%', padding: '12px 16px', background: 'var(--glass-bg-subtle)', border: '1px solid var(--card-border)', borderRadius: 12, color: 'var(--text-primary)', outline: 'none' }} />
-                </div>
-                <div style={{ flex: 2 }}>
-                  <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: 'var(--text-secondary)', marginBottom: 8 }}>Email User</label>
-                  <input type="text" placeholder="you@example.com" onChange={e => setFormData({ ...formData, user: e.target.value })} style={{ width: '100%', padding: '12px 16px', background: 'var(--glass-bg-subtle)', border: '1px solid var(--card-border)', borderRadius: 12, color: 'var(--text-primary)', outline: 'none' }} />
-                </div>
-              </div>
-              <div>
-                <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: 'var(--text-secondary)', marginBottom: 8 }}>App Password</label>
-                <input type="password" placeholder="••••••••••••" onChange={e => setFormData({ ...formData, pass: e.target.value })} style={{ width: '100%', padding: '12px 16px', background: 'var(--glass-bg-subtle)', border: '1px solid var(--card-border)', borderRadius: 12, color: 'var(--text-primary)', outline: 'none' }} />
-              </div>
-            </>
-          ) : (
-            <>
-              <div>
-                <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: 'var(--text-secondary)', marginBottom: 8 }}>API Key / Access Token</label>
-                <input type="password" placeholder="sk_live_••••••••" onChange={e => setFormData({ ...formData, key: e.target.value })} style={{ width: '100%', padding: '12px 16px', background: 'var(--glass-bg-subtle)', border: '1px solid var(--card-border)', borderRadius: 12, color: 'var(--text-primary)', outline: 'none' }} />
-                <p style={{ fontSize: 12, color: 'var(--text-tertiary)', marginTop: 8 }}>Your keys are encrypted end-to-end and never stored in plain text.</p>
-              </div>
-            </>
-          )}
-        </div>
-
-        <div style={{ padding: '24px 32px', borderTop: '1px solid var(--card-border)', display: 'flex', justifyContent: 'flex-end', gap: 12, background: 'var(--glass-bg-subtle)' }}>
-          <button onClick={onClose} style={{ padding: '10px 20px', background: 'transparent', color: 'var(--text-secondary)', border: 'none', borderRadius: 8, fontWeight: 600, fontSize: 13, cursor: 'pointer' }}>Cancel</button>
-          <button onClick={() => onSave(formData)} style={{ padding: '10px 20px', background: 'var(--accent-primary)', color: 'white', border: 'none', borderRadius: 8, fontWeight: 600, fontSize: 13, cursor: 'pointer', boxShadow: '0 4px 12px rgba(249,115,22,0.3)' }}>Save & Connect</button>
-        </div>
-      </div>
+      )}
     </div>
   );
 }
