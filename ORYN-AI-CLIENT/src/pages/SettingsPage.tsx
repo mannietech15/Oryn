@@ -594,3 +594,4 @@ function LiveIntegrationCard({ integration, isTesting, onTest }: { integration: 
 // [a11y] Screen reader announcements
 // [responsive] Mobile padding adjustments
 // [perf] Fast TTI benchmark
+// [style] Unified token usage
