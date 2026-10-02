@@ -457,14 +457,43 @@ export function PersonnelTableRow({
         </div>
       </div>
 
-      <div style={{ display: 'flex', alignItems: 'center', gap: 16, flexWrap: 'wrap', justifyContent: 'flex-end' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 14, flexWrap: 'wrap', justifyContent: 'flex-end' }}>
         <div style={{ fontSize: 12, color: 'var(--text-muted)', fontFamily: 'monospace' }}>
           {employee.email}
         </div>
+        <span style={{
+          padding: '3px 10px',
+          borderRadius: 6,
+          fontSize: 10,
+          fontWeight: 700,
+          textTransform: 'uppercase',
+          letterSpacing: 0.5,
+          fontFamily: 'monospace',
+          background: employee.status === 'active' 
+            ? 'rgba(34, 197, 94, 0.1)' 
+            : employee.status === 'remote' 
+              ? 'rgba(56, 189, 248, 0.1)' 
+              : 'rgba(245, 158, 11, 0.1)',
+          color: employee.status === 'active' 
+            ? 'var(--success)' 
+            : employee.status === 'remote' 
+              ? '#38bdf8' 
+              : '#f59e0b',
+          border: `1px solid ${
+            employee.status === 'active' 
+              ? 'rgba(34, 197, 94, 0.3)' 
+              : employee.status === 'remote' 
+                ? 'rgba(56, 189, 248, 0.3)' 
+                : 'rgba(245, 158, 11, 0.3)'
+          }`
+        }}>
+          {employee.status}
+        </span>
         <div style={{ fontSize: 11, color: 'var(--text-muted)', fontFamily: 'monospace' }}>
           {employee.joinedDate}
         </div>
       </div>
+
     </div>
   );
 }
