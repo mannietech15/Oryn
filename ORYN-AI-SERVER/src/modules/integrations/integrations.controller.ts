@@ -152,3 +152,4 @@ export const defaultIntegrationsController = new IntegrationsController();
 // [refactor] Ledger JSON read verification
 // [style] Parameter type annotations
 // [perf] Reused object structures
+// [refactor] Standardized envelope structure
