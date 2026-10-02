@@ -153,3 +153,4 @@ export const defaultEmailService = new EmailService();
 // [perf] Cache layer initialized for low-latency transport verification
 // [perf] 5-minute TTL window avoids repetitive TCP handshakes
 // [perf] forceRefresh flag enables targeted diagnostic probes
+// [perf] Asynchronous transport pre-warm on module initialization

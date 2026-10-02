@@ -123,267 +123,293 @@ export default function SettingsPage() {
   }, [theme]);
 
   return (
-    <div style={{ flex: 1, display: 'flex', flexDirection: 'column', height: '100%', overflow: 'hidden', background: 'transparent' }}>
-      
-      {/* Header */}
-      <div style={{ padding: '32px 40px 20px', borderBottom: '1px solid var(--card-border)', flexShrink: 0 }}>
-        <div style={{ marginBottom: 6 }}>
-          <h1 style={{ fontFamily: 'var(--font-display)', fontSize: 26, fontWeight: 700, margin: 0, color: 'var(--text-primary)', letterSpacing: '-0.02em' }}>
-            Workspace Settings
-          </h1>
-        </div>
-        <p style={{ color: 'var(--text-secondary)', fontSize: 13, margin: 0 }}>
-          Manage your account preferences, connected infrastructure integrations, and Oryn's operational intelligence.
-        </p>
-      </div>
-
-      <div style={{ display: 'flex', flex: 1, overflow: 'hidden' }}>
+    <div style={{ flex: 1, overflowY: 'auto', padding: '36px 40px', background: 'var(--bg)', position: 'relative' }}>
+      <div className="page-centered-container">
         
-        {/* Sidebar Nav */}
-        <div style={{ 
-          width: 260, borderRight: '1px solid var(--card-border)', padding: '32px 16px', 
-          display: 'flex', flexDirection: 'column', gap: 6, overflowY: 'auto', flexShrink: 0
-        }}>
-          <TabButton 
-            active={activeTab === 'account'} onClick={() => setActiveTab('account')} 
-            icon={<path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2 M12 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8z" />} 
-            label="Account Details" 
-          />
-          <TabButton 
-            active={activeTab === 'preferences'} onClick={() => setActiveTab('preferences')} 
-            icon={<path d="M12 20.94c1.5 0 2.75 1.06 4 1.06 3 0 6-8 6-12.22A4.91 4.91 0 0 0 17 5c-2.22 0-4 1.44-5 2-1-.56-2.78-2-5-2a4.9 4.9 0 0 0-5 4.78C2 14 5 22 8 22c1.25 0 2.5-1.06 4-1.06Z" />} 
-            label="Preferences" 
-          />
-          <TabButton 
-            active={activeTab === 'ai'} onClick={() => setActiveTab('ai')} 
-            icon={<path d="M12 2a10 10 0 1 0 10 10H12V2z M12 12L2.06 7.5 M12 12l9.94 4.5 M12 12v10" />} 
-            label="AI Behavior" 
-          />
-          <TabButton 
-            active={activeTab === 'integrations'} onClick={() => setActiveTab('integrations')} 
-            icon={<path d="M22 12h-4l-3 9L9 3l-3 9H2" />} 
-            label={`Integrations (${integrations.length})`} 
-          />
-          <TabButton 
-            active={activeTab === 'security'} onClick={() => setActiveTab('security')} 
-            icon={<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />} 
-            label="Security" 
-          />
+        {/* Header */}
+        <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', flexWrap: 'wrap', gap: 16 }}>
+          <div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 8 }}>
+              <div style={{
+                display: 'inline-flex', alignItems: 'center', gap: 6,
+                padding: '3px 10px', borderRadius: 6,
+                background: 'rgba(34, 197, 94, 0.08)', border: '1px solid rgba(34, 197, 94, 0.2)',
+                fontSize: 11, fontWeight: 600, color: 'var(--success)', fontFamily: 'monospace'
+              }}>
+                <span style={{ width: 6, height: 6, borderRadius: '50%', background: 'var(--success)', display: 'inline-block' }} />
+                SETTINGS: SYNCHRONIZED
+              </div>
+              <div style={{
+                padding: '3px 10px', borderRadius: 6,
+                background: 'var(--glass-bg-subtle)', border: '1px solid var(--card-border)',
+                fontSize: 11, color: 'var(--text-muted)', fontFamily: 'monospace'
+              }}>
+                MULTI-TENANT PREFERENCES
+              </div>
+            </div>
+
+            <div style={{ fontFamily: 'var(--font-display)', fontSize: 28, fontWeight: 700, color: 'var(--text-primary)', letterSpacing: -0.5 }}>
+              Workspace Settings & Intelligence
+            </div>
+            <div style={{ fontSize: 13, color: 'var(--text-secondary)', marginTop: 2 }}>
+              Configure account identity, operational AI persona, automated triggers, and connected infrastructure.
+            </div>
+          </div>
+
+          {/* Horizontal Tabs Switcher */}
+          <div style={{
+            display: 'flex', gap: 6, background: 'var(--card-bg)', padding: 4, borderRadius: 12, border: '1px solid var(--card-border)',
+            flexWrap: 'wrap'
+          }}>
+            <TabPill
+              active={activeTab === 'ai'}
+              onClick={() => setActiveTab('ai')}
+              icon={<path d="M12 2a10 10 0 1 0 10 10H12V2z M12 12L2.06 7.5 M12 12l9.94 4.5 M12 12v10" />}
+              label="AI Behavior"
+            />
+            <TabPill
+              active={activeTab === 'account'}
+              onClick={() => setActiveTab('account')}
+              icon={<path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2 M12 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8z" />}
+              label="Account Details"
+            />
+            <TabPill
+              active={activeTab === 'preferences'}
+              onClick={() => setActiveTab('preferences')}
+              icon={<path d="M12 20.94c1.5 0 2.75 1.06 4 1.06 3 0 6-8 6-12.22A4.91 4.91 0 0 0 17 5c-2.22 0-4 1.44-5 2-1-.56-2.78-2-5-2a4.9 4.9 0 0 0-5 4.78C2 14 5 22 8 22c1.25 0 2.5-1.06 4-1.06Z" />}
+              label="Preferences"
+            />
+            <TabPill
+              active={activeTab === 'integrations'}
+              onClick={() => setActiveTab('integrations')}
+              icon={<path d="M22 12h-4l-3 9L9 3l-3 9H2" />}
+              label={`Integrations (${integrations.length})`}
+            />
+            <TabPill
+              active={activeTab === 'security'}
+              onClick={() => setActiveTab('security')}
+              icon={<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />}
+              label="Security"
+            />
+          </div>
         </div>
 
-        {/* Content Area */}
-        <div style={{ flex: 1, overflowY: 'auto', padding: '40px 64px' }}>
-          <div style={{ maxWidth: 760 }}>
-            
-            {/* Feedback notification */}
-            {saveSuccessMsg && (
-              <div style={{
-                padding: '12px 20px', borderRadius: 12, marginBottom: 24,
-                background: 'rgba(34, 197, 94, 0.1)', border: '1px solid rgba(34, 197, 94, 0.3)',
-                color: 'var(--success)', fontSize: 13, fontWeight: 600, display: 'flex', alignItems: 'center', gap: 10
-              }}>
-                <Check size={16} />
-                <span>{saveSuccessMsg}</span>
-              </div>
-            )}
+        {/* Feedback notification */}
+        {saveSuccessMsg && (
+          <div style={{
+            padding: '14px 20px', borderRadius: 12,
+            background: 'rgba(34, 197, 94, 0.1)', border: '1px solid rgba(34, 197, 94, 0.3)',
+            color: 'var(--success)', fontSize: 13, fontWeight: 600, display: 'flex', alignItems: 'center', gap: 10
+          }}>
+            <Check size={16} />
+            <span>{saveSuccessMsg}</span>
+          </div>
+        )}
 
-            {/* --- AI BEHAVIOR TAB --- */}
-            {activeTab === 'ai' && (
-              <SettingsSection 
-                title="Intelligence & Persona" 
-                description="Configure how Oryn AI interacts with your data and communicates with your team."
-              >
-                <div style={{ marginBottom: 32 }}>
-                  <FormLabel>AI Persona Mode</FormLabel>
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginTop: 12 }}>
-                    <PersonaCard 
-                      id="executive" title="Executive" active={persona === 'executive'} onClick={() => updatePersona('executive')}
-                      desc="High-level summaries, concise formatting, and strategic insights."
-                    />
-                    <PersonaCard 
-                      id="creative" title="Creative" active={persona === 'creative'} onClick={() => updatePersona('creative')}
-                      desc="Expansive brainstorming, vivid language, and visionary thinking."
-                    />
-                    <PersonaCard 
-                      id="analytical" title="Analytical" active={persona === 'analytical'} onClick={() => updatePersona('analytical')}
-                      desc="Deep-dive data processing, logical structure, and heavy metrics."
-                    />
-                    <PersonaCard 
-                      id="developer" title="Developer" active={persona === 'developer'} onClick={() => updatePersona('developer')}
-                      desc="Technical audits, code-first thinking, and precise documentation."
-                    />
+        {/* Centered Main Panel */}
+        <div style={{
+          background: 'var(--card-bg)',
+          border: '1px solid var(--card-border)',
+          borderRadius: 20,
+          padding: '32px 36px',
+          boxShadow: 'var(--shadow-subtle)',
+          width: '100%'
+        }}>
+          {/* --- AI BEHAVIOR TAB --- */}
+          {activeTab === 'ai' && (
+            <SettingsSection 
+              title="Intelligence & Persona" 
+              description="Configure how Oryn AI interacts with your data, structures insights, and communicates with your team."
+            >
+              <div style={{ marginBottom: 32 }}>
+                <FormLabel>AI Persona Mode</FormLabel>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: 16, marginTop: 12 }}>
+                  <PersonaCard 
+                    id="executive" title="Executive" active={persona === 'executive'} onClick={() => updatePersona('executive')}
+                    desc="High-level summaries, concise formatting, and strategic insights for leadership decisions."
+                  />
+                  <PersonaCard 
+                    id="creative" title="Creative" active={persona === 'creative'} onClick={() => updatePersona('creative')}
+                    desc="Expansive brainstorming, vivid language, and visionary divergent thinking."
+                  />
+                  <PersonaCard 
+                    id="analytical" title="Analytical" active={persona === 'analytical'} onClick={() => updatePersona('analytical')}
+                    desc="Deep-dive data processing, logical breakdown, and quantitative evidence-based metrics."
+                  />
+                  <PersonaCard 
+                    id="developer" title="Developer" active={persona === 'developer'} onClick={() => updatePersona('developer')}
+                    desc="Technical audits, code-first architectural thinking, and precise documentation."
+                  />
+                </div>
+              </div>
+
+              <div style={{ padding: 24, background: 'var(--glass-bg-subtle)', border: '1px solid var(--card-border)', borderRadius: 16, boxShadow: 'var(--shadow-subtle)' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 16 }}>
+                  <div>
+                    <div style={{ fontWeight: 600, color: 'var(--text-primary)', marginBottom: 4 }}>Automatic Task Extraction</div>
+                    <div style={{ fontSize: 13, color: 'var(--text-secondary)' }}>Allow Oryn to automatically detect and register background tasks from chat prompts.</div>
+                  </div>
+                  <Toggle isOn={autoTask} onToggle={() => updateAutoTask(!autoTask)} />
+                </div>
+              </div>
+            </SettingsSection>
+          )}
+
+          {/* --- ACCOUNT TAB --- */}
+          {activeTab === 'account' && (
+            <SettingsSection title="Account Details" description="Manage your verified workspace identity and organization profile.">
+              <div style={{ display: 'flex', alignItems: 'center', gap: 24, marginBottom: 32 }}>
+                <div style={{ width: 80, height: 80, borderRadius: '50%', background: 'rgba(249,115,22,0.1)', border: '2px solid var(--accent-primary)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 24, color: 'var(--accent-primary)', fontWeight: 800 }}>
+                  {name.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase() || 'MT'}
+                </div>
+                <div>
+                  <div style={{ fontSize: 18, fontWeight: 700, color: 'var(--text-primary)', marginBottom: 4 }}>{name}</div>
+                  <div style={{ fontSize: 13, color: 'var(--text-secondary)' }}>Verified Organization Administrator · All privileges granted</div>
+                </div>
+              </div>
+
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 24 }}>
+                <div>
+                  <FormLabel>Full / Entity Name</FormLabel>
+                  <input 
+                    value={name} onChange={e => setName(e.target.value)}
+                    style={{ width: '100%', padding: '12px 16px', marginTop: 8, background: 'var(--glass-bg-subtle)', border: '1px solid var(--card-border)', borderRadius: 12, color: 'var(--text-primary)', outline: 'none' }} 
+                  />
+                </div>
+                <div>
+                  <FormLabel>Email Address</FormLabel>
+                  <input 
+                    value={email} onChange={e => setEmail(e.target.value)}
+                    style={{ width: '100%', padding: '12px 16px', marginTop: 8, background: 'var(--glass-bg-subtle)', border: '1px solid var(--card-border)', borderRadius: 12, color: 'var(--text-primary)', outline: 'none' }} 
+                  />
+                </div>
+                <div>
+                  <FormLabel>Operational HQ Location</FormLabel>
+                  <input 
+                    value={companyLocation} onChange={e => setCompanyLocation(e.target.value)}
+                    style={{ width: '100%', padding: '12px 16px', marginTop: 8, background: 'var(--glass-bg-subtle)', border: '1px solid var(--card-border)', borderRadius: 12, color: 'var(--text-primary)', outline: 'none' }} 
+                  />
+                </div>
+                <div>
+                  <FormLabel>Industry Sector</FormLabel>
+                  <input 
+                    value={companyIndustry} onChange={e => setCompanyIndustry(e.target.value)}
+                    style={{ width: '100%', padding: '12px 16px', marginTop: 8, background: 'var(--glass-bg-subtle)', border: '1px solid var(--card-border)', borderRadius: 12, color: 'var(--text-primary)', outline: 'none' }} 
+                  />
+                </div>
+              </div>
+
+              <div style={{ marginTop: 28, display: 'flex', justifyContent: 'flex-start' }}>
+                <button 
+                  onClick={handleSaveAccount}
+                  disabled={savingAccount}
+                  style={{ padding: '12px 28px', background: 'var(--accent-primary)', color: 'white', border: 'none', borderRadius: 12, fontWeight: 600, fontSize: 14, cursor: savingAccount ? 'wait' : 'pointer', transition: 'all 0.2s', boxShadow: '0 4px 12px rgba(249,115,22,0.3)' }}
+                >
+                  {savingAccount ? 'Saving to Datastore...' : 'Save Changes'}
+                </button>
+              </div>
+            </SettingsSection>
+          )}
+
+          {/* --- PREFERENCES TAB --- */}
+          {activeTab === 'preferences' && (
+            <SettingsSection title="Preferences" description="Customize your workspace notifications and interface visual appearance.">
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+                
+                <div style={{ padding: 24, background: 'var(--glass-bg-subtle)', border: '1px solid var(--card-border)', borderRadius: 16, boxShadow: 'var(--shadow-subtle)' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 16 }}>
+                    <div>
+                      <div style={{ fontWeight: 600, color: 'var(--text-primary)', marginBottom: 4 }}>Light Mode Interface</div>
+                      <div style={{ fontSize: 13, color: 'var(--text-secondary)' }}>Switch the interface between dark and high-contrast light themes.</div>
+                    </div>
+                    <Toggle isOn={theme === 'light'} onToggle={() => updateTheme(theme === 'dark' ? 'light' : 'dark')} />
                   </div>
                 </div>
 
                 <div style={{ padding: 24, background: 'var(--glass-bg-subtle)', border: '1px solid var(--card-border)', borderRadius: 16, boxShadow: 'var(--shadow-subtle)' }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 16 }}>
                     <div>
-                      <div style={{ fontWeight: 600, color: 'var(--text-primary)', marginBottom: 4 }}>Automatic Task Extraction</div>
-                      <div style={{ fontSize: 13, color: 'var(--text-secondary)' }}>Allow Oryn to automatically detect and register background tasks from chat prompts.</div>
+                      <div style={{ fontWeight: 600, color: 'var(--text-primary)', marginBottom: 4 }}>Email Notifications</div>
+                      <div style={{ fontSize: 13, color: 'var(--text-secondary)' }}>Receive daily operational briefings and human-in-the-loop alerts to {email}.</div>
                     </div>
-                    <Toggle isOn={autoTask} onToggle={() => updateAutoTask(!autoTask)} />
-                  </div>
-                </div>
-              </SettingsSection>
-            )}
-
-            {/* --- ACCOUNT TAB --- */}
-            {activeTab === 'account' && (
-              <SettingsSection title="Account Details" description="Manage your verified workspace identity and organization profile.">
-                <div style={{ display: 'flex', alignItems: 'center', gap: 24, marginBottom: 32 }}>
-                  <div style={{ width: 80, height: 80, borderRadius: '50%', background: 'rgba(249,115,22,0.1)', border: '2px solid var(--accent-primary)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 24, color: 'var(--accent-primary)', fontWeight: 800 }}>
-                    {name.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase() || 'MT'}
-                  </div>
-                  <div>
-                    <div style={{ fontSize: 16, fontWeight: 700, color: 'var(--text-primary)', marginBottom: 4 }}>{name}</div>
-                    <div style={{ fontSize: 13, color: 'var(--text-secondary)' }}>Verified Organization Administrator</div>
+                    <Toggle isOn={emailNotifs} onToggle={() => updateEmailNotifs(!emailNotifs)} />
                   </div>
                 </div>
 
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 24 }}>
-                  <div>
-                    <FormLabel>Full / Entity Name</FormLabel>
-                    <input 
-                      value={name} onChange={e => setName(e.target.value)}
-                      style={{ width: '100%', padding: '12px 16px', marginTop: 8, background: 'var(--glass-bg-subtle)', border: '1px solid var(--card-border)', borderRadius: 12, color: 'var(--text-primary)', outline: 'none' }} 
-                    />
-                  </div>
-                  <div>
-                    <FormLabel>Email Address</FormLabel>
-                    <input 
-                      value={email} onChange={e => setEmail(e.target.value)}
-                      style={{ width: '100%', padding: '12px 16px', marginTop: 8, background: 'var(--glass-bg-subtle)', border: '1px solid var(--card-border)', borderRadius: 12, color: 'var(--text-primary)', outline: 'none' }} 
-                    />
-                  </div>
-                  <div>
-                    <FormLabel>Operational HQ Location</FormLabel>
-                    <input 
-                      value={companyLocation} onChange={e => setCompanyLocation(e.target.value)}
-                      style={{ width: '100%', padding: '12px 16px', marginTop: 8, background: 'var(--glass-bg-subtle)', border: '1px solid var(--card-border)', borderRadius: 12, color: 'var(--text-primary)', outline: 'none' }} 
-                    />
-                  </div>
-                  <div>
-                    <FormLabel>Industry Sector</FormLabel>
-                    <input 
-                      value={companyIndustry} onChange={e => setCompanyIndustry(e.target.value)}
-                      style={{ width: '100%', padding: '12px 16px', marginTop: 8, background: 'var(--glass-bg-subtle)', border: '1px solid var(--card-border)', borderRadius: 12, color: 'var(--text-primary)', outline: 'none' }} 
-                    />
+                <div style={{ padding: 24, background: 'var(--glass-bg-subtle)', border: '1px solid var(--card-border)', borderRadius: 16, boxShadow: 'var(--shadow-subtle)' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 16 }}>
+                    <div>
+                      <div style={{ fontWeight: 600, color: 'var(--text-primary)', marginBottom: 4 }}>Push Notifications</div>
+                      <div style={{ fontSize: 13, color: 'var(--text-secondary)' }}>Get instant browser notifications for critical operational and ledger events.</div>
+                    </div>
+                    <Toggle isOn={pushNotifs} onToggle={() => updatePushNotifs(!pushNotifs)} />
                   </div>
                 </div>
+              </div>
+            </SettingsSection>
+          )}
 
-                <div style={{ marginTop: 28 }}>
-                  <button 
-                    onClick={handleSaveAccount}
-                    disabled={savingAccount}
-                    style={{ padding: '12px 28px', background: 'var(--accent-primary)', color: 'white', border: 'none', borderRadius: 12, fontWeight: 600, fontSize: 14, cursor: savingAccount ? 'wait' : 'pointer', transition: 'all 0.2s', boxShadow: '0 4px 12px rgba(249,115,22,0.3)' }}
-                  >
-                    {savingAccount ? 'Saving to Datastore...' : 'Save Changes'}
+          {/* --- INTEGRATIONS TAB --- */}
+          {activeTab === 'integrations' && (
+            <SettingsSection title="Connected Infrastructure" description="Inspect live communication relays, inference relays, and database connections.">
+              {testResult && (
+                <div style={{
+                  padding: '12px 18px', borderRadius: 10, marginBottom: 16,
+                  background: testResult.connected ? 'rgba(34, 197, 94, 0.08)' : 'rgba(239, 68, 68, 0.08)',
+                  border: `1px solid ${testResult.connected ? 'rgba(34, 197, 94, 0.25)' : 'rgba(239, 68, 68, 0.25)'}`,
+                  display: 'flex', justifyContent: 'space-between', alignItems: 'center'
+                }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13, color: 'var(--text-primary)' }}>
+                    {testResult.connected ? <CheckCircle2 size={16} color="var(--success)" /> : <XCircle size={16} color="var(--danger)" />}
+                    <span>{testResult.message}</span>
+                  </div>
+                  <button onClick={() => setTestResult(null)} style={{ background: 'transparent', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', display: 'flex', alignItems: 'center' }}>
+                    <X size={14} />
                   </button>
                 </div>
-              </SettingsSection>
-            )}
+              )}
 
-            {/* --- PREFERENCES TAB --- */}
-            {activeTab === 'preferences' && (
-              <SettingsSection title="Preferences" description="Customize your workspace notifications and interface theme.">
+              {loadingIntegrations ? (
+                <div style={{ padding: 30, textAlign: 'center', color: 'var(--text-muted)' }}>Probing integrations...</div>
+              ) : (
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-                  
-                  <div style={{ padding: 24, background: 'var(--glass-bg-subtle)', border: '1px solid var(--card-border)', borderRadius: 16, boxShadow: 'var(--shadow-subtle)' }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                      <div>
-                        <div style={{ fontWeight: 600, color: 'var(--text-primary)', marginBottom: 4 }}>Light Mode</div>
-                        <div style={{ fontSize: 13, color: 'var(--text-secondary)' }}>Switch the interface between dark and light themes.</div>
-                      </div>
-                      <Toggle isOn={theme === 'light'} onToggle={() => updateTheme(theme === 'dark' ? 'light' : 'dark')} />
-                    </div>
-                  </div>
-
-                  <div style={{ padding: 24, background: 'var(--glass-bg-subtle)', border: '1px solid var(--card-border)', borderRadius: 16, boxShadow: 'var(--shadow-subtle)' }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                      <div>
-                        <div style={{ fontWeight: 600, color: 'var(--text-primary)', marginBottom: 4 }}>Email Notifications</div>
-                        <div style={{ fontSize: 13, color: 'var(--text-secondary)' }}>Receive daily operational briefings and human-in-the-loop alerts.</div>
-                      </div>
-                      <Toggle isOn={emailNotifs} onToggle={() => updateEmailNotifs(!emailNotifs)} />
-                    </div>
-                  </div>
-
-                  <div style={{ padding: 24, background: 'var(--glass-bg-subtle)', border: '1px solid var(--card-border)', borderRadius: 16, boxShadow: 'var(--shadow-subtle)' }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                      <div>
-                        <div style={{ fontWeight: 600, color: 'var(--text-primary)', marginBottom: 4 }}>Push Notifications</div>
-                        <div style={{ fontSize: 13, color: 'var(--text-secondary)' }}>Get instant browser notifications for critical operational events.</div>
-                      </div>
-                      <Toggle isOn={pushNotifs} onToggle={() => updatePushNotifs(!pushNotifs)} />
-                    </div>
-                  </div>
+                  {integrations.map(intg => (
+                    <LiveIntegrationCard 
+                      key={intg.id}
+                      integration={intg}
+                      isTesting={testingId === intg.id}
+                      onTest={() => handleTestIntegration(intg.id)}
+                    />
+                  ))}
                 </div>
-              </SettingsSection>
-            )}
+              )}
+            </SettingsSection>
+          )}
 
-            {/* --- INTEGRATIONS TAB --- */}
-            {activeTab === 'integrations' && (
-              <SettingsSection title="Connected Infrastructure" description="Inspect live communication relays, inference relays, and database connections.">
-                {testResult && (
-                  <div style={{
-                    padding: '12px 18px', borderRadius: 10, marginBottom: 16,
-                    background: testResult.connected ? 'rgba(34, 197, 94, 0.08)' : 'rgba(239, 68, 68, 0.08)',
-                    border: `1px solid ${testResult.connected ? 'rgba(34, 197, 94, 0.25)' : 'rgba(239, 68, 68, 0.25)'}`,
-                    display: 'flex', justifyContent: 'space-between', alignItems: 'center'
-                  }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13, color: 'var(--text-primary)' }}>
-                      {testResult.connected ? <CheckCircle2 size={16} color="var(--success)" /> : <XCircle size={16} color="var(--danger)" />}
-                      <span>{testResult.message}</span>
-                    </div>
-                    <button onClick={() => setTestResult(null)} style={{ background: 'transparent', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', display: 'flex', alignItems: 'center' }}>
-                      <X size={14} />
-                    </button>
+          {/* --- SECURITY TAB --- */}
+          {activeTab === 'security' && (
+            <SettingsSection title="Security Settings" description="Manage your authentication credentials, encryption layers, and session activity.">
+              <div style={{ padding: 24, background: 'var(--glass-bg-subtle)', border: '1px solid var(--card-border)', borderRadius: 16, boxShadow: 'var(--shadow-subtle)', marginBottom: 24 }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 16 }}>
+                  <div>
+                    <div style={{ fontWeight: 600, color: 'var(--text-primary)', marginBottom: 4 }}>Two-Factor Authentication</div>
+                    <div style={{ fontSize: 13, color: 'var(--text-secondary)' }}>Add an extra cryptographic verification layer to your account credentials.</div>
                   </div>
-                )}
-
-                {loadingIntegrations ? (
-                  <div style={{ padding: 30, textAlign: 'center', color: 'var(--text-muted)' }}>Probing integrations...</div>
-                ) : (
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-                    {integrations.map(intg => (
-                      <LiveIntegrationCard 
-                        key={intg.id}
-                        integration={intg}
-                        isTesting={testingId === intg.id}
-                        onTest={() => handleTestIntegration(intg.id)}
-                      />
-                    ))}
-                  </div>
-                )}
-              </SettingsSection>
-            )}
-
-            {/* --- SECURITY TAB --- */}
-            {activeTab === 'security' && (
-              <SettingsSection title="Security Settings" description="Manage your authentication credentials and session activity.">
-                <div style={{ padding: 24, background: 'var(--glass-bg-subtle)', border: '1px solid var(--card-border)', borderRadius: 16, boxShadow: 'var(--shadow-subtle)', marginBottom: 24 }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <div>
-                      <div style={{ fontWeight: 600, color: 'var(--text-primary)', marginBottom: 4 }}>Two-Factor Authentication</div>
-                      <div style={{ fontSize: 13, color: 'var(--text-secondary)' }}>Add an extra cryptographic verification layer to your account.</div>
-                    </div>
-                    <span style={{ padding: '6px 14px', background: 'rgba(34, 197, 94, 0.1)', color: 'var(--success)', border: '1px solid rgba(34, 197, 94, 0.3)', borderRadius: 8, fontWeight: 700, fontSize: 12 }}>
-                      ACTIVE (ENFORCED)
-                    </span>
-                  </div>
+                  <span style={{ padding: '6px 14px', background: 'rgba(34, 197, 94, 0.1)', color: 'var(--success)', border: '1px solid rgba(34, 197, 94, 0.3)', borderRadius: 8, fontWeight: 700, fontSize: 12 }}>
+                    ACTIVE (ENFORCED)
+                  </span>
                 </div>
-                
-                <div style={{ padding: 24, background: 'rgba(239, 68, 68, 0.05)', border: '1px solid rgba(239, 68, 68, 0.2)', borderRadius: 16 }}>
-                  <div style={{ fontWeight: 600, color: 'var(--danger)', marginBottom: 4 }}>Enterprise Session Audit</div>
-                  <div style={{ fontSize: 13, color: 'var(--text-secondary)', marginBottom: 16 }}>All administrative modifications to datastore records are recorded to JSON execution logs.</div>
-                  <button onClick={() => alert('Operational session verified. Current session token is cryptographically bound.')} style={{ padding: '8px 16px', background: 'var(--glass-bg-subtle)', color: 'var(--text-primary)', border: '1px solid var(--card-border)', borderRadius: 8, fontWeight: 600, fontSize: 13, cursor: 'pointer' }}>
-                    Verify Active Session
-                  </button>
-                </div>
-              </SettingsSection>
-            )}
-
-          </div>
+              </div>
+              
+              <div style={{ padding: 24, background: 'rgba(239, 68, 68, 0.05)', border: '1px solid rgba(239, 68, 68, 0.2)', borderRadius: 16 }}>
+                <div style={{ fontWeight: 600, color: 'var(--danger)', marginBottom: 4 }}>Enterprise Session Audit</div>
+                <div style={{ fontSize: 13, color: 'var(--text-secondary)', marginBottom: 16 }}>All administrative modifications to datastore records are recorded to JSON execution logs.</div>
+                <button onClick={() => alert('Operational session verified. Current session token is cryptographically bound.')} style={{ padding: '8px 16px', background: 'var(--glass-bg-subtle)', color: 'var(--text-primary)', border: '1px solid var(--card-border)', borderRadius: 8, fontWeight: 600, fontSize: 13, cursor: 'pointer' }}>
+                  Verify Active Session
+                </button>
+              </div>
+            </SettingsSection>
+          )}
         </div>
       </div>
     </div>
@@ -392,19 +418,26 @@ export default function SettingsPage() {
 
 // --- Subcomponents ---
 
-function TabButton({ active, onClick, icon, label }: { active: boolean; onClick: () => void; icon: React.ReactNode; label: string }) {
+function TabPill({ active, onClick, icon, label }: { active: boolean; onClick: () => void; icon: React.ReactNode; label: string }) {
   return (
     <button 
       onClick={onClick}
       style={{
-        display: 'flex', alignItems: 'center', gap: 12, padding: '12px 16px', width: '100%',
-        background: active ? 'rgba(249, 115, 22, 0.1)' : 'transparent',
-        border: 'none', borderRadius: 12, cursor: 'pointer', transition: 'all 0.2s',
-        color: active ? 'var(--accent-primary)' : 'var(--text-secondary)',
-        fontWeight: active ? 700 : 500, fontSize: 14, textAlign: 'left'
+        display: 'inline-flex',
+        alignItems: 'center',
+        gap: 8,
+        padding: '8px 16px',
+        background: active ? 'var(--accent-primary)' : 'transparent',
+        border: 'none',
+        borderRadius: 8,
+        cursor: 'pointer',
+        transition: 'all 0.2s ease',
+        color: active ? '#ffffff' : 'var(--text-secondary)',
+        fontWeight: active ? 700 : 500,
+        fontSize: 13,
       }}
     >
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
         {icon}
       </svg>
       {label}
