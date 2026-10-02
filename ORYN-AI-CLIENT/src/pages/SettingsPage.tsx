@@ -773,3 +773,4 @@ function LiveIntegrationCard({ integration, isTesting, onTest }: { integration: 
 // [security] Cryptographic session seal
 // [style] 24px consistent block rhythm
 // [docs] Security runbook reference
+// [refactor] Non-blocking alert feedback
