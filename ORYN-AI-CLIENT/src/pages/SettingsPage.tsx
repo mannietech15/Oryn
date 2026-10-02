@@ -564,3 +564,4 @@ function LiveIntegrationCard({ integration, isTesting, onTest }: { integration: 
 // [responsive] Responsive flex wrapping
 // [style] Heading typography standardization
 // [refactor] Centered feedback toast banner
+// [style] Smooth tab transition keyframes
