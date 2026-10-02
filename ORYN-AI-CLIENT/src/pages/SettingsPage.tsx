@@ -762,3 +762,4 @@ function LiveIntegrationCard({ integration, isTesting, onTest }: { integration: 
 // [style] Standard 24px padding
 // [feat] Token fingerprint display
 // [style] Audit button hover styling
+// [docs] SOC2 compliance guidelines
