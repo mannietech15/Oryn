@@ -570,3 +570,4 @@ function LiveIntegrationCard({ integration, isTesting, onTest }: { integration: 
 // [style] 36px 40px outer padding
 // [perf] Flattened DOM hierarchy
 // [style] Theme-adaptive container backgrounds
+// [refactor] Overflow container scroll padding
