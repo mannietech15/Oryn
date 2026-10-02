@@ -716,3 +716,4 @@ function LiveIntegrationCard({ integration, isTesting, onTest }: { integration: 
 // [a11y] Enter key form submission
 // [style] Initials computation fallback
 // [perf] Dirty-state check before save
+// [style] Accessible placeholder contrast
