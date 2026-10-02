@@ -145,3 +145,4 @@ export const defaultIntegrationsController = new IntegrationsController();
 // [perf] Promise.all for status queries
 // [refactor] ISO timestamp in lastSync
 // [docs] Rate limiting recommendations
+// [refactor] NVIDIA NIM relay check
