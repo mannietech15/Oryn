@@ -446,7 +446,34 @@ export function PersonnelDirectory({ employees, loading = false }: PersonnelDire
             }}
           />
         </div>
+
+        {/* Status Filter Tabs */}
+        <div style={{ display: 'flex', gap: 4, background: 'var(--glass-bg-subtle)', padding: 3, borderRadius: 8, border: '1px solid var(--card-border)' }}>
+          {(['all', 'active', 'remote', 'on-leave'] as const).map(tab => (
+            <button
+              key={tab}
+              type="button"
+              onClick={() => setStatusFilter(tab)}
+              style={{
+                padding: '5px 12px',
+                borderRadius: 6,
+                border: 'none',
+                fontSize: 11,
+                fontWeight: 600,
+                textTransform: 'uppercase',
+                fontFamily: 'var(--font-display)',
+                cursor: 'pointer',
+                background: statusFilter === tab ? 'var(--accent-primary)' : 'transparent',
+                color: statusFilter === tab ? '#fff' : 'var(--text-muted)',
+                transition: 'all 0.15s ease'
+              }}
+            >
+              {tab === 'all' ? 'All Personnel' : tab === 'active' ? 'Active' : tab === 'remote' ? 'Remote' : 'On Leave'}
+            </button>
+          ))}
+        </div>
       </div>
+
     </div>
   );
 }
