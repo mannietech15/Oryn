@@ -285,3 +285,4 @@ export default function Sidebar({ page, onNavigate, isOpen, onClose, organizatio
 // [refactor] Settings anchor item
 // [perf] Optimized sidebar re-renders
 // [style] Workspace dropdown alignment
+// [a11y] aria-current attribute on active route
