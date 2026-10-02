@@ -593,3 +593,4 @@ function LiveIntegrationCard({ integration, isTesting, onTest }: { integration: 
 // [docs] Centered design matches enterprise standards
 // [a11y] Screen reader announcements
 // [responsive] Mobile padding adjustments
+// [perf] Fast TTI benchmark
