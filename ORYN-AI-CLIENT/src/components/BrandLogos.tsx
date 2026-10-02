@@ -66,3 +66,12 @@ export function ZendeskLogo({ size = 20, style }: LogoProps) {
     </svg>
   );
 }
+
+export function SalesforceLogo({ size = 20, style }: LogoProps) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" style={style}>
+      <rect width="24" height="24" rx="5" fill="#00A1E0" opacity="0.1" />
+      <path d="M10 5.5a4.5 4.5 0 0 1 4.2 2.92A4.2 4.2 0 0 1 18.5 12a4.2 4.2 0 0 1-.36 1.7A3.8 3.8 0 0 1 20 17a3.8 3.8 0 0 1-3.8 3.8H7.5A4.5 4.5 0 0 1 3 16.3a4.5 4.5 0 0 1 1.25-3.12A4.8 4.8 0 0 1 4 11.5a4.5 4.5 0 0 1 4.5-4.5c.53 0 1.04.09 1.5.26z" fill="#00A1E0" />
+    </svg>
+  );
+}
