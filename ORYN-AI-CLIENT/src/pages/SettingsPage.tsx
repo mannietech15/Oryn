@@ -575,3 +575,4 @@ function LiveIntegrationCard({ integration, isTesting, onTest }: { integration: 
 // [responsive] Fluid column scaling
 // [style] Standardized form label tracking
 // [docs] Enterprise settings layout specifications
+// [types] Strict Tab union type verification
