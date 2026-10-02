@@ -154,3 +154,4 @@ export const defaultEmailService = new EmailService();
 // [perf] 5-minute TTL window avoids repetitive TCP handshakes
 // [perf] forceRefresh flag enables targeted diagnostic probes
 // [perf] Asynchronous transport pre-warm on module initialization
+// [refactor] Decoupled status query from blocking socket round-trips
