@@ -179,7 +179,7 @@ export class Datastore {
         { id: 'f-1', type: 'revenue', category: 'Enterprise Subscriptions', amount: 4200, date: new Date(Date.now() - 86400000 * 5).toISOString().split('T')[0], note: 'Monthly Stripe recurring subscription tranche', createdAt: new Date(Date.now() - 86400000 * 5).toISOString() },
         { id: 'f-2', type: 'revenue', category: 'API Usage & Tokens', amount: 2150, date: new Date(Date.now() - 86400000 * 3).toISOString().split('T')[0], note: 'Metered token consumption overages', createdAt: new Date(Date.now() - 86400000 * 3).toISOString() },
         { id: 'f-3', type: 'expense', category: 'Cloud Infrastructure & GPU', amount: 2450, date: new Date(Date.now() - 86400000 * 7).toISOString().split('T')[0], note: 'NVIDIA NIM compute cluster & AWS relays', createdAt: new Date(Date.now() - 86400000 * 7).toISOString() },
-        { id: 'f-4', type: 'expense', category: 'Operational Engineering', amount: 12200, date: new Date(Date.now() - 86400000 * 12).toISOString().split('T')[0], note: 'Observability & third-party API licensing', createdAt: new Date(Date.now() - 86400000 * 12).toISOString() },
+        { id: 'f-4', type: 'expense', category: 'Operational Engineering', amount: 1650, date: new Date(Date.now() - 86400000 * 12).toISOString().split('T')[0], note: 'Observability & third-party API licensing', createdAt: new Date(Date.now() - 86400000 * 12).toISOString() },
       ],
       aiTaskLogs: [
         { id: 'task-init-1', type: 'chat', model: 'meta/llama-3.2-11b-vision-instruct', latencyMs: 245, tokensUsed: 420, status: 'success', timestamp: new Date(Date.now() - 600000).toISOString() },
