@@ -202,9 +202,24 @@ export function buildFiscalKpis(
           <polyline points="17 6 23 6 23 12"></polyline>
         </svg>
       )
+    },
+    {
+      label: 'Operational Disbursements',
+      value: `$${((metrics?.totalExpenses ?? 0) / 1000).toFixed(1)}K`,
+      detail: 'Accumulated operational liabilities',
+      source: 'Accounts Payable Ledger',
+      period: 'Verified historical total',
+      accent: 'var(--danger)',
+      icon: (
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <polyline points="23 18 13.5 8.5 8.5 13.5 1 6"></polyline>
+          <polyline points="17 18 23 18 23 12"></polyline>
+        </svg>
+      )
     }
   ];
 }
+
 
 
 
