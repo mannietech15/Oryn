@@ -252,6 +252,24 @@ export function buildOrgKpiItems(
   ];
 }
 
+export interface BusinessProfileCardProps {
+  company: {
+    name: string;
+    industry: string;
+    foundedDate: string;
+    location: string;
+  };
+}
+
+export function BusinessProfileCard({ company }: BusinessProfileCardProps) {
+  return (
+    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 20 }}>
+      {/* Entity attributes will be placed here */}
+    </div>
+  );
+}
+
+
 
 
 
