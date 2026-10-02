@@ -1,6 +1,6 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import type { Company, Employee, Team } from '../types';
-import { fetchOrganization } from '../api/oryn';
+import { fetchOrganization, updateOrganizationData } from '../api/oryn';
 
 export default function OrganizationPage() {
   const [company, setCompany] = useState<Company>({
@@ -14,6 +14,11 @@ export default function OrganizationPage() {
   const [teams, setTeams] = useState<Team[]>([]);
   const [loading, setLoading] = useState(true);
 
+  // Add Member Modal State
+  const [showAddMember, setShowAddMember] = useState(false);
+  const [newMember, setNewMember] = useState<{ name: string; role: string; email: string; status: 'active' | 'on-leave' | 'remote' }>({ name: '', role: '', email: '', status: 'active' });
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
   useEffect(() => {
     fetchOrganization()
       .then(data => {
@@ -25,17 +30,45 @@ export default function OrganizationPage() {
       .finally(() => setLoading(false));
   }, []);
 
+  const handleAddMemberSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newMember.name.trim() || !newMember.email.trim()) return;
+
+    setIsSubmitting(true);
+    try {
+      const addedEmployee: Employee = {
+        id: `emp-${Date.now()}`,
+        name: newMember.name,
+        role: newMember.role || 'Staff Engineer',
+        email: newMember.email,
+        status: newMember.status,
+        joinedDate: new Date().toISOString().split('T')[0]
+      };
+
+      const updatedList = [addedEmployee, ...employees];
+      await updateOrganizationData({ employees: updatedList });
+
+      setEmployees(updatedList);
+      setNewMember({ name: '', role: '', email: '', status: 'active' });
+      setShowAddMember(false);
+    } catch (err) {
+      console.error('Failed to add employee', err);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   return (
     <div style={{ flex: 1, overflowY: 'auto', padding: 40, display: 'flex', flexDirection: 'column', gap: 32 }}>
       {/* Header */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', flexWrap: 'wrap', gap: 16 }}>
         <div>
           <div style={{ fontFamily: 'var(--font-display)', fontSize: 11, fontWeight: 700, letterSpacing: 3, color: 'var(--muted)', textTransform: 'uppercase', marginBottom: 8 }}>Entity Management</div>
           <div style={{ fontFamily: 'var(--font-display)', fontSize: 24, fontWeight: 800, color: 'white', letterSpacing: 1.5 }}>
             <span style={{ color: 'var(--cyan)' }}>{company.name}</span> · Organization
           </div>
         </div>
-        <div style={{ display: 'flex', gap: 12 }}>
+        <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
           <div style={{
             padding: '8px 16px', borderRadius: 8,
             background: 'var(--glass-bg-subtle)', border: '1px solid var(--card-border)',
@@ -43,6 +76,16 @@ export default function OrganizationPage() {
           }}>
             {employees.length} Verified Team Members
           </div>
+          <button
+            onClick={() => setShowAddMember(true)}
+            style={{
+              padding: '8px 18px', background: 'var(--cyan)', color: '#000',
+              border: 'none', borderRadius: 8, fontWeight: 700, fontSize: 13, cursor: 'pointer',
+              display: 'flex', alignItems: 'center', gap: 6, boxShadow: '0 2px 8px rgba(0, 240, 255, 0.3)'
+            }}
+          >
+            + Add Team Member
+          </button>
         </div>
       </div>
 
@@ -122,6 +165,78 @@ export default function OrganizationPage() {
             </table>
           </div>
         </>
+      )}
+
+      {/* Add Team Member Modal */}
+      {showAddMember && (
+        <div style={{
+          position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(8px)',
+          display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, padding: 20
+        }}>
+          <div style={{
+            background: 'var(--card-bg)', border: '1px solid var(--border)',
+            borderRadius: 20, padding: 32, width: '100%', maxWidth: 440,
+            boxShadow: 'var(--shadow-subtle)', display: 'flex', flexDirection: 'column', gap: 20
+          }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <h2 style={{ fontSize: 18, fontWeight: 700, margin: 0, color: 'white' }}>Add Team Member</h2>
+              <button onClick={() => setShowAddMember(false)} style={{ background: 'transparent', border: 'none', color: 'var(--muted)', cursor: 'pointer', fontSize: 18 }}>✕</button>
+            </div>
+
+            <form onSubmit={handleAddMemberSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+              <div>
+                <label style={{ fontSize: 11, fontWeight: 700, color: 'var(--muted)', textTransform: 'uppercase' }}>Full Name</label>
+                <input
+                  required
+                  value={newMember.name}
+                  onChange={e => setNewMember({ ...newMember, name: e.target.value })}
+                  placeholder="e.g. Maya Patel"
+                  style={{ width: '100%', padding: '10px 14px', marginTop: 6, background: 'rgba(10,29,58,0.7)', border: '1px solid var(--border)', borderRadius: 10, color: '#fff', outline: 'none' }}
+                />
+              </div>
+
+              <div>
+                <label style={{ fontSize: 11, fontWeight: 700, color: 'var(--muted)', textTransform: 'uppercase' }}>Role / Position</label>
+                <input
+                  required
+                  value={newMember.role}
+                  onChange={e => setNewMember({ ...newMember, role: e.target.value })}
+                  placeholder="e.g. Lead ML Engineer"
+                  style={{ width: '100%', padding: '10px 14px', marginTop: 6, background: 'rgba(10,29,58,0.7)', border: '1px solid var(--border)', borderRadius: 10, color: '#fff', outline: 'none' }}
+                />
+              </div>
+
+              <div>
+                <label style={{ fontSize: 11, fontWeight: 700, color: 'var(--muted)', textTransform: 'uppercase' }}>Corporate Email</label>
+                <input
+                  required
+                  type="email"
+                  value={newMember.email}
+                  onChange={e => setNewMember({ ...newMember, email: e.target.value })}
+                  placeholder="maya@oryn.ai"
+                  style={{ width: '100%', padding: '10px 14px', marginTop: 6, background: 'rgba(10,29,58,0.7)', border: '1px solid var(--border)', borderRadius: 10, color: '#fff', outline: 'none' }}
+                />
+              </div>
+
+              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 10, marginTop: 8 }}>
+                <button
+                  type="button"
+                  onClick={() => setShowAddMember(false)}
+                  style={{ padding: '8px 16px', background: 'transparent', border: '1px solid var(--border)', borderRadius: 8, color: 'var(--muted)', cursor: 'pointer' }}
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={isSubmitting}
+                  style={{ padding: '8px 20px', background: 'var(--cyan)', border: 'none', borderRadius: 8, color: '#000', fontWeight: 700, cursor: 'pointer' }}
+                >
+                  {isSubmitting ? 'Saving...' : 'Add Member'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
       )}
     </div>
   );

@@ -179,6 +179,16 @@ export async function updateCompany(company: any) {
   return res.json();
 }
 
+export async function updateOrganizationData(payload: { company?: any; employees?: any[]; teams?: any[] }) {
+  const res = await fetch(`${BASE}/organization`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload),
+  });
+  if (!res.ok) throw new Error('Failed to update organization');
+  return res.json();
+}
+
 // --- Human-in-the-Loop Email Actions ---
 export async function stageEmailDraft(payload: { to: string; subject: string; body: string }) {
   const res = await fetch(`${BASE}/email/draft`, {
@@ -262,5 +272,13 @@ export async function createEcosystemCommunity(payload: { name: string; descript
   if (!res.ok) throw new Error('Failed to create ecosystem community');
   return res.json();
 }
+
+// --- Telemetry & Analytics ---
+export async function fetchAnalyticsTelemetry() {
+  const res = await fetch(`${BASE}/analytics/telemetry`);
+  if (!res.ok) throw new Error('Failed to fetch analytics telemetry');
+  return res.json();
+}
+
 
 

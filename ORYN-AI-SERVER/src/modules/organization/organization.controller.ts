@@ -15,8 +15,13 @@ export class OrganizationController {
 
   updateCompany = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
-      const { company } = req.body;
-      const updated = this.datastore.updateOrganization({ company });
+      const { company, employees, teams } = req.body;
+      const patch: any = {};
+      if (company) patch.company = company;
+      if (employees) patch.employees = employees;
+      if (teams) patch.teams = teams;
+
+      const updated = this.datastore.updateOrganization(patch);
       res.json(updated);
     } catch (err) {
       next(err);
