@@ -108,15 +108,12 @@ export default function CalendarPage() {
   return (
     <div style={{ flex: 1, display: 'flex', flexDirection: 'column', height: '100%', overflow: 'hidden', background: 'transparent' }}>
       {/* Header */}
-      <div style={{ padding: '40px 48px 24px', borderBottom: '1px solid var(--card-border)', flexShrink: 0 }}>
+      <div style={{ padding: '32px 40px 20px', borderBottom: '1px solid var(--card-border)', flexShrink: 0 }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8, flexWrap: 'wrap', gap: 16 }}>
-          <div style={{ display: 'flex', alignItems: 'flex-end', gap: 12 }}>
-            <h1 style={{ fontFamily: 'var(--font-display)', fontSize: 32, fontWeight: 800, margin: 0, color: 'var(--text-primary)', letterSpacing: '-0.5px' }}>
-              Operational
+          <div>
+            <h1 style={{ fontFamily: 'var(--font-display)', fontSize: 26, fontWeight: 700, margin: 0, color: 'var(--text-primary)', letterSpacing: '-0.02em' }}>
+              Operational Calendar
             </h1>
-            <span style={{ fontFamily: 'var(--font-script)', fontSize: 36, color: 'var(--accent-primary)', lineHeight: 0.8, transform: 'translateY(-4px)' }}>
-              Calendar
-            </span>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
             <button
@@ -125,7 +122,7 @@ export default function CalendarPage() {
                 padding: '8px 16px', background: 'var(--accent-primary)', color: '#fff',
                 border: 'none', borderRadius: 8, fontWeight: 600, fontSize: 13, cursor: 'pointer',
                 display: 'flex', alignItems: 'center', gap: 6, transition: 'all 0.2s',
-                boxShadow: '0 2px 8px rgba(249, 115, 22, 0.3)'
+                boxShadow: 'var(--shadow-subtle)'
               }}
             >
               + Schedule Event

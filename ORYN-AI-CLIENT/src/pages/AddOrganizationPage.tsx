@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { motion, AnimatePresence, Variants } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { updateCompany } from '../api/oryn';
 
 export default function AddOrganizationPage({ onComplete }: { onComplete?: (data: any) => void }) {
@@ -41,87 +41,102 @@ export default function AddOrganizationPage({ onComplete }: { onComplete?: (data
     }
   };
 
-  const orbVariants: Variants = {
-    animate: {
-      scale: [1, 1.2, 1],
-      opacity: [0.3, 0.6, 0.3],
-      rotate: [0, 90, 0],
-      transition: { duration: 8, repeat: Infinity, ease: 'easeInOut' }
-    }
-  };
-
   return (
-    <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative', overflow: 'hidden', minHeight: '100vh', background: 'var(--bg)' }}>
-      {/* ── Background Elements ── */}
-      <motion.div variants={orbVariants} animate="animate" style={{ position: 'absolute', top: '-10%', left: '-10%', width: '50vw', height: '50vw', background: 'radial-gradient(circle, var(--accent-primary) 0%, transparent 60%)', filter: 'blur(120px)', opacity: 0.1, pointerEvents: 'none', zIndex: 0 }} />
-      <motion.div variants={orbVariants} animate="animate" style={{ position: 'absolute', bottom: '-20%', right: '-10%', width: '60vw', height: '60vw', background: 'radial-gradient(circle, #8b5cf6 0%, transparent 60%)', filter: 'blur(150px)', opacity: 0.08, pointerEvents: 'none', zIndex: 0, animationDelay: '-4s' }} />
-      <div style={{ position: 'absolute', inset: 0, backgroundImage: 'radial-gradient(var(--glass-border) 1px, transparent 1px)', backgroundSize: '40px 40px', opacity: 0.5, pointerEvents: 'none', zIndex: 0 }} />
-
-      <motion.div 
-        initial={{ opacity: 0, y: 30, scale: 0.95 }}
-        animate={{ opacity: 1, y: 0, scale: 1 }}
-        transition={{ duration: 0.7, ease: [0.23, 1, 0.32, 1] }}
-        style={{ width: '100%', maxWidth: 540, position: 'relative', zIndex: 10, padding: 20 }}
-      >
-        <div style={{ textAlign: 'center', marginBottom: 40 }}>
-          <div style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: 64, height: 64, borderRadius: 20, background: 'linear-gradient(135deg, rgba(249,115,22,0.2), rgba(249,115,22,0.05))', border: '1px solid rgba(249,115,22,0.2)', marginBottom: 24, boxShadow: '0 0 30px rgba(249,115,22,0.2)' }}>
-            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--accent-primary)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+    <div style={{
+      flex: 1, minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center',
+      background: 'var(--bg)', padding: '24px', position: 'relative'
+    }}>
+      <div style={{ width: '100%', maxWidth: 460 }}>
+        
+        {/* Header Branding */}
+        <div style={{ textAlign: 'center', marginBottom: 28 }}>
+          <div style={{
+            display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+            width: 44, height: 44, borderRadius: 10,
+            background: '#141519', border: '1px solid #222328', marginBottom: 16
+          }}>
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--accent-primary)" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
               <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"></path>
             </svg>
           </div>
-          <h1 style={{ fontFamily: 'var(--font-display)', fontSize: 36, fontWeight: 700, color: 'var(--text-primary)', marginBottom: 8, letterSpacing: -0.5 }}>Setup Workspace</h1>
-          <p style={{ fontSize: 15, color: 'var(--text-secondary)' }}>Configure ORYN for your organization.</p>
+          <h1 style={{ fontSize: 22, fontWeight: 700, color: 'var(--text-primary)', letterSpacing: '-0.02em', margin: '0 0 6px' }}>
+            Set up your workspace
+          </h1>
+          <p style={{ fontSize: 13, color: 'var(--text-secondary)', margin: 0 }}>
+            Configure your organization profile to start automating workflows.
+          </p>
         </div>
 
-        <div style={{ 
-          background: 'var(--card-bg)', backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)',
-          border: '1px solid var(--card-border)', borderRadius: 24, padding: 40, boxShadow: 'var(--shadow-subtle)',
-          position: 'relative', overflow: 'hidden'
+        {/* Setup Card */}
+        <div style={{
+          background: 'var(--card-bg)', border: '1px solid var(--card-border)',
+          borderRadius: 16, padding: '32px 28px', boxShadow: 'var(--shadow-subtle)'
         }}>
-          {/* Progress Bar */}
-          <div style={{ display: 'flex', gap: 8, marginBottom: 40 }}>
+          
+          {/* Step Progress Pills */}
+          <div style={{ display: 'flex', gap: 6, marginBottom: 28 }}>
             {[1, 2, 3].map(i => (
-              <div key={i} style={{ flex: 1, height: 4, borderRadius: 2, background: i <= step ? 'var(--accent-primary)' : 'var(--glass-bg-hover)', transition: 'background 0.4s ease' }} />
+              <div 
+                key={i} 
+                style={{
+                  flex: 1, height: 3, borderRadius: 2,
+                  background: i <= step ? 'var(--accent-primary)' : 'var(--glass-bg-strong)',
+                  transition: 'background 0.3s ease'
+                }} 
+              />
             ))}
           </div>
 
           <AnimatePresence mode="wait">
+            {/* Step 1: Profile */}
             {step === 1 && (
-              <motion.div key="step1" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} transition={{ duration: 0.3 }}>
-                <h2 style={{ fontSize: 20, fontWeight: 600, color: 'var(--text-primary)', marginBottom: 24 }}>1. Organization Profile</h2>
+              <motion.div key="step1" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} transition={{ duration: 0.2 }}>
+                <div style={{ fontSize: 15, fontWeight: 600, color: 'var(--text-primary)', marginBottom: 20 }}>
+                  1. Organization Profile
+                </div>
                 
-                <div style={{ display: 'flex', alignItems: 'center', gap: 20, marginBottom: 24 }}>
+                {/* Logo Uploader */}
+                <div style={{ display: 'flex', alignItems: 'center', gap: 16, marginBottom: 24 }}>
                   <div style={{ 
-                    width: 80, height: 80, borderRadius: '50%', background: 'var(--glass-bg-subtle)', 
+                    width: 56, height: 56, borderRadius: 12, background: 'var(--glass-bg-subtle)', 
                     border: '1px dashed var(--card-border)', display: 'flex', alignItems: 'center', 
                     justifyContent: 'center', overflow: 'hidden', position: 'relative', flexShrink: 0 
                   }}>
                     {orgData.logo ? (
                       <img src={orgData.logo} alt="Logo" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                     ) : (
-                      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                        <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                        <polyline points="21 15 16 10 5 21"></polyline>
+                      </svg>
                     )}
                     <input type="file" accept="image/*" onChange={handleLogoUpload} style={{ position: 'absolute', inset: 0, opacity: 0, cursor: 'pointer' }} />
                   </div>
                   <div>
-                    <div style={{ fontSize: 14, fontWeight: 600, color: 'var(--text-primary)', marginBottom: 4 }}>Company Logo</div>
-                    <div style={{ fontSize: 13, color: 'var(--text-secondary)' }}>Upload a circular logo (PNG, JPG).</div>
+                    <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-primary)', marginBottom: 2 }}>Company Logo</div>
+                    <div style={{ fontSize: 12, color: 'var(--text-muted)' }}>PNG or JPG (click box to upload)</div>
                   </div>
                 </div>
 
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
-                  <Input label="Organization Name" placeholder="e.g. Acme Corp" value={orgData.name} onChange={(v: string) => setOrgData({ ...orgData, name: v })} />
-                  <Input label="Industry" placeholder="e.g. Technology, Finance, Healthcare" value={orgData.industry} onChange={(v: string) => setOrgData({ ...orgData, industry: v })} />
-                  <Input label="Website URL" placeholder="https://example.com" value={orgData.website} onChange={(v: string) => setOrgData({ ...orgData, website: v })} />
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+                  <Input label="Organization Name" placeholder="Acme Corp" value={orgData.name} onChange={(v: string) => setOrgData({ ...orgData, name: v })} />
+                  <Input label="Industry Sector" placeholder="Enterprise Software, Fintech, Healthcare" value={orgData.industry} onChange={(v: string) => setOrgData({ ...orgData, industry: v })} />
+                  <Input label="Website Domain / URL" placeholder="https://acmecorp.com" value={orgData.website} onChange={(v: string) => setOrgData({ ...orgData, website: v })} />
                 </div>
               </motion.div>
             )}
 
+            {/* Step 2: Data Sources */}
             {step === 2 && (
-              <motion.div key="step2" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} transition={{ duration: 0.3 }}>
-                <h2 style={{ fontSize: 20, fontWeight: 600, color: 'var(--text-primary)', marginBottom: 24 }}>2. Connect Data Sources</h2>
-                <p style={{ fontSize: 14, color: 'var(--text-secondary)', marginBottom: 24 }}>ORYN needs data to provide insights. You can connect these later.</p>
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+              <motion.div key="step2" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} transition={{ duration: 0.2 }}>
+                <div style={{ fontSize: 15, fontWeight: 600, color: 'var(--text-primary)', marginBottom: 6 }}>
+                  2. Connect Data Sources
+                </div>
+                <p style={{ fontSize: 13, color: 'var(--text-secondary)', marginBottom: 20 }}>
+                  Select services to monitor. You can configure credentials later in Settings.
+                </p>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
                   {['Google Analytics', 'Stripe', 'Salesforce', 'Notion'].map(name => (
                     <IntegrationCard 
                       key={name}
@@ -138,15 +153,20 @@ export default function AddOrganizationPage({ onComplete }: { onComplete?: (data
               </motion.div>
             )}
 
+            {/* Step 3: Invite Team */}
             {step === 3 && (
-              <motion.div key="step3" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} transition={{ duration: 0.3 }}>
-                <h2 style={{ fontSize: 20, fontWeight: 600, color: 'var(--text-primary)', marginBottom: 24 }}>3. Invite Your Team</h2>
-                <p style={{ fontSize: 14, color: 'var(--text-secondary)', marginBottom: 24 }}>Add members who will have access to this workspace.</p>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 12, marginBottom: 24 }}>
+              <motion.div key="step3" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} transition={{ duration: 0.2 }}>
+                <div style={{ fontSize: 15, fontWeight: 600, color: 'var(--text-primary)', marginBottom: 6 }}>
+                  3. Invite Your Team
+                </div>
+                <p style={{ fontSize: 13, color: 'var(--text-secondary)', marginBottom: 20 }}>
+                  Add team members who will have access to this operational workspace.
+                </p>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginBottom: 16 }}>
                   {teamInvites.map((email, idx) => (
                     <div key={idx} style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
                       <input
-                        placeholder={`colleague_${idx + 1}@${orgData.website ? orgData.website.replace(/^https?:\/\//, '') : 'company.com'}`}
+                        placeholder={`colleague_${idx + 1}@company.com`}
                         value={email}
                         onChange={e => {
                           const updated = [...teamInvites];
@@ -154,16 +174,16 @@ export default function AddOrganizationPage({ onComplete }: { onComplete?: (data
                           setTeamInvites(updated);
                         }}
                         style={{
-                          width: '100%', padding: '12px 16px', background: 'var(--glass-bg-subtle)',
-                          border: '1px solid var(--card-border)', borderRadius: 12, color: 'var(--text-primary)',
-                          outline: 'none', fontSize: 14
+                          width: '100%', padding: '10px 14px', background: 'var(--glass-bg-subtle)',
+                          border: '1px solid var(--card-border)', borderRadius: 8, color: 'var(--text-primary)',
+                          outline: 'none', fontSize: 13
                         }}
                       />
                       {teamInvites.length > 1 && (
                         <button
                           type="button"
                           onClick={() => setTeamInvites(teamInvites.filter((_, i) => i !== idx))}
-                          style={{ background: 'transparent', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', fontSize: 16, padding: '0 8px' }}
+                          style={{ background: 'transparent', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', fontSize: 14, padding: '4px' }}
                         >
                           ✕
                         </button>
@@ -173,9 +193,13 @@ export default function AddOrganizationPage({ onComplete }: { onComplete?: (data
                   <button 
                     type="button"
                     onClick={() => setTeamInvites([...teamInvites, ''])}
-                    style={{ background: 'transparent', border: '1px dashed var(--glass-border)', color: 'var(--text-secondary)', padding: '12px', borderRadius: 12, cursor: 'pointer', transition: 'all 0.2s', fontSize: 13, fontWeight: 500 }} 
-                    onMouseEnter={e => e.currentTarget.style.color = 'var(--text-primary)'} 
-                    onMouseLeave={e => e.currentTarget.style.color = 'var(--text-secondary)'}
+                    style={{
+                      background: 'transparent', border: '1px dashed var(--card-border)',
+                      color: 'var(--text-secondary)', padding: '10px', borderRadius: 8,
+                      cursor: 'pointer', fontSize: 12, fontWeight: 500, marginTop: 4
+                    }} 
+                    onMouseEnter={e => e.currentTarget.style.borderColor = 'var(--text-secondary)'} 
+                    onMouseLeave={e => e.currentTarget.style.borderColor = 'var(--card-border)'}
                   >
                     + Add another invitee
                   </button>
@@ -185,44 +209,67 @@ export default function AddOrganizationPage({ onComplete }: { onComplete?: (data
           </AnimatePresence>
 
           {errorMsg && (
-            <div style={{ padding: '10px 16px', borderRadius: 10, background: 'rgba(239, 68, 68, 0.1)', border: '1px solid rgba(239, 68, 68, 0.3)', color: 'var(--danger)', fontSize: 13, marginTop: 20 }}>
+            <div style={{
+              padding: '10px 14px', borderRadius: 8,
+              background: 'rgba(239, 68, 68, 0.08)', border: '1px solid rgba(239, 68, 68, 0.25)',
+              color: 'var(--danger)', fontSize: 12, marginTop: 16
+            }}>
               {errorMsg}
             </div>
           )}
 
-          <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 40 }}>
+          {/* Navigation Buttons */}
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 32, paddingTop: 20, borderTop: '1px solid var(--card-border)' }}>
             <button 
               onClick={prevStep}
-              style={{ padding: '12px 24px', background: 'transparent', border: '1px solid var(--card-border)', color: 'var(--text-primary)', borderRadius: 12, fontSize: 14, fontWeight: 600, cursor: step === 1 ? 'not-allowed' : 'pointer', opacity: step === 1 ? 0 : 1, transition: 'all 0.2s' }}
+              style={{
+                padding: '8px 16px', background: 'transparent', border: '1px solid var(--card-border)',
+                color: 'var(--text-secondary)', borderRadius: 8, fontSize: 13, fontWeight: 500,
+                cursor: step === 1 ? 'not-allowed' : 'pointer', opacity: step === 1 ? 0 : 1, transition: 'all 0.15s'
+              }}
             >
               Back
             </button>
             <button 
               onClick={step === 3 ? handleFinish : nextStep}
               disabled={loading || (step === 1 && !orgData.name)}
-              style={{ padding: '12px 32px', background: 'var(--accent-primary)', color: 'white', border: 'none', borderRadius: 12, fontSize: 14, fontWeight: 600, cursor: (loading || (step === 1 && !orgData.name)) ? 'not-allowed' : 'pointer', opacity: (loading || (step === 1 && !orgData.name)) ? 0.7 : 1, transition: 'all 0.2s', display: 'flex', alignItems: 'center', gap: 8, boxShadow: '0 4px 14px rgba(249,115,22,0.3)' }}
+              style={{
+                padding: '9px 24px', background: 'var(--accent-primary)', color: '#fff',
+                border: 'none', borderRadius: 8, fontSize: 13, fontWeight: 600,
+                cursor: (loading || (step === 1 && !orgData.name)) ? 'not-allowed' : 'pointer',
+                opacity: (loading || (step === 1 && !orgData.name)) ? 0.6 : 1,
+                transition: 'opacity 0.15s'
+              }}
             >
-              {loading ? (
-                <><div style={{ width: 14, height: 14, border: '2px solid rgba(255,255,255,0.3)', borderTopColor: 'white', borderRadius: '50%', animation: 'spin 0.8s linear infinite' }} /> Processing</>
-              ) : step === 3 ? 'Complete Setup' : 'Continue'}
+              {loading ? 'Saving...' : step === 3 ? 'Complete Setup' : 'Continue'}
             </button>
           </div>
+
         </div>
-      </motion.div>
+      </div>
     </div>
   );
 }
 
 function Input({ label, placeholder, value, onChange }: any) {
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-      {label && <label style={{ fontSize: 12, fontWeight: 600, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: 0.5 }}>{label}</label>}
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+      {label && (
+        <label style={{ fontSize: 12, fontWeight: 500, color: 'var(--text-secondary)' }}>
+          {label}
+        </label>
+      )}
       <input 
-        value={value} onChange={e => onChange?.(e.target.value)}
+        value={value} 
+        onChange={e => onChange?.(e.target.value)}
         placeholder={placeholder}
-        style={{ width: '100%', padding: '14px 16px', background: 'var(--glass-bg-subtle)', border: '1px solid var(--card-border)', borderRadius: 12, color: 'var(--text-primary)', fontSize: 15, outline: 'none', transition: 'all 0.2s', fontFamily: 'var(--font-body)' }}
-        onFocus={e => { e.target.style.borderColor = 'var(--accent-primary)'; e.target.style.boxShadow = '0 0 0 3px rgba(249,115,22,0.1)'; }}
-        onBlur={e => { e.target.style.borderColor = 'var(--card-border)'; e.target.style.boxShadow = 'none'; }}
+        style={{
+          width: '100%', padding: '10px 14px', background: 'var(--glass-bg-subtle)',
+          border: '1px solid var(--card-border)', borderRadius: 8, color: 'var(--text-primary)',
+          fontSize: 13, outline: 'none', transition: 'border-color 0.15s'
+        }}
+        onFocus={e => e.target.style.borderColor = 'var(--accent-primary)'}
+        onBlur={e => e.target.style.borderColor = 'var(--card-border)'}
       />
     </div>
   );
@@ -233,16 +280,25 @@ function IntegrationCard({ icon, name, selected, onToggle }: any) {
     <div 
       onClick={onToggle}
       style={{ 
-        padding: '16px', borderRadius: 16, cursor: 'pointer', transition: 'all 0.2s',
-        background: selected ? 'rgba(249,115,22,0.05)' : 'var(--glass-bg-subtle)',
+        padding: '12px 14px', borderRadius: 10, cursor: 'pointer', transition: 'border-color 0.15s',
+        background: 'var(--glass-bg-subtle)',
         border: `1px solid ${selected ? 'var(--accent-primary)' : 'var(--card-border)'}`,
-        display: 'flex', alignItems: 'center', gap: 12
+        display: 'flex', alignItems: 'center', gap: 10
       }}
     >
-      <div style={{ fontSize: 24 }}>{icon}</div>
-      <div style={{ flex: 1, fontSize: 14, fontWeight: 500, color: selected ? 'var(--accent-primary)' : 'var(--text-primary)' }}>{name}</div>
-      <div style={{ width: 18, height: 18, borderRadius: 9, border: `2px solid ${selected ? 'var(--accent-primary)' : 'var(--text-muted)'}`, display: 'flex', alignItems: 'center', justifyContent: 'center', background: selected ? 'var(--accent-primary)' : 'transparent' }}>
-        {selected && <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>}
+      <div style={{ fontSize: 18 }}>{icon}</div>
+      <div style={{ flex: 1, fontSize: 13, fontWeight: 500, color: selected ? 'var(--text-primary)' : 'var(--text-secondary)' }}>{name}</div>
+      <div style={{
+        width: 16, height: 16, borderRadius: 4,
+        border: `1px solid ${selected ? 'var(--accent-primary)' : 'var(--card-border)'}`,
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+        background: selected ? 'var(--accent-primary)' : 'transparent'
+      }}>
+        {selected && (
+          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+            <polyline points="20 6 9 17 4 12"></polyline>
+          </svg>
+        )}
       </div>
     </div>
   );

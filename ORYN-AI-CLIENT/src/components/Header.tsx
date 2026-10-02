@@ -33,7 +33,7 @@ export default function Header({ page, onNavigate, onToggleSidebar }: Props) {
         <div onClick={() => onNavigate('chat')} style={{ display: 'flex', alignItems: 'center', cursor: 'pointer', gap: 4 }}>
           {/* Hexagon Logo Icon */}
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-             <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="var(--accent-primary)">
+             <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--accent-primary)">
                 <polygon points="12 2 20.66 7 20.66 17 12 22 3.34 17 3.34 7" strokeWidth="2" strokeLinejoin="round" />
                 <circle cx="12" cy="12" r="3" fill="var(--accent-primary)" stroke="none" />
                 <g strokeWidth="2" strokeLinecap="round">
@@ -46,7 +46,7 @@ export default function Header({ page, onNavigate, onToggleSidebar }: Props) {
                 </g>
               </svg>
           </div>
-          <div style={{ fontFamily: 'var(--font-script)', fontSize: 32, color: 'var(--text-primary)', marginLeft: 0, paddingBottom: 6 }}>
+          <div style={{ fontFamily: 'var(--font-display)', fontSize: 20, fontWeight: 800, letterSpacing: '-0.03em', color: 'var(--text-primary)', marginLeft: 6 }}>
             Oryn
           </div>
         </div>

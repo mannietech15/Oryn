@@ -1,32 +1,32 @@
-@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&family=Outfit:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&family=Pacifico&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap');
 
 :root {
   /* 🌌 Core Backgrounds */
   --bg: #09090b;               
-  --surface: #18181b;          
-  --surface-hover: #27272a;    
+  --surface: #121316;          
+  --surface-hover: #18191e;    
   
-  /* 🪟 Glassmorphism & Materials */
-  --card-bg: rgba(24, 24, 27, 0.6); 
-  --card-border: rgba(255, 255, 255, 0.08);
-  --glass-highlight: rgba(255, 255, 255, 0.1);
-  --glass-border: rgba(249, 115, 22, 0.3); /* Orange border */
+  /* 🪟 Clean Surfaces & Borders */
+  --card-bg: #111215; 
+  --card-border: #222328;
+  --glass-highlight: rgba(255, 255, 255, 0.05);
+  --glass-border: #2e3038;
   
-  /* ⚡ Glowing Accents (Solid Orange) */
-  --accent-primary: #f97316; /* Professional Orange */
-  --accent-cyan: #f97316; /* Redirecting old cyan to orange */
-  --accent-purple: #ea580c; /* Darker orange */
-  --accent-glow: rgba(249, 115, 22, 0.25);
-  --accent-gradient: var(--accent-primary); /* No gradient! */
+  /* ⚡ Clean Professional Accents */
+  --accent-primary: #ea580c; /* Deep professional orange */
+  --accent-cyan: #ea580c; 
+  --accent-purple: #c2410c;
+  --accent-glow: transparent;
+  --accent-gradient: #ea580c;
   
   /* 🖋 Typography */
-  --text-primary: #fafafa;     
+  --text-primary: #f4f4f5;     
   --text-secondary: #a1a1aa;   
   --text-muted: #71717a;       
   
   /* 🚥 Semantic Status */
   --success: #10b981;
-  --success-glow: rgba(16, 185, 129, 0.15);
+  --success-glow: rgba(16, 185, 129, 0.1);
   --warn: #f59e0b;
   --danger: #ef4444;
   --info: #3b82f6;
@@ -34,7 +34,7 @@
   /* Legacy mappings */
   --card: var(--card-bg);
   --border: var(--card-border);
-  --border-glow: var(--accent-glow);
+  --border-glow: transparent;
   --accent: var(--accent-primary);
   --cyan: var(--accent-primary);
   --violet: var(--accent-purple);
@@ -43,20 +43,20 @@
   --white: #ffffff;
 
   /* 📏 Typography Definitions */
-  --font-display: 'Montserrat', 'Outfit', 'Plus Jakarta Sans', sans-serif;
-  --font-body: 'Inter', sans-serif;
-  --font-script: 'Pacifico', cursive;
+  --font-display: 'Plus Jakarta Sans', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-body: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-script: 'Plus Jakarta Sans', 'Inter', sans-serif;
 
-  /* 🧊 Glass Utility Colors */
-  --glass-bg-subtle: rgba(255, 255, 255, 0.02);
-  --glass-bg-hover: rgba(255, 255, 255, 0.05);
-  --glass-bg-strong: rgba(255, 255, 255, 0.1);
-  --glass-border-subtle: rgba(255, 255, 255, 0.05);
-  --inverted-bg: #fff;
-  --inverted-text: #000;
+  /* 🧊 Utility Colors */
+  --glass-bg-subtle: #141519;
+  --glass-bg-hover: #18191e;
+  --glass-bg-strong: #222328;
+  --glass-border-subtle: #222328;
+  --inverted-bg: #f4f4f5;
+  --inverted-text: #09090b;
   
   /* 🌥️ Shadows */
-  --shadow-subtle: 0 4px 24px rgba(0, 0, 0, 0.2);
+  --shadow-subtle: 0 1px 3px 0 rgba(0, 0, 0, 0.3), 0 4px 12px 0 rgba(0, 0, 0, 0.15);
 }
 
 :root[data-theme="light"] {
@@ -111,18 +111,16 @@ input, textarea { font-family: inherit; }
   background: rgba(249, 115, 22, 0.5); 
 }
 
-/* 🪟 Panel Utility Classes */
+/* 🪟 Clean Panel Utility Classes */
 .glass-panel {
   background: var(--card-bg);
   border: 1px solid var(--card-border);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.2);
-  transition: all 0.25s ease;
+  border-radius: 12px;
+  box-shadow: var(--shadow-subtle);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 .glass-panel:hover {
   border-color: var(--glass-border);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
 }
 
 /* 🪄 Animations */

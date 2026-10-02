@@ -271,7 +271,7 @@ export function ConversationalMode({
       </button>
 
       {/* Title */}
-      <div style={{ position: 'absolute', top: 40, fontFamily: 'var(--font-script)', fontSize: 24, color: 'var(--accent-primary)' }}>
+      <div style={{ position: 'absolute', top: 40, fontFamily: 'var(--font-display)', fontSize: 20, fontWeight: 800, letterSpacing: '-0.02em', color: 'var(--text-primary)' }}>
         Oryn AI
       </div>
 

@@ -80,8 +80,8 @@ export default function App() {
           </button>
           
           <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--accent-primary)"><polygon points="12 2 20.66 7 20.66 17 12 22 3.34 17 3.34 7" strokeWidth="2" strokeLinejoin="round" /><circle cx="12" cy="12" r="2" fill="var(--accent-primary)" stroke="none" /></svg>
-            <span style={{ fontFamily: 'var(--font-script)', fontSize: 22, color: 'var(--text-primary)', paddingBottom: 2 }}>Oryn</span>
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--accent-primary)"><polygon points="12 2 20.66 7 20.66 17 12 22 3.34 17 3.34 7" strokeWidth="2" strokeLinejoin="round" /><circle cx="12" cy="12" r="2" fill="var(--accent-primary)" stroke="none" /></svg>
+            <span style={{ fontFamily: 'var(--font-display)', fontSize: 18, fontWeight: 800, letterSpacing: '-0.03em', color: 'var(--text-primary)' }}>Oryn</span>
           </div>
           
           <button onClick={() => { chat.startNewSession(); navigate('chat'); }} style={{ width: 40, height: 40, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(249, 115, 22, 0.1)', borderRadius: 10, border: '1px solid rgba(249, 115, 22, 0.2)', color: 'var(--accent-primary)' }}>

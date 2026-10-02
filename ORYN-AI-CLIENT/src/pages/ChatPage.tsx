@@ -109,7 +109,7 @@ function formatContent(text: string) {
       }
       return `<strong style="color: var(--text-primary); font-weight: 600;">${p1}</strong>`;
     })
-    .replace(/__ORYN_PLACEHOLDER__/g, '<span style="font-family: var(--font-script); font-size: 1.35em; font-weight: bold; color: var(--accent-primary); padding-right: 2px;">Oryn</span>')
+    .replace(/__ORYN_PLACEHOLDER__/g, '<span style="font-family: var(--font-display); font-size: 1.05em; font-weight: 700; color: var(--accent-primary); letter-spacing: -0.01em; padding-right: 2px;">Oryn</span>')
     .replace(/### (.*?)(<br\/>|\n|$)/g, '<h3 style="color: var(--accent-primary); font-weight: 700; margin: 16px 0 8px;">$1</h3>$2')
     .replace(/\n/g, '<br/>');
 
@@ -425,7 +425,7 @@ function MessageBubble({ msg, isMobile, onImageClick, language, onEdit, onRegene
           </svg>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-          <span style={{ fontFamily: 'var(--font-script)', fontSize: 20, color: 'var(--text-primary)', fontWeight: 400, marginTop: -2 }}>Oryn AI</span>
+          <span style={{ fontFamily: 'var(--font-display)', fontSize: 15, color: 'var(--text-primary)', fontWeight: 700, letterSpacing: '-0.02em' }}>Oryn AI</span>
           <span style={{ fontSize: 10, background: 'var(--glass-bg-hover)', padding: '2px 6px', borderRadius: 4, fontWeight: 500, color: 'var(--text-secondary)' }}>v2.0</span>
         </div>
       </div>
@@ -447,10 +447,9 @@ function MessageBubble({ msg, isMobile, onImageClick, language, onEdit, onRegene
                     opacity: 0.2;
                   }
                   50% {
-                    transform: scale(1) translateY(-3px);
+                    transform: scale(1) translateY(-2px);
                     opacity: 1;
-                    box-shadow: 0 0 10px rgba(249, 115, 22, 0.6);
-                    background: linear-gradient(135deg, var(--accent-primary), #ffb84d);
+                    background: var(--accent-primary);
                   }
                   100% {
                     transform: scale(0.4) translateY(0px);
@@ -786,8 +785,8 @@ export default function ChatPage({
         {/* Empty State Title */}
         {messages.length === 0 && (
           <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 24 }}>
-            <h1 style={{ fontFamily: 'var(--font-script)', fontSize: isMobile ? 36 : 48, color: 'var(--text-primary)', margin: 0, fontWeight: 400, display: 'flex', alignItems: 'center', gap: 16 }}>
-              <svg width="40" height="40" viewBox="0 0 32 32" fill="none">
+            <h1 style={{ fontFamily: 'var(--font-display)', fontSize: isMobile ? 26 : 34, color: 'var(--text-primary)', margin: 0, fontWeight: 700, letterSpacing: '-0.02em', display: 'flex', alignItems: 'center', gap: 14 }}>
+              <svg width="36" height="36" viewBox="0 0 32 32" fill="none">
                 <polygon points="16,1 31,9 31,23 16,31 1,23 1,9" stroke="var(--accent-primary)" strokeWidth="1.2" fill="rgba(249, 115, 22,0.1)" />
                 <circle cx="16" cy="16" r="3" fill="var(--accent-primary)" />
                 <line x1="16" y1="7" x2="16" y2="13" stroke="var(--accent-primary)" strokeWidth="0.8" opacity="0.6" />

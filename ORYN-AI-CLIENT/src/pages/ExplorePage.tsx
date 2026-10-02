@@ -157,48 +157,41 @@ export default function ExplorePage() {
     <div style={{ flex: 1, overflowY: 'auto', background: 'transparent', perspective: '1000px' }}>
       {/* Hero / Header */}
       <div style={{
-        padding: '60px 40px',
-        background: 'linear-gradient(180deg, rgba(249, 115, 22,0.05) 0%, transparent 100%)',
+        padding: '48px 40px',
+        background: 'var(--surface)',
         textAlign: 'center',
         borderBottom: '1px solid var(--border)',
-        position: 'relative',
-        overflow: 'hidden'
+        position: 'relative'
       }}>
-        <div style={{
-          position: 'absolute', top: -100, left: '50%', transform: 'translateX(-50%)',
-          width: 600, height: 600, background: 'radial-gradient(circle, rgba(249, 115, 22,0.08) 0%, transparent 70%)',
-          pointerEvents: 'none'
-        }} />
-        
         <div style={{ display: 'inline-flex', alignItems: 'center', gap: 8, padding: '4px 12px', borderRadius: 20, background: 'rgba(34, 197, 94, 0.1)', border: '1px solid rgba(34, 197, 94, 0.25)', color: 'var(--success)', fontSize: 11, fontWeight: 700, textTransform: 'uppercase', marginBottom: 16 }}>
           <span style={{ width: 6, height: 6, borderRadius: '50%', background: 'var(--success)' }} />
           LIVE ECOSYSTEM TELEMETRY · REAL-TIME DISCOVERY
         </div>
 
-        <h1 style={{ fontFamily: 'var(--font-display)', fontSize: 44, fontWeight: 800, marginBottom: 16, letterSpacing: -1 }}>
-          Explore the <span style={{ color: 'var(--cyan)' }}>Ecosystem</span>
+        <h1 style={{ fontFamily: 'var(--font-display)', fontSize: 36, fontWeight: 800, marginBottom: 12, letterSpacing: '-0.02em', color: 'var(--text-primary)' }}>
+          Explore the Ecosystem
         </h1>
-        <p style={{ color: 'var(--muted)', fontSize: 18, maxWidth: 640, margin: '0 auto 32px', lineHeight: 1.6 }}>
+        <p style={{ color: 'var(--muted)', fontSize: 16, maxWidth: 640, margin: '0 auto 28px', lineHeight: 1.6 }}>
           Discover verified business networks, connect with enterprise peers, and observe industrial shifts in real time.
         </p>
 
         {/* Search Bar */}
-        <div style={{ maxWidth: 640, margin: '0 auto', position: 'relative' }}>
+        <div style={{ maxWidth: 600, margin: '0 auto', position: 'relative' }}>
           <input 
             type="text" 
             placeholder="Search communities, partners, or market trends..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             style={{
-              width: '100%', padding: '18px 30px', borderRadius: 40, border: '1px solid var(--border)',
-              background: 'rgba(10,29,58,0.7)', backdropFilter: 'blur(20px)', color: 'var(--white)',
-              fontSize: 15, outline: 'none', transition: 'all 0.3s',
-              boxShadow: 'var(--shadow-subtle), 0 0 15px rgba(249, 115, 22,0.05)'
+              width: '100%', padding: '14px 24px', borderRadius: 12, border: '1px solid var(--border)',
+              background: 'var(--card-bg)', color: 'var(--text-primary)',
+              fontSize: 14, outline: 'none', transition: 'all 0.2s',
+              boxShadow: 'var(--shadow-subtle)'
             }}
-            onFocus={(e) => { e.target.style.borderColor = 'var(--cyan)'; e.target.style.boxShadow = 'var(--shadow-subtle), 0 0 25px rgba(249, 115, 22,0.2)'; }}
-            onBlur={(e) => { e.target.style.borderColor = 'var(--border)'; e.target.style.boxShadow = 'var(--shadow-subtle), 0 0 15px rgba(249, 115, 22,0.05)'; }}
+            onFocus={(e) => { e.target.style.borderColor = 'var(--accent-primary)'; }}
+            onBlur={(e) => { e.target.style.borderColor = 'var(--border)'; }}
           />
-          <div style={{ position: 'absolute', right: 24, top: '50%', transform: 'translateY(-50%)', fontSize: 18, color: 'var(--muted)' }}>
+          <div style={{ position: 'absolute', right: 20, top: '50%', transform: 'translateY(-50%)', fontSize: 16, color: 'var(--muted)' }}>
             {search ? (
               <span onClick={() => setSearch('')} style={{ cursor: 'pointer' }}>✕</span>
             ) : '🔍'}
@@ -436,35 +429,36 @@ export default function ExplorePage() {
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 32 }}>
             {caseStudies.map(cs => (
               <div key={cs.id} style={{
-                display: 'flex', gap: 24, padding: 40, background: 'rgba(10,29,58,0.7)', borderRadius: 24, border: '1px solid var(--border)',
-                transition: 'all 0.3s'
+                display: 'flex', gap: 24, padding: 32, background: 'var(--card-bg)', borderRadius: 16, border: '1px solid var(--border)',
+                transition: 'border-color 0.2s, box-shadow 0.2s', boxShadow: 'var(--shadow-subtle)'
               }}
-              onMouseEnter={e => e.currentTarget.style.borderColor = 'rgba(249, 115, 22,0.4)'}
+              onMouseEnter={e => e.currentTarget.style.borderColor = 'var(--glass-border)'}
               onMouseLeave={e => e.currentTarget.style.borderColor = 'var(--border)'}
               >
-                <div style={{ width: 100, height: 100, background: 'rgba(249, 115, 22,0.1)', borderRadius: 20, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 48, flexShrink: 0 }}>
+                <div style={{ width: 64, height: 64, background: 'var(--surface-hover)', border: '1px solid var(--border)', borderRadius: 12, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 32, flexShrink: 0 }}>
                   {cs.image}
                 </div>
                 <div>
-                  <h3 style={{ fontSize: 24, marginBottom: 12 }}>{cs.company}</h3>
-                  <div style={{ padding: '4px 12px', background: 'rgba(34,197,94,0.15)', border: '1px solid rgba(34,197,94,0.3)', borderRadius: 4, display: 'inline-block', fontSize: 12, color: '#4ade80', fontWeight: 700, marginBottom: 16 }}>
+                  <h3 style={{ fontSize: 18, fontWeight: 700, marginBottom: 8, color: 'var(--text-primary)' }}>{cs.company}</h3>
+                  <div style={{ padding: '3px 10px', background: 'rgba(34,197,94,0.1)', border: '1px solid rgba(34,197,94,0.25)', borderRadius: 6, display: 'inline-block', fontSize: 12, color: 'var(--success)', fontWeight: 600, marginBottom: 12 }}>
                     {cs.result}
                   </div>
-                  <p style={{ color: 'var(--muted)', lineHeight: 1.6, fontSize: 15 }}>{cs.summary}</p>
+                  <p style={{ color: 'var(--muted)', lineHeight: 1.6, fontSize: 14 }}>{cs.summary}</p>
                 </div>
               </div>
             ))}
           </div>
         </div>
 
-        {/* Footer Accent */}
+        {/* Footer Enterprise CTA */}
         <div style={{ 
-          marginTop: 100, padding: 60, background: 'linear-gradient(135deg, rgba(249, 115, 22,0.1), rgba(108,47,255,0.1))',
-          borderRadius: 32, textAlign: 'center', border: '1px solid rgba(249, 115, 22,0.1)'
+          marginTop: 64, padding: '48px 40px', background: 'var(--card-bg)',
+          borderRadius: 16, textAlign: 'center', border: '1px solid var(--border)',
+          boxShadow: 'var(--shadow-subtle)'
         }}>
-          <h2 style={{ fontFamily: 'var(--font-display)', fontSize: 28, marginBottom: 16 }}>Ready to expand your footprint?</h2>
-          <p style={{ color: 'var(--muted)', marginBottom: 32, maxWidth: 500, margin: '0 auto 32px' }}>AI-driven networking is just the beginning. Join the Oryn ecosystem and transform your business strategy today.</p>
-          <button onClick={() => { setActiveTab('communities'); setShowCreateModal(true); }} style={{ padding: '16px 40px', background: 'var(--cyan)', color: 'black', border: 'none', borderRadius: 40, fontWeight: 800, fontSize: 16, cursor: 'pointer', boxShadow: '0 10px 30px rgba(249, 115, 22,0.4)' }}>
+          <h2 style={{ fontFamily: 'var(--font-display)', fontSize: 24, fontWeight: 700, marginBottom: 10, color: 'var(--text-primary)', letterSpacing: '-0.02em' }}>Ready to expand your footprint?</h2>
+          <p style={{ color: 'var(--muted)', marginBottom: 24, maxWidth: 520, margin: '0 auto 24px', fontSize: 14 }}>AI-driven networking is just the beginning. Join the Oryn ecosystem and transform your business strategy today.</p>
+          <button onClick={() => { setActiveTab('communities'); setShowCreateModal(true); }} style={{ padding: '12px 28px', background: 'var(--accent-primary)', color: '#fff', border: 'none', borderRadius: 8, fontWeight: 600, fontSize: 14, cursor: 'pointer', boxShadow: 'var(--shadow-subtle)', transition: 'all 0.2s' }}>
             Register New Community
           </button>
         </div>

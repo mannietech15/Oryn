@@ -314,9 +314,6 @@ export default function DashboardPage({ orgProfile }: { orgProfile?: any }) {
 
   return (
     <div className="dashboard-container" style={{ flex: 1, overflowY: 'auto', padding: '36px 40px', background: 'var(--bg)', position: 'relative' }}>
-      {/* Background Subtle Technical Grid */}
-      <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, pointerEvents: 'none', backgroundImage: 'radial-gradient(var(--glass-bg-subtle) 1px, transparent 1px)', backgroundSize: '28px 28px', zIndex: 0 }} />
-
       <div style={{ maxWidth: 1280, margin: '0 auto', position: 'relative', zIndex: 1, display: 'flex', flexDirection: 'column', gap: 28 }}>
         
         {/* ── Credible Header with Real System Status ── */}
@@ -345,9 +342,9 @@ export default function DashboardPage({ orgProfile }: { orgProfile?: any }) {
               </div>
             </div>
 
-            <div className="dashboard-header-text" style={{ display: 'flex', alignItems: 'baseline', gap: 10 }}>
-              <span style={{ fontFamily: 'var(--font-script)', fontSize: 36, fontWeight: 400, color: 'var(--text-primary)' }}>{greeting}</span>
-              <span style={{ fontFamily: 'var(--font-display)', fontSize: 28, fontWeight: 700, color: 'var(--text-primary)', letterSpacing: -0.5 }}>{businessName}</span>
+            <div className="dashboard-header-text" style={{ display: 'flex', alignItems: 'baseline', gap: 8 }}>
+              <span style={{ fontFamily: 'var(--font-display)', fontSize: 26, fontWeight: 700, color: 'var(--text-primary)', letterSpacing: '-0.02em' }}>{greeting},</span>
+              <span style={{ fontFamily: 'var(--font-display)', fontSize: 26, fontWeight: 700, color: 'var(--accent-primary)', letterSpacing: '-0.02em' }}>{businessName}</span>
             </div>
             <div style={{ fontSize: 13, color: 'var(--text-secondary)', marginTop: 2 }}>
               Enterprise Operations & Financial Telemetry Center

@@ -114,7 +114,7 @@ export default function Sidebar({ page, onNavigate, isOpen, onClose, sessions, a
                   </g>
                 </svg>
             </div>
-            <div style={{ fontFamily: 'var(--font-script)', fontSize: 24, color: 'var(--text-primary)', marginLeft: 0, paddingBottom: 4 }}>
+            <div style={{ fontFamily: 'var(--font-display)', fontSize: 18, fontWeight: 800, letterSpacing: '-0.03em', color: 'var(--text-primary)', marginLeft: 2 }}>
               Oryn
             </div>
           </div>
@@ -185,22 +185,22 @@ export default function Sidebar({ page, onNavigate, isOpen, onClose, sessions, a
               onClick={() => onNavigate('add-organization')}
               style={{ 
                 display: 'flex', alignItems: 'center', justifyContent: 'space-between', 
-                background: 'linear-gradient(145deg, rgba(249,115,22,0.05), transparent)', 
-                border: '1px dashed var(--accent-primary)',
-                padding: '10px 14px', borderRadius: 8, cursor: 'pointer', transition: 'all 0.3s'
+                background: 'var(--card-bg)', 
+                border: '1px dashed var(--card-border)',
+                padding: '10px 14px', borderRadius: 8, cursor: 'pointer', transition: 'all 0.2s'
               }}
-              onMouseEnter={e => { e.currentTarget.style.background = 'linear-gradient(145deg, rgba(249,115,22,0.15), rgba(249,115,22,0.05))'; }}
-              onMouseLeave={e => { e.currentTarget.style.background = 'linear-gradient(145deg, rgba(249,115,22,0.05), transparent)'; }}
+              onMouseEnter={e => { e.currentTarget.style.borderColor = 'var(--accent-primary)'; e.currentTarget.style.background = 'var(--surface-hover)'; }}
+              onMouseLeave={e => { e.currentTarget.style.borderColor = 'var(--card-border)'; e.currentTarget.style.background = 'var(--card-bg)'; }}
             >
               <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
                 <div style={{ 
                   width: 20, height: 20, background: 'var(--accent-primary)', borderRadius: 4, 
                   display: 'flex', alignItems: 'center', justifyContent: 'center', 
-                  color: '#fff', boxShadow: '0 0 10px rgba(249,115,22,0.3)' 
+                  color: '#fff'
                 }}>
                   <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
                 </div>
-                <span style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-primary)' }}>Add Organization.</span>
+                <span style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-primary)' }}>Add Organization</span>
               </div>
             </div>
           )}

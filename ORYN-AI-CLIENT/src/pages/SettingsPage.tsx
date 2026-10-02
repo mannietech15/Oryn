@@ -124,16 +124,13 @@ export default function SettingsPage() {
     <div style={{ flex: 1, display: 'flex', flexDirection: 'column', height: '100%', overflow: 'hidden', background: 'transparent' }}>
       
       {/* Header */}
-      <div style={{ padding: '40px 48px 24px', borderBottom: '1px solid var(--card-border)', flexShrink: 0 }}>
-        <div style={{ display: 'flex', alignItems: 'flex-end', gap: 12, marginBottom: 8 }}>
-          <h1 style={{ fontFamily: 'var(--font-display)', fontSize: 32, fontWeight: 800, margin: 0, color: 'var(--text-primary)', letterSpacing: '-0.5px' }}>
-            Workspace
+      <div style={{ padding: '32px 40px 20px', borderBottom: '1px solid var(--card-border)', flexShrink: 0 }}>
+        <div style={{ marginBottom: 6 }}>
+          <h1 style={{ fontFamily: 'var(--font-display)', fontSize: 26, fontWeight: 700, margin: 0, color: 'var(--text-primary)', letterSpacing: '-0.02em' }}>
+            Workspace Settings
           </h1>
-          <span style={{ fontFamily: 'var(--font-script)', fontSize: 36, color: 'var(--accent-primary)', lineHeight: 0.8, transform: 'translateY(-4px)' }}>
-            Settings
-          </span>
         </div>
-        <p style={{ color: 'var(--text-secondary)', fontSize: 14, margin: 0 }}>
+        <p style={{ color: 'var(--text-secondary)', fontSize: 13, margin: 0 }}>
           Manage your account preferences, connected infrastructure integrations, and Oryn's operational intelligence.
         </p>
       </div>
