@@ -577,3 +577,4 @@ function LiveIntegrationCard({ integration, isTesting, onTest }: { integration: 
 // [docs] Enterprise settings layout specifications
 // [types] Strict Tab union type verification
 // [style] Symmetrical 20px card radius
+// [perf] Resize-resistant pure CSS layout
