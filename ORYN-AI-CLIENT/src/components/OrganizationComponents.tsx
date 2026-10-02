@@ -421,7 +421,33 @@ export function PersonnelDirectory({ employees, loading = false }: PersonnelDire
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-      {/* Search and status controls will be rendered here */}
+      {/* Header Search & Filter Bar */}
+      <div style={{ display: 'flex', gap: 10, alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap' }}>
+        <div style={{ position: 'relative', flex: 1, minWidth: 220 }}>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)' }}>
+            <circle cx="11" cy="11" r="8"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+          </svg>
+          <input
+            type="text"
+            placeholder="Search personnel by name, role, or corporate email..."
+            value={searchTerm}
+            onChange={e => setSearchTerm(e.target.value)}
+            style={{
+              width: '100%',
+              padding: '9px 14px 9px 34px',
+              background: 'var(--glass-bg-subtle)',
+              border: '1px solid var(--card-border)',
+              borderRadius: 8,
+              fontSize: 12,
+              color: 'var(--text-primary)',
+              outline: 'none',
+              transition: 'border-color 0.2s'
+            }}
+          />
+        </div>
+      </div>
     </div>
   );
 }
+
