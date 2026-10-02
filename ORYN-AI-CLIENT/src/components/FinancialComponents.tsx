@@ -230,9 +230,32 @@ export function buildFiscalKpis(
           <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
         </svg>
       )
+    },
+    {
+      label: 'Operating Fiscal Margin',
+      value: `${(metrics?.margin ?? 0).toFixed(1)}%`,
+      detail: (metrics?.margin ?? 0) >= 20 
+        ? 'Healthy solvency margin (>20% benchmark)' 
+        : (metrics?.margin ?? 0) >= 0 
+          ? 'Positive operating threshold' 
+          : 'Sub-zero fiscal contraction bound',
+      source: 'Ledger Audit Calculations',
+      period: 'Fiscal cycle ratio',
+      accent: (metrics?.margin ?? 0) >= 20 ? 'var(--success)' : (metrics?.margin ?? 0) >= 0 ? 'var(--accent-primary)' : 'var(--danger)',
+      icon: (
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <circle cx="12" cy="12" r="10"></circle>
+          <path d="m4.93 4.93 4.24 4.24"></path>
+          <path d="m14.83 9.17 4.24-4.24"></path>
+          <path d="m14.83 14.83 4.24 4.24"></path>
+          <path d="m9.17 14.83-4.24 4.24"></path>
+          <circle cx="12" cy="12" r="4"></circle>
+        </svg>
+      )
     }
   ];
 }
+
 
 
 
