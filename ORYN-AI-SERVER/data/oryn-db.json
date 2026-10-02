@@ -260,5 +260,160 @@
       "aiBrief": "Audit newly posted entries in Fiscal Ledger and verify margin thresholds.",
       "createdAt": "2026-10-02T12:19:12.869Z"
     }
+  ],
+  "ecosystemCommunities": [
+    {
+      "id": "1",
+      "name": "AI SaaS Builders",
+      "members": "12.4k",
+      "memberCount": 12400,
+      "tags": [
+        "AI",
+        "SaaS",
+        "Dev"
+      ],
+      "description": "A community for founders building the next generation of AI-native SaaS.",
+      "icon": "🤖",
+      "joined": false
+    },
+    {
+      "id": "2",
+      "name": "Growth Hackers Hub",
+      "members": "8.2k",
+      "memberCount": 8200,
+      "tags": [
+        "Marketing",
+        "B2B"
+      ],
+      "description": "Strategies and tools for hyper-growth in the enterprise space.",
+      "icon": "🚀",
+      "joined": false
+    },
+    {
+      "id": "3",
+      "name": "Sustainable Fintech",
+      "members": "5.1k",
+      "memberCount": 5100,
+      "tags": [
+        "Finance",
+        "ESG"
+      ],
+      "description": "Ethical finance and green technology innovators.",
+      "icon": "🌿",
+      "joined": false
+    }
+  ],
+  "ecosystemBusinesses": [
+    {
+      "id": "1",
+      "name": "Nexus Logistics",
+      "industry": "Supply Chain",
+      "location": "Berlin",
+      "product": "Cloud Fleet Mgmt",
+      "matchType": "same",
+      "connected": false
+    },
+    {
+      "id": "2",
+      "name": "EcoPack Solutions",
+      "industry": "Packaging",
+      "location": "Denver",
+      "product": "Bio-degradable Materials",
+      "matchType": "complementary",
+      "connected": false
+    },
+    {
+      "id": "3",
+      "name": "Zenith CRM",
+      "industry": "Software",
+      "location": "Austin",
+      "product": "Enterprise CRM",
+      "matchType": "same",
+      "connected": false
+    },
+    {
+      "id": "4",
+      "name": "SwiftPay Systems",
+      "industry": "Fintech",
+      "location": "London",
+      "product": "B2B Payments",
+      "matchType": "complementary",
+      "connected": false
+    },
+    {
+      "id": "5",
+      "name": "Quantum Core",
+      "industry": "Computing",
+      "location": "San Francisco",
+      "product": "Quantum Processors",
+      "matchType": "same",
+      "connected": false
+    },
+    {
+      "id": "6",
+      "name": "Atlas Biotech",
+      "industry": "Healthcare",
+      "location": "Boston",
+      "product": "Gene Therapy Kits",
+      "matchType": "complementary",
+      "connected": false
+    },
+    {
+      "id": "7",
+      "name": "Silverline Robotics",
+      "industry": "Manufacturing",
+      "location": "Tokyo",
+      "product": "Industrial Arms",
+      "matchType": "same",
+      "connected": false
+    },
+    {
+      "id": "8",
+      "name": "Nova Energy",
+      "industry": "Renewables",
+      "location": "Oslo",
+      "product": "Fusion Modules",
+      "matchType": "complementary",
+      "connected": false
+    }
+  ],
+  "ecosystemTrends": [
+    {
+      "id": "1",
+      "topic": "Generative Supply Chains",
+      "growth": "+142%",
+      "category": "AI/Logistics",
+      "sentiment": "positive"
+    },
+    {
+      "id": "2",
+      "topic": "Decentralized Workforce",
+      "growth": "+24%",
+      "category": "HR Tech",
+      "sentiment": "neutral"
+    },
+    {
+      "id": "3",
+      "topic": "Hyper-Personalized CRM",
+      "growth": "+89%",
+      "category": "SaaS",
+      "sentiment": "positive"
+    }
+  ],
+  "caseStudies": [
+    {
+      "id": "1",
+      "company": "CloudScale Inc.",
+      "result": "320% Revenue growth",
+      "summary": "Implemented ORYN-AI to automate decision-making across 4 global offices.",
+      "image": "🏢"
+    },
+    {
+      "id": "2",
+      "company": "Velocity Retail",
+      "result": "45% Cost Reduction",
+      "summary": "Optimized inventory using our predictive analytics engine.",
+      "image": "🛒"
+    }
   ]
 }
