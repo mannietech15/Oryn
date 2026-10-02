@@ -406,6 +406,61 @@ export interface PersonnelDirectoryProps {
   loading?: boolean;
 }
 
+export function PersonnelTableRow({ 
+  employee 
+}: { 
+  employee: { id: string; name: string; role: string; email: string; joinedDate: string; status: 'active' | 'on-leave' | 'remote' } 
+}) {
+  const initials = employee.name
+    .split(' ')
+    .filter(Boolean)
+    .slice(0, 2)
+    .map(p => p[0].toUpperCase())
+    .join('');
+
+  return (
+    <div style={{
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      padding: '14px 18px',
+      background: 'var(--glass-bg-subtle)',
+      border: '1px solid var(--card-border)',
+      borderRadius: 12,
+      gap: 16,
+      transition: 'border-color 0.2s ease, transform 0.15s ease'
+    }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+        <div style={{
+          width: 38,
+          height: 38,
+          borderRadius: 10,
+          background: 'rgba(249, 115, 22, 0.12)',
+          border: '1px solid rgba(249, 115, 22, 0.25)',
+          color: 'var(--accent-primary)',
+          fontFamily: 'var(--font-display)',
+          fontWeight: 700,
+          fontSize: 13,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center'
+        }}>
+          {initials || 'U'}
+        </div>
+        <div>
+          <div style={{ fontSize: 13.5, fontWeight: 600, color: 'var(--text-primary)' }}>
+            {employee.name}
+          </div>
+          <div style={{ fontSize: 11, color: 'var(--text-secondary)', marginTop: 2 }}>
+            {employee.role}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+
 export function PersonnelDirectory({ employees, loading = false }: PersonnelDirectoryProps) {
   const [searchTerm, setSearchTerm] = React.useState('');
   const [statusFilter, setStatusFilter] = React.useState<'all' | 'active' | 'remote' | 'on-leave'>('all');
