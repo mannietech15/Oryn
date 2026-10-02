@@ -357,6 +357,62 @@ export function LedgerEntryForm({ onSubmit, isSubmitting = false, error }: Ledge
           {error}
         </div>
       )}
+
+      {/* Transaction Type Toggle */}
+      <div>
+        <label style={{ display: 'block', fontSize: 11, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: 1, marginBottom: 8 }}>
+          Transaction Classification
+        </label>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+          <button
+            type="button"
+            onClick={() => setType('revenue')}
+            style={{
+              padding: '11px',
+              borderRadius: 10,
+              fontSize: 12,
+              fontWeight: 700,
+              fontFamily: 'var(--font-display)',
+              border: type === 'revenue' ? '1px solid rgba(34, 197, 94, 0.4)' : '1px solid var(--card-border)',
+              background: type === 'revenue' ? 'rgba(34, 197, 94, 0.12)' : 'var(--glass-bg-subtle)',
+              color: type === 'revenue' ? 'var(--success)' : 'var(--text-muted)',
+              cursor: 'pointer',
+              transition: 'all 0.2s ease',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: 8
+            }}
+          >
+            <span style={{ width: 6, height: 6, borderRadius: '50%', background: type === 'revenue' ? 'var(--success)' : 'transparent' }} />
+            REVENUE INFLOW
+          </button>
+          <button
+            type="button"
+            onClick={() => setType('expense')}
+            style={{
+              padding: '11px',
+              borderRadius: 10,
+              fontSize: 12,
+              fontWeight: 700,
+              fontFamily: 'var(--font-display)',
+              border: type === 'expense' ? '1px solid rgba(239, 68, 68, 0.4)' : '1px solid var(--card-border)',
+              background: type === 'expense' ? 'rgba(239, 68, 68, 0.12)' : 'var(--glass-bg-subtle)',
+              color: type === 'expense' ? 'var(--danger)' : 'var(--text-muted)',
+              cursor: 'pointer',
+              transition: 'all 0.2s ease',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: 8
+            }}
+          >
+            <span style={{ width: 6, height: 6, borderRadius: '50%', background: type === 'expense' ? 'var(--danger)' : 'transparent' }} />
+            DISBURSEMENT
+          </button>
+        </div>
+      </div>
+
     </form>
   );
 }
