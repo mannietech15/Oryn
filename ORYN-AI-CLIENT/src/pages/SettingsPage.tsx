@@ -645,3 +645,4 @@ function LiveIntegrationCard({ integration, isTesting, onTest }: { integration: 
 // [style] Glowing orange border on active card
 // [feat] Radio bullet indicator
 // [refactor] LocalStorage synchronization
+// [copy] Executive mode description refined
