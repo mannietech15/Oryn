@@ -702,9 +702,18 @@ export function LedgerTransactionList({ entries, loading = false }: LedgerTransa
         </div>
       </div>
 
+      {/* Transaction List Entries */}
+      {filteredEntries.length > 0 && (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 10, maxHeight: 440, overflowY: 'auto', paddingRight: 4 }}>
+          {filteredEntries.map((entry, idx) => (
+            <TransactionItem key={entry.id || `${entry.date}-${idx}`} entry={entry} />
+          ))}
+        </div>
+      )}
     </div>
   );
 }
+
 
 
 
