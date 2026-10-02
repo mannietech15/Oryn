@@ -321,3 +321,4 @@ export default function IntegrationsPage() {
 // [docs] Stale-while-revalidate pattern documentation
 // [a11y] Screen-reader status updates
 // [style] Token-aligned badge palette
+// [perf] Hardware acceleration hints
