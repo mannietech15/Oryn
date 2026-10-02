@@ -33,6 +33,23 @@ export interface FinancialEntry {
   note?: string;
 }
 
+export interface FinancialTelemetryMetrics {
+  totalRevenue: number;
+  totalExpenses: number;
+  netProfit: number;
+  margin: number;
+  entryCount?: number;
+}
+
+export interface FinancialCategoryStat {
+  category: string;
+  total: number;
+  percentage: number;
+  type: 'revenue' | 'expense';
+  color: string;
+}
+
+
 export interface Message {
   id: string;
   role: 'user' | 'assistant';
