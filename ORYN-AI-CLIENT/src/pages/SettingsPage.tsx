@@ -557,3 +557,4 @@ function LiveIntegrationCard({ integration, isTesting, onTest }: { integration: 
 // [style] Pulsing indicator dot
 // [refactor] Clear title and subtitle hierarchy
 // [style] 20px rounded card container
+// [refactor] Replaced left vertical rail with horizontal switcher
