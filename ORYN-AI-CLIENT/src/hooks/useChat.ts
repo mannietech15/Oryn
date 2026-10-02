@@ -367,22 +367,22 @@ export function useChat() {
       
       let errorContent: string;
       if (isAuthError) {
-        errorContent = '***⚠ API AUTHENTICATION ERROR***<br/><br/>NVIDIA NIM is reporting that your **API Key is invalid**. Please check your `.env` file in `ORYN-AI-SERVER`, ensure there are no trailing spaces, and **restart the server**.';
+        errorContent = '***[API AUTHENTICATION ERROR]***<br/><br/>NVIDIA NIM is reporting that your **API Key is invalid**. Please check your `.env` file in `ORYN-AI-SERVER`, ensure there are no trailing spaces, and **restart the server**.';
       } else if (isRateLimit) {
-        errorContent = '***⏳ RATE LIMITED***<br/><br/>The free AI model is temporarily rate-limited. Please **wait 30 seconds** and try again. This is normal for free-tier models.';
+        errorContent = '***[RATE LIMITED]***<br/><br/>The AI inference gateway is temporarily rate-limited. Please **wait 30 seconds** and try again.';
       } else if (err.message?.includes('terminated')) {
-        errorContent = '***⚠ CONNECTION DROPPED***<br/><br/>The connection to the AI provider was dropped unexpectedly after multiple retries. Please try sending your message again.';
+        errorContent = '***[CONNECTION DROPPED]***<br/><br/>The connection to the AI provider was dropped unexpectedly after multiple retries. Please try sending your message again.';
       } else if (err.message && !err.message.includes('fetch')) {
         // Hide internal ReferenceErrors or server-side variable leaks from the user
         const isInternalError = err.message.includes('is not defined') || err.message.includes('Cannot read properties of') || err.message.includes('Unexpected token');
         
         if (isInternalError) {
-          errorContent = `***⚠ SYSTEM ERROR***<br/><br/>An internal server error occurred while processing your request. Our engineering team has been notified. Please try again later.`;
+          errorContent = `***[SYSTEM ERROR]***<br/><br/>An internal server error occurred while processing your request. Our engineering team has been notified. Please try again later.`;
         } else {
-          errorContent = `***⚠ AI ERROR***<br/><br/>${err.message}`;
+          errorContent = `***[AI ERROR]***<br/><br/>${err.message}`;
         }
       } else {
-        errorContent = '***⚠ CONNECTION ERROR***<br/><br/>I am currently unable to reach my core servers. Please ensure that the **ORYN-AI-SERVER** is running on your local machine.';
+        errorContent = '***[CONNECTION ERROR]***<br/><br/>Unable to establish handshake with ORYN core servers. Please ensure that the **ORYN-AI-SERVER** daemon is running.';
       }
 
       setMessages(prev => prev.map(m =>

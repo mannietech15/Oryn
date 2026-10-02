@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
+import { Mail, Send, CheckCircle2, XCircle, BarChart3, TrendingUp, Code2, Lightbulb } from 'lucide-react';
 import { useChat } from '../hooks/useChat';
 import type { Message } from '../types';
 import { ConversationalMode } from '../components/ConversationalMode';
@@ -491,7 +492,7 @@ function MessageBubble({ msg, isMobile, onImageClick, language, onEdit, onRegene
           }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                <span style={{ fontSize: 16 }}>📧</span>
+                <Mail size={16} color="var(--accent-primary)" />
                 <span style={{ fontSize: 12, fontWeight: 700, fontFamily: 'monospace', color: 'var(--accent-primary)' }}>
                   HUMAN-IN-THE-LOOP ACTION PROPOSAL
                 </span>
@@ -527,20 +528,22 @@ function MessageBubble({ msg, isMobile, onImageClick, language, onEdit, onRegene
                   onClick={() => onConfirmEmail?.(msg.id, msg.emailDraft!.id)}
                   style={{ padding: '6px 16px', borderRadius: 6, background: 'var(--accent-primary)', border: 'none', color: '#fff', fontSize: 12, fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6 }}
                 >
-                  <span>🚀</span> Confirm & Send via SMTP
+                  <Send size={13} /> Confirm & Send via SMTP
                 </button>
               </div>
             )}
 
             {msg.emailDraft.status === 'sent' && (
-              <div style={{ fontSize: 11, color: 'var(--success)', fontFamily: 'monospace' }}>
-                ✓ Message dispatched via configured SMTP relay. Reference ID: {msg.emailDraft.messageId || 'N/A'}
+              <div style={{ fontSize: 11, color: 'var(--success)', fontFamily: 'monospace', display: 'flex', alignItems: 'center', gap: 6 }}>
+                <CheckCircle2 size={13} />
+                Message dispatched via configured SMTP relay. Reference ID: {msg.emailDraft.messageId || 'N/A'}
               </div>
             )}
 
             {msg.emailDraft.status === 'failed' && (
-              <div style={{ fontSize: 11, color: 'var(--danger)', fontFamily: 'monospace' }}>
-                ✕ {msg.emailDraft.error || 'Failed to dispatch email.'}
+              <div style={{ fontSize: 11, color: 'var(--danger)', fontFamily: 'monospace', display: 'flex', alignItems: 'center', gap: 6 }}>
+                <XCircle size={13} />
+                {msg.emailDraft.error || 'Failed to dispatch email.'}
               </div>
             )}
           </div>
@@ -1119,11 +1122,11 @@ export default function ChatPage({
           {messages.length === 0 && (
             <div style={{ display: 'flex', gap: 12, marginTop: 16, flexWrap: 'wrap', justifyContent: 'center', maxWidth: '850px', width: '100%' }}>
               {[
-                { icon: '📊', label: 'Analyze Data', prompt: 'Analyze the recent sales trends and identify key growth opportunities...' },
-                { icon: '📈', label: 'Strategy', prompt: 'Help me outline a go-to-market strategy for a new product...' },
-                { icon: '✏️', label: 'Draft Email', prompt: 'Draft a professional email to stakeholders regarding Q3 performance...' },
-                { icon: '</>', label: 'Code', prompt: 'Write a Python script to extract and summarize customer feedback...' },
-                { icon: '💡', label: "ORYN's choice", prompt: 'Generate a summary of the top emerging trends in AI for business...' }
+                { icon: <BarChart3 size={15} color="var(--accent-primary)" />, label: 'Analyze Data', prompt: 'Analyze the recent sales trends and identify key growth opportunities...' },
+                { icon: <TrendingUp size={15} color="var(--accent-primary)" />, label: 'Strategy', prompt: 'Help me outline a go-to-market strategy for a new product...' },
+                { icon: <Mail size={15} color="var(--accent-primary)" />, label: 'Draft Email', prompt: 'Draft a professional email to stakeholders regarding Q3 performance...' },
+                { icon: <Code2 size={15} color="var(--accent-primary)" />, label: 'Code', prompt: 'Write a Python script to extract and summarize customer feedback...' },
+                { icon: <Lightbulb size={15} color="var(--accent-primary)" />, label: "ORYN's choice", prompt: 'Generate a summary of the top emerging trends in AI for business...' }
               ].map(item => (
                 <button 
                   key={item.label}
@@ -1136,7 +1139,7 @@ export default function ChatPage({
                   onMouseEnter={e => { e.currentTarget.style.background = 'var(--glass-bg-hover)'; e.currentTarget.style.transform = 'translateY(-1px)'; }}
                   onMouseLeave={e => { e.currentTarget.style.background = 'var(--glass-bg-subtle)'; e.currentTarget.style.transform = 'translateY(0)'; }}
                 >
-                  <span style={{ color: 'var(--text-secondary)' }}>{item.icon}</span> {item.label}
+                  <span style={{ display: 'flex', alignItems: 'center' }}>{item.icon}</span> {item.label}
                 </button>
               ))}
             </div>

@@ -23,7 +23,7 @@ class RootErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState
   }
 
   componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
-    console.error('💥 Uncaught Application Error:', error, errorInfo);
+    console.error('[Application Error]:', error, errorInfo);
   }
 
   render() {

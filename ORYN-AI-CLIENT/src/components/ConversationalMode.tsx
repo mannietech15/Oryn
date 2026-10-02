@@ -135,7 +135,7 @@ export function ConversationalMode({
       if (isCancelledRef.current) return;
       if (responseText) {
         // Prevent the AI from reading out raw markdown error strings
-        if (responseText.includes('⚠') || responseText.includes('ERROR***')) {
+        if (responseText.includes('ERROR***') || responseText.includes('[ERROR]') || responseText.includes('ERROR]')) {
            startSpeaking("I'm sorry, I'm having trouble connecting to my core servers right now. Please check your connection.");
         } else {
            startSpeaking(responseText);
