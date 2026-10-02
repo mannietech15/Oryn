@@ -203,9 +203,26 @@ export function buildOrgKpiItems(
           <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
         </svg>
       )
+    },
+    {
+      label: 'Functional Departments',
+      value: `${teams.length}`,
+      detail: 'Core operational & engineering branches',
+      source: 'Department Registry',
+      period: 'Active organizational units',
+      accent: 'var(--text-primary)',
+      icon: (
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <rect x="2" y="2" width="20" height="8" rx="2" ry="2"></rect>
+          <rect x="2" y="14" width="20" height="8" rx="2" ry="2"></rect>
+          <line x1="6" y1="6" x2="6.01" y2="6"></line>
+          <line x1="6" y1="18" x2="6.01" y2="18"></line>
+        </svg>
+      )
     }
   ];
 }
+
 
 
 
