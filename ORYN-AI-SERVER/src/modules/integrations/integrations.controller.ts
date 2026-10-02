@@ -155,3 +155,4 @@ export const defaultIntegrationsController = new IntegrationsController();
 // [refactor] Standardized envelope structure
 // [fix] Promise catch wrapper
 // [docs] OpenAPI schema annotations
+// [telemetry] X-Correlation-ID tracing header
