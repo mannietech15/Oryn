@@ -648,3 +648,4 @@ function LiveIntegrationCard({ integration, isTesting, onTest }: { integration: 
 // [copy] Executive mode description refined
 // [copy] Creative mode description refined
 // [copy] Analytical mode description refined
+// [copy] Developer mode description refined
