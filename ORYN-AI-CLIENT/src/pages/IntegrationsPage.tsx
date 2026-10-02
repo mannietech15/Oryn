@@ -310,3 +310,4 @@ export default function IntegrationsPage() {
 // [refactor] Background revalidation pattern
 // [style] Non-blocking status indicator
 // [perf] Memoized render tree
+// [visual] SVG brand logos mounted
