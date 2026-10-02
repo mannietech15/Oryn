@@ -343,3 +343,4 @@ export default function IntegrationsPage() {
 // [docs] Maintenance documentation
 // [types] Card props interface contract
 // [style] 16px border-radius standard
+// [perf] Zero heavyweight dependencies
