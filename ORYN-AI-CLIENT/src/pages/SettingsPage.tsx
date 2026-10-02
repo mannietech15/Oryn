@@ -717,3 +717,4 @@ function LiveIntegrationCard({ integration, isTesting, onTest }: { integration: 
 // [style] Initials computation fallback
 // [perf] Dirty-state check before save
 // [style] Accessible placeholder contrast
+// [types] Account state types validated
