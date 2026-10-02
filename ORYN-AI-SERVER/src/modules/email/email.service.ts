@@ -170,3 +170,4 @@ export const defaultEmailService = new EmailService();
 // [perf] Server health check reads cached status
 // [docs] Cache invalidates automatically after 300,000ms
 // [types] Strict boolean verification contract
+// [style] Standardized error log prefixes
