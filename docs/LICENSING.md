@@ -171,3 +171,11 @@ To satisfy modern supply chain integrity mandates:
 - **CycloneDX / SPDX Output**: You may generate automated SBOM documents from `package-lock.json` manifests using standard tools.
 - **Git Commit Provenance**: All commits are preserved in the git tree with author verification and timestamps.
 - **Reproducible Artifacts**: Builds produced by Vite and TypeScript are deterministic given identical dependency locks.
+
+## 18. Continuous Compliance & CI Verification
+
+To maintain ongoing compliance across developer workflows:
+
+- **Audit Command**: Run `npx license-checker --summary` within client and server directories to inspect current license trees.
+- **Fail-Safe Policy**: Automated CI pipelines can be configured to reject unapproved licenses (e.g. AGPL/GPL) from runtime dependencies.
+- **Header Linter**: Optional pre-commit hooks can enforce SPDX comment headers on all freshly committed source assets.
