@@ -159,3 +159,4 @@ export const defaultEmailService = new EmailService();
 // [fix] Fallback connection handler on DNS timeout
 // [perf] Instant cached return reduces latency from 3000ms to 0.4ms
 // [refactor] Track lastVerifyTimestamp for TTL invalidation
+/** Docs: Fast SMTP verification with TTL cache */
