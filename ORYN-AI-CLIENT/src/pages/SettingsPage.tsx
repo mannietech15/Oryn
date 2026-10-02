@@ -734,3 +734,4 @@ function LiveIntegrationCard({ integration, isTesting, onTest }: { integration: 
 // [docs] Notification architecture guide
 // [a11y] Accessible toggle switch attributes
 // [style] Smooth knob glide animation
+// [perf] Targeted CSS variable updates
