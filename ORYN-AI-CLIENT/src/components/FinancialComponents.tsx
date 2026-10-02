@@ -742,6 +742,48 @@ export function LedgerTransactionList({ entries, loading = false }: LedgerTransa
   );
 }
 
+export interface CategoryBreakdownProps {
+  entries: { id?: string; type: 'revenue' | 'expense'; category: string; amount: number }[];
+}
+
+export function CategoryBreakdown({ entries }: CategoryBreakdownProps) {
+  // Aggregate totals by category
+  const categoryMap: Record<string, { total: number; type: 'revenue' | 'expense' }> = {};
+  let totalVolume = 0;
+
+  entries.forEach(e => {
+    totalVolume += e.amount;
+    if (!categoryMap[e.category]) {
+      categoryMap[e.category] = { total: 0, type: e.type };
+    }
+    categoryMap[e.category].total += e.amount;
+  });
+
+  const categories = Object.entries(categoryMap)
+    .map(([cat, data]) => ({
+      category: cat,
+      total: data.total,
+      type: data.type,
+      percentage: totalVolume > 0 ? (data.total / totalVolume) * 100 : 0
+    }))
+    .sort((a, b) => b.total - a.total);
+
+  if (categories.length === 0) {
+    return (
+      <div style={{ padding: 24, textAlign: 'center', color: 'var(--text-muted)', fontSize: 12 }}>
+        No category allocations computed yet.
+      </div>
+    );
+  }
+
+  return (
+    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 14 }}>
+      {/* Category items will be mapped here */}
+    </div>
+  );
+}
+
+
 
 
 
