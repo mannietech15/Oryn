@@ -486,6 +486,17 @@ export class Datastore {
     return record;
   }
 
+  deleteDocument(id: string): boolean {
+    if (!this.cache || !this.cache.documents) return false;
+    const initialLen = this.cache.documents.length;
+    this.cache.documents = this.cache.documents.filter(d => d.id !== id);
+    if (this.cache.documents.length !== initialLen) {
+      this.save();
+      return true;
+    }
+    return false;
+  }
+
   // --- Email Logs (Human in the loop) ---
   stageEmailDraft(to: string, subject: string, body: string): EmailLogRecord {
     const record: EmailLogRecord = {

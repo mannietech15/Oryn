@@ -59,11 +59,9 @@ export class DocumentsController {
   deleteDocument = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
       const { id } = req.params;
-      const docs = this.datastore.getDocuments();
-      const idx = docs.findIndex(d => d.id === id);
-      if (idx === -1) throw new NotFoundError(`Document '${id}' not found`);
+      const deleted = this.datastore.deleteDocument(id);
+      if (!deleted) throw new NotFoundError(`Document '${id}' not found`);
 
-      docs.splice(idx, 1);
       res.json({ success: true, id });
     } catch (err) {
       next(err);
