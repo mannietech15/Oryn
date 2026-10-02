@@ -743,3 +743,4 @@ function LiveIntegrationCard({ integration, isTesting, onTest }: { integration: 
 // [style] Right aligned toggle switches
 // [perf] Zero FOUC during theme toggle
 // [style] Light theme shadow tokens
+// [feat] Audio cue preference state
