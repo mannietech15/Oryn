@@ -464,6 +464,42 @@ export function LedgerEntryForm({ onSubmit, isSubmitting = false, error }: Ledge
         </div>
       </div>
 
+      {/* Grid: Amount & Date */}
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
+        <div>
+          <label style={{ display: 'block', fontSize: 11, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: 1, marginBottom: 8 }}>
+            Ledger Amount ($)
+          </label>
+          <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
+            <span style={{ position: 'absolute', left: 14, color: 'var(--text-muted)', fontWeight: 700, fontSize: 14 }}>
+              $
+            </span>
+            <input
+              required
+              type="number"
+              step="0.01"
+              min="0.01"
+              placeholder="0.00"
+              value={amount}
+              onChange={e => setAmount(e.target.value)}
+              style={{
+                width: '100%',
+                padding: '12px 16px 12px 28px',
+                background: 'var(--glass-bg-subtle)',
+                border: '1px solid var(--card-border)',
+                borderRadius: 10,
+                color: 'var(--text-primary)',
+                fontFamily: 'monospace',
+                fontSize: 14,
+                outline: 'none',
+                transition: 'border-color 0.2s'
+              }}
+            />
+          </div>
+        </div>
+      </div>
+
+
 
     </form>
   );
