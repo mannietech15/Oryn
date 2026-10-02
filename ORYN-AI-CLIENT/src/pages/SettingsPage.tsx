@@ -764,3 +764,4 @@ function LiveIntegrationCard({ integration, isTesting, onTest }: { integration: 
 // [style] Audit button hover styling
 // [docs] SOC2 compliance guidelines
 // [a11y] Live session status announcement
+// [style] Typography letter spacing
