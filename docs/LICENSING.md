@@ -147,3 +147,11 @@ Users are advised that modern AI software ecosystems incorporate encryption algo
 
 - **Export Administration Regulations (EAR)**: Users must ensure their deployment adheres to applicable export administration regulations.
 - **Sanction Compliance**: Software must not be transferred or made available in violation of international trade sanctions or embargoes.
+
+## 15. Responsible AI Usage Guidance
+
+While the MIT License grants unrestricted utility, the author strongly encourages ethical and responsible AI stewardship:
+
+- **Safety & Alignment**: Implement adequate human oversight and safety verification when deploying autonomous generative models.
+- **Harm Prevention**: Refrain from employing ORYN-AI for unlawful discrimination, disinformation generation, or unauthorized automated surveillance.
+- **Data Privacy**: Ensure user personal data processed via ORYN-AI complies with GDPR, CCPA, and regional privacy frameworks.
