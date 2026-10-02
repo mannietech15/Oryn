@@ -309,3 +309,4 @@ export default function IntegrationsPage() {
 // [perf] Sync freshest status to localStorage cache
 // [refactor] Background revalidation pattern
 // [style] Non-blocking status indicator
+// [perf] Memoized render tree
