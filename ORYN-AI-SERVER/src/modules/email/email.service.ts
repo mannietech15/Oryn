@@ -171,3 +171,4 @@ export const defaultEmailService = new EmailService();
 // [docs] Cache invalidates automatically after 300,000ms
 // [types] Strict boolean verification contract
 // [style] Standardized error log prefixes
+// [perf] Non-blocking queue inspection
