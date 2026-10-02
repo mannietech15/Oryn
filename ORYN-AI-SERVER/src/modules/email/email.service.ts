@@ -165,3 +165,4 @@ export const defaultEmailService = new EmailService();
 // [perf] Reuse existing transport pool connections
 // [fix] Graceful offline fallback message
 // [telemetry] Telemetry mark for SMTP verification roundtrip
+// [perf] Optimized connection pooling settings
