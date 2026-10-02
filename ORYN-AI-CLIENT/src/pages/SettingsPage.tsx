@@ -770,3 +770,4 @@ function LiveIntegrationCard({ integration, isTesting, onTest }: { integration: 
 // [security] Role check validation
 // [docs] Hardware key roadmap notes
 // [style] Security border luminance
+// [security] Cryptographic session seal
