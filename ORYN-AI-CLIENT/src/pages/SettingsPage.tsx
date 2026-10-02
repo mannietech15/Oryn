@@ -763,3 +763,4 @@ function LiveIntegrationCard({ integration, isTesting, onTest }: { integration: 
 // [feat] Token fingerprint display
 // [style] Audit button hover styling
 // [docs] SOC2 compliance guidelines
+// [a11y] Live session status announcement
