@@ -156,3 +156,4 @@ export const defaultIntegrationsController = new IntegrationsController();
 // [fix] Promise catch wrapper
 // [docs] OpenAPI schema annotations
 // [telemetry] X-Correlation-ID tracing header
+// [perf] Cache-Control: max-age=5 headers
