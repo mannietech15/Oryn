@@ -699,3 +699,4 @@ function LiveIntegrationCard({ integration, isTesting, onTest }: { integration: 
 // [docs] Account sync architecture
 // [validation] Email regex validation
 // [style] Form label tracking
+// [perf] Debounced server persistence
