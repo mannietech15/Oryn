@@ -187,10 +187,57 @@ export interface DepartmentGridProps {
 export function DepartmentGrid({ teams, employees = [] }: DepartmentGridProps) {
   return (
     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 16 }}>
-      {/* Department cards will be rendered here */}
+      {teams.map(t => {
+        // Estimate or count department members
+        const count = employees.filter(e => 
+          e.teamId === t.id || 
+          (e.role && t.name && e.role.toLowerCase().includes(t.name.toLowerCase().split(' ')[0]))
+        ).length;
+
+        return (
+          <div 
+            key={t.id} 
+            style={{
+              padding: '20px 22px',
+              background: 'var(--glass-bg-subtle)',
+              border: '1px solid var(--card-border)',
+              borderRadius: 14,
+              display: 'flex',
+              flexDirection: 'column',
+              justifyContent: 'space-between',
+              gap: 12,
+              transition: 'border-color 0.2s ease, transform 0.15s ease'
+            }}
+          >
+            <div>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
+                <div style={{ fontSize: 15, fontWeight: 700, color: 'var(--text-primary)', fontFamily: 'var(--font-display)' }}>
+                  {t.name}
+                </div>
+                <span style={{
+                  fontSize: 10,
+                  fontWeight: 700,
+                  fontFamily: 'monospace',
+                  padding: '3px 8px',
+                  borderRadius: 6,
+                  background: 'rgba(249, 115, 22, 0.08)',
+                  color: 'var(--accent-primary)',
+                  border: '1px solid rgba(249, 115, 22, 0.2)'
+                }}>
+                  {Math.max(1, count)} CONTRIBUTORS
+                </span>
+              </div>
+              <div style={{ fontSize: 12, color: 'var(--text-secondary)', lineHeight: 1.5 }}>
+                {t.description}
+              </div>
+            </div>
+          </div>
+        );
+      })}
     </div>
   );
 }
+
 
 
 export function buildOrgKpiItems(
