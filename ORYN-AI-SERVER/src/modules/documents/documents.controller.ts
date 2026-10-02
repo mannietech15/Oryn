@@ -3,6 +3,8 @@ import { defaultDatastore, Datastore } from '../../infrastructure/storage/datast
 import { defaultAnalysisService, AnalysisService } from '../analysis/analysis.service';
 import { ValidationError, NotFoundError } from '../../shared/errors/app-error';
 
+import { ENV } from '../../config/env';
+
 export class DocumentsController {
   constructor(
     private datastore: Datastore = defaultDatastore,
@@ -19,6 +21,7 @@ export class DocumentsController {
   };
 
   uploadAndAnalyze = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    const startTime = Date.now();
     try {
       if (!req.file) {
         throw new ValidationError('No document uploaded. Please provide a file field named "file".');
@@ -26,6 +29,7 @@ export class DocumentsController {
 
       const prompt = req.body.prompt || 'Provide a concise 1-2 sentence business summary with key operational takeaways.';
       const analysisResult = await this.analysisService.analyzeFile(req.file, prompt);
+      const latencyMs = Math.max(1, Date.now() - startTime);
 
       const extMatch = req.file.originalname.match(/\.([a-z0-9]+)$/i);
       const ext = extMatch ? extMatch[1].toUpperCase() : 'FILE';
@@ -41,12 +45,17 @@ export class DocumentsController {
         aiSummary: analysisResult.analysis
       });
 
-      // Log AI task execution
+      // Calculate dynamic tokens from character length heuristics
+      const promptTokens = Math.ceil(prompt.length / 4);
+      const outputTokens = Math.ceil((analysisResult.analysis?.length || 0) / 4);
+      const tokensUsed = Math.max(30, promptTokens + outputTokens);
+
+      // Log AI task execution with real elapsed duration
       this.datastore.logTask({
         type: 'analysis',
-        model: 'meta/llama-3.2-90b-vision-instruct',
-        latencyMs: 380,
-        tokensUsed: 420,
+        model: ENV.PRO_MODEL,
+        latencyMs,
+        tokensUsed,
         status: 'success'
       });
 
