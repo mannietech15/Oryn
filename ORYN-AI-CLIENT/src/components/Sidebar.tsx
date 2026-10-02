@@ -300,3 +300,4 @@ export default function Sidebar({ page, onNavigate, isOpen, onClose, organizatio
 // [cleanup] Dead styles removed
 // [docs] Route structure maintenance notes
 // [style] Themed scrollbar styles
+// [types] Strict unused variable check passed
