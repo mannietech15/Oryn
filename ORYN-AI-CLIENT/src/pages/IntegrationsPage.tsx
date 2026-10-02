@@ -337,3 +337,4 @@ export default function IntegrationsPage() {
 // [style] WCAG AA contrast ratio
 // [refactor] Degraded state indicator
 // [feat] Test-all pipeline trigger
+// [style] Micro-interaction transitions
