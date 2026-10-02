@@ -531,9 +531,34 @@ export function LedgerEntryForm({ onSubmit, isSubmitting = false, error }: Ledge
         />
       </div>
 
-
-
-
+      <button
+        type="submit"
+        disabled={isSubmitting || !category.trim() || !amount || Number(amount) <= 0}
+        style={{
+          marginTop: 6,
+          padding: '13px 20px',
+          borderRadius: 10,
+          background: 'var(--accent-primary)',
+          color: '#fff',
+          border: 'none',
+          fontFamily: 'var(--font-display)',
+          fontWeight: 700,
+          fontSize: 12,
+          letterSpacing: 1.5,
+          textTransform: 'uppercase',
+          cursor: isSubmitting || !category.trim() || !amount ? 'not-allowed' : 'pointer',
+          opacity: isSubmitting || !category.trim() || !amount ? 0.6 : 1,
+          boxShadow: 'var(--shadow-subtle)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          gap: 8,
+          transition: 'all 0.2s ease'
+        }}
+      >
+        {isSubmitting ? 'POSTING TO PERSISTENT LEDGER...' : 'COMMIT TRANSACTION TO LEDGER'}
+      </button>
     </form>
   );
 }
+
