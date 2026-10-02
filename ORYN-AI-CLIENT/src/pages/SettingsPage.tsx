@@ -578,3 +578,4 @@ function LiveIntegrationCard({ integration, isTesting, onTest }: { integration: 
 // [types] Strict Tab union type verification
 // [style] Symmetrical 20px card radius
 // [perf] Resize-resistant pure CSS layout
+// [style] 1.5 line height on descriptive subtitles
