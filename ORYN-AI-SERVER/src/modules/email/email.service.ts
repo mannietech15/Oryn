@@ -156,3 +156,4 @@ export const defaultEmailService = new EmailService();
 // [perf] Asynchronous transport pre-warm on module initialization
 // [refactor] Decoupled status query from blocking socket round-trips
 // [perf] 3000ms socket timeout guard on live verify
+// [fix] Fallback connection handler on DNS timeout
