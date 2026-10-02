@@ -681,3 +681,4 @@ function LiveIntegrationCard({ integration, isTesting, onTest }: { integration: 
 // [style] Header rhythm tuning
 // [types] AI behavior typing validated
 // [final] AI Persona module validated
+// [feat] Account Details panel mounted
