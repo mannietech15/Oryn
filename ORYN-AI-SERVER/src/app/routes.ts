@@ -10,6 +10,7 @@ import automationRoutes from '../modules/automation/automation.routes';
 import integrationsRoutes from '../modules/integrations/integrations.routes';
 import documentsRoutes from '../modules/documents/documents.routes';
 import organizationRoutes from '../modules/organization/organization.routes';
+import calendarRoutes from '../modules/calendar/calendar.routes';
 
 const router = Router();
 
@@ -27,5 +28,6 @@ router.use('/api', automationRoutes);
 router.use('/api', integrationsRoutes);
 router.use('/api', documentsRoutes);
 router.use('/api', organizationRoutes);
+router.use('/api', calendarRoutes);
 
 export default router;
