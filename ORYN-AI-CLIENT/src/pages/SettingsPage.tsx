@@ -591,3 +591,4 @@ function LiveIntegrationCard({ integration, isTesting, onTest }: { integration: 
 // [style] 28px vertical rhythm
 // [style] Monospace telemetry pill styling
 // [docs] Centered design matches enterprise standards
+// [a11y] Screen reader announcements
