@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { BarChart3, CreditCard, Cloud, FileText, X } from 'lucide-react';
 import { updateCompany } from '../api/oryn';
 
 export default function AddOrganizationPage({ onComplete }: { onComplete?: (data: any) => void }) {
@@ -140,7 +141,12 @@ export default function AddOrganizationPage({ onComplete }: { onComplete?: (data
                   {['Google Analytics', 'Stripe', 'Salesforce', 'Notion'].map(name => (
                     <IntegrationCard 
                       key={name}
-                      icon={name === 'Google Analytics' ? '📊' : name === 'Stripe' ? '💳' : name === 'Salesforce' ? '☁️' : '📝'}
+                      icon={
+                        name === 'Google Analytics' ? <BarChart3 size={18} color="var(--accent-primary)" /> :
+                        name === 'Stripe' ? <CreditCard size={18} color="var(--accent-primary)" /> :
+                        name === 'Salesforce' ? <Cloud size={18} color="var(--accent-primary)" /> :
+                        <FileText size={18} color="var(--accent-primary)" />
+                      }
                       name={name}
                       selected={orgData.integrations.includes(name)}
                       onToggle={() => setOrgData(prev => ({
@@ -183,9 +189,9 @@ export default function AddOrganizationPage({ onComplete }: { onComplete?: (data
                         <button
                           type="button"
                           onClick={() => setTeamInvites(teamInvites.filter((_, i) => i !== idx))}
-                          style={{ background: 'transparent', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', fontSize: 14, padding: '4px' }}
+                          style={{ background: 'transparent', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', display: 'flex', alignItems: 'center', padding: '4px' }}
                         >
-                          ✕
+                          <X size={14} />
                         </button>
                       )}
                     </div>
@@ -286,7 +292,7 @@ function IntegrationCard({ icon, name, selected, onToggle }: any) {
         display: 'flex', alignItems: 'center', gap: 10
       }}
     >
-      <div style={{ fontSize: 18 }}>{icon}</div>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>{icon}</div>
       <div style={{ flex: 1, fontSize: 13, fontWeight: 500, color: selected ? 'var(--text-primary)' : 'var(--text-secondary)' }}>{name}</div>
       <div style={{
         width: 16, height: 16, borderRadius: 4,
