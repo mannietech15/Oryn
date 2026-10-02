@@ -179,4 +179,33 @@ export function OrgKpiGrid({ items, loading }: { items: OrgKpiData[]; loading?: 
   );
 }
 
+export function buildOrgKpiItems(
+  employees: { status: 'active' | 'on-leave' | 'remote' }[],
+  teams: { id: string }[],
+  companyLocation: string
+): OrgKpiData[] {
+  const total = employees.length;
+  const activeCount = employees.filter(e => e.status === 'active').length;
+
+  return [
+    {
+      label: 'Verified Personnel',
+      value: `${total}`,
+      detail: `${activeCount} actively active onsite/relayed contributors`,
+      source: 'Corporate Directory',
+      period: 'Active headcount roster',
+      accent: 'var(--accent-primary)',
+      icon: (
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+          <circle cx="9" cy="7" r="4"></circle>
+          <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+          <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+        </svg>
+      )
+    }
+  ];
+}
+
+
 
