@@ -298,3 +298,4 @@ export default function Sidebar({ page, onNavigate, isOpen, onClose, organizatio
 // [refactor] Validated route mappings
 // [style] Uniform hover highlights
 // [cleanup] Dead styles removed
+// [docs] Route structure maintenance notes
