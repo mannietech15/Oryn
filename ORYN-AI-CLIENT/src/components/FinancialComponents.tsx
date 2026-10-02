@@ -183,4 +183,28 @@ export function FiscalKpis({ items, loading }: { items: FiscalKpiData[]; loading
   );
 }
 
+export function buildFiscalKpis(
+  metrics: { totalRevenue: number; totalExpenses: number; netProfit: number; margin: number } | null,
+  entryCount: number
+): FiscalKpiData[] {
+  const rev = metrics?.totalRevenue ?? 0;
+  return [
+    {
+      label: 'Gross Ledger Revenue',
+      value: `$${(rev / 1000).toFixed(1)}K`,
+      detail: `${entryCount} total transactions posted to ledger`,
+      source: 'JSON Storage Engine',
+      period: 'Verified historical total',
+      accent: 'var(--accent-primary)',
+      icon: (
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline>
+          <polyline points="17 6 23 6 23 12"></polyline>
+        </svg>
+      )
+    }
+  ];
+}
+
+
 
