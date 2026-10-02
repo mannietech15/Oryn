@@ -95,3 +95,16 @@ export function GoogleAnalyticsLogo({ size = 20, style }: LogoProps) {
     </svg>
   );
 }
+
+export function LedgerLogo({ size = 20, style }: LogoProps) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" style={style}>
+      <rect width="24" height="24" rx="5" fill="#ea580c" opacity="0.12" />
+      <path d="M4 6c0-1.66 3.58-3 8-3s8 1.34 8 3-3.58 3-8 3-8-1.34-8-3z" stroke="#ea580c" strokeWidth="1.8" strokeLinecap="round" />
+      <path d="M4 12c0 1.66 3.58 3 8 3s8-1.34 8-3" stroke="#ea580c" strokeWidth="1.8" strokeLinecap="round" />
+      <path d="M4 6v12c0 1.66 3.58 3 8 3s8-1.34 8-3V6" stroke="#ea580c" strokeWidth="1.8" strokeLinecap="round" />
+      <circle cx="8" cy="12" r="1" fill="#ea580c" />
+      <circle cx="8" cy="17" r="1" fill="#ea580c" />
+    </svg>
+  );
+}
