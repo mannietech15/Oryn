@@ -22,7 +22,7 @@
       "id": "f-3",
       "type": "expense",
       "category": "Cloud Infrastructure & GPU",
-      "amount": 18450,
+      "amount": 2450,
       "date": "2026-09-24",
       "note": "NVIDIA NIM compute cluster & AWS relays",
       "createdAt": "2026-09-24T17:15:23.939Z"
