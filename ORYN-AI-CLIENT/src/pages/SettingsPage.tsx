@@ -720,3 +720,4 @@ function LiveIntegrationCard({ integration, isTesting, onTest }: { integration: 
 // [types] Account state types validated
 // [style] 0.2s hover transition
 // [test] Verified against local API
+// [final] Account panel finalized
