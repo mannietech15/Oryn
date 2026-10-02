@@ -322,3 +322,4 @@ export default function IntegrationsPage() {
 // [a11y] Screen-reader status updates
 // [style] Token-aligned badge palette
 // [perf] Hardware acceleration hints
+// [resilience] Auto-retry on network disconnect
