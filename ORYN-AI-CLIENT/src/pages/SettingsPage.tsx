@@ -555,3 +555,4 @@ function LiveIntegrationCard({ integration, isTesting, onTest }: { integration: 
 // [layout] Symmetrical margin: 0 auto matching AnalyticsPage
 // [style] Top status badges: SYNCHRONIZED & PREFERENCES
 // [style] Pulsing indicator dot
+// [refactor] Clear title and subtitle hierarchy
