@@ -133,3 +133,54 @@ export function FiscalInsightSummary({
   );
 }
 
+export interface FiscalKpiData {
+  label: string;
+  value: string;
+  detail: string;
+  source: string;
+  period: string;
+  accent: string;
+  icon: React.ReactNode;
+}
+
+export function FiscalKpis({ items, loading }: { items: FiscalKpiData[]; loading?: boolean }) {
+  return (
+    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: 16 }}>
+      {items.map((k, i) => (
+        <div 
+          key={i} 
+          style={{
+            background: 'var(--card-bg)', 
+            border: '1px solid var(--card-border)',
+            borderRadius: 14, 
+            padding: '20px', 
+            display: 'flex', 
+            flexDirection: 'column', 
+            gap: 8,
+            boxShadow: 'var(--shadow-subtle)',
+            transition: 'transform 0.2s ease, border-color 0.2s ease'
+          }}
+        >
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            <span style={{ fontSize: 11, fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: 0.5 }}>
+              {k.label}
+            </span>
+            <span style={{ color: k.accent }}>{k.icon}</span>
+          </div>
+          <div style={{ fontSize: 26, fontFamily: 'var(--font-display)', fontWeight: 700, color: 'var(--text-primary)' }}>
+            {loading ? '...' : k.value}
+          </div>
+          <div style={{ fontSize: 11, color: 'var(--text-secondary)' }}>
+            {k.detail}
+          </div>
+          <div style={{ borderTop: '1px solid var(--card-border)', paddingTop: 8, marginTop: 4, display: 'flex', justifyContent: 'space-between', fontSize: 10, color: 'var(--text-muted)' }}>
+            <span>{k.source}</span>
+            <span>{k.period}</span>
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+
