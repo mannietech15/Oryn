@@ -633,3 +633,4 @@ function LiveIntegrationCard({ integration, isTesting, onTest }: { integration: 
 // [style] 4px inner padding, 12px radius
 // [mobile] Touch scrolling support
 // [style] Vertical center alignment
+// [perf] Low GC memory footprint
