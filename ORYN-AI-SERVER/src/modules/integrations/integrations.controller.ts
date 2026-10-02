@@ -140,3 +140,4 @@ export const defaultIntegrationsController = new IntegrationsController();
 // [perf] Compact JSON serialization
 // [refactor] Unified adapter mapping
 // [fix] Return degraded status on upstream timeout
+// [style] Route handler formatting
