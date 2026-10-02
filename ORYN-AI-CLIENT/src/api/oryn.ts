@@ -201,3 +201,36 @@ export async function confirmEmailDraft(draftId: string) {
   }
   return res.json();
 }
+
+// --- Operational Calendar ---
+export async function fetchCalendarEvents() {
+  const res = await fetch(`${BASE}/calendar`);
+  if (!res.ok) throw new Error('Failed to fetch calendar events');
+  return res.json();
+}
+
+export async function addCalendarEvent(event: {
+  title: string;
+  time: string;
+  type?: 'internal' | 'external' | 'automation';
+  attendees?: string[];
+  aiBrief?: string;
+}) {
+  const res = await fetch(`${BASE}/calendar`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(event),
+  });
+  if (!res.ok) {
+    const err = await res.json();
+    throw new Error(err.message || 'Failed to create calendar event');
+  }
+  return res.json();
+}
+
+export async function deleteCalendarEvent(id: string) {
+  const res = await fetch(`${BASE}/calendar/${id}`, { method: 'DELETE' });
+  if (!res.ok) throw new Error('Failed to delete calendar event');
+  return res.json();
+}
+
