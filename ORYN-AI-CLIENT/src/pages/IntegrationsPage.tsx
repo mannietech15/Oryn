@@ -316,3 +316,4 @@ export default function IntegrationsPage() {
 // [style] Pulsing green dot animation
 // [refactor] Interactive probe button
 // [feat] Diagnostic banner component
+// [style] Border glow on hover
