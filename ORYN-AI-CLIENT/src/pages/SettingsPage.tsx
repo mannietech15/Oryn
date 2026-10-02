@@ -776,3 +776,4 @@ function LiveIntegrationCard({ integration, isTesting, onTest }: { integration: 
 // [refactor] Non-blocking alert feedback
 // [style] Accessible danger text color
 // [perf] Clean security mount
+// [style] Interactive button feedback
