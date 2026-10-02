@@ -294,3 +294,4 @@ export default function Sidebar({ page, onNavigate, isOpen, onClose, organizatio
 // [style] Notification badge pill
 // [types] SidebarProps contract
 // [perf] Smooth sidebar transitions
+// [style] Tools section header tracking
