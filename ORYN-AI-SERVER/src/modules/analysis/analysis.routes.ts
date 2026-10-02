@@ -13,4 +13,6 @@ router.post(
   defaultAnalysisController.analyze
 );
 
+router.get('/analytics/telemetry', defaultAnalysisController.getTelemetry);
+
 export default router;
