@@ -1,12 +1,15 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { fetchEcosystem, joinEcosystemCommunity, connectEcosystemBusiness, createEcosystemCommunity } from '../api/oryn';
 
 interface Community {
   id: string;
   name: string;
   members: string;
+  memberCount: number;
   tags: string[];
   description: string;
   icon: string;
+  joined?: boolean;
 }
 
 interface Business {
@@ -16,6 +19,7 @@ interface Business {
   location: string;
   product: string;
   matchType: 'same' | 'complementary';
+  connected?: boolean;
 }
 
 interface Trend {
@@ -34,37 +38,120 @@ interface CaseStudy {
   image: string;
 }
 
-const COMMUNITIES: Community[] = [
-  { id: '1', name: 'AI SaaS Builders', members: '12.4k', tags: ['AI', 'SaaS', 'Dev'], description: 'A community for founders building the next generation of AI-native SaaS.', icon: '🤖' },
-  { id: '2', name: 'Growth Hackers Hub', members: '8.2k', tags: ['Marketing', 'B2B'], description: 'Strategies and tools for hyper-growth in the enterprise space.', icon: '🚀' },
-  { id: '3', name: 'Sustainable Fintech', members: '5.1k', tags: ['Finance', 'ESG'], description: 'Ethical finance and green technology innovators.', icon: '🌿' },
-];
-
-const BUSINESSES: Business[] = [
-  { id: '1', name: 'Nexus Logistics', industry: 'Supply Chain', location: 'Berlin', product: 'Cloud Fleet Mgmt', matchType: 'same' },
-  { id: '2', name: 'EcoPack Solutions', industry: 'Packaging', location: 'Denver', product: 'Bio-degradable Materials', matchType: 'complementary' },
-  { id: '3', name: 'Zenith CRM', industry: 'Software', location: 'Austin', product: 'Enterprise CRM', matchType: 'same' },
-  { id: '4', name: 'SwiftPay Systems', industry: 'Fintech', location: 'London', product: 'B2B Payments', matchType: 'complementary' },
-  { id: '5', name: 'Quantum Core', industry: 'Computing', location: 'San Francisco', product: 'Quantum Processors', matchType: 'same' },
-  { id: '6', name: 'Atlas Biotech', industry: 'Healthcare', location: 'Boston', product: 'Gene Therapy Kits', matchType: 'complementary' },
-  { id: '7', name: 'Silverline Robotics', industry: 'Manufacturing', location: 'Tokyo', product: 'Industrial Arms', matchType: 'same' },
-  { id: '8', name: 'Nova Energy', industry: 'Renewables', location: 'Oslo', product: 'Fusion Modules', matchType: 'complementary' },
-];
-
-const TRENDS: Trend[] = [
-  { id: '1', topic: 'Generative Supply Chains', growth: '+142%', category: 'AI/Logistics', sentiment: 'positive' },
-  { id: '2', topic: 'Decentralized Workforce', growth: '+24%', category: 'HR Tech', sentiment: 'neutral' },
-  { id: '3', topic: 'Hyper-Personalized CRM', growth: '+89%', category: 'SaaS', sentiment: 'positive' },
-];
-
-const CASE_STUDIES: CaseStudy[] = [
-  { id: '1', company: 'CloudScale Inc.', result: '320% Revenue growth', summary: 'Implemented ORYN-AI to automate decision-making across 4 global offices.', image: '🏢' },
-  { id: '2', company: 'Velocity Retail', result: '45% Cost Reduction', summary: 'Optimized inventory using our predictive analytics engine.', image: '🛒' },
-];
-
 export default function ExplorePage() {
   const [search, setSearch] = useState('');
   const [activeTab, setActiveTab] = useState<'communities' | 'networking' | 'trends'>('communities');
+  const [sectorFilter, setSectorFilter] = useState('All');
+
+  const [communities, setCommunities] = useState<Community[]>([]);
+  const [businesses, setBusinesses] = useState<Business[]>([]);
+  const [trends, setTrends] = useState<Trend[]>([]);
+  const [caseStudies, setCaseStudies] = useState<CaseStudy[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  const [joiningId, setJoiningId] = useState<string | null>(null);
+  const [connectingId, setConnectingId] = useState<string | null>(null);
+
+  // New Community Modal State
+  const [showCreateModal, setShowCreateModal] = useState(false);
+  const [newComm, setNewComm] = useState({ name: '', description: '', tags: '', icon: '🤖' });
+  const [creatingComm, setCreatingComm] = useState(false);
+
+  const loadData = async () => {
+    try {
+      const data = await fetchEcosystem();
+      if (data.communities) setCommunities(data.communities);
+      if (data.businesses) setBusinesses(data.businesses);
+      if (data.trends) setTrends(data.trends);
+      if (data.caseStudies) setCaseStudies(data.caseStudies);
+    } catch (err) {
+      console.error('Failed to load ecosystem data:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    loadData();
+  }, []);
+
+  const handleJoin = async (id: string) => {
+    setJoiningId(id);
+    try {
+      const updated = await joinEcosystemCommunity(id);
+      setCommunities(prev => prev.map(c => c.id === id ? { ...c, ...updated } : c));
+    } catch (err) {
+      console.error('Failed to toggle community membership', err);
+    } finally {
+      setJoiningId(null);
+    }
+  };
+
+  const handleConnect = async (id: string) => {
+    setConnectingId(id);
+    try {
+      const updated = await connectEcosystemBusiness(id);
+      setBusinesses(prev => prev.map(b => b.id === id ? { ...b, ...updated } : b));
+    } catch (err) {
+      console.error('Failed to connect with partner', err);
+    } finally {
+      setConnectingId(null);
+    }
+  };
+
+  const handleCreateCommunitySubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newComm.name.trim() || !newComm.description.trim()) return;
+
+    setCreatingComm(true);
+    try {
+      const tagsArray = newComm.tags
+        .split(',')
+        .map(t => t.trim())
+        .filter(Boolean);
+
+      const created = await createEcosystemCommunity({
+        name: newComm.name,
+        description: newComm.description,
+        tags: tagsArray.length ? tagsArray : ['Community'],
+        icon: newComm.icon || '🚀'
+      });
+
+      setCommunities(prev => [created, ...prev]);
+      setNewComm({ name: '', description: '', tags: '', icon: '🤖' });
+      setShowCreateModal(false);
+    } catch (err) {
+      console.error('Failed to create community', err);
+    } finally {
+      setCreatingComm(false);
+    }
+  };
+
+  // Filtered lists
+  const query = search.toLowerCase().trim();
+
+  const filteredCommunities = communities.filter(c => {
+    const matchName = c.name.toLowerCase().includes(query);
+    const matchDesc = c.description.toLowerCase().includes(query);
+    const matchTags = c.tags?.some(t => t.toLowerCase().includes(query));
+    return matchName || matchDesc || matchTags;
+  });
+
+  const filteredBusinesses = businesses.filter(b => {
+    const matchSector = sectorFilter === 'All' || b.industry.toLowerCase().includes(sectorFilter.toLowerCase());
+    const matchName = b.name.toLowerCase().includes(query);
+    const matchLoc = b.location.toLowerCase().includes(query);
+    const matchProd = b.product.toLowerCase().includes(query);
+    return matchSector && (matchName || matchLoc || matchProd);
+  });
+
+  const filteredTrends = trends.filter(t => {
+    const matchTopic = t.topic.toLowerCase().includes(query);
+    const matchCat = t.category.toLowerCase().includes(query);
+    return matchTopic || matchCat;
+  });
+
+  const allSectors = ['All', ...Array.from(new Set(businesses.map(b => b.industry)))];
 
   return (
     <div style={{ flex: 1, overflowY: 'auto', background: 'transparent', perspective: '1000px' }}>
@@ -83,148 +170,259 @@ export default function ExplorePage() {
           pointerEvents: 'none'
         }} />
         
+        <div style={{ display: 'inline-flex', alignItems: 'center', gap: 8, padding: '4px 12px', borderRadius: 20, background: 'rgba(34, 197, 94, 0.1)', border: '1px solid rgba(34, 197, 94, 0.25)', color: 'var(--success)', fontSize: 11, fontWeight: 700, textTransform: 'uppercase', marginBottom: 16 }}>
+          <span style={{ width: 6, height: 6, borderRadius: '50%', background: 'var(--success)' }} />
+          LIVE ECOSYSTEM TELEMETRY · REAL-TIME DISCOVERY
+        </div>
+
         <h1 style={{ fontFamily: 'var(--font-display)', fontSize: 44, fontWeight: 800, marginBottom: 16, letterSpacing: -1 }}>
           Explore the <span style={{ color: 'var(--cyan)' }}>Ecosystem</span>
         </h1>
-        <p style={{ color: 'var(--muted)', fontSize: 18, maxWidth: 600, margin: '0 auto 32px', lineHeight: 1.6 }}>
-          Discover communities, connect with partners, and stay ahead of industrial shifts with AI-powered networking.
+        <p style={{ color: 'var(--muted)', fontSize: 18, maxWidth: 640, margin: '0 auto 32px', lineHeight: 1.6 }}>
+          Discover verified business networks, connect with enterprise peers, and observe industrial shifts in real time.
         </p>
 
         {/* Search Bar */}
         <div style={{ maxWidth: 640, margin: '0 auto', position: 'relative' }}>
           <input 
             type="text" 
-            placeholder="Search for communities, businesses, or trends..."
+            placeholder="Search communities, partners, or market trends..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             style={{
-              width: '100%', padding: '20px 30px', borderRadius: 40, border: '1px solid var(--border)',
+              width: '100%', padding: '18px 30px', borderRadius: 40, border: '1px solid var(--border)',
               background: 'rgba(10,29,58,0.7)', backdropFilter: 'blur(20px)', color: 'var(--white)',
-              fontSize: 16, outline: 'none', transition: 'all 0.3s',
+              fontSize: 15, outline: 'none', transition: 'all 0.3s',
               boxShadow: 'var(--shadow-subtle), 0 0 15px rgba(249, 115, 22,0.05)'
             }}
             onFocus={(e) => { e.target.style.borderColor = 'var(--cyan)'; e.target.style.boxShadow = 'var(--shadow-subtle), 0 0 25px rgba(249, 115, 22,0.2)'; }}
             onBlur={(e) => { e.target.style.borderColor = 'var(--border)'; e.target.style.boxShadow = 'var(--shadow-subtle), 0 0 15px rgba(249, 115, 22,0.05)'; }}
           />
-          <div style={{ position: 'absolute', right: 24, top: '50%', transform: 'translateY(-50%)', fontSize: 20 }}>🔍</div>
+          <div style={{ position: 'absolute', right: 24, top: '50%', transform: 'translateY(-50%)', fontSize: 18, color: 'var(--muted)' }}>
+            {search ? (
+              <span onClick={() => setSearch('')} style={{ cursor: 'pointer' }}>✕</span>
+            ) : '🔍'}
+          </div>
         </div>
       </div>
 
       {/* Main Content Sections */}
       <div style={{ padding: '40px', maxWidth: 1400, margin: '0 auto' }}>
         
-        {/* Navigation Tabs */}
-        <div style={{ display: 'flex', gap: 32, marginBottom: 40, borderBottom: '1px solid var(--border)', paddingBottom: 16 }}>
-          {(['communities', 'networking', 'trends'] as const).map(tab => (
+        {/* Navigation Tabs and Create Action */}
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 40, borderBottom: '1px solid var(--border)', paddingBottom: 16, flexWrap: 'wrap', gap: 16 }}>
+          <div style={{ display: 'flex', gap: 32 }}>
+            {(['communities', 'networking', 'trends'] as const).map(tab => (
+              <button
+                key={tab}
+                onClick={() => setActiveTab(tab)}
+                style={{
+                  background: 'none', border: 'none', padding: '8px 4px', cursor: 'pointer',
+                  fontFamily: 'var(--font-display)', fontSize: 13, fontWeight: 700, letterSpacing: 2,
+                  textTransform: 'uppercase', color: activeTab === tab ? 'var(--cyan)' : 'var(--muted)',
+                  position: 'relative', transition: 'all 0.3s'
+                }}
+              >
+                {tab} ({tab === 'communities' ? communities.length : tab === 'networking' ? businesses.length : trends.length})
+                {activeTab === tab && (
+                  <div style={{ position: 'absolute', bottom: -17, left: 0, right: 0, height: 2, background: 'var(--cyan)', boxShadow: '0 0 10px var(--cyan)' }} />
+                )}
+              </button>
+            ))}
+          </div>
+
+          {activeTab === 'communities' && (
             <button
-              key={tab}
-              onClick={() => setActiveTab(tab)}
+              onClick={() => setShowCreateModal(true)}
               style={{
-                background: 'none', border: 'none', padding: '8px 4px', cursor: 'pointer',
-                fontFamily: 'var(--font-display)', fontSize: 13, fontWeight: 700, letterSpacing: 2,
-                textTransform: 'uppercase', color: activeTab === tab ? 'var(--cyan)' : 'var(--muted)',
-                position: 'relative', transition: 'all 0.3s'
+                padding: '8px 18px', background: 'var(--accent-primary)', color: '#fff',
+                border: 'none', borderRadius: 8, fontWeight: 600, fontSize: 12, cursor: 'pointer',
+                display: 'flex', alignItems: 'center', gap: 6, boxShadow: '0 2px 8px rgba(249, 115, 22, 0.3)'
               }}
             >
-              {tab}
-              {activeTab === tab && (
-                <div style={{ position: 'absolute', bottom: -17, left: 0, right: 0, height: 2, background: 'var(--cyan)', boxShadow: '0 0 10px var(--cyan)' }} />
-              )}
+              + Create Community
             </button>
-          ))}
-        </div>
-
-        {/* Dynamic Section Rendering */}
-        <div style={{ animation: 'rise 0.5s ease-out' }}>
-          {activeTab === 'communities' && (
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(350px, 1fr))', gap: 24 }}>
-              {COMMUNITIES.map(c => (
-                <div key={c.id} style={{
-                  padding: 32, background: 'var(--card-bg)', border: '1px solid var(--border)', borderRadius: 20,
-                  backdropFilter: 'blur(10px)', transition: 'all 0.3s', cursor: 'pointer'
-                }}
-                onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-8px)'; e.currentTarget.style.background = 'var(--card-bg)'; e.currentTarget.style.borderColor = 'rgba(249, 115, 22,0.3)'; }}
-                onMouseLeave={e => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.background = 'var(--card-bg)'; e.currentTarget.style.borderColor = 'var(--border)'; }}
-                >
-                  <div style={{ fontSize: 40, marginBottom: 20 }}>{c.icon}</div>
-                  <h3 style={{ fontFamily: 'var(--font-display)', fontSize: 20, marginBottom: 8 }}>{c.name}</h3>
-                  <div style={{ fontSize: 12, color: 'var(--cyan)', fontWeight: 700, marginBottom: 16 }}>{c.members} Members</div>
-                  <p style={{ color: 'var(--muted)', fontSize: 14, lineHeight: 1.6, marginBottom: 20 }}>{c.description}</p>
-                  <div style={{ display: 'flex', gap: 8, marginBottom: 24 }}>
-                    {c.tags.map(tag => (
-                      <span key={tag} style={{ padding: '4px 10px', background: 'rgba(249, 115, 22,0.05)', border: '1px solid rgba(249, 115, 22,0.1)', borderRadius: 4, fontSize: 10, color: 'var(--muted)', fontWeight: 600 }}>#{tag}</span>
-                    ))}
-                  </div>
-                  <button style={{ width: '100%', padding: '12px', background: 'rgba(249, 115, 22,0.08)', border: '1px solid var(--cyan)', borderRadius: 10, color: 'var(--cyan)', fontWeight: 700, cursor: 'pointer', transition: 'all 0.2s' }}>
-                    Join Community
-                  </button>
-                </div>
-              ))}
-            </div>
-          )}
-
-          {activeTab === 'networking' && (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 32 }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <h2 style={{ fontFamily: 'var(--font-display)', fontSize: 24 }}>Recommended Connections</h2>
-                <div style={{ display: 'flex', gap: 12 }}>
-                  <span style={{ fontSize: 12, color: 'var(--muted)' }}>Filter by Sector:</span>
-                  <select style={{ background: 'rgba(10,29,58,0.7)', border: '1px solid var(--border)', color: 'var(--white)', padding: '4px 12px', borderRadius: 8 }}>
-                    <option>All Sectors</option>
-                    <option>Logistics</option>
-                    <option>Software</option>
-                  </select>
-                </div>
-              </div>
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: 20 }}>
-                {BUSINESSES.map(b => (
-                  <div key={b.id} style={{
-                    padding: 24, background: 'rgba(10,29,58,0.5)', border: '1px solid var(--border)', borderRadius: 16,
-                    borderLeft: `4px solid ${b.matchType === 'same' ? 'var(--cyan)' : 'var(--violet)'}`
-                  }}>
-                    <div style={{ fontSize: 10, fontWeight: 700, color: b.matchType === 'same' ? 'var(--cyan)' : 'var(--violet)', textTransform: 'uppercase', letterSpacing: 1, marginBottom: 8 }}>
-                      {b.matchType === 'same' ? 'Direct Competitor / Peer' : 'Strategic Partner'}
-                    </div>
-                    <div style={{ fontSize: 18, fontWeight: 600, marginBottom: 4 }}>{b.name}</div>
-                    <div style={{ fontSize: 13, color: 'var(--muted)', marginBottom: 20 }}>{b.industry} · {b.location}</div>
-                    <div style={{ padding: '8px 12px', background: 'rgba(0,0,0,0.2)', borderRadius: 8, fontSize: 12, marginBottom: 20 }}>
-                      <span style={{ color: 'var(--muted)' }}>Keys Products:</span> {b.product}
-                    </div>
-                    <button style={{ width: '100%', padding: '10px', background: 'white', color: 'black', border: 'none', borderRadius: 8, fontWeight: 700, cursor: 'pointer', transition: 'all 0.2s' }}>
-                      Connect
-                    </button>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {activeTab === 'trends' && (
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 40 }}>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
-                <h2 style={{ fontFamily: 'var(--font-display)', fontSize: 24 }}>Emerging Shifts</h2>
-                {TRENDS.map(t => (
-                  <div key={t.id} style={{ padding: 24, background: 'var(--card-bg)', borderRadius: 16, border: '1px solid var(--border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <div>
-                      <div style={{ fontSize: 12, color: 'var(--muted)', marginBottom: 4 }}>{t.category}</div>
-                      <div style={{ fontSize: 18, fontWeight: 600 }}>{t.topic}</div>
-                    </div>
-                    <div style={{ textAlign: 'right' }}>
-                      <div style={{ color: t.sentiment === 'positive' ? 'var(--success)' : 'var(--white)', fontSize: 20, fontWeight: 800 }}>{t.growth}</div>
-                      <div style={{ fontSize: 11, color: 'var(--muted)' }}>Annual Momentum</div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-              <div style={{ background: 'rgba(249, 115, 22,0.03)', border: '1px dashed rgba(249, 115, 22,0.2)', borderRadius: 20, padding: 32, display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', gap: 16 }}>
-                <div style={{ fontSize: 40 }}>📊</div>
-                <div style={{ fontFamily: 'var(--font-display)', fontSize: 18, fontWeight: 600 }}>Detailed Trend Analysis</div>
-                <p style={{ color: 'var(--muted)', fontSize: 14, textAlign: 'center' }}>Connect your LinkedIn or Market data source to unlock deep trend forecasting.</p>
-                <button style={{ padding: '12px 24px', background: 'var(--cyan)', color: 'black', border: 'none', borderRadius: 10, fontWeight: 700, cursor: 'pointer' }}>Connect Data Source</button>
-              </div>
-            </div>
           )}
         </div>
+
+        {loading ? (
+          <div style={{ padding: 60, textAlign: 'center', color: 'var(--muted)', fontSize: 14 }}>
+            Syncing live ecosystem telemetry...
+          </div>
+        ) : (
+          <div style={{ animation: 'rise 0.5s ease-out' }}>
+            {/* --- Communities Section --- */}
+            {activeTab === 'communities' && (
+              <div>
+                {filteredCommunities.length === 0 ? (
+                  <div style={{ padding: 60, textAlign: 'center', color: 'var(--muted)', background: 'var(--card-bg)', borderRadius: 16, border: '1px solid var(--border)' }}>
+                    No communities match your search query. Try broadening your terms or click "+ Create Community".
+                  </div>
+                ) : (
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(350px, 1fr))', gap: 24 }}>
+                    {filteredCommunities.map(c => {
+                      const isJoining = joiningId === c.id;
+                      return (
+                        <div key={c.id} style={{
+                          padding: 32, background: 'var(--card-bg)', border: `1px solid ${c.joined ? 'rgba(34, 197, 94, 0.4)' : 'var(--border)'}`, borderRadius: 20,
+                          backdropFilter: 'blur(10px)', transition: 'all 0.3s', display: 'flex', flexDirection: 'column', justifyContent: 'space-between'
+                        }}
+                        onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-6px)'; e.currentTarget.style.borderColor = c.joined ? 'var(--success)' : 'rgba(249, 115, 22,0.3)'; }}
+                        onMouseLeave={e => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.borderColor = c.joined ? 'rgba(34, 197, 94, 0.4)' : 'var(--border)'; }}
+                        >
+                          <div>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 16 }}>
+                              <div style={{ fontSize: 40 }}>{c.icon}</div>
+                              {c.joined && (
+                                <span style={{
+                                  padding: '3px 10px', borderRadius: 12,
+                                  background: 'rgba(34, 197, 94, 0.1)', color: 'var(--success)',
+                                  fontSize: 10, fontWeight: 700, border: '1px solid rgba(34, 197, 94, 0.3)'
+                                }}>
+                                  ✓ MEMBER
+                                </span>
+                              )}
+                            </div>
+                            <h3 style={{ fontFamily: 'var(--font-display)', fontSize: 20, marginBottom: 8 }}>{c.name}</h3>
+                            <div style={{ fontSize: 12, color: 'var(--cyan)', fontWeight: 700, marginBottom: 16 }}>{c.members} Members</div>
+                            <p style={{ color: 'var(--muted)', fontSize: 14, lineHeight: 1.6, marginBottom: 20 }}>{c.description}</p>
+                            <div style={{ display: 'flex', gap: 8, marginBottom: 24, flexWrap: 'wrap' }}>
+                              {c.tags.map(tag => (
+                                <span key={tag} style={{ padding: '4px 10px', background: 'rgba(249, 115, 22,0.05)', border: '1px solid rgba(249, 115, 22,0.1)', borderRadius: 4, fontSize: 10, color: 'var(--muted)', fontWeight: 600 }}>#{tag}</span>
+                              ))}
+                            </div>
+                          </div>
+
+                          <button 
+                            onClick={() => handleJoin(c.id)}
+                            disabled={isJoining}
+                            style={{
+                              width: '100%', padding: '12px',
+                              background: c.joined ? 'rgba(34, 197, 94, 0.12)' : 'rgba(249, 115, 22,0.08)',
+                              border: `1px solid ${c.joined ? 'var(--success)' : 'var(--cyan)'}`,
+                              borderRadius: 10, color: c.joined ? 'var(--success)' : 'var(--cyan)',
+                              fontWeight: 700, cursor: isJoining ? 'wait' : 'pointer', transition: 'all 0.2s'
+                            }}
+                          >
+                            {isJoining ? 'Updating Membership...' : c.joined ? 'Leave Community' : 'Join Community'}
+                          </button>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* --- Networking / Businesses Section --- */}
+            {activeTab === 'networking' && (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 32 }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 16 }}>
+                  <div>
+                    <h2 style={{ fontFamily: 'var(--font-display)', fontSize: 24, margin: 0 }}>Recommended Connections</h2>
+                    <div style={{ fontSize: 12, color: 'var(--muted)', marginTop: 4 }}>Showing {filteredBusinesses.length} operational entities ready for collaboration</div>
+                  </div>
+
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                    <span style={{ fontSize: 12, color: 'var(--muted)' }}>Filter by Sector:</span>
+                    <select 
+                      value={sectorFilter}
+                      onChange={(e) => setSectorFilter(e.target.value)}
+                      style={{ background: 'rgba(10,29,58,0.7)', border: '1px solid var(--border)', color: 'var(--white)', padding: '6px 14px', borderRadius: 8, outline: 'none' }}
+                    >
+                      {allSectors.map(s => (
+                        <option key={s} value={s}>{s}</option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+
+                {filteredBusinesses.length === 0 ? (
+                  <div style={{ padding: 60, textAlign: 'center', color: 'var(--muted)', background: 'var(--card-bg)', borderRadius: 16, border: '1px solid var(--border)' }}>
+                    No businesses match the selected sector or search criteria.
+                  </div>
+                ) : (
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: 20 }}>
+                    {filteredBusinesses.map(b => {
+                      const isConnecting = connectingId === b.id;
+                      return (
+                        <div key={b.id} style={{
+                          padding: 24, background: 'rgba(10,29,58,0.5)', border: '1px solid var(--border)', borderRadius: 16,
+                          borderLeft: `4px solid ${b.connected ? 'var(--success)' : b.matchType === 'same' ? 'var(--cyan)' : 'var(--violet)'}`,
+                          display: 'flex', flexDirection: 'column', justifyContent: 'space-between'
+                        }}>
+                          <div>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
+                              <div style={{ fontSize: 10, fontWeight: 700, color: b.matchType === 'same' ? 'var(--cyan)' : 'var(--violet)', textTransform: 'uppercase', letterSpacing: 1 }}>
+                                {b.matchType === 'same' ? 'Direct Peer' : 'Strategic Partner'}
+                              </div>
+                              {b.connected && (
+                                <span style={{ fontSize: 10, fontWeight: 700, color: 'var(--success)', background: 'rgba(34, 197, 94, 0.1)', padding: '2px 8px', borderRadius: 10 }}>
+                                  CONNECTED
+                                </span>
+                              )}
+                            </div>
+                            <div style={{ fontSize: 18, fontWeight: 600, marginBottom: 4 }}>{b.name}</div>
+                            <div style={{ fontSize: 13, color: 'var(--muted)', marginBottom: 16 }}>{b.industry} · {b.location}</div>
+                            <div style={{ padding: '8px 12px', background: 'rgba(0,0,0,0.2)', borderRadius: 8, fontSize: 12, marginBottom: 20 }}>
+                              <span style={{ color: 'var(--muted)' }}>Key Offerings:</span> {b.product}
+                            </div>
+                          </div>
+
+                          <button 
+                            onClick={() => handleConnect(b.id)}
+                            disabled={isConnecting}
+                            style={{
+                              width: '100%', padding: '10px',
+                              background: b.connected ? 'rgba(34, 197, 94, 0.2)' : 'white',
+                              color: b.connected ? 'var(--success)' : 'black',
+                              border: b.connected ? '1px solid var(--success)' : 'none',
+                              borderRadius: 8, fontWeight: 700, cursor: isConnecting ? 'wait' : 'pointer', transition: 'all 0.2s'
+                            }}
+                          >
+                            {isConnecting ? 'Updating...' : b.connected ? 'Disconnect Partner' : 'Connect'}
+                          </button>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* --- Emerging Shifts / Trends Section --- */}
+            {activeTab === 'trends' && (
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 40 }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+                  <h2 style={{ fontFamily: 'var(--font-display)', fontSize: 24, margin: 0 }}>Emerging Shifts & Signals</h2>
+                  {filteredTrends.map(t => (
+                    <div key={t.id} style={{ padding: 24, background: 'var(--card-bg)', borderRadius: 16, border: '1px solid var(--border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <div>
+                        <div style={{ fontSize: 12, color: 'var(--muted)', marginBottom: 4 }}>{t.category}</div>
+                        <div style={{ fontSize: 18, fontWeight: 600 }}>{t.topic}</div>
+                      </div>
+                      <div style={{ textAlign: 'right' }}>
+                        <div style={{ color: t.sentiment === 'positive' ? 'var(--success)' : 'var(--white)', fontSize: 20, fontWeight: 800 }}>{t.growth}</div>
+                        <div style={{ fontSize: 11, color: 'var(--muted)' }}>Annual Momentum</div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                <div style={{ background: 'rgba(249, 115, 22,0.03)', border: '1px dashed rgba(249, 115, 22,0.2)', borderRadius: 20, padding: 32, display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', gap: 16 }}>
+                  <div style={{ fontSize: 40 }}>📊</div>
+                  <div style={{ fontFamily: 'var(--font-display)', fontSize: 18, fontWeight: 600 }}>Detailed Trend Telemetry</div>
+                  <p style={{ color: 'var(--muted)', fontSize: 14, textAlign: 'center', maxWidth: 360, lineHeight: 1.5 }}>
+                    Real-time cross-industry signals are synthesized automatically from connected enterprise pipelines and ecosystem nodes.
+                  </p>
+                  <div style={{ padding: '8px 16px', borderRadius: 8, background: 'rgba(34, 197, 94, 0.1)', color: 'var(--success)', fontSize: 12, fontWeight: 600 }}>
+                    Telemetry Model: Active Autonomous Synthesis
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
 
         {/* Case Studies Section - Always visible at bottom */}
         <div style={{ marginTop: 80 }}>
@@ -233,10 +431,10 @@ export default function ExplorePage() {
               <div style={{ fontSize: 12, fontWeight: 700, color: 'var(--cyan)', textTransform: 'uppercase', letterSpacing: 2, marginBottom: 8 }}>Success Stories</div>
               <h2 style={{ fontFamily: 'var(--font-display)', fontSize: 32, fontWeight: 800 }}>The ORYN Impact</h2>
             </div>
-            <button style={{ color: 'var(--cyan)', background: 'none', border: 'none', cursor: 'pointer', fontWeight: 600 }}>View All Case Studies →</button>
+            <div style={{ color: 'var(--muted)', fontSize: 13 }}>Verified Enterprise Case Studies</div>
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 32 }}>
-            {CASE_STUDIES.map(cs => (
+            {caseStudies.map(cs => (
               <div key={cs.id} style={{
                 display: 'flex', gap: 24, padding: 40, background: 'rgba(10,29,58,0.7)', borderRadius: 24, border: '1px solid var(--border)',
                 transition: 'all 0.3s'
@@ -266,9 +464,92 @@ export default function ExplorePage() {
         }}>
           <h2 style={{ fontFamily: 'var(--font-display)', fontSize: 28, marginBottom: 16 }}>Ready to expand your footprint?</h2>
           <p style={{ color: 'var(--muted)', marginBottom: 32, maxWidth: 500, margin: '0 auto 32px' }}>AI-driven networking is just the beginning. Join the Oryn ecosystem and transform your business strategy today.</p>
-          <button style={{ padding: '16px 40px', background: 'var(--cyan)', color: 'black', border: 'none', borderRadius: 40, fontWeight: 800, fontSize: 16, cursor: 'pointer', boxShadow: '0 10px 30px rgba(249, 115, 22,0.4)' }}>Get Started Now</button>
+          <button onClick={() => { setActiveTab('communities'); setShowCreateModal(true); }} style={{ padding: '16px 40px', background: 'var(--cyan)', color: 'black', border: 'none', borderRadius: 40, fontWeight: 800, fontSize: 16, cursor: 'pointer', boxShadow: '0 10px 30px rgba(249, 115, 22,0.4)' }}>
+            Register New Community
+          </button>
         </div>
       </div>
+
+      {/* Create Community Modal */}
+      {showCreateModal && (
+        <div style={{
+          position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(8px)',
+          display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, padding: 20
+        }}>
+          <div style={{
+            background: 'var(--card-bg)', border: '1px solid var(--border)',
+            borderRadius: 20, padding: 32, width: '100%', maxWidth: 480,
+            boxShadow: 'var(--shadow-subtle)', display: 'flex', flexDirection: 'column', gap: 20
+          }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <h2 style={{ fontSize: 18, fontWeight: 700, margin: 0, color: 'var(--white)' }}>Create Ecosystem Community</h2>
+              <button onClick={() => setShowCreateModal(false)} style={{ background: 'transparent', border: 'none', color: 'var(--muted)', cursor: 'pointer', fontSize: 18 }}>✕</button>
+            </div>
+
+            <form onSubmit={handleCreateCommunitySubmit} style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+              <div>
+                <label style={{ fontSize: 11, fontWeight: 700, color: 'var(--muted)', textTransform: 'uppercase' }}>Community Name</label>
+                <input
+                  required
+                  value={newComm.name}
+                  onChange={e => setNewComm({ ...newComm, name: e.target.value })}
+                  placeholder="e.g. Decentralized AI Founders"
+                  style={{ width: '100%', padding: '10px 14px', marginTop: 6, background: 'rgba(10,29,58,0.7)', border: '1px solid var(--border)', borderRadius: 10, color: '#fff', outline: 'none' }}
+                />
+              </div>
+
+              <div>
+                <label style={{ fontSize: 11, fontWeight: 700, color: 'var(--muted)', textTransform: 'uppercase' }}>Icon / Emoji</label>
+                <input
+                  value={newComm.icon}
+                  onChange={e => setNewComm({ ...newComm, icon: e.target.value })}
+                  placeholder="🤖, 🌐, 🚀, 💡"
+                  style={{ width: '100%', padding: '10px 14px', marginTop: 6, background: 'rgba(10,29,58,0.7)', border: '1px solid var(--border)', borderRadius: 10, color: '#fff', outline: 'none' }}
+                />
+              </div>
+
+              <div>
+                <label style={{ fontSize: 11, fontWeight: 700, color: 'var(--muted)', textTransform: 'uppercase' }}>Tags (comma separated)</label>
+                <input
+                  value={newComm.tags}
+                  onChange={e => setNewComm({ ...newComm, tags: e.target.value })}
+                  placeholder="AI, Infra, Founders"
+                  style={{ width: '100%', padding: '10px 14px', marginTop: 6, background: 'rgba(10,29,58,0.7)', border: '1px solid var(--border)', borderRadius: 10, color: '#fff', outline: 'none' }}
+                />
+              </div>
+
+              <div>
+                <label style={{ fontSize: 11, fontWeight: 700, color: 'var(--muted)', textTransform: 'uppercase' }}>Mission & Description</label>
+                <textarea
+                  rows={3}
+                  required
+                  value={newComm.description}
+                  onChange={e => setNewComm({ ...newComm, description: e.target.value })}
+                  placeholder="Describe the mission and who should join this community..."
+                  style={{ width: '100%', padding: '10px 14px', marginTop: 6, background: 'rgba(10,29,58,0.7)', border: '1px solid var(--border)', borderRadius: 10, color: '#fff', outline: 'none', resize: 'vertical' }}
+                />
+              </div>
+
+              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 10, marginTop: 8 }}>
+                <button
+                  type="button"
+                  onClick={() => setShowCreateModal(false)}
+                  style={{ padding: '8px 16px', background: 'transparent', border: '1px solid var(--border)', borderRadius: 8, color: 'var(--muted)', cursor: 'pointer' }}
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={creatingComm}
+                  style={{ padding: '8px 20px', background: 'var(--cyan)', border: 'none', borderRadius: 8, color: '#000', fontWeight: 700, cursor: 'pointer' }}
+                >
+                  {creatingComm ? 'Creating...' : 'Create Community'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
