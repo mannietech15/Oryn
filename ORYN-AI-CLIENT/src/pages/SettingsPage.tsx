@@ -750,3 +750,4 @@ function LiveIntegrationCard({ integration, isTesting, onTest }: { integration: 
 // [style] Glassmorphic backdrop tuning
 // [types] Clean preferences handlers
 // [style] Interactive micro-animations
+// [final] Preferences panel finalized
