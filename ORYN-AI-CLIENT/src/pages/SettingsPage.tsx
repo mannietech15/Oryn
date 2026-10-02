@@ -560,3 +560,4 @@ function LiveIntegrationCard({ integration, isTesting, onTest }: { integration: 
 // [refactor] Replaced left vertical rail with horizontal switcher
 // [style] Card border contrast harmony
 // [perf] Fixed minimum height avoids layout shifts
+// [style] Subtle box shadow token
