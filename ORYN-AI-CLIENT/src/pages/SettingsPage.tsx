@@ -729,3 +729,4 @@ function LiveIntegrationCard({ integration, isTesting, onTest }: { integration: 
 // [refactor] Email preference persistence
 // [feat] Push notification toggle
 // [refactor] Push preference persistence
+// [style] 24px padding on preference cards
