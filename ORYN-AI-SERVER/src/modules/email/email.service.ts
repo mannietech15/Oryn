@@ -180,3 +180,4 @@ export const defaultEmailService = new EmailService();
 // [perf] Non-blocking server boot sequence
 // [docs] SMTP Relay configuration instructions
 // [security] Sanitize upstream server responses
+// [perf] Keepalive TCP socket configuration
