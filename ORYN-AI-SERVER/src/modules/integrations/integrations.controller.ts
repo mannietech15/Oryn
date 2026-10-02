@@ -1,11 +1,35 @@
 import { Request, Response, NextFunction } from 'express';
 import { defaultEmailService } from '../email/email.service';
+import { defaultDatastore, Datastore } from '../../infrastructure/storage/datastore';
 import { ENV } from '../../config/env';
 
 export class IntegrationsController {
+  constructor(private datastore: Datastore = defaultDatastore) {}
+
   getStatus = async (_req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
       const smtpVerify = await defaultEmailService.verifyTransport();
+      const workflows = this.datastore.getWorkflows();
+      const taskMetrics = this.datastore.getTaskMetrics();
+      const finMetrics = this.datastore.getFinancialMetrics();
+
+      // Count actual workflow steps and system features referencing each service
+      const countReferences = (keywords: string[]) => {
+        return workflows.filter(w => 
+          keywords.some(k => 
+            w.name.toLowerCase().includes(k) || 
+            w.description.toLowerCase().includes(k) || 
+            w.steps.some(s => s.toLowerCase().includes(k))
+          )
+        ).length;
+      };
+
+      const smtpUsage = countReferences(['smtp', 'email', 'relay', 'mail']) + (this.datastore.getEmailLogs().length > 0 ? 1 : 0);
+      const nvidiaUsage = countReferences(['inference', 'llama', 'ai', 'synthesis', 'gateway']) + (taskMetrics.totalCount > 0 ? 1 : 0);
+      const datastoreUsage = workflows.length + (finMetrics.entryCount > 0 ? 1 : 0) + (this.datastore.getDocuments().length > 0 ? 1 : 0);
+      const stripeUsage = countReferences(['stripe', 'billing', 'revenue', 'invoice']);
+      const zendeskUsage = countReferences(['support', 'ticket', 'zendesk']);
+      const slackUsage = countReferences(['slack', 'dispatch', 'notify', 'team']);
 
       const integrations = [
         {
@@ -18,7 +42,7 @@ export class IntegrationsController {
           user: ENV.SMTP_USER || 'Unconfigured',
           statusMessage: smtpVerify.message,
           lastSync: smtpVerify.connected ? 'Active transport verified' : 'Handshake unverified',
-          usedByCount: 3,
+          usedByCount: smtpUsage,
         },
         {
           id: 'nvidia',
@@ -27,8 +51,8 @@ export class IntegrationsController {
           status: ENV.NVIDIA_API_KEY ? 'connected' : 'disconnected',
           model: ENV.DEFAULT_MODEL,
           statusMessage: ENV.NVIDIA_API_KEY ? 'API key authenticated on NGC endpoint' : 'Missing NVIDIA_API_KEY',
-          lastSync: 'Continuous telemetry stream',
-          usedByCount: 5,
+          lastSync: taskMetrics.lastTaskAt ? `Active (Last task at ${new Date(taskMetrics.lastTaskAt).toLocaleTimeString()})` : 'Continuous telemetry stream',
+          usedByCount: nvidiaUsage,
         },
         {
           id: 'datastore',
@@ -36,8 +60,8 @@ export class IntegrationsController {
           category: 'Persistence',
           status: 'connected',
           statusMessage: 'Local JSON storage engine verified and mounted',
-          lastSync: 'Continuous write sync',
-          usedByCount: 8,
+          lastSync: finMetrics.lastUpdated ? `Active (Last write at ${new Date(finMetrics.lastUpdated).toLocaleTimeString()})` : 'Continuous write sync',
+          usedByCount: datastoreUsage,
         },
         {
           id: 'stripe',
@@ -47,8 +71,8 @@ export class IntegrationsController {
           statusMessage: process.env.STRIPE_SECRET_KEY
             ? 'Stripe webhook receiver active'
             : 'Available (Requires STRIPE_SECRET_KEY in server environment)',
-          lastSync: process.env.STRIPE_SECRET_KEY ? 'Synced 2m ago' : 'Not configured',
-          usedByCount: process.env.STRIPE_SECRET_KEY ? 2 : 0,
+          lastSync: process.env.STRIPE_SECRET_KEY ? 'Active webhook sync' : 'Not configured',
+          usedByCount: stripeUsage,
         },
         {
           id: 'zendesk',
@@ -58,8 +82,8 @@ export class IntegrationsController {
           statusMessage: process.env.ZENDESK_TOKEN
             ? 'Ticket synchronization active'
             : 'Available (Requires ZENDESK_TOKEN in server environment)',
-          lastSync: process.env.ZENDESK_TOKEN ? 'Synced 5m ago' : 'Not configured',
-          usedByCount: process.env.ZENDESK_TOKEN ? 1 : 0,
+          lastSync: process.env.ZENDESK_TOKEN ? 'Active API polling' : 'Not configured',
+          usedByCount: zendeskUsage,
         },
         {
           id: 'slack',
@@ -69,8 +93,8 @@ export class IntegrationsController {
           statusMessage: process.env.SLACK_BOT_TOKEN
             ? 'Bot webhook integration active'
             : 'Available (Requires SLACK_BOT_TOKEN in server environment)',
-          lastSync: process.env.SLACK_BOT_TOKEN ? 'Synced 1m ago' : 'Not configured',
-          usedByCount: process.env.SLACK_BOT_TOKEN ? 1 : 0,
+          lastSync: process.env.SLACK_BOT_TOKEN ? 'Active webhook socket' : 'Not configured',
+          usedByCount: slackUsage,
         },
       ];
 
