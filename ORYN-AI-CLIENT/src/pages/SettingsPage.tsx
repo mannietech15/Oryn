@@ -684,3 +684,4 @@ function LiveIntegrationCard({ integration, isTesting, onTest }: { integration: 
 // [feat] Account Details panel mounted
 // [style] 80px initials avatar with accent border
 // [feat] Administrator verified badge
+// [layout] 2-column input grid
