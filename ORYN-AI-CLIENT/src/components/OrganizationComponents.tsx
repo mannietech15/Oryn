@@ -263,11 +263,34 @@ export interface BusinessProfileCardProps {
 
 export function BusinessProfileCard({ company }: BusinessProfileCardProps) {
   return (
-    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 20 }}>
-      {/* Entity attributes will be placed here */}
+    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 16 }}>
+      <div style={{ background: 'var(--glass-bg-subtle)', padding: '18px 20px', borderRadius: 12, border: '1px solid var(--card-border)' }}>
+        <div style={{ fontSize: 10, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: 1, marginBottom: 6, fontFamily: 'monospace' }}>
+          LEGAL ENTITY
+        </div>
+        <div style={{ fontSize: 16, fontWeight: 700, color: 'var(--text-primary)', fontFamily: 'var(--font-display)' }}>
+          {company.name}
+        </div>
+        <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 4 }}>
+          Multi-tenant verified organization
+        </div>
+      </div>
+
+      <div style={{ background: 'var(--glass-bg-subtle)', padding: '18px 20px', borderRadius: 12, border: '1px solid var(--card-border)' }}>
+        <div style={{ fontSize: 10, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: 1, marginBottom: 6, fontFamily: 'monospace' }}>
+          PRIMARY SECTOR
+        </div>
+        <div style={{ fontSize: 16, fontWeight: 700, color: 'var(--accent-primary)', fontFamily: 'var(--font-display)' }}>
+          {company.industry}
+        </div>
+        <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 4 }}>
+          Core operating classification
+        </div>
+      </div>
     </div>
   );
 }
+
 
 
 
