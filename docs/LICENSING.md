@@ -140,3 +140,10 @@ While the text of the MIT License does not include an explicit patent clause:
 
 - **Implied Patent License**: Under prevailing international open source jurisprudence, distribution under the MIT license implies a royalty-free license to any contributor patents necessary to exercise the granted rights.
 - **Defensive Non-Aggression**: Any party instituting patent litigation claiming that ORYN-AI infringes intellectual property waives their moral right to reciprocal community support.
+
+## 14. Export Regulations & International Compliance
+
+Users are advised that modern AI software ecosystems incorporate encryption algorithms and cross-border data transfer mechanisms:
+
+- **Export Administration Regulations (EAR)**: Users must ensure their deployment adheres to applicable export administration regulations.
+- **Sanction Compliance**: Software must not be transferred or made available in violation of international trade sanctions or embargoes.
