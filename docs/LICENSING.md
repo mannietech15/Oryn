@@ -163,3 +163,11 @@ For organizations requiring commercial warranties, dedicated support, or indemni
 - **Commercial SLAs**: Enterprise agreements with guaranteed response times and security patching commitments.
 - **Custom Indemnification**: Legal liability protection agreements tailored to enterprise compliance officers.
 - **Inquiries**: Direct commercial licensing inquiries to `mannietech817@gmail.com`.
+
+## 17. Software Bill of Materials (SBOM) & Provenance
+
+To satisfy modern supply chain integrity mandates:
+
+- **CycloneDX / SPDX Output**: You may generate automated SBOM documents from `package-lock.json` manifests using standard tools.
+- **Git Commit Provenance**: All commits are preserved in the git tree with author verification and timestamps.
+- **Reproducible Artifacts**: Builds produced by Vite and TypeScript are deterministic given identical dependency locks.
