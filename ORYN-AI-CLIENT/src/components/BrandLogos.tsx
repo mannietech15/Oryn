@@ -108,3 +108,36 @@ export function LedgerLogo({ size = 20, style }: LogoProps) {
     </svg>
   );
 }
+
+export function getBrandLogo(idOrName: string, size: number = 20, style?: React.CSSProperties): React.ReactNode {
+  const key = (idOrName || '').toLowerCase();
+  if (key.includes('gmail') || key.includes('smtp') || key.includes('mail') || key.includes('email')) {
+    return <GmailLogo size={size} style={style} />;
+  }
+  if (key.includes('slack')) {
+    return <SlackLogo size={size} style={style} />;
+  }
+  if (key.includes('nvidia') || key.includes('nim')) {
+    return <NvidiaLogo size={size} style={style} />;
+  }
+  if (key.includes('stripe') || key.includes('billing')) {
+    return <StripeLogo size={size} style={style} />;
+  }
+  if (key.includes('zendesk') || key.includes('ticket')) {
+    return <ZendeskLogo size={size} style={style} />;
+  }
+  if (key.includes('salesforce') || key.includes('crm')) {
+    return <SalesforceLogo size={size} style={style} />;
+  }
+  if (key.includes('notion') || key.includes('docs')) {
+    return <NotionLogo size={size} style={style} />;
+  }
+  if (key.includes('analytics') || key.includes('google')) {
+    return <GoogleAnalyticsLogo size={size} style={style} />;
+  }
+  if (key.includes('ledger') || key.includes('datastore') || key.includes('telemetry') || key.includes('database')) {
+    return <LedgerLogo size={size} style={style} />;
+  }
+  return null;
+}
+
