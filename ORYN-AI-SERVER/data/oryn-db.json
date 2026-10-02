@@ -4,7 +4,7 @@
       "id": "f-1",
       "type": "revenue",
       "category": "Enterprise Subscriptions",
-      "amount": 84200,
+      "amount": 4200,
       "date": "2026-09-26",
       "note": "Monthly Stripe recurring subscription tranche",
       "createdAt": "2026-09-26T17:15:23.939Z"
