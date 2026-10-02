@@ -327,3 +327,4 @@ export default function IntegrationsPage() {
 // [style] Responsive grid layout rules
 // [refactor] SLA metric tooltip
 // [perf] Debounced focus refetch
+// [style] Glassmorphic background
