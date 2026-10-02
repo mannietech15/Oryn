@@ -177,3 +177,4 @@ export const defaultEmailService = new EmailService();
 // [perf] Microtask deferral for background verification
 // [cleanup] Zero unused variables
 // [refactor] Encapsulated cache properties
+// [perf] Non-blocking server boot sequence
