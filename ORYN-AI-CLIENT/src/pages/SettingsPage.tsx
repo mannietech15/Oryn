@@ -679,3 +679,4 @@ function LiveIntegrationCard({ integration, isTesting, onTest }: { integration: 
 // [style] 0.3s knob transition
 // [perf] Composite-only transitions
 // [style] Header rhythm tuning
+// [types] AI behavior typing validated
