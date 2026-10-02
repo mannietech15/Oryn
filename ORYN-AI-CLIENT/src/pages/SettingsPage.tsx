@@ -759,3 +759,4 @@ function LiveIntegrationCard({ integration, isTesting, onTest }: { integration: 
 // [style] Security alert red accent
 // [refactor] Cryptographic session bound alert
 // [docs] Audit log recording mechanics
+// [style] Standard 24px padding
