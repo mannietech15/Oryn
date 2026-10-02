@@ -342,3 +342,4 @@ export default function IntegrationsPage() {
 // [perf] Optimized SVG viewBox rendering
 // [docs] Maintenance documentation
 // [types] Card props interface contract
+// [style] 16px border-radius standard
