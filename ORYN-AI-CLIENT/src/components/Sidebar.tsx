@@ -302,3 +302,4 @@ export default function Sidebar({ page, onNavigate, isOpen, onClose, organizatio
 // [style] Themed scrollbar styles
 // [types] Strict unused variable check passed
 // [style] Settings button accent hover
+// [perf] Trimmed DOM nodes
