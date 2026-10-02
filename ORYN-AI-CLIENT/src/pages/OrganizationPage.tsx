@@ -1,7 +1,17 @@
-import React, { useState, useEffect } from 'react';
-import { UserPlus, X } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { UserPlus } from 'lucide-react';
 import type { Company, Employee, Team } from '../types';
 import { fetchOrganization, updateOrganizationData } from '../api/oryn';
+import {
+  OrgCard,
+  GovernanceInsightSummary,
+  OrgKpiGrid,
+  buildOrgKpiItems,
+  BusinessProfileCard,
+  DepartmentGrid,
+  PersonnelDirectory,
+  AddMemberModal
+} from '../components/OrganizationComponents';
 
 export default function OrganizationPage() {
   const [company, setCompany] = useState<Company>({
@@ -17,7 +27,6 @@ export default function OrganizationPage() {
 
   // Add Member Modal State
   const [showAddMember, setShowAddMember] = useState(false);
-  const [newMember, setNewMember] = useState<{ name: string; role: string; email: string; status: 'active' | 'on-leave' | 'remote' }>({ name: '', role: '', email: '', status: 'active' });
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
@@ -31,18 +40,15 @@ export default function OrganizationPage() {
       .finally(() => setLoading(false));
   }, []);
 
-  const handleAddMemberSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!newMember.name.trim() || !newMember.email.trim()) return;
-
+  const handleAddMember = async (member: { name: string; role: string; email: string; status: 'active' | 'on-leave' | 'remote' }) => {
     setIsSubmitting(true);
     try {
       const addedEmployee: Employee = {
         id: `emp-${Date.now()}`,
-        name: newMember.name,
-        role: newMember.role || 'Staff Engineer',
-        email: newMember.email,
-        status: newMember.status,
+        name: member.name,
+        role: member.role || 'Staff Engineer',
+        email: member.email,
+        status: member.status,
         joinedDate: new Date().toISOString().split('T')[0]
       };
 
@@ -50,7 +56,6 @@ export default function OrganizationPage() {
       await updateOrganizationData({ employees: updatedList });
 
       setEmployees(updatedList);
-      setNewMember({ name: '', role: '', email: '', status: 'active' });
       setShowAddMember(false);
     } catch (err) {
       console.error('Failed to add employee', err);
@@ -59,196 +64,114 @@ export default function OrganizationPage() {
     }
   };
 
+  const activeCount = employees.filter(e => e.status === 'active').length;
+  const remoteCount = employees.filter(e => e.status === 'remote').length;
+  const kpiItems = buildOrgKpiItems(employees, teams, company.location);
+
   return (
-    <div style={{ flex: 1, overflowY: 'auto', padding: 40, display: 'flex', flexDirection: 'column', gap: 32 }}>
-      {/* Header */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', flexWrap: 'wrap', gap: 16 }}>
-        <div>
-          <div style={{ fontFamily: 'var(--font-display)', fontSize: 11, fontWeight: 700, letterSpacing: 3, color: 'var(--muted)', textTransform: 'uppercase', marginBottom: 8 }}>Entity Management</div>
-          <div style={{ fontFamily: 'var(--font-display)', fontSize: 24, fontWeight: 800, color: 'white', letterSpacing: 1.5 }}>
-            <span style={{ color: 'var(--cyan)' }}>{company.name}</span> · Organization
+    <div style={{ flex: 1, overflowY: 'auto', padding: '36px 40px', background: 'var(--bg)', position: 'relative' }}>
+      <div style={{ maxWidth: 1200, margin: '0 auto', display: 'flex', flexDirection: 'column', gap: 28 }}>
+        
+        {/* Header */}
+        <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', flexWrap: 'wrap', gap: 16 }}>
+          <div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 8 }}>
+              <div style={{
+                display: 'inline-flex', alignItems: 'center', gap: 6,
+                padding: '3px 10px', borderRadius: 6,
+                background: 'rgba(34, 197, 94, 0.08)', border: '1px solid rgba(34, 197, 94, 0.2)',
+                fontSize: 11, fontWeight: 600, color: 'var(--success)', fontFamily: 'monospace'
+              }}>
+                <span style={{ width: 6, height: 6, borderRadius: '50%', background: 'var(--success)', display: 'inline-block' }} />
+                ENTITY MATRIX: VERIFIED
+              </div>
+              <div style={{
+                padding: '3px 10px', borderRadius: 6,
+                background: 'var(--glass-bg-subtle)', border: '1px solid var(--card-border)',
+                fontSize: 11, color: 'var(--text-muted)', fontFamily: 'monospace'
+              }}>
+                MULTI-TENANT DIRECTORY
+              </div>
+            </div>
+
+            <div style={{ fontFamily: 'var(--font-display)', fontSize: 28, fontWeight: 700, color: 'var(--text-primary)', letterSpacing: -0.5 }}>
+              Enterprise Organization & Governance Matrix
+            </div>
+            <div style={{ fontSize: 13, color: 'var(--text-secondary)', marginTop: 2 }}>
+              Corporate structure, departmental hierarchy, and authenticated personnel credentials.
+            </div>
+          </div>
+
+          <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
+            <div style={{
+              padding: '6px 14px', borderRadius: 8,
+              background: 'var(--glass-bg-subtle)', border: '1px solid var(--card-border)',
+              color: 'var(--text-muted)', fontSize: 12, fontFamily: 'monospace'
+            }}>
+              ROSTER: <strong style={{ color: 'var(--text-primary)' }}>{employees.length} Members</strong>
+            </div>
+            <button
+              onClick={() => setShowAddMember(true)}
+              style={{
+                padding: '8px 18px', background: 'var(--accent-primary)', color: '#fff',
+                border: 'none', borderRadius: 8, fontWeight: 600, fontSize: 13, cursor: 'pointer',
+                display: 'flex', alignItems: 'center', gap: 8, boxShadow: 'var(--shadow-subtle)',
+                transition: 'opacity 0.2s ease'
+              }}
+            >
+              <UserPlus size={15} /> Enroll Contributor
+            </button>
           </div>
         </div>
-        <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
-          <div style={{
-            padding: '8px 16px', borderRadius: 8,
-            background: 'var(--glass-bg-subtle)', border: '1px solid var(--card-border)',
-            color: 'var(--text-muted)', fontSize: 12, fontFamily: 'monospace'
-          }}>
-            {employees.length} Verified Team Members
-          </div>
-          <button
-            onClick={() => setShowAddMember(true)}
-            style={{
-              padding: '8px 18px', background: 'var(--accent-primary)', color: '#fff',
-              border: 'none', borderRadius: 8, fontWeight: 600, fontSize: 13, cursor: 'pointer',
-              display: 'flex', alignItems: 'center', gap: 8, boxShadow: 'var(--shadow-subtle)'
-            }}
+
+        {/* Evidence-oriented Workforce Governance Finding */}
+        <GovernanceInsightSummary
+          totalEmployees={employees.length}
+          activeCount={activeCount}
+          remoteCount={remoteCount}
+          departmentsCount={teams.length}
+          companyName={company.name}
+        />
+
+        {/* Top 4 Contextual KPIs */}
+        <OrgKpiGrid items={kpiItems} loading={loading} />
+
+        {/* 2-Column Section: Business Profile & Departments */}
+        <div style={{ display: 'grid', gridTemplateColumns: 'minmax(320px, 1.15fr) minmax(320px, 1fr)', gap: 24, alignItems: 'start' }}>
+          {/* Left Column: Business Profile */}
+          <OrgCard 
+            title="Enterprise Business Profile" 
+            subtitle="Verified corporate registration and operational headquarters"
           >
-            <UserPlus size={15} /> Add Team Member
-          </button>
+            <BusinessProfileCard company={company} />
+          </OrgCard>
+
+          {/* Right Column: Departments */}
+          <OrgCard 
+            title="Departments & Functional Units" 
+            subtitle={`Active operations across ${teams.length} branches`}
+          >
+            <DepartmentGrid teams={teams} employees={employees} />
+          </OrgCard>
         </div>
+
+        {/* Bottom Section: Personnel Directory Table */}
+        <OrgCard 
+          title="Personnel Directory & Access Registry" 
+          subtitle={`Verified roster of ${employees.length} corporate contributors`}
+        >
+          <PersonnelDirectory employees={employees} loading={loading} />
+        </OrgCard>
+
       </div>
 
-      {loading ? (
-        <div style={{ color: 'var(--muted)', textAlign: 'center', padding: 40 }}>
-          Querying organization directory...
-        </div>
-      ) : (
-        <>
-          <div style={{ display: 'grid', gridTemplateColumns: '1.5fr 1fr', gap: 24 }}>
-            {/* Company Details Card */}
-            <div style={{ background: 'var(--card)', border: '1px solid var(--border)', borderRadius: 20, padding: 32, backdropFilter: 'blur(20px)', boxShadow: 'var(--shadow-subtle)' }}>
-              <div style={{ fontFamily: 'var(--font-display)', fontSize: 10, fontWeight: 700, letterSpacing: 2.5, color: 'var(--cyan)', textTransform: 'uppercase', marginBottom: 24 }}><span className="color-circle"></span>Business Profile</div>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 40 }}>
-                <div>
-                  <Label>Company Name</Label>
-                  <Value>{company.name}</Value>
-                </div>
-                <div>
-                  <Label>Industry Sector</Label>
-                  <Value>{company.industry}</Value>
-                </div>
-                <div>
-                  <Label>Operational HQ</Label>
-                  <Value>{company.location}</Value>
-                </div>
-                <div>
-                  <Label>Foundation Date</Label>
-                  <Value>{company.foundedDate}</Value>
-                </div>
-              </div>
-            </div>
-
-            {/* Teams */}
-            <div style={{ background: 'var(--card)', border: '1px solid var(--border)', borderRadius: 20, padding: 32, backdropFilter: 'blur(20px)', boxShadow: 'var(--shadow-subtle)' }}>
-              <div style={{ fontFamily: 'var(--font-display)', fontSize: 10, fontWeight: 700, letterSpacing: 2.5, color: 'var(--cyan)', textTransform: 'uppercase', marginBottom: 24 }}><span className="color-circle"></span>Departments ({teams.length})</div>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-                {teams.map(t => (
-                  <div key={t.id} style={{ padding: '16px 20px', background: 'var(--glass-bg-subtle)', border: '1px solid var(--glass-bg-hover)', borderRadius: 12 }}>
-                    <div style={{ fontSize: 14, fontWeight: 700, color: 'white', marginBottom: 4 }}>{t.name}</div>
-                    <div style={{ fontSize: 12, color: 'var(--muted)', lineHeight: 1.4 }}>{t.description}</div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-
-          {/* Employees Table */}
-          <div style={{ background: 'var(--card)', border: '1px solid var(--border)', borderRadius: 20, padding: 32, backdropFilter: 'blur(20px)', boxShadow: 'var(--shadow-subtle)' }}>
-            <div style={{ fontFamily: 'var(--font-display)', fontSize: 10, fontWeight: 700, letterSpacing: 2.5, color: 'var(--cyan)', textTransform: 'uppercase', marginBottom: 24 }}><span className="color-circle"></span>Personnel Directory ({employees.length})</div>
-            <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
-              <thead>
-                <tr style={{ borderBottom: '1px solid var(--glass-bg-strong)' }}>
-                  {['Name', 'Role', 'Email', 'Status', 'Joined'].map(h => (
-                    <th key={h} style={{ padding: '12px 0', fontSize: 11, fontWeight: 700, color: 'var(--muted)', textTransform: 'uppercase', letterSpacing: 1.5 }}>{h}</th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                {employees.map(e => (
-                  <tr key={e.id}>
-                    <td style={{ padding: '20px 0', borderBottom: '1px solid var(--glass-bg-subtle)', fontSize: 14, fontWeight: 600, color: 'white' }}>{e.name}</td>
-                    <td style={{ padding: '20px 0', borderBottom: '1px solid var(--glass-bg-subtle)', fontSize: 13, color: 'var(--text-secondary)' }}>{e.role}</td>
-                    <td style={{ padding: '20px 0', borderBottom: '1px solid var(--glass-bg-subtle)', fontSize: 13, color: 'var(--muted)', fontFamily: 'monospace' }}>{e.email}</td>
-                    <td style={{ padding: '20px 0', borderBottom: '1px solid var(--glass-bg-subtle)' }}>
-                      <span style={{ 
-                        padding: '4px 10px', borderRadius: 20, fontSize: 10, fontWeight: 800, textTransform: 'uppercase', letterSpacing: 1,
-                        background: 'rgba(0,255,170,0.1)', color: 'var(--success)', border: '1px solid rgba(0,255,170,0.3)'
-                      }}>
-                        {e.status}
-                      </span>
-                    </td>
-                    <td style={{ padding: '20px 0', borderBottom: '1px solid var(--glass-bg-subtle)', fontSize: 13, color: 'var(--muted)' }}>{e.joinedDate}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </>
-      )}
-
       {/* Add Team Member Modal */}
-      {showAddMember && (
-        <div style={{
-          position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(8px)',
-          display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, padding: 20
-        }}>
-          <div style={{
-            background: 'var(--card-bg)', border: '1px solid var(--border)',
-            borderRadius: 20, padding: 32, width: '100%', maxWidth: 440,
-            boxShadow: 'var(--shadow-subtle)', display: 'flex', flexDirection: 'column', gap: 20
-          }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <h2 style={{ fontSize: 18, fontWeight: 700, margin: 0, color: 'white' }}>Add Team Member</h2>
-              <button onClick={() => setShowAddMember(false)} style={{ background: 'transparent', border: 'none', color: 'var(--muted)', cursor: 'pointer', display: 'flex', alignItems: 'center' }}>
-                <X size={18} />
-              </button>
-            </div>
-
-            <form onSubmit={handleAddMemberSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-              <div>
-                <label style={{ fontSize: 11, fontWeight: 700, color: 'var(--muted)', textTransform: 'uppercase' }}>Full Name</label>
-                <input
-                  required
-                  value={newMember.name}
-                  onChange={e => setNewMember({ ...newMember, name: e.target.value })}
-                  placeholder="e.g. Maya Patel"
-                  style={{ width: '100%', padding: '10px 14px', marginTop: 6, background: 'var(--card-bg)', border: '1px solid var(--border)', borderRadius: 10, color: '#fff', outline: 'none' }}
-                />
-              </div>
-
-              <div>
-                <label style={{ fontSize: 11, fontWeight: 700, color: 'var(--muted)', textTransform: 'uppercase' }}>Role / Position</label>
-                <input
-                  required
-                  value={newMember.role}
-                  onChange={e => setNewMember({ ...newMember, role: e.target.value })}
-                  placeholder="e.g. Lead ML Engineer"
-                  style={{ width: '100%', padding: '10px 14px', marginTop: 6, background: 'var(--card-bg)', border: '1px solid var(--border)', borderRadius: 10, color: '#fff', outline: 'none' }}
-                />
-              </div>
-
-              <div>
-                <label style={{ fontSize: 11, fontWeight: 700, color: 'var(--muted)', textTransform: 'uppercase' }}>Corporate Email</label>
-                <input
-                  required
-                  type="email"
-                  value={newMember.email}
-                  onChange={e => setNewMember({ ...newMember, email: e.target.value })}
-                  placeholder="maya@oryn.ai"
-                  style={{ width: '100%', padding: '10px 14px', marginTop: 6, background: 'var(--card-bg)', border: '1px solid var(--border)', borderRadius: 10, color: '#fff', outline: 'none' }}
-                />
-              </div>
-
-              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 10, marginTop: 8 }}>
-                <button
-                  type="button"
-                  onClick={() => setShowAddMember(false)}
-                  style={{ padding: '8px 16px', background: 'transparent', border: '1px solid var(--border)', borderRadius: 8, color: 'var(--muted)', cursor: 'pointer' }}
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  disabled={isSubmitting}
-                  style={{ padding: '8px 20px', background: 'var(--cyan)', border: 'none', borderRadius: 8, color: '#000', fontWeight: 700, cursor: 'pointer' }}
-                >
-                  {isSubmitting ? 'Saving...' : 'Add Member'}
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
+      <AddMemberModal
+        isOpen={showAddMember}
+        onClose={() => setShowAddMember(false)}
+        onSubmit={handleAddMember}
+        isSubmitting={isSubmitting}
+      />
     </div>
   );
-}
-
-function Label({ children }: { children: React.ReactNode }) {
-  return <div style={{ fontSize: 11, fontWeight: 600, color: 'var(--muted)', textTransform: 'uppercase', letterSpacing: 1, marginBottom: 8 }}>{children}</div>;
-}
-
-function Value({ children }: { children: React.ReactNode }) {
-  return <div style={{ fontSize: 16, fontWeight: 700, color: 'white' }}>{children}</div>;
 }
