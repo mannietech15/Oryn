@@ -652,3 +652,4 @@ function LiveIntegrationCard({ integration, isTesting, onTest }: { integration: 
 // [style] auto-fit minmax(260px, 1fr) grid
 // [feat] Automatic task extraction toggle
 // [refactor] AutoTask persistence
+// [style] Custom toggle switch styling
