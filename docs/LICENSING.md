@@ -133,3 +133,10 @@ The MIT License grants rights exclusively over software copyright. It explicitly
 - **Names & Logos**: The names "ORYN", "ORYN-AI", "MannieTech", and associated logos or branding graphics are proprietary identifiers.
 - **Fair Use**: You may use the name "ORYN-AI" purely to identify your project as an integration or derivative (e.g., "Plugin for ORYN-AI").
 - **No Endorsement**: You may not imply endorsement, sponsorship, or certification by MannieTech or Manasseh without prior written permission.
+
+## 13. Patent Rights & Non-Aggression Intent
+
+While the text of the MIT License does not include an explicit patent clause:
+
+- **Implied Patent License**: Under prevailing international open source jurisprudence, distribution under the MIT license implies a royalty-free license to any contributor patents necessary to exercise the granted rights.
+- **Defensive Non-Aggression**: Any party instituting patent litigation claiming that ORYN-AI infringes intellectual property waives their moral right to reciprocal community support.
