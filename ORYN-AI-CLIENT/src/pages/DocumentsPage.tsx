@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { FileUp, FolderOpen, Trash2 } from 'lucide-react';
 import { fetchDocuments, uploadDocument, deleteDocument } from '../api/oryn';
 
 interface DocumentRecord {
@@ -129,7 +130,7 @@ export default function DocumentsPage() {
                 </>
               ) : (
                 <>
-                  <span>📄</span>
+                  <FileUp size={16} />
                   Upload & Analyze
                 </>
               )}
@@ -158,7 +159,9 @@ export default function DocumentsPage() {
             background: 'var(--card-bg)', borderRadius: 14, border: '1px solid var(--card-border)',
             display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12
           }}>
-            <div style={{ fontSize: 36 }}>📂</div>
+            <div style={{ width: 56, height: 56, borderRadius: 12, background: 'var(--surface-hover)', border: '1px solid var(--border)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <FolderOpen size={28} color="var(--accent-primary)" />
+            </div>
             <div style={{ fontSize: 16, fontWeight: 600, color: 'var(--text-primary)' }}>
               No Documents Analyzed Yet
             </div>
@@ -198,12 +201,13 @@ export default function DocumentsPage() {
                     onClick={() => handleDelete(doc.id)}
                     style={{
                       background: 'transparent', border: '1px solid var(--card-border)',
-                      color: 'var(--text-muted)', borderRadius: 6, padding: '4px 10px',
-                      fontSize: 11, cursor: 'pointer'
+                      color: 'var(--text-muted)', borderRadius: 6, padding: '5px 10px',
+                      fontSize: 11, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 4
                     }}
                     onMouseEnter={e => { e.currentTarget.style.color = 'var(--danger)'; e.currentTarget.style.borderColor = 'var(--danger)'; }}
                     onMouseLeave={e => { e.currentTarget.style.color = 'var(--text-muted)'; e.currentTarget.style.borderColor = 'var(--card-border)'; }}
                   >
+                    <Trash2 size={12} />
                     Delete
                   </button>
                 </div>
