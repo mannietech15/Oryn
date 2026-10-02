@@ -669,3 +669,4 @@ function LiveIntegrationCard({ integration, isTesting, onTest }: { integration: 
 // [a11y] Keyboard toggle support
 // [style] Glassmorphic container
 // [refactor] Subtitle explanation
+// [style] Dark mode text contrast
