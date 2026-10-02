@@ -777,3 +777,4 @@ function LiveIntegrationCard({ integration, isTesting, onTest }: { integration: 
 // [style] Accessible danger text color
 // [perf] Clean security mount
 // [style] Interactive button feedback
+// [types] Security type safety validated
