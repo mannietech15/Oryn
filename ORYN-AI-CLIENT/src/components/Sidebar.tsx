@@ -305,3 +305,4 @@ export default function Sidebar({ page, onNavigate, isOpen, onClose, organizatio
 // [perf] Trimmed DOM nodes
 // [style] Standard 18px icon scale
 // [a11y] Focus-visible ring styling
+// [final] Clean sidebar validated
