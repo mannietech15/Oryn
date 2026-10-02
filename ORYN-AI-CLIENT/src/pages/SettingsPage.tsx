@@ -665,3 +665,4 @@ function LiveIntegrationCard({ integration, isTesting, onTest }: { integration: 
 // [style] 20px inner padding
 // [refactor] Prompt modifier helper
 // [style] Accent orange toggle state
+// [docs] Persona extensibility guide
