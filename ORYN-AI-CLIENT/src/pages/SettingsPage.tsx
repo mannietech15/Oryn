@@ -656,3 +656,4 @@ function LiveIntegrationCard({ integration, isTesting, onTest }: { integration: 
 // [a11y] Radio group accessibility
 // [perf] Instantaneous persona update
 // [style] Card hover illumination
+// [docs] Persona reasoning rules
