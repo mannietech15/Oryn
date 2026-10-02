@@ -102,6 +102,16 @@ export interface OrganizationRecord {
   teams: TeamRecord[];
 }
 
+export interface CalendarEventRecord {
+  id: string;
+  title: string;
+  time: string;
+  type: 'internal' | 'external' | 'automation';
+  attendees: string[];
+  aiBrief: string;
+  createdAt: string;
+}
+
 export interface DatabaseSchema {
   financialEntries: FinancialEntryRecord[];
   aiTaskLogs: AiTaskRecord[];
@@ -109,6 +119,7 @@ export interface DatabaseSchema {
   workflowExecutionLogs: WorkflowExecutionLogRecord[];
   documents: DocumentRecord[];
   emailLogs: EmailLogRecord[];
+  calendarEvents: CalendarEventRecord[];
   organization: OrganizationRecord;
 }
 
@@ -228,6 +239,35 @@ export class Datastore {
         }
       ],
       emailLogs: [],
+      calendarEvents: [
+        {
+          id: 'cal-1',
+          title: 'Infrastructure & Inference Architecture Sync',
+          time: '10:00 AM - 10:45 AM',
+          type: 'internal',
+          attendees: ['Alex Chen', 'Jordan Lee'],
+          aiBrief: 'Review latency metrics on NVIDIA NIM Llama 3.2 gateway and evaluate fallback routing behavior.',
+          createdAt: new Date().toISOString()
+        },
+        {
+          id: 'cal-2',
+          title: 'Weekly Executive Sales Synthesis Pipeline',
+          time: '17:00 UTC - Dispatch',
+          type: 'automation',
+          attendees: ['Workflow Daemon', 'Custom SMTP Relay'],
+          aiBrief: 'Autonomous aggregation of Stripe transactions and dispatch to executive leadership.',
+          createdAt: new Date().toISOString()
+        },
+        {
+          id: 'cal-3',
+          title: 'Fiscal Ledger Audit & Reconciliation',
+          time: '3:00 PM - 3:30 PM',
+          type: 'internal',
+          attendees: ['Sarah Miller', 'Operations Team'],
+          aiBrief: 'Audit newly posted entries in Fiscal Ledger and verify margin thresholds.',
+          createdAt: new Date().toISOString()
+        }
+      ],
       organization: {
         company: {
           name: 'Oryn AI Corp',
@@ -263,6 +303,10 @@ export class Datastore {
       } else {
         const raw = fs.readFileSync(this.dbPath, 'utf-8');
         this.cache = JSON.parse(raw);
+        if (!this.cache.calendarEvents) {
+          this.cache.calendarEvents = this.getDefaultData().calendarEvents;
+          this.save();
+        }
         logger.info('Loaded persistent database', { path: this.dbPath });
       }
     } catch (err: any) {
@@ -472,6 +516,35 @@ export class Datastore {
 
   getEmailLogs(limit: number = 20): EmailLogRecord[] {
     return (this.cache?.emailLogs || []).slice(0, limit);
+  }
+
+  // --- Calendar Events ---
+  getCalendarEvents(): CalendarEventRecord[] {
+    return this.cache?.calendarEvents || [];
+  }
+
+  addCalendarEvent(event: Omit<CalendarEventRecord, 'id' | 'createdAt'>): CalendarEventRecord {
+    const record: CalendarEventRecord = {
+      ...event,
+      id: `cal-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
+      createdAt: new Date().toISOString()
+    };
+    if (!this.cache) this.cache = this.getDefaultData();
+    if (!this.cache.calendarEvents) this.cache.calendarEvents = [];
+    this.cache.calendarEvents.unshift(record);
+    this.save();
+    return record;
+  }
+
+  deleteCalendarEvent(id: string): boolean {
+    if (!this.cache || !this.cache.calendarEvents) return false;
+    const initialLen = this.cache.calendarEvents.length;
+    this.cache.calendarEvents = this.cache.calendarEvents.filter(e => e.id !== id);
+    if (this.cache.calendarEvents.length !== initialLen) {
+      this.save();
+      return true;
+    }
+    return false;
   }
 
   // --- Organization ---
