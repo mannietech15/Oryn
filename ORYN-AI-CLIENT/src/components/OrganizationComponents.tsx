@@ -647,8 +647,57 @@ export function AddMemberModal({ isOpen, onClose, onSubmit, isSubmitting = false
         flexDirection: 'column',
         gap: 20
       }}>
-        {/* Header will go here */}
+        {/* Modal Header */}
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <div>
+            <div style={{ fontSize: 17, fontWeight: 700, color: 'var(--text-primary)', fontFamily: 'var(--font-display)' }}>
+              Enroll Team Member
+            </div>
+            <div style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 2 }}>
+              Add a verified personnel contributor to directory
+            </div>
+          </div>
+          <button 
+            type="button" 
+            onClick={onClose}
+            style={{ background: 'transparent', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', padding: 4 }}
+          >
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+              <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+          </button>
+        </div>
+
+        <form onSubmit={e => { e.preventDefault(); onSubmit({ name, role, email, status }); }} style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+          <div>
+            <label style={{ display: 'block', fontSize: 11, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: 1, marginBottom: 6 }}>
+              Full Name
+            </label>
+            <input
+              required
+              value={name}
+              onChange={e => setName(e.target.value)}
+              placeholder="e.g. Maya Patel"
+              style={{ width: '100%', padding: '11px 14px', background: 'var(--glass-bg-subtle)', border: '1px solid var(--card-border)', borderRadius: 10, color: 'var(--text-primary)', outline: 'none', fontSize: 13 }}
+            />
+          </div>
+
+          <div>
+            <label style={{ display: 'block', fontSize: 11, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: 1, marginBottom: 6 }}>
+              Role / Position
+            </label>
+            <input
+              required
+              value={role}
+              onChange={e => setRole(e.target.value)}
+              placeholder="e.g. Lead Systems Architect"
+              style={{ width: '100%', padding: '11px 14px', background: 'var(--glass-bg-subtle)', border: '1px solid var(--card-border)', borderRadius: 10, color: 'var(--text-primary)', outline: 'none', fontSize: 13 }}
+            />
+          </div>
+        </form>
       </div>
+
     </div>
   );
 }
