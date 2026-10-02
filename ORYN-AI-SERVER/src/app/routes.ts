@@ -11,6 +11,7 @@ import integrationsRoutes from '../modules/integrations/integrations.routes';
 import documentsRoutes from '../modules/documents/documents.routes';
 import organizationRoutes from '../modules/organization/organization.routes';
 import calendarRoutes from '../modules/calendar/calendar.routes';
+import ecosystemRoutes from '../modules/ecosystem/ecosystem.routes';
 
 const router = Router();
 
@@ -29,5 +30,6 @@ router.use('/api', integrationsRoutes);
 router.use('/api', documentsRoutes);
 router.use('/api', organizationRoutes);
 router.use('/api', calendarRoutes);
+router.use('/api', ecosystemRoutes);
 
 export default router;
