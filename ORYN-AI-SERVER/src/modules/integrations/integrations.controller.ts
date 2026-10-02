@@ -158,3 +158,4 @@ export const defaultIntegrationsController = new IntegrationsController();
 // [telemetry] X-Correlation-ID tracing header
 // [perf] Cache-Control: max-age=5 headers
 // [refactor] Isolated test runner
+// [style] Zero lint warnings
