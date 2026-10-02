@@ -348,3 +348,4 @@ export default function IntegrationsPage() {
 // [style] Secondary text contrast tuning
 // [refactor] Webhook endpoint override hook
 // [feat] 6/6 Operational counter badge
+// [style] Unified page padding
