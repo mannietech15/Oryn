@@ -277,3 +277,4 @@ export default function Sidebar({ page, onNavigate, isOpen, onClose, organizatio
   );
 }
 // [refactor] Removed Intelligence History block
+// [refactor] Pruned session icons and props
