@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { BarChart3, CreditCard, Cloud, FileText, X } from 'lucide-react';
+import { X } from 'lucide-react';
+import { GoogleAnalyticsLogo, StripeLogo, SalesforceLogo, NotionLogo } from '../components/BrandLogos';
 import { updateCompany } from '../api/oryn';
 
 export default function AddOrganizationPage({ onComplete }: { onComplete?: (data: any) => void }) {
@@ -142,10 +143,10 @@ export default function AddOrganizationPage({ onComplete }: { onComplete?: (data
                     <IntegrationCard 
                       key={name}
                       icon={
-                        name === 'Google Analytics' ? <BarChart3 size={18} color="var(--accent-primary)" /> :
-                        name === 'Stripe' ? <CreditCard size={18} color="var(--accent-primary)" /> :
-                        name === 'Salesforce' ? <Cloud size={18} color="var(--accent-primary)" /> :
-                        <FileText size={18} color="var(--accent-primary)" />
+                        name === 'Google Analytics' ? <GoogleAnalyticsLogo size={20} /> :
+                        name === 'Stripe' ? <StripeLogo size={20} /> :
+                        name === 'Salesforce' ? <SalesforceLogo size={20} /> :
+                        <NotionLogo size={20} />
                       }
                       name={name}
                       selected={orgData.integrations.includes(name)}
