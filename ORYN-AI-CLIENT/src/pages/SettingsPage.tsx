@@ -702,3 +702,4 @@ function LiveIntegrationCard({ integration, isTesting, onTest }: { integration: 
 // [perf] Debounced server persistence
 // [style] 24px extra bold initials
 // [a11y] Form label association
+// [style] 0 4px 12px button shadow
