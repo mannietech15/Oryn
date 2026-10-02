@@ -662,3 +662,4 @@ function LiveIntegrationCard({ integration, isTesting, onTest }: { integration: 
 // [telemetry] Persona update telemetry
 // [style] Radio circle precision styling
 // [perf] Idempotent click guard
+// [style] 20px inner padding
