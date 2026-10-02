@@ -724,10 +724,48 @@ export function AddMemberModal({ isOpen, onClose, onSubmit, isSubmitting = false
               <option value="on-leave">On Leave / Sabbatical</option>
             </select>
           </div>
+
+          <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 10, marginTop: 8 }}>
+            <button
+              type="button"
+              onClick={onClose}
+              style={{
+                padding: '10px 18px',
+                background: 'transparent',
+                border: '1px solid var(--card-border)',
+                borderRadius: 10,
+                color: 'var(--text-muted)',
+                cursor: 'pointer',
+                fontSize: 12,
+                fontWeight: 600
+              }}
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              disabled={isSubmitting || !name.trim() || !email.trim()}
+              style={{
+                padding: '10px 22px',
+                background: 'var(--accent-primary)',
+                color: '#fff',
+                border: 'none',
+                borderRadius: 10,
+                fontWeight: 700,
+                fontSize: 12,
+                fontFamily: 'var(--font-display)',
+                letterSpacing: 1,
+                textTransform: 'uppercase',
+                cursor: isSubmitting || !name.trim() || !email.trim() ? 'not-allowed' : 'pointer',
+                opacity: isSubmitting || !name.trim() || !email.trim() ? 0.6 : 1,
+                boxShadow: 'var(--shadow-subtle)'
+              }}
+            >
+              {isSubmitting ? 'Enrolling...' : 'Enroll Contributor'}
+            </button>
+          </div>
         </form>
-
       </div>
-
     </div>
   );
 }
