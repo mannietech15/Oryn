@@ -606,3 +606,4 @@ function LiveIntegrationCard({ integration, isTesting, onTest }: { integration: 
 // [style] Inactive pill hover transition
 // [refactor] 5 core tabs rendered
 // [feat] Dynamic integration counter
+// [style] 15px vector icon alignment
