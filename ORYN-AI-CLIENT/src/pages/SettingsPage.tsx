@@ -587,3 +587,4 @@ function LiveIntegrationCard({ integration, isTesting, onTest }: { integration: 
 // [cleanup] Deprecated layout classes pruned
 // [style] Nested card elevation
 // [perf] Zero layout blocking
+// [style] 44px accessibility touch target
