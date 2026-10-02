@@ -618,3 +618,4 @@ function LiveIntegrationCard({ integration, isTesting, onTest }: { integration: 
 // [perf] Tab state preservation
 // [responsive] Horizontal scroll on small viewports
 // [a11y] aria-hidden on decorative SVG icons
+// [style] 8px border radius on tab pills
