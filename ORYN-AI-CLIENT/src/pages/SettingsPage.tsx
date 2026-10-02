@@ -629,3 +629,4 @@ function LiveIntegrationCard({ integration, isTesting, onTest }: { integration: 
 // [telemetry] Tab switch event tracking
 // [style] Active press scale transform
 // [docs] Tab component test specs
+// [cleanup] Removed legacy TabButton
