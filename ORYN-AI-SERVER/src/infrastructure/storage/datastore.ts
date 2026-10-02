@@ -276,7 +276,7 @@ export class Datastore {
           size: '2.4 MB',
           date: new Date(Date.now() - 86400000 * 2).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
           tags: ['Finance', 'Ledger'],
-          aiSummary: 'Fiscal overview confirming $124.8K revenue baseline with strong recurring expansion across enterprise contracts.'
+          aiSummary: 'Fiscal overview confirming $6.4K revenue baseline with steady recurring expansion across active client tiers.'
         }
       ],
       emailLogs: [],
