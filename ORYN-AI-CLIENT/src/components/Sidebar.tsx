@@ -290,3 +290,4 @@ export default function Sidebar({ page, onNavigate, isOpen, onClose, organizatio
 // [a11y] Logical tab order across links
 // [style] Border separator contrast
 // [refactor] Removed legacy session handlers
+// [docs] Navigation grouping guide
