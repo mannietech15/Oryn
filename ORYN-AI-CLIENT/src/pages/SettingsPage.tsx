@@ -707,3 +707,4 @@ function LiveIntegrationCard({ integration, isTesting, onTest }: { integration: 
 // [style] Glassmorphic input background
 // [docs] Multi-tenant isolation
 // [refactor] Header workspace sync
+// [style] Standard 12px 16px input padding
