@@ -320,3 +320,4 @@ export default function IntegrationsPage() {
 // [refactor] Human readable sync time
 // [docs] Stale-while-revalidate pattern documentation
 // [a11y] Screen-reader status updates
+// [style] Token-aligned badge palette
