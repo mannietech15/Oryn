@@ -595,3 +595,4 @@ function LiveIntegrationCard({ integration, isTesting, onTest }: { integration: 
 // [responsive] Mobile padding adjustments
 // [perf] Fast TTI benchmark
 // [style] Unified token usage
+// [types] Zero compilation warnings
