@@ -687,3 +687,4 @@ function LiveIntegrationCard({ integration, isTesting, onTest }: { integration: 
 // [layout] 2-column input grid
 // [feat] Entity name input binding
 // [feat] Email address input binding
+// [feat] HQ location input binding
