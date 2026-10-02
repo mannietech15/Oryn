@@ -756,3 +756,4 @@ function LiveIntegrationCard({ integration, isTesting, onTest }: { integration: 
 // [style] Emerald green security pill
 // [feat] Enterprise audit card
 // [feat] Session audit verification button
+// [style] Security alert red accent
