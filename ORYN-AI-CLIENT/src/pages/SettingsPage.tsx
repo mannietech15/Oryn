@@ -698,3 +698,4 @@ function LiveIntegrationCard({ integration, isTesting, onTest }: { integration: 
 // [style] Input focus ring styling
 // [docs] Account sync architecture
 // [validation] Email regex validation
+// [style] Form label tracking
