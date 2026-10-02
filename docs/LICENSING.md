@@ -44,3 +44,14 @@ Distribution rights are governed by clear, permissive conditions:
 - **Source Code Distribution**: Copies of the original or altered source code may be distributed freely across public or private channels.
 - **Compiled Binaries & Bundles**: You may distribute compiled output (such as Vite production bundles or transpiled Express server artifacts).
 - **Sublicensing**: Downstream recipients may be licensed under differing terms (including proprietary commercial licenses), provided the original copyright notice is honored.
+
+## 5. Copyright Notice & Attribution Compliance
+
+The single mandatory obligation of the MIT License is preserving attribution:
+
+- **Source Code Notice**: Every copy of the source code or substantial fraction thereof must retain the root `LICENSE` file.
+- **Frontend Distribution**: In web applications distributing minified bundles, preserving the attribution in source maps, legal acknowledgment modals, or bundled license notices satisfies compliance.
+- **Attribution Statement**:
+  ```text
+  Copyright (c) 2026 Manasseh (MannieTech) <mannietech817@gmail.com>
+  ```
