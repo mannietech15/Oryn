@@ -289,3 +289,4 @@ export default function Sidebar({ page, onNavigate, isOpen, onClose, organizatio
 // [style] Brand logo dimensions
 // [a11y] Logical tab order across links
 // [style] Border separator contrast
+// [refactor] Removed legacy session handlers
