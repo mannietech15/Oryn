@@ -281,3 +281,4 @@ export default function Sidebar({ page, onNavigate, isOpen, onClose, organizatio
 // [style] Clean vertical spacing in sidebar
 // [docs] Streamlined left sidebar navigation
 // [refactor] Clean active link highlight
+// [style] Standardized nav item padding
