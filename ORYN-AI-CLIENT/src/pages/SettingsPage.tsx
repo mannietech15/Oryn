@@ -596,3 +596,4 @@ function LiveIntegrationCard({ integration, isTesting, onTest }: { integration: 
 // [perf] Fast TTI benchmark
 // [style] Unified token usage
 // [types] Zero compilation warnings
+// [style] Smooth resize transitions
