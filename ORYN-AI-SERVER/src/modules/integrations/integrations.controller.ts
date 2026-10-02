@@ -148,3 +148,4 @@ export const defaultIntegrationsController = new IntegrationsController();
 // [refactor] NVIDIA NIM relay check
 // [refactor] Stripe key verification
 // [refactor] Slack webhook check
+// [refactor] Zendesk token validation
