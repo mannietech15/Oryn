@@ -31,7 +31,7 @@
       "id": "f-4",
       "type": "expense",
       "category": "Operational Engineering",
-      "amount": 12200,
+      "amount": 1650,
       "date": "2026-09-19",
       "note": "Observability & third-party API licensing",
       "createdAt": "2026-09-19T17:15:23.939Z"
