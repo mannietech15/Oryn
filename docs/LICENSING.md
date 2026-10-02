@@ -187,3 +187,14 @@ If you believe any content or code contained within this repository infringes up
 - **Designated Contact**: Send formal notices to `mannietech817@gmail.com`.
 - **Notice Contents**: Include identification of the copyrighted work, URL/commit of alleged infringing material, and your contact credentials.
 - **Triage Window**: Inquiries will be acknowledged within 48 hours for immediate evaluation and resolution.
+
+## 20. Licensing FAQ & Quick Reference
+
+### Can I use ORYN-AI for commercial purposes?
+Yes. The MIT License permits commercial deployment, distribution, and SaaS hosting without royalty payments.
+
+### Must I share my source code changes?
+No. Unlike copyleft licenses (GPL/AGPL), the MIT license does not compel you to publish your modified source code.
+
+### What is the sole obligation?
+Include the original copyright and permission notice in any copy or substantial portion of the Software.
