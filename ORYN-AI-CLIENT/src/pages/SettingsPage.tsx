@@ -603,3 +603,4 @@ function LiveIntegrationCard({ integration, isTesting, onTest }: { integration: 
 // [final] Centered layout verified
 // [feat] TabPill component definition
 // [style] Active pill orange highlight
+// [style] Inactive pill hover transition
