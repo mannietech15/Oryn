@@ -231,9 +231,20 @@ export function DepartmentGrid({ teams, employees = [] }: DepartmentGridProps) {
                 {t.description}
               </div>
             </div>
+
+            <div style={{ borderTop: '1px solid var(--card-border)', paddingTop: 10, marginTop: 4, display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: 11 }}>
+              <span style={{ color: 'var(--text-muted)', fontFamily: 'monospace', fontSize: 10 }}>
+                UNIT REF: {t.id.toUpperCase()}
+              </span>
+              <span style={{ color: 'var(--success)', display: 'flex', alignItems: 'center', gap: 5, fontSize: 10, fontWeight: 600, fontFamily: 'monospace' }}>
+                <span style={{ width: 5, height: 5, borderRadius: '50%', background: 'var(--success)' }} />
+                ACTIVE DEPLOYMENT
+              </span>
+            </div>
           </div>
         );
       })}
+
     </div>
   );
 }
