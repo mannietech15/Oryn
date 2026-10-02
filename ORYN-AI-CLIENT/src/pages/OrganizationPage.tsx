@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Building2, Users, UserPlus, X, Briefcase, MapPin, Calendar } from 'lucide-react';
+import { UserPlus, X } from 'lucide-react';
 import type { Company, Employee, Team } from '../types';
 import { fetchOrganization, updateOrganizationData } from '../api/oryn';
 
