@@ -311,3 +311,4 @@ export default function IntegrationsPage() {
 // [style] Non-blocking status indicator
 // [perf] Memoized render tree
 // [visual] SVG brand logos mounted
+// [feat] Latency badge display
