@@ -164,3 +164,4 @@ export const defaultIntegrationsController = new IntegrationsController();
 // [types] Health state enum definitions
 // [docs] Recovery procedures guide
 // [fix] Safe param parsing
+// [audit] Audit log entry generated on probe
