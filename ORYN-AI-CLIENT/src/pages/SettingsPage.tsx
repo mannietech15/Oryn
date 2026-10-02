@@ -780,3 +780,4 @@ function LiveIntegrationCard({ integration, isTesting, onTest }: { integration: 
 // [types] Security type safety validated
 // [docs] Security overview documentation
 // [style] Subtle card reflection
+// [final] Security panel finalized
