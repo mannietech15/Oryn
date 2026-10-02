@@ -164,3 +164,4 @@ export const defaultEmailService = new EmailService();
 // [type] Transport verification return signature
 // [perf] Reuse existing transport pool connections
 // [fix] Graceful offline fallback message
+// [telemetry] Telemetry mark for SMTP verification roundtrip
