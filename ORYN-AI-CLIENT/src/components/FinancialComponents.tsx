@@ -702,8 +702,36 @@ export function LedgerTransactionList({ entries, loading = false }: LedgerTransa
         </div>
       </div>
 
+      {/* Loading & Empty States */}
+      {loading && (
+        <div style={{ padding: '32px 16px', textAlign: 'center', color: 'var(--text-muted)', fontSize: 13 }}>
+          Querying persistent double-entry ledger...
+        </div>
+      )}
+
+      {!loading && filteredEntries.length === 0 && (
+        <div style={{
+          padding: '36px 20px',
+          textAlign: 'center',
+          background: 'var(--glass-bg-subtle)',
+          borderRadius: 12,
+          border: '1px dashed var(--card-border)',
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          gap: 8
+        }}>
+          <span style={{ color: 'var(--text-muted)', fontSize: 13, fontWeight: 600 }}>
+            {searchTerm || filterType !== 'all' ? 'No matching transactions found' : 'No transactions recorded in ledger yet'}
+          </span>
+          <span style={{ color: 'var(--text-muted)', fontSize: 11 }}>
+            {searchTerm || filterType !== 'all' ? 'Try adjusting your search criteria or filter tabs.' : 'Use the entry form to post your first verified transaction.'}
+          </span>
+        </div>
+      )}
+
       {/* Transaction List Entries */}
-      {filteredEntries.length > 0 && (
+      {!loading && filteredEntries.length > 0 && (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 10, maxHeight: 440, overflowY: 'auto', paddingRight: 4 }}>
           {filteredEntries.map((entry, idx) => (
             <TransactionItem key={entry.id || `${entry.date}-${idx}`} entry={entry} />
@@ -713,6 +741,7 @@ export function LedgerTransactionList({ entries, loading = false }: LedgerTransa
     </div>
   );
 }
+
 
 
 
