@@ -351,3 +351,4 @@ export default function IntegrationsPage() {
 // [style] Unified page padding
 // [resilience] Grid error boundary
 // [perf] Instant FCP benchmark
+// [style] Subtle card drop shadow
