@@ -112,6 +112,43 @@ export interface CalendarEventRecord {
   createdAt: string;
 }
 
+export interface EcosystemCommunityRecord {
+  id: string;
+  name: string;
+  members: string;
+  memberCount: number;
+  tags: string[];
+  description: string;
+  icon: string;
+  joined: boolean;
+}
+
+export interface EcosystemBusinessRecord {
+  id: string;
+  name: string;
+  industry: string;
+  location: string;
+  product: string;
+  matchType: 'same' | 'complementary';
+  connected: boolean;
+}
+
+export interface EcosystemTrendRecord {
+  id: string;
+  topic: string;
+  growth: string;
+  category: string;
+  sentiment: 'positive' | 'neutral';
+}
+
+export interface CaseStudyRecord {
+  id: string;
+  company: string;
+  result: string;
+  summary: string;
+  image: string;
+}
+
 export interface DatabaseSchema {
   financialEntries: FinancialEntryRecord[];
   aiTaskLogs: AiTaskRecord[];
@@ -121,6 +158,10 @@ export interface DatabaseSchema {
   emailLogs: EmailLogRecord[];
   calendarEvents: CalendarEventRecord[];
   organization: OrganizationRecord;
+  ecosystemCommunities: EcosystemCommunityRecord[];
+  ecosystemBusinesses: EcosystemBusinessRecord[];
+  ecosystemTrends: EcosystemTrendRecord[];
+  caseStudies: CaseStudyRecord[];
 }
 
 export class Datastore {
@@ -284,7 +325,31 @@ export class Datastore {
           { id: 't1', name: 'Inference & Core Engineering', description: 'Core LLM routing, latency optimization, and streaming infrastructure.' },
           { id: 't2', name: 'Enterprise Workflow Systems', description: 'Background job queues, event webhooks, and third-party integrations.' },
         ]
-      }
+      },
+      ecosystemCommunities: [
+        { id: '1', name: 'AI SaaS Builders', members: '12.4k', memberCount: 12400, tags: ['AI', 'SaaS', 'Dev'], description: 'A community for founders building the next generation of AI-native SaaS.', icon: '🤖', joined: false },
+        { id: '2', name: 'Growth Hackers Hub', members: '8.2k', memberCount: 8200, tags: ['Marketing', 'B2B'], description: 'Strategies and tools for hyper-growth in the enterprise space.', icon: '🚀', joined: false },
+        { id: '3', name: 'Sustainable Fintech', members: '5.1k', memberCount: 5100, tags: ['Finance', 'ESG'], description: 'Ethical finance and green technology innovators.', icon: '🌿', joined: false },
+      ],
+      ecosystemBusinesses: [
+        { id: '1', name: 'Nexus Logistics', industry: 'Supply Chain', location: 'Berlin', product: 'Cloud Fleet Mgmt', matchType: 'same', connected: false },
+        { id: '2', name: 'EcoPack Solutions', industry: 'Packaging', location: 'Denver', product: 'Bio-degradable Materials', matchType: 'complementary', connected: false },
+        { id: '3', name: 'Zenith CRM', industry: 'Software', location: 'Austin', product: 'Enterprise CRM', matchType: 'same', connected: false },
+        { id: '4', name: 'SwiftPay Systems', industry: 'Fintech', location: 'London', product: 'B2B Payments', matchType: 'complementary', connected: false },
+        { id: '5', name: 'Quantum Core', industry: 'Computing', location: 'San Francisco', product: 'Quantum Processors', matchType: 'same', connected: false },
+        { id: '6', name: 'Atlas Biotech', industry: 'Healthcare', location: 'Boston', product: 'Gene Therapy Kits', matchType: 'complementary', connected: false },
+        { id: '7', name: 'Silverline Robotics', industry: 'Manufacturing', location: 'Tokyo', product: 'Industrial Arms', matchType: 'same', connected: false },
+        { id: '8', name: 'Nova Energy', industry: 'Renewables', location: 'Oslo', product: 'Fusion Modules', matchType: 'complementary', connected: false },
+      ],
+      ecosystemTrends: [
+        { id: '1', topic: 'Generative Supply Chains', growth: '+142%', category: 'AI/Logistics', sentiment: 'positive' },
+        { id: '2', topic: 'Decentralized Workforce', growth: '+24%', category: 'HR Tech', sentiment: 'neutral' },
+        { id: '3', topic: 'Hyper-Personalized CRM', growth: '+89%', category: 'SaaS', sentiment: 'positive' },
+      ],
+      caseStudies: [
+        { id: '1', company: 'CloudScale Inc.', result: '320% Revenue growth', summary: 'Implemented ORYN-AI to automate decision-making across 4 global offices.', image: '🏢' },
+        { id: '2', company: 'Velocity Retail', result: '45% Cost Reduction', summary: 'Optimized inventory using our predictive analytics engine.', image: '🛒' },
+      ]
     };
   }
 
@@ -305,6 +370,14 @@ export class Datastore {
         this.cache = JSON.parse(raw);
         if (this.cache && !this.cache.calendarEvents) {
           this.cache.calendarEvents = this.getDefaultData().calendarEvents;
+          this.save();
+        }
+        if (this.cache && !this.cache.ecosystemCommunities) {
+          const defaults = this.getDefaultData();
+          this.cache.ecosystemCommunities = defaults.ecosystemCommunities;
+          this.cache.ecosystemBusinesses = defaults.ecosystemBusinesses;
+          this.cache.ecosystemTrends = defaults.ecosystemTrends;
+          this.cache.caseStudies = defaults.caseStudies;
           this.save();
         }
         logger.info('Loaded persistent database', { path: this.dbPath });
@@ -568,6 +641,57 @@ export class Datastore {
     this.cache.organization = { ...this.cache.organization, ...org };
     this.save();
     return this.cache.organization;
+  }
+
+  // --- Ecosystem ---
+  getEcosystemData() {
+    if (!this.cache) this.cache = this.getDefaultData();
+    return {
+      communities: this.cache.ecosystemCommunities || [],
+      businesses: this.cache.ecosystemBusinesses || [],
+      trends: this.cache.ecosystemTrends || [],
+      caseStudies: this.cache.caseStudies || []
+    };
+  }
+
+  toggleCommunityJoin(id: string): EcosystemCommunityRecord | null {
+    if (!this.cache) this.cache = this.getDefaultData();
+    if (!this.cache.ecosystemCommunities) this.cache.ecosystemCommunities = this.getDefaultData().ecosystemCommunities;
+    const comm = this.cache.ecosystemCommunities.find(c => c.id === id);
+    if (!comm) return null;
+    comm.joined = !comm.joined;
+    comm.memberCount = comm.joined ? comm.memberCount + 1 : Math.max(1, comm.memberCount - 1);
+    comm.members = comm.memberCount >= 1000 ? `${(comm.memberCount / 1000).toFixed(1)}k` : `${comm.memberCount}`;
+    this.save();
+    return comm;
+  }
+
+  toggleBusinessConnect(id: string): EcosystemBusinessRecord | null {
+    if (!this.cache) this.cache = this.getDefaultData();
+    if (!this.cache.ecosystemBusinesses) this.cache.ecosystemBusinesses = this.getDefaultData().ecosystemBusinesses;
+    const biz = this.cache.ecosystemBusinesses.find(b => b.id === id);
+    if (!biz) return null;
+    biz.connected = !biz.connected;
+    this.save();
+    return biz;
+  }
+
+  addCommunity(community: { name: string; description: string; tags: string[]; icon?: string }): EcosystemCommunityRecord {
+    if (!this.cache) this.cache = this.getDefaultData();
+    if (!this.cache.ecosystemCommunities) this.cache.ecosystemCommunities = [];
+    const newComm: EcosystemCommunityRecord = {
+      id: `comm-${Date.now()}`,
+      name: community.name,
+      description: community.description,
+      tags: community.tags || ['Ecosystem'],
+      icon: community.icon || '🌐',
+      members: '1',
+      memberCount: 1,
+      joined: true
+    };
+    this.cache.ecosystemCommunities.unshift(newComm);
+    this.save();
+    return newComm;
   }
 }
 
