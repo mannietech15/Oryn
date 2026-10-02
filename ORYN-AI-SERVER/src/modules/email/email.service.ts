@@ -151,3 +151,4 @@ export class EmailService {
 
 export const defaultEmailService = new EmailService();
 // [perf] Cache layer initialized for low-latency transport verification
+// [perf] 5-minute TTL window avoids repetitive TCP handshakes
