@@ -647,3 +647,4 @@ function LiveIntegrationCard({ integration, isTesting, onTest }: { integration: 
 // [refactor] LocalStorage synchronization
 // [copy] Executive mode description refined
 // [copy] Creative mode description refined
+// [copy] Analytical mode description refined
