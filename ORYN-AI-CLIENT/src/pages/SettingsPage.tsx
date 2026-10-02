@@ -627,3 +627,4 @@ function LiveIntegrationCard({ integration, isTesting, onTest }: { integration: 
 // [perf] Memoized tab pill list
 // [style] Light mode tab pill contrast
 // [telemetry] Tab switch event tracking
+// [style] Active press scale transform
