@@ -141,3 +141,4 @@ export const defaultIntegrationsController = new IntegrationsController();
 // [refactor] Unified adapter mapping
 // [fix] Return degraded status on upstream timeout
 // [style] Route handler formatting
+// [refactor] 99.98% target uptime metric
