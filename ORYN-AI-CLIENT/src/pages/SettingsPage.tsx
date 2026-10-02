@@ -636,3 +636,4 @@ function LiveIntegrationCard({ integration, isTesting, onTest }: { integration: 
 // [perf] Low GC memory footprint
 // [style] 1px solid var(--card-border)
 // [refactor] Tab keyboard shortcuts
+// [style] Bold weight on active tab
