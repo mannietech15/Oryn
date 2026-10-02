@@ -163,3 +163,4 @@ export const defaultIntegrationsController = new IntegrationsController();
 // [perf] Fast-path routing
 // [types] Health state enum definitions
 // [docs] Recovery procedures guide
+// [fix] Safe param parsing
