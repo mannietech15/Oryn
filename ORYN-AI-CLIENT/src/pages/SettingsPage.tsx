@@ -723,3 +723,4 @@ function LiveIntegrationCard({ integration, isTesting, onTest }: { integration: 
 // [final] Account panel finalized
 // [feat] Preferences panel mounted
 // [feat] Light mode toggle card
+// [refactor] data-theme DOM synchronization
