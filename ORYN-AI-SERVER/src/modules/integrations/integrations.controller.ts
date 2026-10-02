@@ -133,3 +133,4 @@ export class IntegrationsController {
 }
 
 export const defaultIntegrationsController = new IntegrationsController();
+// [perf] GET /status uses cached transport verify
