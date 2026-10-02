@@ -691,3 +691,4 @@ function LiveIntegrationCard({ integration, isTesting, onTest }: { integration: 
 // [feat] Industry sector input binding
 // [refactor] Server organization hydration
 // [resilience] LocalStorage fallback
+// [feat] Datastore update handler
