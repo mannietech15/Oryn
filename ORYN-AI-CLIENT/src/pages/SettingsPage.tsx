@@ -676,3 +676,4 @@ function LiveIntegrationCard({ integration, isTesting, onTest }: { integration: 
 // [docs] Task extraction parameters
 // [style] 15px bold title scale
 // [a11y] aria-describedby card binding
+// [style] 0.3s knob transition
