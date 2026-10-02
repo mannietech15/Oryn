@@ -646,3 +646,4 @@ function LiveIntegrationCard({ integration, isTesting, onTest }: { integration: 
 // [feat] Radio bullet indicator
 // [refactor] LocalStorage synchronization
 // [copy] Executive mode description refined
+// [copy] Creative mode description refined
