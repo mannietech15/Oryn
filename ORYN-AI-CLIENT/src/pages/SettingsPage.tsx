@@ -589,3 +589,4 @@ function LiveIntegrationCard({ integration, isTesting, onTest }: { integration: 
 // [perf] Zero layout blocking
 // [style] 44px accessibility touch target
 // [style] 28px vertical rhythm
+// [style] Monospace telemetry pill styling
