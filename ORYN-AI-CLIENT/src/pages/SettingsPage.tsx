@@ -584,3 +584,4 @@ function LiveIntegrationCard({ integration, isTesting, onTest }: { integration: 
 // [layout] Full width distribution
 // [style] Crisp 1px border contrast
 // [docs] Breakpoint definitions
+// [cleanup] Deprecated layout classes pruned
