@@ -604,3 +604,4 @@ function LiveIntegrationCard({ integration, isTesting, onTest }: { integration: 
 // [feat] TabPill component definition
 // [style] Active pill orange highlight
 // [style] Inactive pill hover transition
+// [refactor] 5 core tabs rendered
