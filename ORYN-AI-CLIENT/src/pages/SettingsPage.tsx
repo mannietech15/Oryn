@@ -610,3 +610,4 @@ function LiveIntegrationCard({ integration, isTesting, onTest }: { integration: 
 // [a11y] role=tab accessibility contract
 // [perf] Instantaneous tab state switch
 // [style] Enclosing pill bar container
+// [a11y] Arrow key tab navigation support
