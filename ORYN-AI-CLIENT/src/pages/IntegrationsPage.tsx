@@ -305,3 +305,4 @@ export default function IntegrationsPage() {
   );
 }
 // [perf] INITIAL_INTEGRATIONS provides immediate card mounting
+// [perf] LocalStorage snapshot eliminates blank loading screen
