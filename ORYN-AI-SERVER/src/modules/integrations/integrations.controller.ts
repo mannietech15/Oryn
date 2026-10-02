@@ -162,3 +162,4 @@ export const defaultIntegrationsController = new IntegrationsController();
 // [security] Mask API keys and secrets in output
 // [perf] Fast-path routing
 // [types] Health state enum definitions
+// [docs] Recovery procedures guide
