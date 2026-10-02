@@ -291,3 +291,4 @@ export default function Sidebar({ page, onNavigate, isOpen, onClose, organizatio
 // [style] Border separator contrast
 // [refactor] Removed legacy session handlers
 // [docs] Navigation grouping guide
+// [style] Notification badge pill
