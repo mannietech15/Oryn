@@ -330,3 +330,4 @@ export default function IntegrationsPage() {
 // [style] Glassmorphic background
 // [refactor] Granular per-card loading state
 // [feat] Copy webhook URL utility
+// [style] Typography hierarchy
