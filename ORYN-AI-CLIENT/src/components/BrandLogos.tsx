@@ -20,3 +20,18 @@ export function GmailLogo({ size = 20, style }: LogoProps) {
     </svg>
   );
 }
+
+export function SlackLogo({ size = 20, style }: LogoProps) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" style={style}>
+      <path d="M5.04 14.02a2.02 2.02 0 1 0-2.02 2.02h2.02v-2.02z" fill="#36C5F0" />
+      <path d="M6.05 14.02a2.02 2.02 0 0 0 4.04 0V8.97a2.02 2.02 0 1 0-4.04 0v5.05z" fill="#36C5F0" />
+      <path d="M9.98 5.04a2.02 2.02 0 1 0-2.02-2.02v2.02h2.02z" fill="#2EB67D" />
+      <path d="M9.98 6.05a2.02 2.02 0 0 0 0 4.04h5.05a2.02 2.02 0 1 0 0-4.04H9.98z" fill="#2EB67D" />
+      <path d="M18.96 9.98a2.02 2.02 0 1 0 2.02-2.02h-2.02v2.02z" fill="#E01E5A" />
+      <path d="M17.95 9.98a2.02 2.02 0 0 0-4.04 0v5.05a2.02 2.02 0 1 0 4.04 0V9.98z" fill="#E01E5A" />
+      <path d="M14.02 18.96a2.02 2.02 0 1 0 2.02 2.02v-2.02h-2.02z" fill="#ECB22E" />
+      <path d="M14.02 17.95a2.02 2.02 0 0 0 0-4.04H8.97a2.02 2.02 0 1 0 0 4.04h5.05z" fill="#ECB22E" />
+    </svg>
+  );
+}
