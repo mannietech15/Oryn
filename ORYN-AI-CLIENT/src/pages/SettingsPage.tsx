@@ -735,3 +735,4 @@ function LiveIntegrationCard({ integration, isTesting, onTest }: { integration: 
 // [a11y] Accessible toggle switch attributes
 // [style] Smooth knob glide animation
 // [perf] Targeted CSS variable updates
+// [style] Hover elevation effect
