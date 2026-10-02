@@ -623,3 +623,4 @@ function LiveIntegrationCard({ integration, isTesting, onTest }: { integration: 
 // [style] Accessible focus indicators
 // [docs] TabPill prop types documented
 // [refactor] Default initial tab set to 'ai'
+// [style] 16px gap spacing
