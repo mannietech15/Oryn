@@ -155,9 +155,9 @@
       "createdAt": "2026-09-16T17:15:23.939Z",
       "lastRunAt": "2026-10-01T17:12:23.939Z",
       "nextRunAt": "2026-10-01T17:17:23.939Z",
-      "runCount": 1120,
-      "successCount": 1118,
-      "failureCount": 2
+      "runCount": 42,
+      "successCount": 41,
+      "failureCount": 1
     }
   ],
   "workflowExecutionLogs": [
