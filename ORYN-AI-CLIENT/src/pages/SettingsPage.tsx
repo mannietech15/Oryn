@@ -638,3 +638,4 @@ function LiveIntegrationCard({ integration, isTesting, onTest }: { integration: 
 // [refactor] Tab keyboard shortcuts
 // [style] Bold weight on active tab
 // [a11y] Accessibility checklist verified
+// [refactor] Synchronous tab updates
