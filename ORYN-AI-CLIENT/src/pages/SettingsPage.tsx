@@ -644,3 +644,4 @@ function LiveIntegrationCard({ integration, isTesting, onTest }: { integration: 
 // [feat] 4 Persona modes configured
 // [style] Glowing orange border on active card
 // [feat] Radio bullet indicator
+// [refactor] LocalStorage synchronization
