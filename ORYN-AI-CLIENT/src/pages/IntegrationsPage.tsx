@@ -314,3 +314,4 @@ export default function IntegrationsPage() {
 // [feat] Latency badge display
 // [feat] Uptime percentage badge
 // [style] Pulsing green dot animation
+// [refactor] Interactive probe button
