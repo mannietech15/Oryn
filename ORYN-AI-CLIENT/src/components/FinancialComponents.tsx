@@ -413,6 +413,58 @@ export function LedgerEntryForm({ onSubmit, isSubmitting = false, error }: Ledge
         </div>
       </div>
 
+      {/* Category Input & Quick Chips */}
+      <div>
+        <label style={{ display: 'block', fontSize: 11, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: 1, marginBottom: 8 }}>
+          Ledger Category
+        </label>
+        <input
+          required
+          type="text"
+          placeholder="e.g. Enterprise SaaS, GPU Inference, Cloud Compute"
+          value={category}
+          onChange={e => setCategory(e.target.value)}
+          style={{
+            width: '100%',
+            padding: '12px 16px',
+            background: 'var(--glass-bg-subtle)',
+            border: '1px solid var(--card-border)',
+            borderRadius: 10,
+            color: 'var(--text-primary)',
+            fontSize: 13,
+            outline: 'none',
+            transition: 'border-color 0.2s'
+          }}
+        />
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, marginTop: 8 }}>
+          {(type === 'revenue' 
+            ? ['Enterprise SaaS', 'Inference API', 'Consulting Retainer', 'SLA License']
+            : ['GPU Compute', 'Cloud Hosting', 'Staff Payroll', 'Office Lease', 'Telemetry API']
+          ).map(chip => (
+            <button
+              key={chip}
+              type="button"
+              onClick={() => setCategory(chip)}
+              style={{
+                fontSize: 10,
+                fontWeight: 600,
+                fontFamily: 'monospace',
+                padding: '3px 8px',
+                borderRadius: 6,
+                background: category === chip ? 'var(--accent-primary)' : 'var(--glass-bg-subtle)',
+                color: category === chip ? '#fff' : 'var(--text-muted)',
+                border: '1px solid var(--card-border)',
+                cursor: 'pointer',
+                transition: 'all 0.15s ease'
+              }}
+            >
+              {chip}
+            </button>
+          ))}
+        </div>
+      </div>
+
+
     </form>
   );
 }
