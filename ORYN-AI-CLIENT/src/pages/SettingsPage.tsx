@@ -727,3 +727,4 @@ function LiveIntegrationCard({ integration, isTesting, onTest }: { integration: 
 // [refactor] Theme localStorage persistence
 // [feat] Email notification toggle
 // [refactor] Email preference persistence
+// [feat] Push notification toggle
