@@ -28,3 +28,11 @@ Under the MIT License, commercial exploitation of ORYN-AI is expressly permitted
 - **Enterprise Deployment**: You may deploy ORYN-AI within proprietary internal business environments.
 - **SaaS & Cloud Hosting**: You may offer hosted versions, multi-tenant services, or cloud API endpoints utilizing ORYN-AI software.
 - **Commercial Bundling**: You may bundle, embed, or sell ORYN-AI components alongside proprietary software suites.
+
+## 3. Modification & Derivative Works
+
+Users and organizations possess full authority to adapt and enhance the codebase:
+
+- **Source Refactoring**: You are permitted to modify any TypeScript, React, Node.js, or styling assets.
+- **Custom Integrations**: Adding proprietary database drivers, specialized LLM wrappers, or enterprise single sign-on (SSO) modules is fully sanctioned.
+- **Derivative Works**: Derivative works do not automatically require open-sourcing (permissive, non-copyleft license).
