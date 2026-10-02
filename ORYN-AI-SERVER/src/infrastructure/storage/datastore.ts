@@ -303,7 +303,7 @@ export class Datastore {
       } else {
         const raw = fs.readFileSync(this.dbPath, 'utf-8');
         this.cache = JSON.parse(raw);
-        if (!this.cache.calendarEvents) {
+        if (this.cache && !this.cache.calendarEvents) {
           this.cache.calendarEvents = this.getDefaultData().calendarEvents;
           this.save();
         }
