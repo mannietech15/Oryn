@@ -151,3 +151,4 @@ export const defaultIntegrationsController = new IntegrationsController();
 // [refactor] Zendesk token validation
 // [refactor] Ledger JSON read verification
 // [style] Parameter type annotations
+// [perf] Reused object structures
