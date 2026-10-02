@@ -767,3 +767,4 @@ function LiveIntegrationCard({ integration, isTesting, onTest }: { integration: 
 // [style] Typography letter spacing
 // [perf] Instant session verification
 // [style] Uppercase status styling
+// [security] Role check validation
