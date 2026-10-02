@@ -149,3 +149,4 @@ export const defaultIntegrationsController = new IntegrationsController();
 // [refactor] Stripe key verification
 // [refactor] Slack webhook check
 // [refactor] Zendesk token validation
+// [refactor] Ledger JSON read verification
