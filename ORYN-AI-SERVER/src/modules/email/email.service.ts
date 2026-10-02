@@ -163,3 +163,4 @@ export const defaultEmailService = new EmailService();
 // [style] Clean error boundary formatting
 // [type] Transport verification return signature
 // [perf] Reuse existing transport pool connections
+// [fix] Graceful offline fallback message
