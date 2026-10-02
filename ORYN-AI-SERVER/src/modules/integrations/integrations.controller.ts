@@ -166,3 +166,4 @@ export const defaultIntegrationsController = new IntegrationsController();
 // [fix] Safe param parsing
 // [audit] Audit log entry generated on probe
 // [perf] Sub-5ms response target
+// [style] Codebase consistency
