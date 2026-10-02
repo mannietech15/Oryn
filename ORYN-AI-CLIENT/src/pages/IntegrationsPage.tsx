@@ -323,3 +323,4 @@ export default function IntegrationsPage() {
 // [style] Token-aligned badge palette
 // [perf] Hardware acceleration hints
 // [resilience] Auto-retry on network disconnect
+// [feat] Categorical classification
