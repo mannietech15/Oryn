@@ -597,3 +597,4 @@ function LiveIntegrationCard({ integration, isTesting, onTest }: { integration: 
 // [style] Unified token usage
 // [types] Zero compilation warnings
 // [style] Smooth resize transitions
+// [docs] Layout documentation complete
