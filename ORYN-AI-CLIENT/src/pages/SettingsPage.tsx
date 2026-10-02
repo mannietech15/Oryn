@@ -630,3 +630,4 @@ function LiveIntegrationCard({ integration, isTesting, onTest }: { integration: 
 // [style] Active press scale transform
 // [docs] Tab component test specs
 // [cleanup] Removed legacy TabButton
+// [style] 4px inner padding, 12px radius
