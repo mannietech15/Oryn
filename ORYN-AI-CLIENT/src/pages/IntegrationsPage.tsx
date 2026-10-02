@@ -353,3 +353,4 @@ export default function IntegrationsPage() {
 // [perf] Instant FCP benchmark
 // [style] Subtle card drop shadow
 // [docs] Integrations page architecture notes
+// [final] Instant rendering verified
