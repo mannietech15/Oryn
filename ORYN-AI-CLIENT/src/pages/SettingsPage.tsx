@@ -736,3 +736,4 @@ function LiveIntegrationCard({ integration, isTesting, onTest }: { integration: 
 // [style] Smooth knob glide animation
 // [perf] Targeted CSS variable updates
 // [style] Hover elevation effect
+// [refactor] Browser permission request hook
