@@ -641,3 +641,4 @@ function LiveIntegrationCard({ integration, isTesting, onTest }: { integration: 
 // [refactor] Synchronous tab updates
 // [style] Stroke and fill styling
 // [final] Tab switcher finalized
+// [feat] 4 Persona modes configured
