@@ -712,3 +712,4 @@ function LiveIntegrationCard({ integration, isTesting, onTest }: { integration: 
 // [style] Emerald green notification
 // [security] String sanitization on save
 // [style] Left-aligned action button
+// [docs] Inline sync comments
