@@ -312,3 +312,4 @@ export default function IntegrationsPage() {
 // [perf] Memoized render tree
 // [visual] SVG brand logos mounted
 // [feat] Latency badge display
+// [feat] Uptime percentage badge
