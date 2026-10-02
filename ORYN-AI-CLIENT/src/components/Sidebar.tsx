@@ -284,3 +284,4 @@ export default function Sidebar({ page, onNavigate, isOpen, onClose, organizatio
 // [style] Standardized nav item padding
 // [refactor] Settings anchor item
 // [perf] Optimized sidebar re-renders
+// [style] Workspace dropdown alignment
