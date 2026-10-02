@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Mail, Zap, CreditCard, MessageSquare, Plug, CheckCircle2, XCircle, X, Check } from 'lucide-react';
+import { Plug, CheckCircle2, XCircle, X, Check } from 'lucide-react';
+import { GmailLogo, NvidiaLogo, SlackLogo, StripeLogo, ZendeskLogo, LedgerLogo } from '../components/BrandLogos';
 import { fetchOrganization, updateCompany, fetchIntegrations, testIntegration } from '../api/oryn';
 
 type Tab = 'account' | 'preferences' | 'ai' | 'integrations' | 'security';
@@ -470,11 +471,13 @@ function Toggle({ isOn, onToggle }: { isOn: boolean; onToggle: () => void }) {
 
 function getIntegrationIcon(id: string) {
   switch (id) {
-    case 'smtp': return <Mail size={22} color="var(--accent-primary)" />;
-    case 'nvidia': return <Zap size={22} color="var(--accent-primary)" />;
-    case 'stripe': return <CreditCard size={22} color="var(--accent-primary)" />;
-    case 'slack': return <MessageSquare size={22} color="var(--accent-primary)" />;
-    default: return <Plug size={22} color="var(--accent-primary)" />;
+    case 'smtp': return <GmailLogo size={24} />;
+    case 'nvidia': return <NvidiaLogo size={24} />;
+    case 'stripe': return <StripeLogo size={24} />;
+    case 'slack': return <SlackLogo size={24} />;
+    case 'zendesk': return <ZendeskLogo size={24} />;
+    case 'datastore': return <LedgerLogo size={24} />;
+    default: return <Plug size={24} color="var(--accent-primary)" />;
   }
 }
 
