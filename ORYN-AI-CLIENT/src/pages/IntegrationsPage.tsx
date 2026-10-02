@@ -344,3 +344,4 @@ export default function IntegrationsPage() {
 // [types] Card props interface contract
 // [style] 16px border-radius standard
 // [perf] Zero heavyweight dependencies
+// [a11y] Keyboard navigation focus outline
