@@ -714,3 +714,4 @@ function LiveIntegrationCard({ integration, isTesting, onTest }: { integration: 
 // [style] Left-aligned action button
 // [docs] Inline sync comments
 // [a11y] Enter key form submission
+// [style] Initials computation fallback
