@@ -305,7 +305,12 @@ export function FiscalChart({ entries }: FiscalChartProps) {
               boxShadow: 'var(--shadow-subtle)'
             }} 
           />
+          <XAxis dataKey="date" stroke="var(--text-muted)" fontSize={11} tickLine={false} />
+          <YAxis stroke="var(--text-muted)" fontSize={11} tickLine={false} tickFormatter={(v) => `$${v}`} />
+          <Area type="monotone" dataKey="revenue" stroke="var(--accent-primary)" strokeWidth={2} fillOpacity={1} fill="url(#fiscalColorRev)" />
+          <Area type="monotone" dataKey="expense" stroke="var(--danger)" strokeWidth={2} fillOpacity={1} fill="url(#fiscalColorExp)" />
         </AreaChart>
+
 
       </ResponsiveContainer>
 
