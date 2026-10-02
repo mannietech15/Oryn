@@ -643,3 +643,4 @@ function LiveIntegrationCard({ integration, isTesting, onTest }: { integration: 
 // [final] Tab switcher finalized
 // [feat] 4 Persona modes configured
 // [style] Glowing orange border on active card
+// [feat] Radio bullet indicator
