@@ -153,3 +153,4 @@ export const defaultIntegrationsController = new IntegrationsController();
 // [style] Parameter type annotations
 // [perf] Reused object structures
 // [refactor] Standardized envelope structure
+// [fix] Promise catch wrapper
