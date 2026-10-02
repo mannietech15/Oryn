@@ -697,3 +697,4 @@ function LiveIntegrationCard({ integration, isTesting, onTest }: { integration: 
 // [refactor] Auto-dismiss timer
 // [style] Input focus ring styling
 // [docs] Account sync architecture
+// [validation] Email regex validation
