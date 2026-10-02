@@ -22,7 +22,18 @@ export interface Team {
   name: string;
   description: string;
   leadId?: string;
+  leadName?: string;
+  memberCount?: number;
 }
+
+export interface OrganizationTelemetry {
+  totalPersonnel: number;
+  activeCount: number;
+  remoteCount: number;
+  departmentsCount: number;
+  governanceStatus: 'verified' | 'audit_pending';
+}
+
 
 export interface FinancialEntry {
   id: string;
