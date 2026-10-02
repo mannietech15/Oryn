@@ -287,7 +287,32 @@ export function BusinessProfileCard({ company }: BusinessProfileCardProps) {
           Core operating classification
         </div>
       </div>
+
+      <div style={{ background: 'var(--glass-bg-subtle)', padding: '18px 20px', borderRadius: 12, border: '1px solid var(--card-border)' }}>
+        <div style={{ fontSize: 10, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: 1, marginBottom: 6, fontFamily: 'monospace' }}>
+          HEADQUARTERS
+        </div>
+        <div style={{ fontSize: 16, fontWeight: 700, color: 'var(--text-primary)', fontFamily: 'var(--font-display)' }}>
+          {company.location}
+        </div>
+        <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 4 }}>
+          Principal operations node
+        </div>
+      </div>
+
+      <div style={{ background: 'var(--glass-bg-subtle)', padding: '18px 20px', borderRadius: 12, border: '1px solid var(--card-border)' }}>
+        <div style={{ fontSize: 10, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: 1, marginBottom: 6, fontFamily: 'monospace' }}>
+          FOUNDATION DATE
+        </div>
+        <div style={{ fontSize: 16, fontWeight: 700, color: 'var(--text-primary)', fontFamily: 'var(--font-display)' }}>
+          {company.foundedDate}
+        </div>
+        <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 4 }}>
+          Corporate milestone registration
+        </div>
+      </div>
     </div>
+
   );
 }
 
