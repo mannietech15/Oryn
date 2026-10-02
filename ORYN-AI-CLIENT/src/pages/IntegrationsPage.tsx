@@ -352,3 +352,4 @@ export default function IntegrationsPage() {
 // [resilience] Grid error boundary
 // [perf] Instant FCP benchmark
 // [style] Subtle card drop shadow
+// [docs] Integrations page architecture notes
