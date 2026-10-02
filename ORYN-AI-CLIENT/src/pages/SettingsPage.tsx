@@ -666,3 +666,4 @@ function LiveIntegrationCard({ integration, isTesting, onTest }: { integration: 
 // [refactor] Prompt modifier helper
 // [style] Accent orange toggle state
 // [docs] Persona extensibility guide
+// [a11y] Keyboard toggle support
