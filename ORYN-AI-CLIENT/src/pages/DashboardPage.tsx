@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Mail, Zap, CreditCard, MessageSquare, Plug, Lightbulb } from 'lucide-react';
+import { Zap, Plug, Lightbulb } from 'lucide-react';
+import { GmailLogo, NvidiaLogo, SlackLogo, StripeLogo, ZendeskLogo, LedgerLogo } from '../components/BrandLogos';
 import {
   runCommand, fetchBriefing, fetchAlerts, fetchGoals,
   fetchGoalAction, fetchHealthScore,
@@ -261,11 +262,13 @@ export default function DashboardPage({ orgProfile }: { orgProfile?: any }) {
 
   const getIntegrationIcon = (id: string) => {
     switch (id) {
-      case 'smtp': return <Mail size={16} color="var(--accent-primary)" />;
-      case 'nvidia': return <Zap size={16} color="var(--accent-primary)" />;
-      case 'stripe': return <CreditCard size={16} color="var(--accent-primary)" />;
-      case 'slack': return <MessageSquare size={16} color="var(--accent-primary)" />;
-      default: return <Plug size={16} color="var(--accent-primary)" />;
+      case 'smtp': return <GmailLogo size={18} />;
+      case 'nvidia': return <NvidiaLogo size={18} />;
+      case 'stripe': return <StripeLogo size={18} />;
+      case 'slack': return <SlackLogo size={18} />;
+      case 'zendesk': return <ZendeskLogo size={18} />;
+      case 'datastore': return <LedgerLogo size={18} />;
+      default: return <Plug size={18} color="var(--accent-primary)" />;
     }
   };
 
