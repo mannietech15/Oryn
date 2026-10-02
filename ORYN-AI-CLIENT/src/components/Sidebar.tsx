@@ -287,3 +287,4 @@ export default function Sidebar({ page, onNavigate, isOpen, onClose, organizatio
 // [style] Workspace dropdown alignment
 // [a11y] aria-current attribute on active route
 // [style] Brand logo dimensions
+// [a11y] Logical tab order across links
