@@ -182,3 +182,4 @@ export const defaultEmailService = new EmailService();
 // [security] Sanitize upstream server responses
 // [perf] Keepalive TCP socket configuration
 // [style] Clean imports hierarchy
+// [refactor] sendAlertEmail checks cached status
