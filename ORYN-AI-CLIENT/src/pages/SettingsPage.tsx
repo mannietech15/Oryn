@@ -565,3 +565,4 @@ function LiveIntegrationCard({ integration, isTesting, onTest }: { integration: 
 // [style] Heading typography standardization
 // [refactor] Centered feedback toast banner
 // [style] Smooth tab transition keyframes
+// [docs] Centered layout architecture guide
