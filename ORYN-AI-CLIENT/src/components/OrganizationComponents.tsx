@@ -179,6 +179,20 @@ export function OrgKpiGrid({ items, loading }: { items: OrgKpiData[]; loading?: 
   );
 }
 
+export interface DepartmentGridProps {
+  teams: { id: string; name: string; description: string; leadId?: string; leadName?: string }[];
+  employees?: { id: string; teamId?: string; role?: string }[];
+}
+
+export function DepartmentGrid({ teams, employees = [] }: DepartmentGridProps) {
+  return (
+    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 16 }}>
+      {/* Department cards will be rendered here */}
+    </div>
+  );
+}
+
+
 export function buildOrgKpiItems(
   employees: { status: 'active' | 'on-leave' | 'remote' }[],
   teams: { id: string }[],
