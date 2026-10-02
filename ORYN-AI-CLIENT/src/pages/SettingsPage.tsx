@@ -654,3 +654,4 @@ function LiveIntegrationCard({ integration, isTesting, onTest }: { integration: 
 // [refactor] AutoTask persistence
 // [style] Custom toggle switch styling
 // [a11y] Radio group accessibility
+// [perf] Instantaneous persona update
