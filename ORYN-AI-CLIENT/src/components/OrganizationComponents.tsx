@@ -263,7 +263,9 @@ export interface BusinessProfileCardProps {
 
 export function BusinessProfileCard({ company }: BusinessProfileCardProps) {
   return (
-    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 16 }}>
+    <div>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 16 }}>
+
       <div style={{ background: 'var(--glass-bg-subtle)', padding: '18px 20px', borderRadius: 12, border: '1px solid var(--card-border)' }}>
         <div style={{ fontSize: 10, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: 1, marginBottom: 6, fontFamily: 'monospace' }}>
           LEGAL ENTITY
@@ -312,6 +314,18 @@ export function BusinessProfileCard({ company }: BusinessProfileCardProps) {
         </div>
       </div>
     </div>
+
+    <div style={{ marginTop: 16, padding: '12px 16px', borderRadius: 10, background: 'var(--glass-bg-subtle)', border: '1px solid var(--card-border)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 10 }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 11, fontFamily: 'monospace', color: 'var(--text-secondary)' }}>
+        <span style={{ width: 6, height: 6, borderRadius: '50%', background: 'var(--success)' }} />
+        ENTERPRISE REGISTRATION: ORG-US-WEST-90214
+      </div>
+      <div style={{ fontSize: 11, color: 'var(--text-muted)', fontFamily: 'monospace' }}>
+        TIER: PRODUCTION ENTERPRISE CLUSTER
+      </div>
+    </div>
+  </div>
+
 
   );
 }
