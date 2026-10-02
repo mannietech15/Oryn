@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { Mail, Zap, CreditCard, MessageSquare, Plug, Lightbulb } from 'lucide-react';
 import {
   runCommand, fetchBriefing, fetchAlerts, fetchGoals,
   fetchGoalAction, fetchHealthScore,
@@ -252,11 +253,21 @@ export default function DashboardPage({ orgProfile }: { orgProfile?: any }) {
   const activeWorkflows = (workflowsData?.workflows || []).map(w => ({
     name: w.name,
     status: w.status === 'active' ? 'Active' : 'Paused',
-    task: `${w.trigger} · ${w.steps.join(' ➔ ')}`,
+    task: `${w.trigger} · ${w.steps.join(' → ')}`,
     load: w.status === 'active' ? 70 : 0,
     trigger: w.trigger,
     color: w.status === 'active' ? 'var(--success)' : 'var(--text-secondary)'
   }));
+
+  const getIntegrationIcon = (id: string) => {
+    switch (id) {
+      case 'smtp': return <Mail size={16} color="var(--accent-primary)" />;
+      case 'nvidia': return <Zap size={16} color="var(--accent-primary)" />;
+      case 'stripe': return <CreditCard size={16} color="var(--accent-primary)" />;
+      case 'slack': return <MessageSquare size={16} color="var(--accent-primary)" />;
+      default: return <Plug size={16} color="var(--accent-primary)" />;
+    }
+  };
 
   // Operational Integrations mapped from live backend probes
   const operationalIntegrations = integrationsList.map(intg => ({
@@ -264,7 +275,7 @@ export default function DashboardPage({ orgProfile }: { orgProfile?: any }) {
     status: intg.status === 'connected' ? 'Connected' : intg.status === 'available' ? 'Available' : 'Disconnected',
     badge: intg.statusMessage,
     detail: intg.lastSync,
-    icon: intg.id === 'smtp' ? '📧' : intg.id === 'nvidia' ? '⚡' : intg.id === 'stripe' ? '💳' : intg.id === 'slack' ? '💬' : '🔌',
+    icon: getIntegrationIcon(intg.id),
     isConnected: intg.status === 'connected'
   }));
 
@@ -429,7 +440,7 @@ export default function DashboardPage({ orgProfile }: { orgProfile?: any }) {
                     <div style={{ fontSize: 14, color: 'var(--text-primary)', lineHeight: 1.6 }}>{cmdResult.answer}</div>
                     {cmdResult.action && (
                       <div style={{ display: 'flex', alignItems: 'flex-start', gap: 10, background: 'var(--glass-bg-subtle)', padding: '10px 14px', borderRadius: 8, border: '1px solid var(--glass-bg-hover)' }}>
-                        <span style={{ fontSize: 14 }}>⚡</span>
+                        <Zap size={15} color="var(--accent-primary)" style={{ flexShrink: 0, marginTop: 2 }} />
                         <div>
                           <div style={{ fontSize: 11, color: 'var(--text-muted)', fontWeight: 600 }}>RECOMMENDED ACTION</div>
                           <div style={{ fontSize: 13, color: 'var(--accent-primary)', fontWeight: 500, marginTop: 2 }}>{cmdResult.action}</div>
@@ -460,7 +471,7 @@ export default function DashboardPage({ orgProfile }: { orgProfile?: any }) {
                   {briefingText}
                 </div>
                 <div style={{ display: 'flex', alignItems: 'flex-start', gap: 10, background: 'rgba(249, 115, 22, 0.04)', padding: '12px 14px', borderRadius: 10, border: '1px solid rgba(249, 115, 22, 0.15)' }}>
-                  <div style={{ fontSize: 14, color: 'var(--accent-primary)', marginTop: 2 }}>💡</div>
+                  <Lightbulb size={16} color="var(--accent-primary)" style={{ flexShrink: 0, marginTop: 2 }} />
                   <div style={{ flex: 1 }}>
                     <div style={{ fontSize: 11, color: 'var(--accent-primary)', fontWeight: 700, letterSpacing: '0.3px' }}>RECOMMENDED IMMEDIATE ACTION</div>
                     <div style={{ fontSize: 12.5, color: 'var(--text-primary)', marginTop: 2, lineHeight: 1.45 }}>{briefing.tip}</div>
@@ -580,7 +591,7 @@ export default function DashboardPage({ orgProfile }: { orgProfile?: any }) {
                   }}
                 >
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                    <span style={{ fontSize: 16 }}>{g.icon}</span>
+                    <span style={{ display: 'flex', alignItems: 'center' }}>{g.icon}</span>
                     <span style={{
                       fontSize: 9, fontWeight: 700, fontFamily: 'monospace',
                       color: g.status === 'Connected' ? 'var(--success)' : g.status === 'Degraded' ? 'var(--danger)' : 'var(--text-muted)'
