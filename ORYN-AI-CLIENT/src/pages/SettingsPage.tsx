@@ -598,3 +598,4 @@ function LiveIntegrationCard({ integration, isTesting, onTest }: { integration: 
 // [types] Zero compilation warnings
 // [style] Smooth resize transitions
 // [docs] Layout documentation complete
+// [layout] Symmetrical grid items
