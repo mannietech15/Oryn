@@ -760,3 +760,4 @@ function LiveIntegrationCard({ integration, isTesting, onTest }: { integration: 
 // [refactor] Cryptographic session bound alert
 // [docs] Audit log recording mechanics
 // [style] Standard 24px padding
+// [feat] Token fingerprint display
