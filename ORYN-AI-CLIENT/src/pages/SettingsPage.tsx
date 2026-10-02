@@ -724,3 +724,4 @@ function LiveIntegrationCard({ integration, isTesting, onTest }: { integration: 
 // [feat] Preferences panel mounted
 // [feat] Light mode toggle card
 // [refactor] data-theme DOM synchronization
+// [refactor] Theme localStorage persistence
