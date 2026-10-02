@@ -324,3 +324,4 @@ export default function IntegrationsPage() {
 // [perf] Hardware acceleration hints
 // [resilience] Auto-retry on network disconnect
 // [feat] Categorical classification
+// [style] Responsive grid layout rules
