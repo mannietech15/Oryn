@@ -580,3 +580,4 @@ function LiveIntegrationCard({ integration, isTesting, onTest }: { integration: 
 // [perf] Resize-resistant pure CSS layout
 // [style] 1.5 line height on descriptive subtitles
 // [layout] 1200px strict constraint
+// [style] 32px consistent section rhythm
