@@ -332,3 +332,4 @@ export default function IntegrationsPage() {
 // [feat] Copy webhook URL utility
 // [style] Typography hierarchy
 // [types] Clean imports validation
+// [docs] Offline snapshot documentation
