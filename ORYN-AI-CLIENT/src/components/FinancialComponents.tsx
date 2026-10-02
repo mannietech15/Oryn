@@ -1,5 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
+import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 
 export interface FinCardProps {
   title: string;
@@ -255,6 +256,38 @@ export function buildFiscalKpis(
     }
   ];
 }
+
+export interface FiscalChartProps {
+  entries: { id?: string; date: string; amount: number; type: 'revenue' | 'expense' }[];
+}
+
+export function FiscalChart({ entries }: FiscalChartProps) {
+  const chartData = [...entries]
+    .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
+    .map(e => ({
+      date: e.date,
+      revenue: e.type === 'revenue' ? e.amount : 0,
+      expense: e.type === 'expense' ? e.amount : 0
+    }));
+
+  if (chartData.length === 0) {
+    return (
+      <div style={{ padding: 40, textAlign: 'center', color: 'var(--text-muted)', fontSize: 13 }}>
+        No financial telemetry recorded. Post transactions to generate cash flow curves.
+      </div>
+    );
+  }
+
+  return (
+    <div style={{ width: '100%', height: 280, marginTop: 10 }}>
+      <ResponsiveContainer width="100%" height="100%">
+        <AreaChart data={chartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+        </AreaChart>
+      </ResponsiveContainer>
+    </div>
+  );
+}
+
 
 
 
