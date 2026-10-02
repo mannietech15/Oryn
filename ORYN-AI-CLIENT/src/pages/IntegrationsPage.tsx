@@ -350,3 +350,4 @@ export default function IntegrationsPage() {
 // [feat] 6/6 Operational counter badge
 // [style] Unified page padding
 // [resilience] Grid error boundary
+// [perf] Instant FCP benchmark
