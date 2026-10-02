@@ -617,3 +617,4 @@ function LiveIntegrationCard({ integration, isTesting, onTest }: { integration: 
 // [style] 13px font with medium tracking
 // [perf] Tab state preservation
 // [responsive] Horizontal scroll on small viewports
+// [a11y] aria-hidden on decorative SVG icons
