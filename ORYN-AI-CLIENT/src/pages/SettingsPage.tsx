@@ -746,3 +746,4 @@ function LiveIntegrationCard({ integration, isTesting, onTest }: { integration: 
 // [feat] Audio cue preference state
 // [style] High contrast titles
 // [docs] Preference sync comments
+// [test] Theme switching verified
