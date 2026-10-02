@@ -651,3 +651,4 @@ function LiveIntegrationCard({ integration, isTesting, onTest }: { integration: 
 // [copy] Developer mode description refined
 // [style] auto-fit minmax(260px, 1fr) grid
 // [feat] Automatic task extraction toggle
+// [refactor] AutoTask persistence
