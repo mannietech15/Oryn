@@ -658,3 +658,4 @@ function LiveIntegrationCard({ integration, isTesting, onTest }: { integration: 
 // [style] Card hover illumination
 // [docs] Persona reasoning rules
 // [types] Persona union type enforcement
+// [style] Persona description typography
