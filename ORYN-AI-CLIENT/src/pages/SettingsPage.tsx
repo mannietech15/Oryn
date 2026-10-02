@@ -774,3 +774,4 @@ function LiveIntegrationCard({ integration, isTesting, onTest }: { integration: 
 // [style] 24px consistent block rhythm
 // [docs] Security runbook reference
 // [refactor] Non-blocking alert feedback
+// [style] Accessible danger text color
