@@ -608,4 +608,50 @@ export function PersonnelDirectory({ employees, loading = false }: PersonnelDire
   );
 }
 
+export interface AddMemberModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  onSubmit: (member: { name: string; role: string; email: string; status: 'active' | 'on-leave' | 'remote' }) => Promise<void>;
+  isSubmitting?: boolean;
+}
+
+export function AddMemberModal({ isOpen, onClose, onSubmit, isSubmitting = false }: AddMemberModalProps) {
+  const [name, setName] = React.useState('');
+  const [role, setRole] = React.useState('');
+  const [email, setEmail] = React.useState('');
+  const [status, setStatus] = React.useState<'active' | 'on-leave' | 'remote'>('active');
+
+  if (!isOpen) return null;
+
+  return (
+    <div style={{
+      position: 'fixed',
+      inset: 0,
+      background: 'rgba(0,0,0,0.7)',
+      backdropFilter: 'blur(8px)',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      zIndex: 1000,
+      padding: 20
+    }}>
+      <div style={{
+        background: 'var(--card-bg)',
+        border: '1px solid var(--card-border)',
+        borderRadius: 20,
+        padding: '28px 32px',
+        width: '100%',
+        maxWidth: 460,
+        boxShadow: 'var(--shadow-subtle)',
+        display: 'flex',
+        flexDirection: 'column',
+        gap: 20
+      }}>
+        {/* Header will go here */}
+      </div>
+    </div>
+  );
+}
+
+
 
