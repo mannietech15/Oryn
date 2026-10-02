@@ -583,3 +583,4 @@ function LiveIntegrationCard({ integration, isTesting, onTest }: { integration: 
 // [style] 32px consistent section rhythm
 // [layout] Full width distribution
 // [style] Crisp 1px border contrast
+// [docs] Breakpoint definitions
