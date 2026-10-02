@@ -568,7 +568,44 @@ export function PersonnelDirectory({ employees, loading = false }: PersonnelDire
         </div>
       </div>
 
+      {/* Loading & Empty States */}
+      {loading && (
+        <div style={{ padding: '32px 16px', textAlign: 'center', color: 'var(--text-muted)', fontSize: 13 }}>
+          Querying enterprise personnel directory...
+        </div>
+      )}
+
+      {!loading && filtered.length === 0 && (
+        <div style={{
+          padding: '36px 20px',
+          textAlign: 'center',
+          background: 'var(--glass-bg-subtle)',
+          borderRadius: 12,
+          border: '1px dashed var(--card-border)',
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          gap: 8
+        }}>
+          <span style={{ color: 'var(--text-muted)', fontSize: 13, fontWeight: 600 }}>
+            No personnel match the specified search or filter criteria
+          </span>
+          <span style={{ color: 'var(--text-muted)', fontSize: 11 }}>
+            Try adjusting the search query or toggle the status filters above.
+          </span>
+        </div>
+      )}
+
+      {/* Personnel List Items */}
+      {!loading && filtered.length > 0 && (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 10, maxHeight: 460, overflowY: 'auto', paddingRight: 4 }}>
+          {filtered.map(emp => (
+            <PersonnelTableRow key={emp.id} employee={emp} />
+          ))}
+        </div>
+      )}
     </div>
   );
 }
+
 
