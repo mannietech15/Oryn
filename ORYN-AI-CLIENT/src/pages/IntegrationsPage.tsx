@@ -326,3 +326,4 @@ export default function IntegrationsPage() {
 // [feat] Categorical classification
 // [style] Responsive grid layout rules
 // [refactor] SLA metric tooltip
+// [perf] Debounced focus refetch
