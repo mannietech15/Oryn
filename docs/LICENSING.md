@@ -36,3 +36,11 @@ Users and organizations possess full authority to adapt and enhance the codebase
 - **Source Refactoring**: You are permitted to modify any TypeScript, React, Node.js, or styling assets.
 - **Custom Integrations**: Adding proprietary database drivers, specialized LLM wrappers, or enterprise single sign-on (SSO) modules is fully sanctioned.
 - **Derivative Works**: Derivative works do not automatically require open-sourcing (permissive, non-copyleft license).
+
+## 4. Redistribution & Sublicensing Provisions
+
+Distribution rights are governed by clear, permissive conditions:
+
+- **Source Code Distribution**: Copies of the original or altered source code may be distributed freely across public or private channels.
+- **Compiled Binaries & Bundles**: You may distribute compiled output (such as Vite production bundles or transpiled Express server artifacts).
+- **Sublicensing**: Downstream recipients may be licensed under differing terms (including proprietary commercial licenses), provided the original copyright notice is honored.
