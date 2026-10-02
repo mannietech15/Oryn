@@ -695,3 +695,4 @@ function LiveIntegrationCard({ integration, isTesting, onTest }: { integration: 
 // [style] Save button loading state
 // [feat] Success notification banner
 // [refactor] Auto-dismiss timer
+// [style] Input focus ring styling
