@@ -75,3 +75,12 @@ export function SalesforceLogo({ size = 20, style }: LogoProps) {
     </svg>
   );
 }
+
+export function NotionLogo({ size = 20, style }: LogoProps) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" style={style}>
+      <rect width="24" height="24" rx="5" fill="#ffffff" opacity="0.1" />
+      <path d="M4.22 4.45L16.2 3.53a1.5 1.5 0 0 1 1.6 1.48v13.54a1.5 1.5 0 0 1-1.38 1.49L7.4 20.97a1.5 1.5 0 0 1-1.6-1.48V5.94c0-.77.58-1.42 1.35-1.49l-2.93.01zm4.84 2.87v10.05l7.08-.55V6.78l-7.08.54zm1.8 1.9l3.47 5.76V9.06l1.32-.1v7.05l-1.52.12-3.48-5.76v5.88l-1.31.1V9.32l1.52-.1z" fill="#ffffff" />
+    </svg>
+  );
+}
