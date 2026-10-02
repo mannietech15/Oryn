@@ -601,3 +601,4 @@ function LiveIntegrationCard({ integration, isTesting, onTest }: { integration: 
 // [layout] Symmetrical grid items
 // [style] Clean typography letter spacing
 // [final] Centered layout verified
+// [feat] TabPill component definition
