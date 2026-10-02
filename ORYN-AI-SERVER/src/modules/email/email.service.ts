@@ -11,6 +11,8 @@ const logger = new Logger('EmailService');
 export class EmailService {
   private transporter: nodemailer.Transporter | null = null;
   private isConfigured: boolean = false;
+  private cachedVerifyResult: { connected: boolean; message: string; host?: string; port?: number } | null = null;
+  private lastVerifyTimestamp: number = 0;
 
   constructor(private datastore: Datastore = defaultDatastore) {
     this.initTransporter();
@@ -36,6 +38,8 @@ export class EmailService {
         });
         this.isConfigured = true;
         logger.info('Configured active SMTP transport', { host: ENV.SMTP_HOST, port: ENV.SMTP_PORT, user: ENV.SMTP_USER });
+        // Eagerly pre-warm verification cache asynchronously
+        this.verifyTransport(true).catch(() => {});
       } catch (err: any) {
         logger.error('Failed to configure SMTP transport', { error: err.message });
         this.isConfigured = false;
@@ -46,7 +50,7 @@ export class EmailService {
     }
   }
 
-  async verifyTransport(): Promise<{ connected: boolean; message: string; host?: string; port?: number }> {
+  async verifyTransport(forceRefresh: boolean = false): Promise<{ connected: boolean; message: string; host?: string; port?: number }> {
     if (!this.isConfigured || !this.transporter) {
       return {
         connected: false,
@@ -56,24 +60,33 @@ export class EmailService {
       };
     }
 
+    if (!forceRefresh && this.cachedVerifyResult && (Date.now() - this.lastVerifyTimestamp < 300000)) {
+      return this.cachedVerifyResult;
+    }
+
     try {
       await this.transporter.verify();
-      return {
+      this.cachedVerifyResult = {
         connected: true,
         message: `SMTP connection established successfully to ${ENV.SMTP_HOST}:${ENV.SMTP_PORT}`,
         host: ENV.SMTP_HOST,
         port: ENV.SMTP_PORT
       };
+      this.lastVerifyTimestamp = Date.now();
+      return this.cachedVerifyResult;
     } catch (err: any) {
       logger.warn('SMTP verification handshake failed', { error: err.message });
-      return {
+      this.cachedVerifyResult = {
         connected: false,
         message: `SMTP handshake failure: ${err.message}`,
         host: ENV.SMTP_HOST,
         port: ENV.SMTP_PORT
       };
+      this.lastVerifyTimestamp = Date.now();
+      return this.cachedVerifyResult;
     }
   }
+
 
   stageDraft(to: string | string[], subject: string, body: string) {
     const recipient = Array.isArray(to) ? to.join(', ') : to;
@@ -137,3 +150,4 @@ export class EmailService {
 }
 
 export const defaultEmailService = new EmailService();
+// [perf] Cache layer initialized for low-latency transport verification

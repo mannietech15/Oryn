@@ -39,6 +39,42 @@
   ],
   "aiTaskLogs": [
     {
+      "type": "automation",
+      "model": "engine/pipeline-runner",
+      "latencyMs": 318,
+      "tokensUsed": 0,
+      "status": "success",
+      "id": "task-1790957043657-71",
+      "timestamp": "2026-10-02T16:04:03.661Z"
+    },
+    {
+      "type": "automation",
+      "model": "engine/pipeline-runner",
+      "latencyMs": 245,
+      "tokensUsed": 0,
+      "status": "success",
+      "id": "task-1790957042422-916",
+      "timestamp": "2026-10-02T16:04:02.422Z"
+    },
+    {
+      "type": "automation",
+      "model": "engine/pipeline-runner",
+      "latencyMs": 355,
+      "tokensUsed": 0,
+      "status": "success",
+      "id": "task-1790957041556-903",
+      "timestamp": "2026-10-02T16:04:01.556Z"
+    },
+    {
+      "type": "automation",
+      "model": "engine/pipeline-runner",
+      "latencyMs": 268,
+      "tokensUsed": 0,
+      "status": "success",
+      "id": "task-1790957040271-759",
+      "timestamp": "2026-10-02T16:04:00.273Z"
+    },
+    {
       "id": "task-init-1",
       "type": "chat",
       "model": "meta/llama-3.2-11b-vision-instruct",
@@ -80,10 +116,10 @@
         "SMTP Relay"
       ],
       "createdAt": "2026-09-01T17:15:23.939Z",
-      "lastRunAt": "2026-09-25T17:15:23.939Z",
+      "lastRunAt": "2026-10-02T16:04:02.420Z",
       "nextRunAt": "2026-10-02T17:15:23.939Z",
-      "runCount": 24,
-      "successCount": 24,
+      "runCount": 27,
+      "successCount": 27,
       "failureCount": 0
     },
     {
@@ -99,10 +135,10 @@
         "Admin Notification"
       ],
       "createdAt": "2026-09-11T17:15:23.939Z",
-      "lastRunAt": "2026-10-01T13:15:23.939Z",
+      "lastRunAt": "2026-10-02T16:04:03.656Z",
       "nextRunAt": null,
-      "runCount": 142,
-      "successCount": 140,
+      "runCount": 143,
+      "successCount": 141,
       "failureCount": 2
     },
     {
@@ -125,6 +161,54 @@
     }
   ],
   "workflowExecutionLogs": [
+    {
+      "workflowId": "wf-2",
+      "workflowName": "Stripe Churn Risk Detection & Escrow",
+      "trigger": "Manual Console Dispatch",
+      "durationMs": 318,
+      "status": "success",
+      "stepsCompleted": 4,
+      "totalSteps": 4,
+      "error": null,
+      "id": "exec-1790957043656-362",
+      "executedAt": "2026-10-02T16:04:03.656Z"
+    },
+    {
+      "workflowId": "wf-1",
+      "workflowName": "Weekly Executive Revenue Briefing",
+      "trigger": "Manual Console Dispatch",
+      "durationMs": 245,
+      "status": "success",
+      "stepsCompleted": 4,
+      "totalSteps": 4,
+      "error": null,
+      "id": "exec-1790957042420-328",
+      "executedAt": "2026-10-02T16:04:02.420Z"
+    },
+    {
+      "workflowId": "wf-1",
+      "workflowName": "Weekly Executive Revenue Briefing",
+      "trigger": "Manual Console Dispatch",
+      "durationMs": 355,
+      "status": "success",
+      "stepsCompleted": 4,
+      "totalSteps": 4,
+      "error": null,
+      "id": "exec-1790957041556-621",
+      "executedAt": "2026-10-02T16:04:01.556Z"
+    },
+    {
+      "workflowId": "wf-1",
+      "workflowName": "Weekly Executive Revenue Briefing",
+      "trigger": "Manual Console Dispatch",
+      "durationMs": 268,
+      "status": "success",
+      "stepsCompleted": 4,
+      "totalSteps": 4,
+      "error": null,
+      "id": "exec-1790957040256-276",
+      "executedAt": "2026-10-02T16:04:00.256Z"
+    },
     {
       "id": "exec-1",
       "workflowId": "wf-1",
@@ -179,10 +263,9 @@
   "emailLogs": [],
   "organization": {
     "company": {
-      "name": "Oryn AI Corp",
-      "industry": "Enterprise AI & Workflow Systems",
-      "foundedDate": "2025-01-15",
-      "location": "San Francisco, CA"
+      "name": "Skillbridge",
+      "industry": "Job searchers",
+      "location": "HQ: skillbridge.vercel.app"
     },
     "employees": [
       {

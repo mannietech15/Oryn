@@ -108,10 +108,11 @@ export class IntegrationsController {
     try {
       const { id } = req.params;
       if (id === 'smtp') {
-        const verify = await defaultEmailService.verifyTransport();
+        const verify = await defaultEmailService.verifyTransport(true);
         res.json({ id, ...verify });
         return;
       }
+
       if (id === 'nvidia') {
         res.json({
           id,
