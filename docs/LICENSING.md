@@ -179,3 +179,11 @@ To maintain ongoing compliance across developer workflows:
 - **Audit Command**: Run `npx license-checker --summary` within client and server directories to inspect current license trees.
 - **Fail-Safe Policy**: Automated CI pipelines can be configured to reject unapproved licenses (e.g. AGPL/GPL) from runtime dependencies.
 - **Header Linter**: Optional pre-commit hooks can enforce SPDX comment headers on all freshly committed source assets.
+
+## 19. IP Dispute Resolution & Legal Notice Procedure
+
+If you believe any content or code contained within this repository infringes upon your copyright or intellectual property rights:
+
+- **Designated Contact**: Send formal notices to `mannietech817@gmail.com`.
+- **Notice Contents**: Include identification of the copyrighted work, URL/commit of alleged infringing material, and your contact credentials.
+- **Triage Window**: Inquiries will be acknowledged within 48 hours for immediate evaluation and resolution.
