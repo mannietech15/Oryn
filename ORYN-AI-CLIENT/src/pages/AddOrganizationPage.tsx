@@ -1,10 +1,13 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence, Variants } from 'framer-motion';
+import { updateCompany } from '../api/oryn';
 
 export default function AddOrganizationPage({ onComplete }: { onComplete?: (data: any) => void }) {
   const [step, setStep] = useState(1);
   const [loading, setLoading] = useState(false);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [orgData, setOrgData] = useState({ name: '', industry: '', website: '', logo: '', integrations: [] as string[] });
+  const [teamInvites, setTeamInvites] = useState<string[]>(['', '']);
 
   const handleLogoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -20,12 +23,22 @@ export default function AddOrganizationPage({ onComplete }: { onComplete?: (data
   const nextStep = () => setStep(s => Math.min(3, s + 1));
   const prevStep = () => setStep(s => Math.max(1, s - 1));
 
-  const handleFinish = () => {
+  const handleFinish = async () => {
     setLoading(true);
-    setTimeout(() => {
+    setErrorMsg(null);
+    try {
+      await updateCompany({
+        name: orgData.name || 'New Organization',
+        industry: orgData.industry || 'Technology & AI',
+        location: orgData.website ? `HQ: ${orgData.website}` : 'Global Remote',
+      });
+      if (onComplete) onComplete({ ...orgData, name: orgData.name || 'New Organization', teamInvites: teamInvites.filter(Boolean) });
+    } catch (err: any) {
+      console.error(err);
+      setErrorMsg(err.message || 'Failed to persist organization configuration.');
+    } finally {
       setLoading(false);
-      if (onComplete) onComplete({ ...orgData, name: orgData.name || 'New Organization' });
-    }, 1500);
+    }
   };
 
   const orbVariants: Variants = {
@@ -130,13 +143,52 @@ export default function AddOrganizationPage({ onComplete }: { onComplete?: (data
                 <h2 style={{ fontSize: 20, fontWeight: 600, color: 'var(--text-primary)', marginBottom: 24 }}>3. Invite Your Team</h2>
                 <p style={{ fontSize: 14, color: 'var(--text-secondary)', marginBottom: 24 }}>Add members who will have access to this workspace.</p>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 12, marginBottom: 24 }}>
-                  <Input placeholder="colleague@acmecorp.com" />
-                  <Input placeholder="manager@acmecorp.com" />
-                  <button style={{ background: 'transparent', border: '1px dashed var(--glass-border)', color: 'var(--text-secondary)', padding: '12px', borderRadius: 12, cursor: 'pointer', transition: 'all 0.2s', fontSize: 13, fontWeight: 500 }} onMouseEnter={e => e.currentTarget.style.color = 'var(--text-primary)'} onMouseLeave={e => e.currentTarget.style.color = 'var(--text-secondary)'}>+ Add another</button>
+                  {teamInvites.map((email, idx) => (
+                    <div key={idx} style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+                      <input
+                        placeholder={`colleague_${idx + 1}@${orgData.website ? orgData.website.replace(/^https?:\/\//, '') : 'company.com'}`}
+                        value={email}
+                        onChange={e => {
+                          const updated = [...teamInvites];
+                          updated[idx] = e.target.value;
+                          setTeamInvites(updated);
+                        }}
+                        style={{
+                          width: '100%', padding: '12px 16px', background: 'var(--glass-bg-subtle)',
+                          border: '1px solid var(--card-border)', borderRadius: 12, color: 'var(--text-primary)',
+                          outline: 'none', fontSize: 14
+                        }}
+                      />
+                      {teamInvites.length > 1 && (
+                        <button
+                          type="button"
+                          onClick={() => setTeamInvites(teamInvites.filter((_, i) => i !== idx))}
+                          style={{ background: 'transparent', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', fontSize: 16, padding: '0 8px' }}
+                        >
+                          ✕
+                        </button>
+                      )}
+                    </div>
+                  ))}
+                  <button 
+                    type="button"
+                    onClick={() => setTeamInvites([...teamInvites, ''])}
+                    style={{ background: 'transparent', border: '1px dashed var(--glass-border)', color: 'var(--text-secondary)', padding: '12px', borderRadius: 12, cursor: 'pointer', transition: 'all 0.2s', fontSize: 13, fontWeight: 500 }} 
+                    onMouseEnter={e => e.currentTarget.style.color = 'var(--text-primary)'} 
+                    onMouseLeave={e => e.currentTarget.style.color = 'var(--text-secondary)'}
+                  >
+                    + Add another invitee
+                  </button>
                 </div>
               </motion.div>
             )}
           </AnimatePresence>
+
+          {errorMsg && (
+            <div style={{ padding: '10px 16px', borderRadius: 10, background: 'rgba(239, 68, 68, 0.1)', border: '1px solid rgba(239, 68, 68, 0.3)', color: 'var(--danger)', fontSize: 13, marginTop: 20 }}>
+              {errorMsg}
+            </div>
+          )}
 
           <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 40 }}>
             <button 
