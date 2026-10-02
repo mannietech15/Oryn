@@ -768,3 +768,4 @@ function LiveIntegrationCard({ integration, isTesting, onTest }: { integration: 
 // [perf] Instant session verification
 // [style] Uppercase status styling
 // [security] Role check validation
+// [docs] Hardware key roadmap notes
