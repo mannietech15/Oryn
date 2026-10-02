@@ -307,7 +307,7 @@ Contributions are what make the open-source community an incredible place to lea
 
 ## 📄 License
 
-Distributed under the **MIT License**. See `LICENSE` for more information.
+Distributed under the **MIT License**. See [`LICENSE`](./LICENSE) and [`docs/LICENSING.md`](./docs/LICENSING.md) for full terms, permissions, and compliance details.
 
 ---
 
