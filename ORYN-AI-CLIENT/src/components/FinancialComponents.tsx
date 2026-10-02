@@ -318,9 +318,45 @@ export function FiscalChart({ entries }: FiscalChartProps) {
   );
 }
 
+export interface LedgerEntryFormProps {
+  onSubmit: (entry: { type: 'revenue' | 'expense'; category: string; amount: number; date: string; note?: string }) => Promise<void>;
+  isSubmitting?: boolean;
+  error?: string | null;
+}
 
+export function LedgerEntryForm({ onSubmit, isSubmitting = false, error }: LedgerEntryFormProps) {
+  const [type, setType] = React.useState<'revenue' | 'expense'>('revenue');
+  const [category, setCategory] = React.useState('');
+  const [amount, setAmount] = React.useState('');
+  const [date, setDate] = React.useState(new Date().toISOString().split('T')[0]);
+  const [note, setNote] = React.useState('');
 
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!category.trim() || !amount || Number(amount) <= 0) return;
+    await onSubmit({
+      type,
+      category: category.trim(),
+      amount: Number(amount),
+      date,
+      note: note.trim() || undefined
+    });
+    setCategory('');
+    setAmount('');
+    setNote('');
+  };
 
-
-
-
+  return (
+    <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
+      {error && (
+        <div style={{
+          padding: '10px 14px', borderRadius: 8,
+          background: 'rgba(239, 68, 68, 0.1)', border: '1px solid rgba(239, 68, 68, 0.25)',
+          color: 'var(--danger)', fontSize: 12
+        }}>
+          {error}
+        </div>
+      )}
+    </form>
+  );
+}
