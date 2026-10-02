@@ -640,3 +640,4 @@ function LiveIntegrationCard({ integration, isTesting, onTest }: { integration: 
 // [a11y] Accessibility checklist verified
 // [refactor] Synchronous tab updates
 // [style] Stroke and fill styling
+// [final] Tab switcher finalized
