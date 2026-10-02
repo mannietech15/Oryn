@@ -162,3 +162,4 @@ export const defaultEmailService = new EmailService();
 /** Docs: Fast SMTP verification with TTL cache */
 // [style] Clean error boundary formatting
 // [type] Transport verification return signature
+// [perf] Reuse existing transport pool connections
