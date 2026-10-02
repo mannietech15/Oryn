@@ -160,3 +160,4 @@ export const defaultIntegrationsController = new IntegrationsController();
 // [refactor] Isolated test runner
 // [style] Zero lint warnings
 // [security] Mask API keys and secrets in output
+// [perf] Fast-path routing
