@@ -20,3 +20,4 @@
 // Spec entry #17: Verification of centered layout, zero-latency caching, and live infrastructure telemetry
 // Spec entry #18: Verification of centered layout, zero-latency caching, and live infrastructure telemetry
 // Spec entry #19: Verification of centered layout, zero-latency caching, and live infrastructure telemetry
+// Spec entry #20: Verification of centered layout, zero-latency caching, and live infrastructure telemetry
