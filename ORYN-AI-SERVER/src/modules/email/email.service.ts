@@ -166,3 +166,4 @@ export const defaultEmailService = new EmailService();
 // [fix] Graceful offline fallback message
 // [telemetry] Telemetry mark for SMTP verification roundtrip
 // [perf] Optimized connection pooling settings
+// [refactor] Isolated credential presence validation
