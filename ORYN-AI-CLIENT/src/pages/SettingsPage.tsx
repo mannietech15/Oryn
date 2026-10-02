@@ -751,3 +751,4 @@ function LiveIntegrationCard({ integration, isTesting, onTest }: { integration: 
 // [types] Clean preferences handlers
 // [style] Interactive micro-animations
 // [final] Preferences panel finalized
+// [feat] Security settings panel mounted
