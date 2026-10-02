@@ -586,3 +586,4 @@ function LiveIntegrationCard({ integration, isTesting, onTest }: { integration: 
 // [docs] Breakpoint definitions
 // [cleanup] Deprecated layout classes pruned
 // [style] Nested card elevation
+// [perf] Zero layout blocking
