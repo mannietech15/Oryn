@@ -551,3 +551,4 @@ function LiveIntegrationCard({ integration, isTesting, onTest }: { integration: 
     </div>
   );
 }
+// [layout] page-centered-container max-width 1200px centered
