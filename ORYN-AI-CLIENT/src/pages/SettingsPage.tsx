@@ -579,3 +579,4 @@ function LiveIntegrationCard({ integration, isTesting, onTest }: { integration: 
 // [style] Symmetrical 20px card radius
 // [perf] Resize-resistant pure CSS layout
 // [style] 1.5 line height on descriptive subtitles
+// [layout] 1200px strict constraint
