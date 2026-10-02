@@ -599,3 +599,4 @@ function LiveIntegrationCard({ integration, isTesting, onTest }: { integration: 
 // [style] Smooth resize transitions
 // [docs] Layout documentation complete
 // [layout] Symmetrical grid items
+// [style] Clean typography letter spacing
