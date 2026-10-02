@@ -668,3 +668,4 @@ function LiveIntegrationCard({ integration, isTesting, onTest }: { integration: 
 // [docs] Persona extensibility guide
 // [a11y] Keyboard toggle support
 // [style] Glassmorphic container
+// [refactor] Subtitle explanation
