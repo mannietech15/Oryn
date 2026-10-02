@@ -161,3 +161,4 @@ export const defaultIntegrationsController = new IntegrationsController();
 // [style] Zero lint warnings
 // [security] Mask API keys and secrets in output
 // [perf] Fast-path routing
+// [types] Health state enum definitions
