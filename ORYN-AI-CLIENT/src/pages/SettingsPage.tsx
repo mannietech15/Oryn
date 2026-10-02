@@ -682,3 +682,4 @@ function LiveIntegrationCard({ integration, isTesting, onTest }: { integration: 
 // [types] AI behavior typing validated
 // [final] AI Persona module validated
 // [feat] Account Details panel mounted
+// [style] 80px initials avatar with accent border
