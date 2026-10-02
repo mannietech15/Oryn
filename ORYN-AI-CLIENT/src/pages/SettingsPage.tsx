@@ -663,3 +663,4 @@ function LiveIntegrationCard({ integration, isTesting, onTest }: { integration: 
 // [style] Radio circle precision styling
 // [perf] Idempotent click guard
 // [style] 20px inner padding
+// [refactor] Prompt modifier helper
