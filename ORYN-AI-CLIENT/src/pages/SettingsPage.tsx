@@ -649,3 +649,4 @@ function LiveIntegrationCard({ integration, isTesting, onTest }: { integration: 
 // [copy] Creative mode description refined
 // [copy] Analytical mode description refined
 // [copy] Developer mode description refined
+// [style] auto-fit minmax(260px, 1fr) grid
