@@ -345,3 +345,4 @@ export default function IntegrationsPage() {
 // [style] 16px border-radius standard
 // [perf] Zero heavyweight dependencies
 // [a11y] Keyboard navigation focus outline
+// [style] Secondary text contrast tuning
