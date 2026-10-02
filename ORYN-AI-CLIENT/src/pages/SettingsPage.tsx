@@ -675,3 +675,4 @@ function LiveIntegrationCard({ integration, isTesting, onTest }: { integration: 
 // [resilience] Reload persistence
 // [docs] Task extraction parameters
 // [style] 15px bold title scale
+// [a11y] aria-describedby card binding
