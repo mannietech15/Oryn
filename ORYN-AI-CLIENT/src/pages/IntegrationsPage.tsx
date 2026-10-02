@@ -346,3 +346,4 @@ export default function IntegrationsPage() {
 // [perf] Zero heavyweight dependencies
 // [a11y] Keyboard navigation focus outline
 // [style] Secondary text contrast tuning
+// [refactor] Webhook endpoint override hook
