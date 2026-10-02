@@ -319,3 +319,4 @@ export default function IntegrationsPage() {
 // [style] Border glow on hover
 // [refactor] Human readable sync time
 // [docs] Stale-while-revalidate pattern documentation
+// [a11y] Screen-reader status updates
