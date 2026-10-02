@@ -167,3 +167,4 @@ export const defaultEmailService = new EmailService();
 // [telemetry] Telemetry mark for SMTP verification roundtrip
 // [perf] Optimized connection pooling settings
 // [refactor] Isolated credential presence validation
+// [perf] Server health check reads cached status
