@@ -731,3 +731,4 @@ function LiveIntegrationCard({ integration, isTesting, onTest }: { integration: 
 // [refactor] Push preference persistence
 // [style] 24px padding on preference cards
 // [style] 16px gap between preference rows
+// [docs] Notification architecture guide
