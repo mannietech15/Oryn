@@ -701,3 +701,4 @@ function LiveIntegrationCard({ integration, isTesting, onTest }: { integration: 
 // [style] Form label tracking
 // [perf] Debounced server persistence
 // [style] 24px extra bold initials
+// [a11y] Form label association
