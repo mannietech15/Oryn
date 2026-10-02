@@ -752,3 +752,4 @@ function LiveIntegrationCard({ integration, isTesting, onTest }: { integration: 
 // [style] Interactive micro-animations
 // [final] Preferences panel finalized
 // [feat] Security settings panel mounted
+// [feat] 2FA enforcement status card
