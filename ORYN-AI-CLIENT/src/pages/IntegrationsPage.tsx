@@ -338,3 +338,4 @@ export default function IntegrationsPage() {
 // [refactor] Degraded state indicator
 // [feat] Test-all pipeline trigger
 // [style] Micro-interaction transitions
+// [refactor] Toast notification binding
