@@ -754,3 +754,4 @@ function LiveIntegrationCard({ integration, isTesting, onTest }: { integration: 
 // [feat] Security settings panel mounted
 // [feat] 2FA enforcement status card
 // [style] Emerald green security pill
+// [feat] Enterprise audit card
