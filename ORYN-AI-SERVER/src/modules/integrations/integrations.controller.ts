@@ -139,3 +139,4 @@ export const defaultIntegrationsController = new IntegrationsController();
 /** Docs: Integrations status endpoint contract */
 // [perf] Compact JSON serialization
 // [refactor] Unified adapter mapping
+// [fix] Return degraded status on upstream timeout
