@@ -747,3 +747,4 @@ function LiveIntegrationCard({ integration, isTesting, onTest }: { integration: 
 // [style] High contrast titles
 // [docs] Preference sync comments
 // [test] Theme switching verified
+// [style] Glassmorphic backdrop tuning
