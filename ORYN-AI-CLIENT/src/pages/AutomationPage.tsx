@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { RefreshCw, Zap, ArrowRight } from 'lucide-react';
 import { fetchWorkflows, fetchWorkflowLogs, toggleWorkflow, runWorkflow } from '../api/oryn';
 
 type AutomationStatus = 'active' | 'paused' | 'disabled';
@@ -131,7 +132,8 @@ export default function AutomationPage() {
                 cursor: 'pointer', transition: 'all 0.2s', display: 'flex', alignItems: 'center', gap: 6
               }}
             >
-              🔄 Refresh Telemetry
+              <RefreshCw size={13} style={{ animation: loading ? 'spin 1s linear infinite' : 'none' }} />
+              Refresh Telemetry
             </button>
           </div>
         </div>
@@ -143,7 +145,7 @@ export default function AutomationPage() {
             background: 'rgba(249, 115, 22, 0.08)', border: '1px solid rgba(249, 115, 22, 0.25)',
             color: 'var(--text-primary)', fontSize: 13, display: 'flex', alignItems: 'center', gap: 10
           }}>
-            <span>⚡</span>
+            <Zap size={15} color="var(--accent-primary)" />
             <span>{actionMessage}</span>
           </div>
         )}
@@ -273,7 +275,7 @@ export default function AutomationPage() {
                           {st}
                         </span>
                         {sIdx < wf.steps.length - 1 && (
-                          <span style={{ color: 'var(--accent-primary)', fontSize: 12 }}>➔</span>
+                          <ArrowRight size={12} color="var(--accent-primary)" />
                         )}
                       </div>
                     ))}
