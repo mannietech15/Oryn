@@ -766,3 +766,4 @@ function LiveIntegrationCard({ integration, isTesting, onTest }: { integration: 
 // [a11y] Live session status announcement
 // [style] Typography letter spacing
 // [perf] Instant session verification
+// [style] Uppercase status styling
