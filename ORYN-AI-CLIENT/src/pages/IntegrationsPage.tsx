@@ -317,3 +317,4 @@ export default function IntegrationsPage() {
 // [refactor] Interactive probe button
 // [feat] Diagnostic banner component
 // [style] Border glow on hover
+// [refactor] Human readable sync time
