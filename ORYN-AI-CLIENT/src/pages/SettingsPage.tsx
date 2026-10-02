@@ -718,3 +718,4 @@ function LiveIntegrationCard({ integration, isTesting, onTest }: { integration: 
 // [perf] Dirty-state check before save
 // [style] Accessible placeholder contrast
 // [types] Account state types validated
+// [style] 0.2s hover transition
