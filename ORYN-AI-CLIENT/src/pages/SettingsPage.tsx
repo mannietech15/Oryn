@@ -655,3 +655,4 @@ function LiveIntegrationCard({ integration, isTesting, onTest }: { integration: 
 // [style] Custom toggle switch styling
 // [a11y] Radio group accessibility
 // [perf] Instantaneous persona update
+// [style] Card hover illumination
