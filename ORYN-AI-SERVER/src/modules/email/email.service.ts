@@ -155,3 +155,4 @@ export const defaultEmailService = new EmailService();
 // [perf] forceRefresh flag enables targeted diagnostic probes
 // [perf] Asynchronous transport pre-warm on module initialization
 // [refactor] Decoupled status query from blocking socket round-trips
+// [perf] 3000ms socket timeout guard on live verify
