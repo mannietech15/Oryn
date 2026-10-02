@@ -696,3 +696,4 @@ function LiveIntegrationCard({ integration, isTesting, onTest }: { integration: 
 // [feat] Success notification banner
 // [refactor] Auto-dismiss timer
 // [style] Input focus ring styling
+// [docs] Account sync architecture
