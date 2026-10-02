@@ -622,3 +622,4 @@ function LiveIntegrationCard({ integration, isTesting, onTest }: { integration: 
 // [types] Tab union validation
 // [style] Accessible focus indicators
 // [docs] TabPill prop types documented
+// [refactor] Default initial tab set to 'ai'
