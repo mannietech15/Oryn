@@ -125,3 +125,11 @@ All community and team contributions submitted to ORYN-AI are governed by the In
 - **Automatic MIT Licensing**: By submitting a pull request, code snippet, or patch, the contributor agrees to license their submission under the terms of the MIT License.
 - **Warranty of Ownership**: Contributors certify that their contributions are their original work or that they possess sufficient rights to grant the license.
 - **No Additional CLA Required**: Minor and standard enhancements do not necessitate an external signed CLA beyond standard GitHub pull request terms.
+
+## 12. Trademark & Brand Identity Notice
+
+The MIT License grants rights exclusively over software copyright. It explicitly does NOT grant trademark rights:
+
+- **Names & Logos**: The names "ORYN", "ORYN-AI", "MannieTech", and associated logos or branding graphics are proprietary identifiers.
+- **Fair Use**: You may use the name "ORYN-AI" purely to identify your project as an integration or derivative (e.g., "Plugin for ORYN-AI").
+- **No Endorsement**: You may not imply endorsement, sponsorship, or certification by MannieTech or Manasseh without prior written permission.
