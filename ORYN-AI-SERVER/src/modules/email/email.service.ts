@@ -176,3 +176,4 @@ export const defaultEmailService = new EmailService();
 // [trace] Debug log cache status
 // [perf] Microtask deferral for background verification
 // [cleanup] Zero unused variables
+// [refactor] Encapsulated cache properties
