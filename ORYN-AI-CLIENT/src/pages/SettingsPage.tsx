@@ -576,3 +576,4 @@ function LiveIntegrationCard({ integration, isTesting, onTest }: { integration: 
 // [style] Standardized form label tracking
 // [docs] Enterprise settings layout specifications
 // [types] Strict Tab union type verification
+// [style] Symmetrical 20px card radius
