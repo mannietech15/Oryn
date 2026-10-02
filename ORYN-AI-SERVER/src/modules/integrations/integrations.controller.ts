@@ -159,3 +159,4 @@ export const defaultIntegrationsController = new IntegrationsController();
 // [perf] Cache-Control: max-age=5 headers
 // [refactor] Isolated test runner
 // [style] Zero lint warnings
+// [security] Mask API keys and secrets in output
