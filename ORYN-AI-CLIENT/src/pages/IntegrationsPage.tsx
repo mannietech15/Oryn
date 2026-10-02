@@ -339,3 +339,4 @@ export default function IntegrationsPage() {
 // [feat] Test-all pipeline trigger
 // [style] Micro-interaction transitions
 // [refactor] Toast notification binding
+// [perf] Optimized SVG viewBox rendering
