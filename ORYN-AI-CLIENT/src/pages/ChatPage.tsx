@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { Mail, Send, CheckCircle2, XCircle, BarChart3, TrendingUp, Code2, Lightbulb } from 'lucide-react';
+import { GmailLogo } from '../components/BrandLogos';
 import { useChat } from '../hooks/useChat';
 import type { Message } from '../types';
 import { ConversationalMode } from '../components/ConversationalMode';
@@ -492,7 +493,7 @@ function MessageBubble({ msg, isMobile, onImageClick, language, onEdit, onRegene
           }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                <Mail size={16} color="var(--accent-primary)" />
+                <GmailLogo size={18} />
                 <span style={{ fontSize: 12, fontWeight: 700, fontFamily: 'monospace', color: 'var(--accent-primary)' }}>
                   HUMAN-IN-THE-LOOP ACTION PROPOSAL
                 </span>
