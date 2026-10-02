@@ -722,3 +722,4 @@ function LiveIntegrationCard({ integration, isTesting, onTest }: { integration: 
 // [test] Verified against local API
 // [final] Account panel finalized
 // [feat] Preferences panel mounted
+// [feat] Light mode toggle card
