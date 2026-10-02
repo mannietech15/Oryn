@@ -313,3 +313,4 @@ export default function IntegrationsPage() {
 // [visual] SVG brand logos mounted
 // [feat] Latency badge display
 // [feat] Uptime percentage badge
+// [style] Pulsing green dot animation
