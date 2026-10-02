@@ -143,3 +143,4 @@ export const defaultIntegrationsController = new IntegrationsController();
 // [style] Route handler formatting
 // [refactor] 99.98% target uptime metric
 // [perf] Promise.all for status queries
+// [refactor] ISO timestamp in lastSync
