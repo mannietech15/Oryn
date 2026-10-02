@@ -349,3 +349,4 @@ export default function IntegrationsPage() {
 // [refactor] Webhook endpoint override hook
 // [feat] 6/6 Operational counter badge
 // [style] Unified page padding
+// [resilience] Grid error boundary
