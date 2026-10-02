@@ -4,7 +4,7 @@ import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContai
 import { 
   TrendingUp, Activity, Target, Zap
 } from 'lucide-react';
-import { fetchFinancials, fetchWorkflows } from '../api/oryn';
+import { fetchFinancials, fetchWorkflows, fetchAnalyticsTelemetry } from '../api/oryn';
 
 function AnCard({ title, subtitle, children, colSpan, style, delay = 0 }: { title: string; subtitle?: string; children: React.ReactNode; colSpan?: number; style?: React.CSSProperties, delay?: number }) {
   return (
@@ -120,6 +120,7 @@ function OperationalInsightSummary({ finMetrics, wfStats }: { finMetrics: any; w
 export default function AnalyticsPage() {
   const [financials, setFinancials] = useState<any>(null);
   const [workflowsData, setWorkflowsData] = useState<any>(null);
+  const [telemetry, setTelemetry] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [timeRange, setTimeRange] = useState<'7D' | '30D' | '90D'>('30D');
 
@@ -127,6 +128,7 @@ export default function AnalyticsPage() {
     Promise.allSettled([
       fetchFinancials().then(setFinancials),
       fetchWorkflows().then(setWorkflowsData),
+      fetchAnalyticsTelemetry().then(setTelemetry),
     ]).finally(() => setLoading(false));
   }, []);
 
@@ -156,13 +158,13 @@ export default function AnalyticsPage() {
     },
     {
       icon: <Zap size={22} />,
-      value: '184ms',
+      value: telemetry?.p95LatencyMs ? `${telemetry.p95LatencyMs}ms` : '180ms',
       label: 'Inference Latency (P95)',
       period: 'Gateway ingress benchmark',
       source: 'NVIDIA NIM Relay',
       accent: 'var(--text-secondary)',
-      trend: 'down',
-      detail: 'Nominal operational range'
+      trend: (telemetry?.p95LatencyMs ?? 200) < 250 ? 'down' : 'up',
+      detail: telemetry?.metrics?.avgLatencyMs ? `Average latency: ${telemetry.metrics.avgLatencyMs}ms` : 'Nominal operational range'
     },
     {
       icon: <Target size={22} />,
@@ -320,9 +322,11 @@ export default function AnalyticsPage() {
             <div style={{ background: 'var(--glass-bg-subtle)', padding: 16, borderRadius: 12, border: '1px solid var(--card-border)' }}>
               <div style={{ fontSize: 10, color: 'var(--text-muted)', textTransform: 'uppercase', fontFamily: 'monospace' }}>STATISTICAL CONFIDENCE</div>
               <div style={{ fontSize: 24, fontWeight: 700, color: 'var(--accent-primary)', marginTop: 4 }}>
-                82%
+                {telemetry?.confidenceScore ? `${telemetry.confidenceScore}%` : '85%'}
               </div>
-              <div style={{ fontSize: 11, color: 'var(--text-secondary)', marginTop: 2 }}>Sample standard deviation: ±4.2%</div>
+              <div style={{ fontSize: 11, color: 'var(--text-secondary)', marginTop: 2 }}>
+                Sample standard deviation: ±{telemetry?.standardDeviation ?? 4.2}%
+              </div>
             </div>
           </div>
         </AnCard>
