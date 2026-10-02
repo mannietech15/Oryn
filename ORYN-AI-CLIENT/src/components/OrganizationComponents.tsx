@@ -456,9 +456,19 @@ export function PersonnelTableRow({
           </div>
         </div>
       </div>
+
+      <div style={{ display: 'flex', alignItems: 'center', gap: 16, flexWrap: 'wrap', justifyContent: 'flex-end' }}>
+        <div style={{ fontSize: 12, color: 'var(--text-muted)', fontFamily: 'monospace' }}>
+          {employee.email}
+        </div>
+        <div style={{ fontSize: 11, color: 'var(--text-muted)', fontFamily: 'monospace' }}>
+          {employee.joinedDate}
+        </div>
+      </div>
     </div>
   );
 }
+
 
 
 export function PersonnelDirectory({ employees, loading = false }: PersonnelDirectoryProps) {
