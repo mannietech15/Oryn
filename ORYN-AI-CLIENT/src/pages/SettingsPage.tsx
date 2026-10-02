@@ -567,3 +567,4 @@ function LiveIntegrationCard({ integration, isTesting, onTest }: { integration: 
 // [style] Smooth tab transition keyframes
 // [docs] Centered layout architecture guide
 // [a11y] Header container accessibility
+// [style] 36px 40px outer padding
