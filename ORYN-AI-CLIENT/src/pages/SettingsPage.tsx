@@ -713,3 +713,4 @@ function LiveIntegrationCard({ integration, isTesting, onTest }: { integration: 
 // [security] String sanitization on save
 // [style] Left-aligned action button
 // [docs] Inline sync comments
+// [a11y] Enter key form submission
