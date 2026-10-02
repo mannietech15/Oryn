@@ -706,3 +706,4 @@ function LiveIntegrationCard({ integration, isTesting, onTest }: { integration: 
 // [resilience] Network error alert
 // [style] Glassmorphic input background
 // [docs] Multi-tenant isolation
+// [refactor] Header workspace sync
