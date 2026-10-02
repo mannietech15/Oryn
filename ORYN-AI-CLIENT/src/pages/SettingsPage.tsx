@@ -733,3 +733,4 @@ function LiveIntegrationCard({ integration, isTesting, onTest }: { integration: 
 // [style] 16px gap between preference rows
 // [docs] Notification architecture guide
 // [a11y] Accessible toggle switch attributes
+// [style] Smooth knob glide animation
