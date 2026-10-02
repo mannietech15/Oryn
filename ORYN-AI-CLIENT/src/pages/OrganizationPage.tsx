@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
-import { UserPlus } from 'lucide-react';
+import { UserPlus, Download } from 'lucide-react';
 import type { Company, Employee, Team } from '../types';
+
 import { fetchOrganization, updateOrganizationData } from '../api/oryn';
 import {
   OrgCard,
@@ -64,6 +65,16 @@ export default function OrganizationPage() {
     }
   };
 
+  const handleExportRoster = () => {
+    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(employees, null, 2));
+    const downloadAnchor = document.createElement('a');
+    downloadAnchor.setAttribute("href", dataStr);
+    downloadAnchor.setAttribute("download", `organization-roster-${new Date().toISOString().split('T')[0]}.json`);
+    document.body.appendChild(downloadAnchor);
+    downloadAnchor.click();
+    downloadAnchor.remove();
+  };
+
   const activeCount = employees.filter(e => e.status === 'active').length;
   const remoteCount = employees.filter(e => e.status === 'remote').length;
   const kpiItems = buildOrgKpiItems(employees, teams, company.location);
@@ -102,7 +113,7 @@ export default function OrganizationPage() {
             </div>
           </div>
 
-          <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
+          <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
             <div style={{
               padding: '6px 14px', borderRadius: 8,
               background: 'var(--glass-bg-subtle)', border: '1px solid var(--card-border)',
@@ -110,6 +121,16 @@ export default function OrganizationPage() {
             }}>
               ROSTER: <strong style={{ color: 'var(--text-primary)' }}>{employees.length} Members</strong>
             </div>
+            <button
+              onClick={handleExportRoster}
+              style={{
+                padding: '8px 14px', background: 'var(--glass-bg-subtle)', color: 'var(--text-secondary)',
+                border: '1px solid var(--card-border)', borderRadius: 8, fontWeight: 600, fontSize: 13, cursor: 'pointer',
+                display: 'flex', alignItems: 'center', gap: 6, transition: 'all 0.2s ease'
+              }}
+            >
+              <Download size={14} /> Export
+            </button>
             <button
               onClick={() => setShowAddMember(true)}
               style={{
@@ -123,6 +144,7 @@ export default function OrganizationPage() {
             </button>
           </div>
         </div>
+
 
         {/* Evidence-oriented Workforce Governance Finding */}
         <GovernanceInsightSummary
