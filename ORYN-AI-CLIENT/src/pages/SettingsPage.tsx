@@ -672,3 +672,4 @@ function LiveIntegrationCard({ integration, isTesting, onTest }: { integration: 
 // [style] Dark mode text contrast
 // [perf] Sub-millisecond write duration
 // [style] 0 0 16px orange shadow
+// [resilience] Reload persistence
