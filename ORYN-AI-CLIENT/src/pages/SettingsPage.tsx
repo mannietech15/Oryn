@@ -757,3 +757,4 @@ function LiveIntegrationCard({ integration, isTesting, onTest }: { integration: 
 // [feat] Enterprise audit card
 // [feat] Session audit verification button
 // [style] Security alert red accent
+// [refactor] Cryptographic session bound alert
