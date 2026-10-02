@@ -558,3 +558,4 @@ function LiveIntegrationCard({ integration, isTesting, onTest }: { integration: 
 // [refactor] Clear title and subtitle hierarchy
 // [style] 20px rounded card container
 // [refactor] Replaced left vertical rail with horizontal switcher
+// [style] Card border contrast harmony
