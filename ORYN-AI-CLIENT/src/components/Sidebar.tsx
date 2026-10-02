@@ -299,3 +299,4 @@ export default function Sidebar({ page, onNavigate, isOpen, onClose, organizatio
 // [style] Uniform hover highlights
 // [cleanup] Dead styles removed
 // [docs] Route structure maintenance notes
+// [style] Themed scrollbar styles
