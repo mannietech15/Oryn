@@ -566,3 +566,4 @@ function LiveIntegrationCard({ integration, isTesting, onTest }: { integration: 
 // [refactor] Centered feedback toast banner
 // [style] Smooth tab transition keyframes
 // [docs] Centered layout architecture guide
+// [a11y] Header container accessibility
