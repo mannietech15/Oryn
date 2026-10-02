@@ -639,3 +639,4 @@ function LiveIntegrationCard({ integration, isTesting, onTest }: { integration: 
 // [style] Bold weight on active tab
 // [a11y] Accessibility checklist verified
 // [refactor] Synchronous tab updates
+// [style] Stroke and fill styling
