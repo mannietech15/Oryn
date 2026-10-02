@@ -181,3 +181,4 @@ export const defaultEmailService = new EmailService();
 // [docs] SMTP Relay configuration instructions
 // [security] Sanitize upstream server responses
 // [perf] Keepalive TCP socket configuration
+// [style] Clean imports hierarchy
