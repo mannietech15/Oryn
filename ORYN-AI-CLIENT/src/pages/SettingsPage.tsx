@@ -628,3 +628,4 @@ function LiveIntegrationCard({ integration, isTesting, onTest }: { integration: 
 // [style] Light mode tab pill contrast
 // [telemetry] Tab switch event tracking
 // [style] Active press scale transform
+// [docs] Tab component test specs
