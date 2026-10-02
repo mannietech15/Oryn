@@ -608,3 +608,4 @@ function LiveIntegrationCard({ integration, isTesting, onTest }: { integration: 
 // [feat] Dynamic integration counter
 // [style] 15px vector icon alignment
 // [a11y] role=tab accessibility contract
+// [perf] Instantaneous tab state switch
