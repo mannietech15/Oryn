@@ -635,3 +635,4 @@ function LiveIntegrationCard({ integration, isTesting, onTest }: { integration: 
 // [style] Vertical center alignment
 // [perf] Low GC memory footprint
 // [style] 1px solid var(--card-border)
+// [refactor] Tab keyboard shortcuts
