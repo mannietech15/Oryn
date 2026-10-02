@@ -582,3 +582,4 @@ function LiveIntegrationCard({ integration, isTesting, onTest }: { integration: 
 // [layout] 1200px strict constraint
 // [style] 32px consistent section rhythm
 // [layout] Full width distribution
+// [style] Crisp 1px border contrast
