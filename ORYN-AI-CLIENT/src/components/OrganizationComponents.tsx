@@ -695,7 +695,37 @@ export function AddMemberModal({ isOpen, onClose, onSubmit, isSubmitting = false
               style={{ width: '100%', padding: '11px 14px', background: 'var(--glass-bg-subtle)', border: '1px solid var(--card-border)', borderRadius: 10, color: 'var(--text-primary)', outline: 'none', fontSize: 13 }}
             />
           </div>
+
+          <div>
+            <label style={{ display: 'block', fontSize: 11, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: 1, marginBottom: 6 }}>
+              Corporate Email
+            </label>
+            <input
+              required
+              type="email"
+              value={email}
+              onChange={e => setEmail(e.target.value)}
+              placeholder="e.g. maya@oryn.ai"
+              style={{ width: '100%', padding: '11px 14px', background: 'var(--glass-bg-subtle)', border: '1px solid var(--card-border)', borderRadius: 10, color: 'var(--text-primary)', outline: 'none', fontSize: 13, fontFamily: 'monospace' }}
+            />
+          </div>
+
+          <div>
+            <label style={{ display: 'block', fontSize: 11, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: 1, marginBottom: 6 }}>
+              Deployment Arrangement
+            </label>
+            <select
+              value={status}
+              onChange={e => setStatus(e.target.value as any)}
+              style={{ width: '100%', padding: '11px 14px', background: 'var(--card-bg)', border: '1px solid var(--card-border)', borderRadius: 10, color: 'var(--text-primary)', outline: 'none', fontSize: 13 }}
+            >
+              <option value="active">Active Onsite / Relayed</option>
+              <option value="remote">Remote Distributed</option>
+              <option value="on-leave">On Leave / Sabbatical</option>
+            </select>
+          </div>
         </form>
+
       </div>
 
     </div>
