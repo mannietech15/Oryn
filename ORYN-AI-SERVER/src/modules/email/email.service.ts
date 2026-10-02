@@ -168,3 +168,4 @@ export const defaultEmailService = new EmailService();
 // [perf] Optimized connection pooling settings
 // [refactor] Isolated credential presence validation
 // [perf] Server health check reads cached status
+// [docs] Cache invalidates automatically after 300,000ms
