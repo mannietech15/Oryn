@@ -507,6 +507,31 @@ export function LedgerEntryForm({ onSubmit, isSubmitting = false, error }: Ledge
         </div>
       </div>
 
+      {/* Reference Note / Memo */}
+      <div>
+        <label style={{ display: 'block', fontSize: 11, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: 1, marginBottom: 8 }}>
+          Reference Memo (Optional)
+        </label>
+        <input
+          type="text"
+          placeholder="e.g. Q3 enterprise agreement settlement #104"
+          value={note}
+          onChange={e => setNote(e.target.value)}
+          style={{
+            width: '100%',
+            padding: '12px 16px',
+            background: 'var(--glass-bg-subtle)',
+            border: '1px solid var(--card-border)',
+            borderRadius: 10,
+            color: 'var(--text-primary)',
+            fontSize: 13,
+            outline: 'none',
+            transition: 'border-color 0.2s'
+          }}
+        />
+      </div>
+
+
 
 
     </form>
