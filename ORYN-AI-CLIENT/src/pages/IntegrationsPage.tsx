@@ -308,3 +308,4 @@ export default function IntegrationsPage() {
 // [perf] LocalStorage snapshot eliminates blank loading screen
 // [perf] Sync freshest status to localStorage cache
 // [refactor] Background revalidation pattern
+// [style] Non-blocking status indicator
