@@ -1,6 +1,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import CustomDatePicker from './CustomDatePicker';
 
 export interface FinCardProps {
   title: string;
@@ -496,6 +497,13 @@ export function LedgerEntryForm({ onSubmit, isSubmitting = false, error }: Ledge
               }}
             />
           </div>
+        </div>
+
+        <div>
+          <label style={{ display: 'block', fontSize: 11, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: 1, marginBottom: 8 }}>
+            Posting Date
+          </label>
+          <CustomDatePicker value={date} onChange={setDate} />
         </div>
       </div>
 
