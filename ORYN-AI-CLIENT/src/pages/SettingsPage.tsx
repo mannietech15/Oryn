@@ -612,3 +612,4 @@ function LiveIntegrationCard({ integration, isTesting, onTest }: { integration: 
 // [style] Enclosing pill bar container
 // [a11y] Arrow key tab navigation support
 // [style] 0.2s smooth color transition
+// [docs] Tab interaction documentation
