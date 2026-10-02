@@ -315,3 +315,4 @@ export default function IntegrationsPage() {
 // [feat] Uptime percentage badge
 // [style] Pulsing green dot animation
 // [refactor] Interactive probe button
+// [feat] Diagnostic banner component
