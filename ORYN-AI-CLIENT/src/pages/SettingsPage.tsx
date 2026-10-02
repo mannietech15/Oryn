@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Mail, Zap, CreditCard, MessageSquare, Plug, CheckCircle2, XCircle, X, Check } from 'lucide-react';
 import { fetchOrganization, updateCompany, fetchIntegrations, testIntegration } from '../api/oryn';
 
 type Tab = 'account' | 'preferences' | 'ai' | 'integrations' | 'security';
@@ -180,7 +181,7 @@ export default function SettingsPage() {
                 background: 'rgba(34, 197, 94, 0.1)', border: '1px solid rgba(34, 197, 94, 0.3)',
                 color: 'var(--success)', fontSize: 13, fontWeight: 600, display: 'flex', alignItems: 'center', gap: 10
               }}>
-                <span>✓</span>
+                <Check size={16} />
                 <span>{saveSuccessMsg}</span>
               </div>
             )}
@@ -329,10 +330,13 @@ export default function SettingsPage() {
                     border: `1px solid ${testResult.connected ? 'rgba(34, 197, 94, 0.25)' : 'rgba(239, 68, 68, 0.25)'}`,
                     display: 'flex', justifyContent: 'space-between', alignItems: 'center'
                   }}>
-                    <div style={{ fontSize: 13, color: 'var(--text-primary)' }}>
-                      {testResult.connected ? '✅' : '❌'} {testResult.message}
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13, color: 'var(--text-primary)' }}>
+                      {testResult.connected ? <CheckCircle2 size={16} color="var(--success)" /> : <XCircle size={16} color="var(--danger)" />}
+                      <span>{testResult.message}</span>
                     </div>
-                    <button onClick={() => setTestResult(null)} style={{ background: 'transparent', border: 'none', color: 'var(--text-muted)', cursor: 'pointer' }}>✕</button>
+                    <button onClick={() => setTestResult(null)} style={{ background: 'transparent', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', display: 'flex', alignItems: 'center' }}>
+                      <X size={14} />
+                    </button>
                   </div>
                 )}
 
@@ -464,14 +468,23 @@ function Toggle({ isOn, onToggle }: { isOn: boolean; onToggle: () => void }) {
   );
 }
 
+function getIntegrationIcon(id: string) {
+  switch (id) {
+    case 'smtp': return <Mail size={22} color="var(--accent-primary)" />;
+    case 'nvidia': return <Zap size={22} color="var(--accent-primary)" />;
+    case 'stripe': return <CreditCard size={22} color="var(--accent-primary)" />;
+    case 'slack': return <MessageSquare size={22} color="var(--accent-primary)" />;
+    default: return <Plug size={22} color="var(--accent-primary)" />;
+  }
+}
+
 function LiveIntegrationCard({ integration, isTesting, onTest }: { integration: any; isTesting: boolean; onTest: () => void }) {
   const isConn = integration.status === 'connected';
-  const icon = integration.id === 'smtp' ? '📧' : integration.id === 'nvidia' ? '⚡' : integration.id === 'stripe' ? '💳' : integration.id === 'slack' ? '💬' : '🔌';
 
   return (
     <div style={{ display: 'flex', alignItems: 'center', gap: 20, padding: '20px', background: 'var(--glass-bg-subtle)', border: '1px solid var(--card-border)', borderRadius: 16, boxShadow: 'var(--shadow-subtle)' }}>
-      <div style={{ width: 48, height: 48, borderRadius: 12, background: 'var(--glass-bg-hover)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 24 }}>
-        {icon}
+      <div style={{ width: 48, height: 48, borderRadius: 12, background: 'var(--glass-bg-hover)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        {getIntegrationIcon(integration.id)}
       </div>
       <div style={{ flex: 1 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
