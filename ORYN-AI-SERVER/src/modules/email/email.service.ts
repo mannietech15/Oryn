@@ -172,3 +172,4 @@ export const defaultEmailService = new EmailService();
 // [types] Strict boolean verification contract
 // [style] Standardized error log prefixes
 // [perf] Non-blocking queue inspection
+// [fix] Reset cache if config is refreshed
