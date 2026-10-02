@@ -677,3 +677,4 @@ function LiveIntegrationCard({ integration, isTesting, onTest }: { integration: 
 // [style] 15px bold title scale
 // [a11y] aria-describedby card binding
 // [style] 0.3s knob transition
+// [perf] Composite-only transitions
