@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { Search, X, Check, BarChart3, Bot, Zap, Globe, Rocket, Lightbulb, Activity, Package, ShieldCheck, Building2, Users } from 'lucide-react';
 import { fetchEcosystem, joinEcosystemCommunity, connectEcosystemBusiness, createEcosystemCommunity } from '../api/oryn';
 
 interface Community {
@@ -38,6 +39,24 @@ interface CaseStudy {
   image: string;
 }
 
+function renderCommunityIcon(iconStr: string) {
+  if (iconStr === '🤖' || iconStr === 'ai' || iconStr.includes('ai') || iconStr.includes('robot')) return <Bot size={24} color="var(--accent-primary)" />;
+  if (iconStr === '⚡' || iconStr === 'energy' || iconStr.includes('power') || iconStr.includes('fintech')) return <Zap size={24} color="var(--accent-primary)" />;
+  if (iconStr === '🌐' || iconStr === 'global' || iconStr.includes('net') || iconStr.includes('web')) return <Globe size={24} color="var(--accent-primary)" />;
+  if (iconStr === '🚀' || iconStr === 'rocket' || iconStr.includes('start') || iconStr.includes('scale')) return <Rocket size={24} color="var(--accent-primary)" />;
+  if (iconStr === '💡' || iconStr === 'idea' || iconStr.includes('innov')) return <Lightbulb size={24} color="var(--accent-primary)" />;
+  if (iconStr === '🧬' || iconStr.includes('bio') || iconStr.includes('health')) return <Activity size={24} color="var(--accent-primary)" />;
+  return <Users size={24} color="var(--accent-primary)" />;
+}
+
+function renderCaseStudyIcon(img: string) {
+  if (img === '🏥' || img.includes('health') || img.includes('med')) return <Activity size={24} color="var(--accent-primary)" />;
+  if (img === '⚡' || img.includes('energy') || img.includes('power')) return <Zap size={24} color="var(--accent-primary)" />;
+  if (img === '📦' || img.includes('logistics') || img.includes('supply')) return <Package size={24} color="var(--accent-primary)" />;
+  if (img === '🔒' || img.includes('security') || img.includes('sec')) return <ShieldCheck size={24} color="var(--accent-primary)" />;
+  return <Building2 size={24} color="var(--accent-primary)" />;
+}
+
 export default function ExplorePage() {
   const [search, setSearch] = useState('');
   const [activeTab, setActiveTab] = useState<'communities' | 'networking' | 'trends'>('communities');
@@ -54,7 +73,7 @@ export default function ExplorePage() {
 
   // New Community Modal State
   const [showCreateModal, setShowCreateModal] = useState(false);
-  const [newComm, setNewComm] = useState({ name: '', description: '', tags: '', icon: '🤖' });
+  const [newComm, setNewComm] = useState({ name: '', description: '', tags: '', icon: 'ai' });
   const [creatingComm, setCreatingComm] = useState(false);
 
   const loadData = async () => {
@@ -191,10 +210,10 @@ export default function ExplorePage() {
             onFocus={(e) => { e.target.style.borderColor = 'var(--accent-primary)'; }}
             onBlur={(e) => { e.target.style.borderColor = 'var(--border)'; }}
           />
-          <div style={{ position: 'absolute', right: 20, top: '50%', transform: 'translateY(-50%)', fontSize: 16, color: 'var(--muted)' }}>
+          <div style={{ position: 'absolute', right: 20, top: '50%', transform: 'translateY(-50%)', display: 'flex', alignItems: 'center' }}>
             {search ? (
-              <span onClick={() => setSearch('')} style={{ cursor: 'pointer' }}>✕</span>
-            ) : '🔍'}
+              <span onClick={() => setSearch('')} style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', color: 'var(--muted)' }}><X size={16} /></span>
+            ) : <Search size={16} color="var(--muted)" />}
           </div>
         </div>
       </div>
@@ -265,14 +284,17 @@ export default function ExplorePage() {
                         >
                           <div>
                             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 16 }}>
-                              <div style={{ fontSize: 40 }}>{c.icon}</div>
+                              <div style={{ width: 44, height: 44, borderRadius: 10, background: 'var(--surface-hover)', border: '1px solid var(--border)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                {renderCommunityIcon(c.icon)}
+                              </div>
                               {c.joined && (
                                 <span style={{
                                   padding: '3px 10px', borderRadius: 12,
                                   background: 'rgba(34, 197, 94, 0.1)', color: 'var(--success)',
-                                  fontSize: 10, fontWeight: 700, border: '1px solid rgba(34, 197, 94, 0.3)'
+                                  fontSize: 10, fontWeight: 700, border: '1px solid rgba(34, 197, 94, 0.3)',
+                                  display: 'inline-flex', alignItems: 'center', gap: 4
                                 }}>
-                                  ✓ MEMBER
+                                  <Check size={11} /> MEMBER
                                 </span>
                               )}
                             </div>
@@ -403,7 +425,9 @@ export default function ExplorePage() {
                 </div>
 
                 <div style={{ background: 'rgba(249, 115, 22,0.03)', border: '1px dashed rgba(249, 115, 22,0.2)', borderRadius: 20, padding: 32, display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', gap: 16 }}>
-                  <div style={{ fontSize: 40 }}>📊</div>
+                  <div style={{ width: 64, height: 64, borderRadius: 12, background: 'var(--surface-hover)', border: '1px solid var(--border)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <BarChart3 size={32} color="var(--accent-primary)" />
+                  </div>
                   <div style={{ fontFamily: 'var(--font-display)', fontSize: 18, fontWeight: 600 }}>Detailed Trend Telemetry</div>
                   <p style={{ color: 'var(--muted)', fontSize: 14, textAlign: 'center', maxWidth: 360, lineHeight: 1.5 }}>
                     Real-time cross-industry signals are synthesized automatically from connected enterprise pipelines and ecosystem nodes.
@@ -435,8 +459,8 @@ export default function ExplorePage() {
               onMouseEnter={e => e.currentTarget.style.borderColor = 'var(--glass-border)'}
               onMouseLeave={e => e.currentTarget.style.borderColor = 'var(--border)'}
               >
-                <div style={{ width: 64, height: 64, background: 'var(--surface-hover)', border: '1px solid var(--border)', borderRadius: 12, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 32, flexShrink: 0 }}>
-                  {cs.image}
+                <div style={{ width: 64, height: 64, background: 'var(--surface-hover)', border: '1px solid var(--border)', borderRadius: 12, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                  {renderCaseStudyIcon(cs.image)}
                 </div>
                 <div>
                   <h3 style={{ fontSize: 18, fontWeight: 700, marginBottom: 8, color: 'var(--text-primary)' }}>{cs.company}</h3>
@@ -477,7 +501,9 @@ export default function ExplorePage() {
           }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <h2 style={{ fontSize: 18, fontWeight: 700, margin: 0, color: 'var(--white)' }}>Create Ecosystem Community</h2>
-              <button onClick={() => setShowCreateModal(false)} style={{ background: 'transparent', border: 'none', color: 'var(--muted)', cursor: 'pointer', fontSize: 18 }}>✕</button>
+              <button onClick={() => setShowCreateModal(false)} style={{ background: 'transparent', border: 'none', color: 'var(--muted)', cursor: 'pointer', display: 'flex', alignItems: 'center' }}>
+                <X size={18} />
+              </button>
             </div>
 
             <form onSubmit={handleCreateCommunitySubmit} style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
@@ -487,19 +513,24 @@ export default function ExplorePage() {
                   required
                   value={newComm.name}
                   onChange={e => setNewComm({ ...newComm, name: e.target.value })}
-                  placeholder="e.g. Decentralized AI Founders"
-                  style={{ width: '100%', padding: '10px 14px', marginTop: 6, background: 'rgba(10,29,58,0.7)', border: '1px solid var(--border)', borderRadius: 10, color: '#fff', outline: 'none' }}
+                  placeholder="e.g. Enterprise AI Founders"
+                  style={{ width: '100%', padding: '10px 14px', marginTop: 6, background: 'var(--card-bg)', border: '1px solid var(--border)', borderRadius: 10, color: '#fff', outline: 'none' }}
                 />
               </div>
 
               <div>
-                <label style={{ fontSize: 11, fontWeight: 700, color: 'var(--muted)', textTransform: 'uppercase' }}>Icon / Emoji</label>
-                <input
+                <label style={{ fontSize: 11, fontWeight: 700, color: 'var(--muted)', textTransform: 'uppercase' }}>Icon Category</label>
+                <select
                   value={newComm.icon}
                   onChange={e => setNewComm({ ...newComm, icon: e.target.value })}
-                  placeholder="🤖, 🌐, 🚀, 💡"
-                  style={{ width: '100%', padding: '10px 14px', marginTop: 6, background: 'rgba(10,29,58,0.7)', border: '1px solid var(--border)', borderRadius: 10, color: '#fff', outline: 'none' }}
-                />
+                  style={{ width: '100%', padding: '10px 14px', marginTop: 6, background: 'var(--card-bg)', border: '1px solid var(--border)', borderRadius: 10, color: '#fff', outline: 'none' }}
+                >
+                  <option value="ai">AI & Robotics</option>
+                  <option value="energy">Fintech & Energy</option>
+                  <option value="global">Global Networks</option>
+                  <option value="rocket">Startups & Scaleups</option>
+                  <option value="idea">Innovation</option>
+                </select>
               </div>
 
               <div>
