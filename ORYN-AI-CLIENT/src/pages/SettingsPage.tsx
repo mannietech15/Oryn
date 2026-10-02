@@ -753,3 +753,4 @@ function LiveIntegrationCard({ integration, isTesting, onTest }: { integration: 
 // [final] Preferences panel finalized
 // [feat] Security settings panel mounted
 // [feat] 2FA enforcement status card
+// [style] Emerald green security pill
