@@ -704,3 +704,4 @@ function LiveIntegrationCard({ integration, isTesting, onTest }: { integration: 
 // [a11y] Form label association
 // [style] 0 4px 12px button shadow
 // [resilience] Network error alert
+// [style] Glassmorphic input background
