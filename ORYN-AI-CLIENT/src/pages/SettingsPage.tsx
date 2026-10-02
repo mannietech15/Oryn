@@ -705,3 +705,4 @@ function LiveIntegrationCard({ integration, isTesting, onTest }: { integration: 
 // [style] 0 4px 12px button shadow
 // [resilience] Network error alert
 // [style] Glassmorphic input background
+// [docs] Multi-tenant isolation
