@@ -142,3 +142,4 @@ export const defaultIntegrationsController = new IntegrationsController();
 // [fix] Return degraded status on upstream timeout
 // [style] Route handler formatting
 // [refactor] 99.98% target uptime metric
+// [perf] Promise.all for status queries
