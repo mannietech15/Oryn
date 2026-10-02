@@ -637,3 +637,4 @@ function LiveIntegrationCard({ integration, isTesting, onTest }: { integration: 
 // [style] 1px solid var(--card-border)
 // [refactor] Tab keyboard shortcuts
 // [style] Bold weight on active tab
+// [a11y] Accessibility checklist verified
