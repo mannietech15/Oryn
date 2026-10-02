@@ -574,3 +574,4 @@ function LiveIntegrationCard({ integration, isTesting, onTest }: { integration: 
 // [style] Accent border gradient on active elements
 // [responsive] Fluid column scaling
 // [style] Standardized form label tracking
+// [docs] Enterprise settings layout specifications
