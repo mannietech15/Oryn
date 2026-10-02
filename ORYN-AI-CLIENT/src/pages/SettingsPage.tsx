@@ -632,3 +632,4 @@ function LiveIntegrationCard({ integration, isTesting, onTest }: { integration: 
 // [cleanup] Removed legacy TabButton
 // [style] 4px inner padding, 12px radius
 // [mobile] Touch scrolling support
+// [style] Vertical center alignment
