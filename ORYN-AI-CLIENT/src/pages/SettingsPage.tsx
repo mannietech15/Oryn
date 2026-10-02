@@ -568,3 +568,4 @@ function LiveIntegrationCard({ integration, isTesting, onTest }: { integration: 
 // [docs] Centered layout architecture guide
 // [a11y] Header container accessibility
 // [style] 36px 40px outer padding
+// [perf] Flattened DOM hierarchy
