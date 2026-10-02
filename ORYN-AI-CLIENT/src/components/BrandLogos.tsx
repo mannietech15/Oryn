@@ -45,3 +45,12 @@ export function NvidiaLogo({ size = 20, style }: LogoProps) {
     </svg>
   );
 }
+
+export function StripeLogo({ size = 20, style }: LogoProps) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" style={style}>
+      <rect width="24" height="24" rx="5" fill="#635BFF" />
+      <path d="M10.8 10.3c0-.64.53-.94 1.39-.94 1.25 0 2.82.42 4.07 1.14V6.76c-1.34-.53-2.68-.76-4.07-.76-3.33 0-5.55 1.73-5.55 4.63 0 4.52 6.22 3.8 6.22 5.75 0 .76-.66 1-1.58 1-1.37 0-3.14-.58-4.54-1.39v3.83c1.55.67 3.1 1 4.54 1 3.42 0 5.76-1.7 5.76-4.66 0-4.88-6.24-4.03-6.24-5.86z" fill="#fff"/>
+    </svg>
+  );
+}
