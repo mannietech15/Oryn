@@ -673,3 +673,4 @@ function LiveIntegrationCard({ integration, isTesting, onTest }: { integration: 
 // [perf] Sub-millisecond write duration
 // [style] 0 0 16px orange shadow
 // [resilience] Reload persistence
+// [docs] Task extraction parameters
