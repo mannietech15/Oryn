@@ -588,3 +588,4 @@ function LiveIntegrationCard({ integration, isTesting, onTest }: { integration: 
 // [style] Nested card elevation
 // [perf] Zero layout blocking
 // [style] 44px accessibility touch target
+// [style] 28px vertical rhythm
