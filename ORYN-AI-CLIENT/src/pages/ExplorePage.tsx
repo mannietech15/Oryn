@@ -133,11 +133,11 @@ export default function ExplorePage() {
         name: newComm.name,
         description: newComm.description,
         tags: tagsArray.length ? tagsArray : ['Community'],
-        icon: newComm.icon || '🚀'
+        icon: newComm.icon || 'rocket'
       });
 
       setCommunities(prev => [created, ...prev]);
-      setNewComm({ name: '', description: '', tags: '', icon: '🤖' });
+      setNewComm({ name: '', description: '', tags: '', icon: 'ai' });
       setShowCreateModal(false);
     } catch (err) {
       console.error('Failed to create community', err);

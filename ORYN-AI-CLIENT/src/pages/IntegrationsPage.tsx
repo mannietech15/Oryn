@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { Mail, Zap, Database, CreditCard, Ticket, MessageSquare, Plug, RefreshCw, CheckCircle2, XCircle, X } from 'lucide-react';
 import { fetchIntegrations, testIntegration } from '../api/oryn';
 
 interface IntegrationItem {
@@ -52,13 +53,13 @@ export default function IntegrationsPage() {
 
   const getIcon = (id: string) => {
     switch (id) {
-      case 'smtp': return '📧';
-      case 'nvidia': return '⚡';
-      case 'datastore': return '💾';
-      case 'stripe': return '💳';
-      case 'zendesk': return '🎫';
-      case 'slack': return '💬';
-      default: return '🔌';
+      case 'smtp': return <Mail size={20} color="var(--accent-primary)" />;
+      case 'nvidia': return <Zap size={20} color="var(--accent-primary)" />;
+      case 'datastore': return <Database size={20} color="var(--accent-primary)" />;
+      case 'stripe': return <CreditCard size={20} color="var(--accent-primary)" />;
+      case 'zendesk': return <Ticket size={20} color="var(--accent-primary)" />;
+      case 'slack': return <MessageSquare size={20} color="var(--accent-primary)" />;
+      default: return <Plug size={20} color="var(--accent-primary)" />;
     }
   };
 
@@ -106,7 +107,8 @@ export default function IntegrationsPage() {
               cursor: 'pointer', transition: 'all 0.2s', display: 'flex', alignItems: 'center', gap: 6
             }}
           >
-            🔄 Re-probe Infrastructure
+            <RefreshCw size={13} style={{ animation: loading ? 'spin 1s linear infinite' : 'none' }} />
+            Re-probe Infrastructure
           </button>
         </div>
 
@@ -119,7 +121,7 @@ export default function IntegrationsPage() {
             display: 'flex', alignItems: 'center', justifyContent: 'space-between'
           }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-              <span style={{ fontSize: 16 }}>{testResult.connected ? '✅' : '❌'}</span>
+              {testResult.connected ? <CheckCircle2 size={18} color="var(--success)" /> : <XCircle size={18} color="var(--danger)" />}
               <div>
                 <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-primary)' }}>
                   {testResult.id.toUpperCase()} Handshake Diagnostic
@@ -131,9 +133,9 @@ export default function IntegrationsPage() {
             </div>
             <button
               onClick={() => setTestResult(null)}
-              style={{ background: 'transparent', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', fontSize: 14 }}
+              style={{ background: 'transparent', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', display: 'flex', alignItems: 'center' }}
             >
-              ✕
+              <X size={16} />
             </button>
           </div>
         )}
@@ -216,7 +218,7 @@ export default function IntegrationsPage() {
                       onMouseEnter={e => { e.currentTarget.style.borderColor = 'var(--accent-primary)'; e.currentTarget.style.color = 'var(--accent-primary)'; }}
                       onMouseLeave={e => { e.currentTarget.style.borderColor = 'var(--card-border)'; e.currentTarget.style.color = 'var(--text-primary)'; }}
                     >
-                      {isTesting ? 'Verifying...' : '⚡ Test Handshake'}
+                      {isTesting ? 'Verifying...' : <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}><Zap size={12} /> Test Handshake</span>}
                     </button>
                   </div>
                 </div>
