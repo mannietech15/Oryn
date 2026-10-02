@@ -711,3 +711,4 @@ function LiveIntegrationCard({ integration, isTesting, onTest }: { integration: 
 // [perf] Smooth 60fps input typing
 // [style] Emerald green notification
 // [security] String sanitization on save
+// [style] Left-aligned action button
