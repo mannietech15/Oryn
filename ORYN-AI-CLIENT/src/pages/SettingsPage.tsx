@@ -719,3 +719,4 @@ function LiveIntegrationCard({ integration, isTesting, onTest }: { integration: 
 // [style] Accessible placeholder contrast
 // [types] Account state types validated
 // [style] 0.2s hover transition
+// [test] Verified against local API
