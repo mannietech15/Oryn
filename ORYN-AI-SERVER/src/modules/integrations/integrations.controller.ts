@@ -137,3 +137,4 @@ export const defaultIntegrationsController = new IntegrationsController();
 // [perf] Live probe only on POST /test
 // [refactor] Latency benchmarks included in response
 /** Docs: Integrations status endpoint contract */
+// [perf] Compact JSON serialization
