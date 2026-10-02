@@ -398,14 +398,30 @@ export function BusinessProfileCard({ company }: BusinessProfileCardProps) {
     </div>
   </div>
 
-
   );
 }
 
+export interface PersonnelDirectoryProps {
+  employees: { id: string; name: string; role: string; email: string; joinedDate: string; status: 'active' | 'on-leave' | 'remote' }[];
+  loading?: boolean;
+}
 
+export function PersonnelDirectory({ employees, loading = false }: PersonnelDirectoryProps) {
+  const [searchTerm, setSearchTerm] = React.useState('');
+  const [statusFilter, setStatusFilter] = React.useState<'all' | 'active' | 'remote' | 'on-leave'>('all');
 
+  const filtered = employees.filter(e => {
+    const matchesStatus = statusFilter === 'all' || e.status === statusFilter;
+    const matchesQuery = 
+      e.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      e.role.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      e.email.toLowerCase().includes(searchTerm.toLowerCase());
+    return matchesStatus && matchesQuery;
+  });
 
-
-
-
-
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+      {/* Search and status controls will be rendered here */}
+    </div>
+  );
+}
