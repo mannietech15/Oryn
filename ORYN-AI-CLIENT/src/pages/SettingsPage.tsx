@@ -621,3 +621,4 @@ function LiveIntegrationCard({ integration, isTesting, onTest }: { integration: 
 // [style] 8px border radius on tab pills
 // [types] Tab union validation
 // [style] Accessible focus indicators
+// [docs] TabPill prop types documented
