@@ -742,3 +742,4 @@ function LiveIntegrationCard({ integration, isTesting, onTest }: { integration: 
 // [resilience] Safe boolean parsing
 // [style] Right aligned toggle switches
 // [perf] Zero FOUC during theme toggle
+// [style] Light theme shadow tokens
