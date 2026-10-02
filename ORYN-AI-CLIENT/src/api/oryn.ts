@@ -234,3 +234,33 @@ export async function deleteCalendarEvent(id: string) {
   return res.json();
 }
 
+// --- Ecosystem Intelligence ---
+export async function fetchEcosystem() {
+  const res = await fetch(`${BASE}/ecosystem`);
+  if (!res.ok) throw new Error('Failed to fetch ecosystem directory');
+  return res.json();
+}
+
+export async function joinEcosystemCommunity(id: string) {
+  const res = await fetch(`${BASE}/ecosystem/communities/${id}/join`, { method: 'POST' });
+  if (!res.ok) throw new Error('Failed to update community membership');
+  return res.json();
+}
+
+export async function connectEcosystemBusiness(id: string) {
+  const res = await fetch(`${BASE}/ecosystem/businesses/${id}/connect`, { method: 'POST' });
+  if (!res.ok) throw new Error('Failed to update business connection');
+  return res.json();
+}
+
+export async function createEcosystemCommunity(payload: { name: string; description: string; tags: string[]; icon?: string }) {
+  const res = await fetch(`${BASE}/ecosystem/communities`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload),
+  });
+  if (!res.ok) throw new Error('Failed to create ecosystem community');
+  return res.json();
+}
+
+
