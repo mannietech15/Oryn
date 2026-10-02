@@ -179,3 +179,4 @@ export const defaultEmailService = new EmailService();
 // [refactor] Encapsulated cache properties
 // [perf] Non-blocking server boot sequence
 // [docs] SMTP Relay configuration instructions
+// [security] Sanitize upstream server responses
