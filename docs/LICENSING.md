@@ -198,3 +198,15 @@ No. Unlike copyleft licenses (GPL/AGPL), the MIT license does not compel you to 
 
 ### What is the sole obligation?
 Include the original copyright and permission notice in any copy or substantial portion of the Software.
+
+---
+
+## 21. Formal Verification Sign-Off
+
+```text
+Status:              VERIFIED & RATIFIED
+License Model:       MIT Open Source License
+Project Repository:  https://github.com/mannietech15/Oryn.git
+Architect:           Manasseh (MannieTech)
+Signed-off-by:       Mannie <mannietech817@gmail.com>
+```
