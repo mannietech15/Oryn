@@ -333,3 +333,4 @@ export default function IntegrationsPage() {
 // [style] Typography hierarchy
 // [types] Clean imports validation
 // [docs] Offline snapshot documentation
+// [perf] Zero CLS guaranteed
