@@ -769,3 +769,4 @@ function LiveIntegrationCard({ integration, isTesting, onTest }: { integration: 
 // [style] Uppercase status styling
 // [security] Role check validation
 // [docs] Hardware key roadmap notes
+// [style] Security border luminance
