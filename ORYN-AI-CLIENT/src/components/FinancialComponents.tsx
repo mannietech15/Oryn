@@ -777,11 +777,35 @@ export function CategoryBreakdown({ entries }: CategoryBreakdownProps) {
   }
 
   return (
-    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 14 }}>
-      {/* Category items will be mapped here */}
+    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: 14 }}>
+      {categories.slice(0, 6).map(c => {
+        const isRev = c.type === 'revenue';
+        const color = isRev ? 'var(--success)' : 'var(--danger)';
+        return (
+          <div key={c.category} style={{ background: 'var(--glass-bg-subtle)', padding: 14, borderRadius: 10, border: '1px solid var(--card-border)' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                <span style={{ width: 6, height: 6, borderRadius: '50%', background: color }} />
+                <span style={{ fontSize: 12, fontWeight: 600, color: 'var(--text-primary)' }}>{c.category}</span>
+              </div>
+              <span style={{ fontSize: 11, fontFamily: 'monospace', fontWeight: 700, color }}>
+                ${c.total.toLocaleString()}
+              </span>
+            </div>
+            <div style={{ width: '100%', height: 4, background: 'var(--card-border)', borderRadius: 2, overflow: 'hidden' }}>
+              <div style={{ width: `${Math.min(100, Math.max(4, c.percentage))}%`, height: '100%', background: color, borderRadius: 2 }} />
+            </div>
+            <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 6, fontSize: 10, color: 'var(--text-muted)' }}>
+              <span style={{ textTransform: 'uppercase', fontFamily: 'monospace' }}>{c.type === 'revenue' ? 'Inflow' : 'Disbursement'}</span>
+              <span>{c.percentage.toFixed(1)}% volume</span>
+            </div>
+          </div>
+        );
+      })}
     </div>
   );
 }
+
 
 
 
