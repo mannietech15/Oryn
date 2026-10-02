@@ -700,3 +700,4 @@ function LiveIntegrationCard({ integration, isTesting, onTest }: { integration: 
 // [validation] Email regex validation
 // [style] Form label tracking
 // [perf] Debounced server persistence
+// [style] 24px extra bold initials
