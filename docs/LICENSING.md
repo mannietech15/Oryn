@@ -63,3 +63,20 @@ The Software is supplied on an "AS IS" basis:
 - **No Warranty**: Neither the author nor contributors provide warranties of any kind, whether express, statutory, or implied, including merchantability or fitness for a particular purpose.
 - **Limitation of Damages**: In no event shall the authors or copyright holders be held liable for any claim, damages, data loss, downtime, or other liabilities arising out of or in connection with the Software.
 - **Risk Assumption**: Deployers and operators bear all responsibility for assessing suitability, security testing, and production deployment safety.
+
+## 7. Source Code File Header Template
+
+When authoring new source files or contributing significant modules to ORYN-AI, apply the following header convention:
+
+```typescript
+/**
+ * ORYN-AI — Intelligent Enterprise Workspace & Analytics
+ * 
+ * Copyright (c) 2026 Manasseh (MannieTech) <mannietech817@gmail.com>
+ * SPDX-License-Identifier: MIT
+ * 
+ * Licensed under the MIT License. See LICENSE in the project root for details.
+ */
+```
+
+For CSS/SCSS or shell scripts, adjust the comment block syntax (`/* ... */` or `#`) accordingly while preserving the copyright and SPDX lines.
