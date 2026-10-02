@@ -160,3 +160,4 @@ export const defaultEmailService = new EmailService();
 // [perf] Instant cached return reduces latency from 3000ms to 0.4ms
 // [refactor] Track lastVerifyTimestamp for TTL invalidation
 /** Docs: Fast SMTP verification with TTL cache */
+// [style] Clean error boundary formatting
