@@ -625,3 +625,4 @@ function LiveIntegrationCard({ integration, isTesting, onTest }: { integration: 
 // [refactor] Default initial tab set to 'ai'
 // [style] 16px gap spacing
 // [perf] Memoized tab pill list
+// [style] Light mode tab pill contrast
