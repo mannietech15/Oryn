@@ -292,7 +292,21 @@ export function FiscalChart({ entries }: FiscalChartProps) {
               <stop offset="95%" stopColor="var(--danger)" stopOpacity={0}/>
             </linearGradient>
           </defs>
+          <CartesianGrid strokeDasharray="3 3" stroke="var(--card-border)" opacity={0.6} />
+          <Tooltip 
+            formatter={(value: any, name: any) => [`$${Number(value).toLocaleString()}`, name === 'revenue' ? 'Revenue' : 'Expense']}
+            labelFormatter={(label: any) => `Date: ${label}`}
+            contentStyle={{ 
+              background: 'var(--card-bg)', 
+              border: '1px solid var(--card-border)', 
+              borderRadius: 8, 
+              fontSize: 12,
+              color: 'var(--text-primary)',
+              boxShadow: 'var(--shadow-subtle)'
+            }} 
+          />
         </AreaChart>
+
       </ResponsiveContainer>
 
     </div>
