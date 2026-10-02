@@ -216,9 +216,24 @@ export function buildFiscalKpis(
           <polyline points="17 18 23 18 23 12"></polyline>
         </svg>
       )
+    },
+    {
+      label: 'Net Capital Velocity',
+      value: `${(metrics?.netProfit ?? 0) < 0 ? '-' : ''}$${Math.abs((metrics?.netProfit ?? 0) / 1000).toFixed(1)}K`,
+      detail: (metrics?.netProfit ?? 0) >= 0 ? 'Net positive retained cash velocity' : 'Operating deficit / negative run-rate',
+      source: 'Capital Treasury Ledger',
+      period: 'Verified net delta',
+      accent: (metrics?.netProfit ?? 0) >= 0 ? 'var(--success)' : 'var(--danger)',
+      icon: (
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
+          <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
+        </svg>
+      )
     }
   ];
 }
+
 
 
 
