@@ -341,3 +341,4 @@ export default function IntegrationsPage() {
 // [refactor] Toast notification binding
 // [perf] Optimized SVG viewBox rendering
 // [docs] Maintenance documentation
+// [types] Card props interface contract
