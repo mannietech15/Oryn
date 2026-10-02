@@ -54,3 +54,15 @@ export function StripeLogo({ size = 20, style }: LogoProps) {
     </svg>
   );
 }
+
+export function ZendeskLogo({ size = 20, style }: LogoProps) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" style={style}>
+      <rect width="24" height="24" rx="5" fill="#03363D" />
+      <path d="M5 11.5A5.5 5.5 0 0 1 10.5 6V11.5H5z" fill="#00A656" />
+      <path d="M19 6v5.5H13.5L19 6z" fill="#E8EBED" />
+      <path d="M5 18v-5.5h5.5L5 18z" fill="#E8EBED" />
+      <path d="M19 12.5A5.5 5.5 0 0 1 13.5 18V12.5H19z" fill="#00A656" />
+    </svg>
+  );
+}
