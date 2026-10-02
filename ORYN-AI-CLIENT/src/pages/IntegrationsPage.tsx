@@ -334,3 +334,4 @@ export default function IntegrationsPage() {
 // [types] Clean imports validation
 // [docs] Offline snapshot documentation
 // [perf] Zero CLS guaranteed
+// [style] WCAG AA contrast ratio
