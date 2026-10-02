@@ -155,3 +155,11 @@ While the MIT License grants unrestricted utility, the author strongly encourage
 - **Safety & Alignment**: Implement adequate human oversight and safety verification when deploying autonomous generative models.
 - **Harm Prevention**: Refrain from employing ORYN-AI for unlawful discrimination, disinformation generation, or unauthorized automated surveillance.
 - **Data Privacy**: Ensure user personal data processed via ORYN-AI complies with GDPR, CCPA, and regional privacy frameworks.
+
+## 16. Dual-Licensing & Enterprise Custom Agreements
+
+For organizations requiring commercial warranties, dedicated support, or indemnification clauses beyond standard MIT terms:
+
+- **Commercial SLAs**: Enterprise agreements with guaranteed response times and security patching commitments.
+- **Custom Indemnification**: Legal liability protection agreements tailored to enterprise compliance officers.
+- **Inquiries**: Direct commercial licensing inquiries to `mannietech817@gmail.com`.
