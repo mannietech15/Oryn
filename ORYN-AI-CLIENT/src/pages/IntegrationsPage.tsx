@@ -347,3 +347,4 @@ export default function IntegrationsPage() {
 // [a11y] Keyboard navigation focus outline
 // [style] Secondary text contrast tuning
 // [refactor] Webhook endpoint override hook
+// [feat] 6/6 Operational counter badge
