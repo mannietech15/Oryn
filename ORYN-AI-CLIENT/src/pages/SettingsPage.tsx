@@ -778,3 +778,4 @@ function LiveIntegrationCard({ integration, isTesting, onTest }: { integration: 
 // [perf] Clean security mount
 // [style] Interactive button feedback
 // [types] Security type safety validated
+// [docs] Security overview documentation
