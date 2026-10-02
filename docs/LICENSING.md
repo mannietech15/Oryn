@@ -117,3 +117,11 @@ The backend tier (`ORYN-AI-SERVER`) operates on high-performance open-source mod
 | `nodemailer` | Email Delivery Engine | MIT-0 / MIT |
 | `openai` | Official OpenAI API Client SDK | Apache-2.0 |
 | `typescript` | Static Typing Compiler | Apache-2.0 |
+
+## 11. Contributor Inbound Licensing (Inbound = Outbound)
+
+All community and team contributions submitted to ORYN-AI are governed by the Inbound = Outbound principle:
+
+- **Automatic MIT Licensing**: By submitting a pull request, code snippet, or patch, the contributor agrees to license their submission under the terms of the MIT License.
+- **Warranty of Ownership**: Contributors certify that their contributions are their original work or that they possess sufficient rights to grant the license.
+- **No Additional CLA Required**: Minor and standard enhancements do not necessitate an external signed CLA beyond standard GitHub pull request terms.
