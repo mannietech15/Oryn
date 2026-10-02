@@ -88,3 +88,18 @@ ORYN-AI relies on third-party open-source packages across its frontend and backe
 - **Approved Permissive Licenses**: MIT, Apache-2.0, BSD-2-Clause, BSD-3-Clause, ISC.
 - **Restricted Licenses**: Copyleft licenses (GPL, AGPL) are prohibited from runtime dependencies to avoid contaminating proprietary user integrations.
 - **Dependency Auditing**: Automated package scanners run regularly to audit transitive licensing structures.
+
+## 9. Client-Side Dependency Licensing Catalog
+
+The frontend tier (`ORYN-AI-CLIENT`) incorporates verified permissive dependencies:
+
+| Dependency | Purpose | License |
+|---|---|---|
+| `react` & `react-dom` | UI Rendering Engine | MIT |
+| `react-router-dom` | Client-Side SPA Routing | MIT |
+| `framer-motion` | Motion & UI Animations | MIT |
+| `lucide-react` | Enterprise Vector Iconography | ISC |
+| `@react-three/fiber` & `drei` | 3D Canvas Infrastructure | MIT |
+| `recharts` | Metric & Data Visualization Charts | MIT |
+| `ogl` | Minimal WebGL Library | MIT |
+| `vite` | Next-Generation Frontend Bundler | MIT |
