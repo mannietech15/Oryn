@@ -80,3 +80,11 @@ When authoring new source files or contributing significant modules to ORYN-AI, 
 ```
 
 For CSS/SCSS or shell scripts, adjust the comment block syntax (`/* ... */` or `#`) accordingly while preserving the copyright and SPDX lines.
+
+## 8. Third-Party Dependency Compliance Framework
+
+ORYN-AI relies on third-party open-source packages across its frontend and backend stacks. All direct runtime dependencies must adhere to permissive open-source licenses compatible with the MIT license:
+
+- **Approved Permissive Licenses**: MIT, Apache-2.0, BSD-2-Clause, BSD-3-Clause, ISC.
+- **Restricted Licenses**: Copyleft licenses (GPL, AGPL) are prohibited from runtime dependencies to avoid contaminating proprietary user integrations.
+- **Dependency Auditing**: Automated package scanners run regularly to audit transitive licensing structures.
