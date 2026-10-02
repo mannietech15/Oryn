@@ -585,3 +585,4 @@ function LiveIntegrationCard({ integration, isTesting, onTest }: { integration: 
 // [style] Crisp 1px border contrast
 // [docs] Breakpoint definitions
 // [cleanup] Deprecated layout classes pruned
+// [style] Nested card elevation
