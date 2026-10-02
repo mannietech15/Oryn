@@ -620,3 +620,4 @@ function LiveIntegrationCard({ integration, isTesting, onTest }: { integration: 
 // [a11y] aria-hidden on decorative SVG icons
 // [style] 8px border radius on tab pills
 // [types] Tab union validation
+// [style] Accessible focus indicators
