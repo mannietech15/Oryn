@@ -304,3 +304,4 @@ export default function Sidebar({ page, onNavigate, isOpen, onClose, organizatio
 // [style] Settings button accent hover
 // [perf] Trimmed DOM nodes
 // [style] Standard 18px icon scale
+// [a11y] Focus-visible ring styling
