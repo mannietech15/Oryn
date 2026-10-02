@@ -184,3 +184,4 @@ export const defaultEmailService = new EmailService();
 // [style] Clean imports hierarchy
 // [refactor] sendAlertEmail checks cached status
 // [perf] Latency benchmark logged in development
+// [final] Transport caching fully verified
