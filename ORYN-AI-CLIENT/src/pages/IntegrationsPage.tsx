@@ -336,3 +336,4 @@ export default function IntegrationsPage() {
 // [perf] Zero CLS guaranteed
 // [style] WCAG AA contrast ratio
 // [refactor] Degraded state indicator
+// [feat] Test-all pipeline trigger
