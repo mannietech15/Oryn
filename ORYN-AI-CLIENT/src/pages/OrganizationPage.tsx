@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Building2, Users, UserPlus, X, Briefcase, MapPin, Calendar } from 'lucide-react';
 import type { Company, Employee, Team } from '../types';
 import { fetchOrganization, updateOrganizationData } from '../api/oryn';
 
@@ -79,12 +80,12 @@ export default function OrganizationPage() {
           <button
             onClick={() => setShowAddMember(true)}
             style={{
-              padding: '8px 18px', background: 'var(--cyan)', color: '#000',
-              border: 'none', borderRadius: 8, fontWeight: 700, fontSize: 13, cursor: 'pointer',
-              display: 'flex', alignItems: 'center', gap: 6, boxShadow: '0 2px 8px rgba(0, 240, 255, 0.3)'
+              padding: '8px 18px', background: 'var(--accent-primary)', color: '#fff',
+              border: 'none', borderRadius: 8, fontWeight: 600, fontSize: 13, cursor: 'pointer',
+              display: 'flex', alignItems: 'center', gap: 8, boxShadow: 'var(--shadow-subtle)'
             }}
           >
-            + Add Team Member
+            <UserPlus size={15} /> Add Team Member
           </button>
         </div>
       </div>
@@ -180,7 +181,9 @@ export default function OrganizationPage() {
           }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <h2 style={{ fontSize: 18, fontWeight: 700, margin: 0, color: 'white' }}>Add Team Member</h2>
-              <button onClick={() => setShowAddMember(false)} style={{ background: 'transparent', border: 'none', color: 'var(--muted)', cursor: 'pointer', fontSize: 18 }}>✕</button>
+              <button onClick={() => setShowAddMember(false)} style={{ background: 'transparent', border: 'none', color: 'var(--muted)', cursor: 'pointer', display: 'flex', alignItems: 'center' }}>
+                <X size={18} />
+              </button>
             </div>
 
             <form onSubmit={handleAddMemberSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
@@ -191,7 +194,7 @@ export default function OrganizationPage() {
                   value={newMember.name}
                   onChange={e => setNewMember({ ...newMember, name: e.target.value })}
                   placeholder="e.g. Maya Patel"
-                  style={{ width: '100%', padding: '10px 14px', marginTop: 6, background: 'rgba(10,29,58,0.7)', border: '1px solid var(--border)', borderRadius: 10, color: '#fff', outline: 'none' }}
+                  style={{ width: '100%', padding: '10px 14px', marginTop: 6, background: 'var(--card-bg)', border: '1px solid var(--border)', borderRadius: 10, color: '#fff', outline: 'none' }}
                 />
               </div>
 
@@ -202,7 +205,7 @@ export default function OrganizationPage() {
                   value={newMember.role}
                   onChange={e => setNewMember({ ...newMember, role: e.target.value })}
                   placeholder="e.g. Lead ML Engineer"
-                  style={{ width: '100%', padding: '10px 14px', marginTop: 6, background: 'rgba(10,29,58,0.7)', border: '1px solid var(--border)', borderRadius: 10, color: '#fff', outline: 'none' }}
+                  style={{ width: '100%', padding: '10px 14px', marginTop: 6, background: 'var(--card-bg)', border: '1px solid var(--border)', borderRadius: 10, color: '#fff', outline: 'none' }}
                 />
               </div>
 
@@ -214,7 +217,7 @@ export default function OrganizationPage() {
                   value={newMember.email}
                   onChange={e => setNewMember({ ...newMember, email: e.target.value })}
                   placeholder="maya@oryn.ai"
-                  style={{ width: '100%', padding: '10px 14px', marginTop: 6, background: 'rgba(10,29,58,0.7)', border: '1px solid var(--border)', borderRadius: 10, color: '#fff', outline: 'none' }}
+                  style={{ width: '100%', padding: '10px 14px', marginTop: 6, background: 'var(--card-bg)', border: '1px solid var(--border)', borderRadius: 10, color: '#fff', outline: 'none' }}
                 />
               </div>
 
