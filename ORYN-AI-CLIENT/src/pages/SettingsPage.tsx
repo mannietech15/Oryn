@@ -749,3 +749,4 @@ function LiveIntegrationCard({ integration, isTesting, onTest }: { integration: 
 // [test] Theme switching verified
 // [style] Glassmorphic backdrop tuning
 // [types] Clean preferences handlers
+// [style] Interactive micro-animations
