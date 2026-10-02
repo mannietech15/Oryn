@@ -761,3 +761,4 @@ function LiveIntegrationCard({ integration, isTesting, onTest }: { integration: 
 // [docs] Audit log recording mechanics
 // [style] Standard 24px padding
 // [feat] Token fingerprint display
+// [style] Audit button hover styling
