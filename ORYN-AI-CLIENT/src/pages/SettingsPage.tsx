@@ -690,3 +690,4 @@ function LiveIntegrationCard({ integration, isTesting, onTest }: { integration: 
 // [feat] HQ location input binding
 // [feat] Industry sector input binding
 // [refactor] Server organization hydration
+// [resilience] LocalStorage fallback
