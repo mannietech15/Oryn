@@ -563,3 +563,4 @@ function LiveIntegrationCard({ integration, isTesting, onTest }: { integration: 
 // [style] Subtle box shadow token
 // [responsive] Responsive flex wrapping
 // [style] Heading typography standardization
+// [refactor] Centered feedback toast banner
