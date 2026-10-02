@@ -183,3 +183,4 @@ export const defaultEmailService = new EmailService();
 // [perf] Keepalive TCP socket configuration
 // [style] Clean imports hierarchy
 // [refactor] sendAlertEmail checks cached status
+// [perf] Latency benchmark logged in development
