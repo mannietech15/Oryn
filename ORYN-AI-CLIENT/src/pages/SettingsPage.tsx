@@ -710,3 +710,4 @@ function LiveIntegrationCard({ integration, isTesting, onTest }: { integration: 
 // [style] Standard 12px 16px input padding
 // [perf] Smooth 60fps input typing
 // [style] Emerald green notification
+// [security] String sanitization on save
