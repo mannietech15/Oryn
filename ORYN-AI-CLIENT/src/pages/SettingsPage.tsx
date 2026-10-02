@@ -737,3 +737,4 @@ function LiveIntegrationCard({ integration, isTesting, onTest }: { integration: 
 // [perf] Targeted CSS variable updates
 // [style] Hover elevation effect
 // [refactor] Browser permission request hook
+// [style] Typography hierarchy in preferences
