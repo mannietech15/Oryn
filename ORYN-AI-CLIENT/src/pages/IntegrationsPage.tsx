@@ -304,3 +304,4 @@ export default function IntegrationsPage() {
     </div>
   );
 }
+// [perf] INITIAL_INTEGRATIONS provides immediate card mounting
