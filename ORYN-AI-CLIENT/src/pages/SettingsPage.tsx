@@ -692,3 +692,4 @@ function LiveIntegrationCard({ integration, isTesting, onTest }: { integration: 
 // [refactor] Server organization hydration
 // [resilience] LocalStorage fallback
 // [feat] Datastore update handler
+// [style] Save button loading state
