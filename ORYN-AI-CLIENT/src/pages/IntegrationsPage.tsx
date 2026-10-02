@@ -329,3 +329,4 @@ export default function IntegrationsPage() {
 // [perf] Debounced focus refetch
 // [style] Glassmorphic background
 // [refactor] Granular per-card loading state
+// [feat] Copy webhook URL utility
