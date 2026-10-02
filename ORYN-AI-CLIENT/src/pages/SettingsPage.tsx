@@ -738,3 +738,4 @@ function LiveIntegrationCard({ integration, isTesting, onTest }: { integration: 
 // [style] Hover elevation effect
 // [refactor] Browser permission request hook
 // [style] Typography hierarchy in preferences
+// [docs] Theme token mapping documentation
