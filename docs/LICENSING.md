@@ -55,3 +55,11 @@ The single mandatory obligation of the MIT License is preserving attribution:
   ```text
   Copyright (c) 2026 Manasseh (MannieTech) <mannietech817@gmail.com>
   ```
+
+## 6. Limitation of Liability & Warranty Disclaimer
+
+The Software is supplied on an "AS IS" basis:
+
+- **No Warranty**: Neither the author nor contributors provide warranties of any kind, whether express, statutory, or implied, including merchantability or fitness for a particular purpose.
+- **Limitation of Damages**: In no event shall the authors or copyright holders be held liable for any claim, damages, data loss, downtime, or other liabilities arising out of or in connection with the Software.
+- **Risk Assumption**: Deployers and operators bear all responsibility for assessing suitability, security testing, and production deployment safety.
