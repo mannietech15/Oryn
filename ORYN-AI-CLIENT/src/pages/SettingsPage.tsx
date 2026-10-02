@@ -573,3 +573,4 @@ function LiveIntegrationCard({ integration, isTesting, onTest }: { integration: 
 // [refactor] Overflow container scroll padding
 // [style] Accent border gradient on active elements
 // [responsive] Fluid column scaling
+// [style] Standardized form label tracking
