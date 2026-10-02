@@ -318,3 +318,4 @@ export default function IntegrationsPage() {
 // [feat] Diagnostic banner component
 // [style] Border glow on hover
 // [refactor] Human readable sync time
+// [docs] Stale-while-revalidate pattern documentation
