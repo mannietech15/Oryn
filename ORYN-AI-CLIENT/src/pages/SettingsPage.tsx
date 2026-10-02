@@ -660,3 +660,4 @@ function LiveIntegrationCard({ integration, isTesting, onTest }: { integration: 
 // [types] Persona union type enforcement
 // [style] Persona description typography
 // [telemetry] Persona update telemetry
+// [style] Radio circle precision styling
