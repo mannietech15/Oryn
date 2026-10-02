@@ -328,3 +328,4 @@ export default function IntegrationsPage() {
 // [refactor] SLA metric tooltip
 // [perf] Debounced focus refetch
 // [style] Glassmorphic background
+// [refactor] Granular per-card loading state
