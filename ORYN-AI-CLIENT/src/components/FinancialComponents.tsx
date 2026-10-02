@@ -562,3 +562,28 @@ export function LedgerEntryForm({ onSubmit, isSubmitting = false, error }: Ledge
   );
 }
 
+export interface LedgerTransactionListProps {
+  entries: { id?: string; type: 'revenue' | 'expense'; category: string; amount: number; date: string; note?: string }[];
+  loading?: boolean;
+}
+
+export function LedgerTransactionList({ entries, loading = false }: LedgerTransactionListProps) {
+  const [searchTerm, setSearchTerm] = React.useState('');
+  const [filterType, setFilterType] = React.useState<'all' | 'revenue' | 'expense'>('all');
+
+  const filteredEntries = entries.filter(e => {
+    const matchesType = filterType === 'all' || e.type === filterType;
+    const matchesSearch = 
+      e.category.toLowerCase().includes(searchTerm.toLowerCase()) || 
+      (e.note && e.note.toLowerCase().includes(searchTerm.toLowerCase()));
+    return matchesType && matchesSearch;
+  });
+
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+      {/* List controls will be injected here */}
+    </div>
+  );
+}
+
+
