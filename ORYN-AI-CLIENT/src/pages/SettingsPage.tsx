@@ -553,3 +553,4 @@ function LiveIntegrationCard({ integration, isTesting, onTest }: { integration: 
 }
 // [layout] page-centered-container max-width 1200px centered
 // [layout] Symmetrical margin: 0 auto matching AnalyticsPage
+// [style] Top status badges: SYNCHRONIZED & PREFERENCES
