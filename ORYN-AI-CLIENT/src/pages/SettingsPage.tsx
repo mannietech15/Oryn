@@ -653,3 +653,4 @@ function LiveIntegrationCard({ integration, isTesting, onTest }: { integration: 
 // [feat] Automatic task extraction toggle
 // [refactor] AutoTask persistence
 // [style] Custom toggle switch styling
+// [a11y] Radio group accessibility
