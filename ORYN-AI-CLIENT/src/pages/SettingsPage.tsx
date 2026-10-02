@@ -614,3 +614,4 @@ function LiveIntegrationCard({ integration, isTesting, onTest }: { integration: 
 // [style] 0.2s smooth color transition
 // [docs] Tab interaction documentation
 // [refactor] Tab state management
+// [style] 13px font with medium tracking
