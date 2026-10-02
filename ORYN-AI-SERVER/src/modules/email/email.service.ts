@@ -158,3 +158,4 @@ export const defaultEmailService = new EmailService();
 // [perf] 3000ms socket timeout guard on live verify
 // [fix] Fallback connection handler on DNS timeout
 // [perf] Instant cached return reduces latency from 3000ms to 0.4ms
+// [refactor] Track lastVerifyTimestamp for TTL invalidation
