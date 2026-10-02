@@ -138,3 +138,4 @@ export const defaultIntegrationsController = new IntegrationsController();
 // [refactor] Latency benchmarks included in response
 /** Docs: Integrations status endpoint contract */
 // [perf] Compact JSON serialization
+// [refactor] Unified adapter mapping
