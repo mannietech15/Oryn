@@ -616,3 +616,4 @@ function LiveIntegrationCard({ integration, isTesting, onTest }: { integration: 
 // [refactor] Tab state management
 // [style] 13px font with medium tracking
 // [perf] Tab state preservation
+// [responsive] Horizontal scroll on small viewports
