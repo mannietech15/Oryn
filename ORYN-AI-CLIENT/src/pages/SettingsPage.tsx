@@ -631,3 +631,4 @@ function LiveIntegrationCard({ integration, isTesting, onTest }: { integration: 
 // [docs] Tab component test specs
 // [cleanup] Removed legacy TabButton
 // [style] 4px inner padding, 12px radius
+// [mobile] Touch scrolling support
