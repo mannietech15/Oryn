@@ -745,3 +745,4 @@ function LiveIntegrationCard({ integration, isTesting, onTest }: { integration: 
 // [style] Light theme shadow tokens
 // [feat] Audio cue preference state
 // [style] High contrast titles
+// [docs] Preference sync comments
