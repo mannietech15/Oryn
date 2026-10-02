@@ -174,3 +174,4 @@ export const defaultEmailService = new EmailService();
 // [perf] Non-blocking queue inspection
 // [fix] Reset cache if config is refreshed
 // [trace] Debug log cache status
+// [perf] Microtask deferral for background verification
