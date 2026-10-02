@@ -160,9 +160,9 @@ export default function DashboardPage({ orgProfile }: { orgProfile?: any }) {
   const cmdInputRef = useRef<HTMLInputElement>(null);
   const briefingText = useTypewriter(briefing?.summary ?? '');
 
-  /* ── Load all data on mount from actual backend routes ── */
-  useEffect(() => {
-    Promise.allSettled([
+  /* ── Load all data on mount and poll in realtime ── */
+  const loadDashboardData = useCallback(() => {
+    return Promise.allSettled([
       fetchFinancials().then(setFinancials),
       fetchWorkflows().then(setWorkflowsData),
       fetchIntegrations().then(setIntegrationsList),
@@ -179,8 +179,30 @@ export default function DashboardPage({ orgProfile }: { orgProfile?: any }) {
     });
   }, []);
 
+  useEffect(() => {
+    loadDashboardData();
+    const interval = setInterval(loadDashboardData, 15000);
+    return () => clearInterval(interval);
+  }, [loadDashboardData]);
+
   const finMetrics = financials?.metrics;
   const wfStats = workflowsData?.stats;
+
+  // Compute dynamic cumulative revenue trajectory points from actual ledger entries
+  const revenuePoints = (() => {
+    const entries = financials?.entries || [];
+    const revEntries = entries
+      .filter((e: any) => e.type === 'revenue')
+      .sort((a: any, b: any) => new Date(a.date).getTime() - new Date(b.date).getTime());
+    if (revEntries.length === 0) return [0, 0, 0, 0];
+    let running = 0;
+    const pts = revEntries.map((e: any) => {
+      running += e.amount;
+      return Math.round(running / 1000);
+    });
+    if (pts.length === 1) return [0, pts[0]];
+    return pts;
+  })();
 
   // Contextual, explainable KPI metrics derived from real ledger and runner stats
   const contextualKPIs = [
@@ -590,7 +612,7 @@ export default function DashboardPage({ orgProfile }: { orgProfile?: any }) {
                   {finMetrics?.totalRevenue ? `${finMetrics.margin}% operating margin on verified entries` : 'No ledger entries'}
                 </div>
               </div>
-              <SparkLine points={finMetrics?.totalRevenue ? [30, 45, 60, 50, 75, 80, 95, 110, Math.max(finMetrics.entryCount * 15, 60)] : [0, 0, 0, 0]} />
+              <SparkLine points={revenuePoints} />
             </Card>
           </div>
 
