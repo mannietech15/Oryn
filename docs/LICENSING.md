@@ -103,3 +103,17 @@ The frontend tier (`ORYN-AI-CLIENT`) incorporates verified permissive dependenci
 | `recharts` | Metric & Data Visualization Charts | MIT |
 | `ogl` | Minimal WebGL Library | MIT |
 | `vite` | Next-Generation Frontend Bundler | MIT |
+
+## 10. Server-Side Dependency Licensing Catalog
+
+The backend tier (`ORYN-AI-SERVER`) operates on high-performance open-source modules:
+
+| Dependency | Purpose | License |
+|---|---|---|
+| `express` | HTTP Application Server Framework | MIT |
+| `cors` | Cross-Origin Resource Sharing Middleware | MIT |
+| `dotenv` | Environment Variable Management | BSD-2-Clause |
+| `multer` | Multipart Form Data & File Uploads | MIT |
+| `nodemailer` | Email Delivery Engine | MIT-0 / MIT |
+| `openai` | Official OpenAI API Client SDK | Apache-2.0 |
+| `typescript` | Static Typing Compiler | Apache-2.0 |
