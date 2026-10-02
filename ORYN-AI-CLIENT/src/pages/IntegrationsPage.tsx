@@ -325,3 +325,4 @@ export default function IntegrationsPage() {
 // [resilience] Auto-retry on network disconnect
 // [feat] Categorical classification
 // [style] Responsive grid layout rules
+// [refactor] SLA metric tooltip
