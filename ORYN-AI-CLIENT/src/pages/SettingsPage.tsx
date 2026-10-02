@@ -678,3 +678,4 @@ function LiveIntegrationCard({ integration, isTesting, onTest }: { integration: 
 // [a11y] aria-describedby card binding
 // [style] 0.3s knob transition
 // [perf] Composite-only transitions
+// [style] Header rhythm tuning
