@@ -592,3 +592,4 @@ function LiveIntegrationCard({ integration, isTesting, onTest }: { integration: 
 // [style] Monospace telemetry pill styling
 // [docs] Centered design matches enterprise standards
 // [a11y] Screen reader announcements
+// [responsive] Mobile padding adjustments
