@@ -626,3 +626,4 @@ function LiveIntegrationCard({ integration, isTesting, onTest }: { integration: 
 // [style] 16px gap spacing
 // [perf] Memoized tab pill list
 // [style] Light mode tab pill contrast
+// [telemetry] Tab switch event tracking
