@@ -20,3 +20,11 @@ The System Package Data Exchange (SPDX) standard provides a machine-readable for
 - **SPDX-URL**: https://spdx.org/licenses/MIT.html
 
 Source files within this repository should reference this identifier in their leading commentary to ensure automated legal compliance and artifact scanning.
+
+## 2. Commercial Use Rights
+
+Under the MIT License, commercial exploitation of ORYN-AI is expressly permitted without royalty obligations or fee assessments:
+
+- **Enterprise Deployment**: You may deploy ORYN-AI within proprietary internal business environments.
+- **SaaS & Cloud Hosting**: You may offer hosted versions, multi-tenant services, or cloud API endpoints utilizing ORYN-AI software.
+- **Commercial Bundling**: You may bundle, embed, or sell ORYN-AI components alongside proprietary software suites.
