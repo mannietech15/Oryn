@@ -295,3 +295,4 @@ export default function Sidebar({ page, onNavigate, isOpen, onClose, organizatio
 // [types] SidebarProps contract
 // [perf] Smooth sidebar transitions
 // [style] Tools section header tracking
+// [refactor] Validated route mappings
