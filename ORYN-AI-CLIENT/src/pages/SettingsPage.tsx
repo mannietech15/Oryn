@@ -602,3 +602,4 @@ function LiveIntegrationCard({ integration, isTesting, onTest }: { integration: 
 // [style] Clean typography letter spacing
 // [final] Centered layout verified
 // [feat] TabPill component definition
+// [style] Active pill orange highlight
