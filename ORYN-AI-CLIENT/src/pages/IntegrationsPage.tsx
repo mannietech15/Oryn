@@ -340,3 +340,4 @@ export default function IntegrationsPage() {
 // [style] Micro-interaction transitions
 // [refactor] Toast notification binding
 // [perf] Optimized SVG viewBox rendering
+// [docs] Maintenance documentation
