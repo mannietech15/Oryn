@@ -556,3 +556,4 @@ function LiveIntegrationCard({ integration, isTesting, onTest }: { integration: 
 // [style] Top status badges: SYNCHRONIZED & PREFERENCES
 // [style] Pulsing indicator dot
 // [refactor] Clear title and subtitle hierarchy
+// [style] 20px rounded card container
