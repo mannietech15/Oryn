@@ -335,3 +335,4 @@ export default function IntegrationsPage() {
 // [docs] Offline snapshot documentation
 // [perf] Zero CLS guaranteed
 // [style] WCAG AA contrast ratio
+// [refactor] Degraded state indicator
