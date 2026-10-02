@@ -173,3 +173,4 @@ export const defaultEmailService = new EmailService();
 // [style] Standardized error log prefixes
 // [perf] Non-blocking queue inspection
 // [fix] Reset cache if config is refreshed
+// [trace] Debug log cache status
