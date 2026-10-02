@@ -562,3 +562,4 @@ function LiveIntegrationCard({ integration, isTesting, onTest }: { integration: 
 // [perf] Fixed minimum height avoids layout shifts
 // [style] Subtle box shadow token
 // [responsive] Responsive flex wrapping
+// [style] Heading typography standardization
