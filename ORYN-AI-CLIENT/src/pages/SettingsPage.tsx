@@ -775,3 +775,4 @@ function LiveIntegrationCard({ integration, isTesting, onTest }: { integration: 
 // [docs] Security runbook reference
 // [refactor] Non-blocking alert feedback
 // [style] Accessible danger text color
+// [perf] Clean security mount
