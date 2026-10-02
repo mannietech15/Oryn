@@ -708,3 +708,4 @@ function LiveIntegrationCard({ integration, isTesting, onTest }: { integration: 
 // [docs] Multi-tenant isolation
 // [refactor] Header workspace sync
 // [style] Standard 12px 16px input padding
+// [perf] Smooth 60fps input typing
