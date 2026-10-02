@@ -84,3 +84,14 @@ export function NotionLogo({ size = 20, style }: LogoProps) {
     </svg>
   );
 }
+
+export function GoogleAnalyticsLogo({ size = 20, style }: LogoProps) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" style={style}>
+      <rect width="24" height="24" rx="5" fill="#F9AB00" opacity="0.1" />
+      <path d="M12 7a2.5 2.5 0 0 1 2.5 2.5V17a2.5 2.5 0 0 1-5 0V9.5A2.5 2.5 0 0 1 12 7z" fill="#F9AB00" />
+      <path d="M18.5 12a2.5 2.5 0 0 1 2.5 2.5V17a2.5 2.5 0 0 1-5 0v-2.5a2.5 2.5 0 0 1 2.5-2.5z" fill="#E37400" />
+      <path d="M5.5 14.5A2.5 2.5 0 0 1 8 17v0a2.5 2.5 0 0 1-5 0v0a2.5 2.5 0 0 1 2.5-2.5z" fill="#F9AB00" />
+    </svg>
+  );
+}
