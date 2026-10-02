@@ -715,3 +715,4 @@ function LiveIntegrationCard({ integration, isTesting, onTest }: { integration: 
 // [docs] Inline sync comments
 // [a11y] Enter key form submission
 // [style] Initials computation fallback
+// [perf] Dirty-state check before save
