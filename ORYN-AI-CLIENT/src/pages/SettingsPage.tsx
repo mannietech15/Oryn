@@ -694,3 +694,4 @@ function LiveIntegrationCard({ integration, isTesting, onTest }: { integration: 
 // [feat] Datastore update handler
 // [style] Save button loading state
 // [feat] Success notification banner
+// [refactor] Auto-dismiss timer
