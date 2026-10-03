@@ -142,30 +142,11 @@ export default function IntegrationsPage() {
         {/* Header */}
         <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between' }}>
           <div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 8 }}>
-              <div style={{
-                display: 'inline-flex', alignItems: 'center', gap: 6,
-                padding: '3px 10px', borderRadius: 6,
-                background: 'rgba(34, 197, 94, 0.08)', border: '1px solid rgba(34, 197, 94, 0.2)',
-                fontSize: 11, fontWeight: 600, color: 'var(--success)', fontFamily: 'monospace'
-              }}>
-                <span style={{ width: 6, height: 6, borderRadius: '50%', background: 'var(--success)', display: 'inline-block' }} />
-                INFRASTRUCTURE PROBE: ACTIVE
-              </div>
-              <div style={{
-                padding: '3px 10px', borderRadius: 6,
-                background: 'var(--glass-bg-subtle)', border: '1px solid var(--card-border)',
-                fontSize: 11, color: 'var(--text-muted)', fontFamily: 'monospace'
-              }}>
-                TRUTHFUL SERVICE DISCOVERY
-              </div>
-            </div>
-
             <div style={{ fontFamily: 'var(--font-display)', fontSize: 28, fontWeight: 700, color: 'var(--text-primary)', letterSpacing: -0.5 }}>
-              Connected Enterprise Infrastructure
+              Integrations & Connected Services
             </div>
             <div style={{ fontSize: 13, color: 'var(--text-secondary)', marginTop: 2 }}>
-              Inspect live communication relays, inference endpoints, and external gateway connection states.
+              Manage communication relays, API services, and external application connections.
             </div>
           </div>
 
