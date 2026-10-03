@@ -6,7 +6,7 @@ import { fetchOrganization, updateCompany, fetchIntegrations, testIntegration } 
 type Tab = 'account' | 'preferences' | 'ai' | 'integrations' | 'security';
 type Persona = 'executive' | 'creative' | 'analytical' | 'developer';
 
-export default function SettingsPage() {
+export default function SettingsPage({ onLogout }: { onLogout?: () => void } = {}) {
   const [activeTab, setActiveTab] = useState<Tab>('ai');
 
   // Form States persisted with localStorage fallback and server sync
@@ -299,7 +299,7 @@ export default function SettingsPage() {
                 </div>
               </div>
 
-              <div style={{ marginTop: 28, display: 'flex', justifyContent: 'flex-start' }}>
+              <div style={{ marginTop: 28, display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 16 }}>
                 <button 
                   onClick={handleSaveAccount}
                   disabled={savingAccount}
@@ -307,6 +307,38 @@ export default function SettingsPage() {
                 >
                   {savingAccount ? 'Saving to Datastore...' : 'Save Changes'}
                 </button>
+
+                {onLogout && (
+                  <button
+                    type="button"
+                    onClick={onLogout}
+                    style={{
+                      padding: '11px 20px',
+                      background: 'rgba(239, 68, 68, 0.08)',
+                      border: '1px solid rgba(239, 68, 68, 0.25)',
+                      borderRadius: 12,
+                      color: '#ef4444',
+                      fontWeight: 600,
+                      fontSize: 13.5,
+                      cursor: 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 8,
+                      transition: 'all 0.2s'
+                    }}
+                    onMouseEnter={e => {
+                      e.currentTarget.style.background = 'rgba(239, 68, 68, 0.16)';
+                      e.currentTarget.style.borderColor = 'rgba(239, 68, 68, 0.4)';
+                    }}
+                    onMouseLeave={e => {
+                      e.currentTarget.style.background = 'rgba(239, 68, 68, 0.08)';
+                      e.currentTarget.style.borderColor = 'rgba(239, 68, 68, 0.25)';
+                    }}
+                  >
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
+                    Log Out of Session
+                  </button>
+                )}
               </div>
             </SettingsSection>
           )}
@@ -404,9 +436,32 @@ export default function SettingsPage() {
               <div style={{ padding: 24, background: 'rgba(239, 68, 68, 0.05)', border: '1px solid rgba(239, 68, 68, 0.2)', borderRadius: 16 }}>
                 <div style={{ fontWeight: 600, color: 'var(--danger)', marginBottom: 4 }}>Enterprise Session Audit</div>
                 <div style={{ fontSize: 13, color: 'var(--text-secondary)', marginBottom: 16 }}>All administrative modifications to datastore records are recorded to JSON execution logs.</div>
-                <button onClick={() => alert('Operational session verified. Current session token is cryptographically bound.')} style={{ padding: '8px 16px', background: 'var(--glass-bg-subtle)', color: 'var(--text-primary)', border: '1px solid var(--card-border)', borderRadius: 8, fontWeight: 600, fontSize: 13, cursor: 'pointer' }}>
-                  Verify Active Session
-                </button>
+                <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
+                  <button onClick={() => alert('Operational session verified. Current session token is cryptographically bound.')} style={{ padding: '8px 16px', background: 'var(--glass-bg-subtle)', color: 'var(--text-primary)', border: '1px solid var(--card-border)', borderRadius: 8, fontWeight: 600, fontSize: 13, cursor: 'pointer' }}>
+                    Verify Active Session
+                  </button>
+                  {onLogout && (
+                    <button 
+                      onClick={onLogout} 
+                      style={{ 
+                        padding: '8px 16px', 
+                        background: 'rgba(239, 68, 68, 0.1)', 
+                        color: '#ef4444', 
+                        border: '1px solid rgba(239, 68, 68, 0.3)', 
+                        borderRadius: 8, 
+                        fontWeight: 600, 
+                        fontSize: 13, 
+                        cursor: 'pointer',
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: 6
+                      }}
+                    >
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
+                      Terminate & Log Out
+                    </button>
+                  )}
+                </div>
               </div>
             </SettingsSection>
           )}

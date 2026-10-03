@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Sidebar from './components/Sidebar';
 import ChatPage from './pages/ChatPage';
 import DashboardPage from './pages/DashboardPage';
@@ -12,12 +12,55 @@ import AutomationPage from './pages/AutomationPage';
 import IntegrationsPage from './pages/IntegrationsPage';
 import DocumentsPage from './pages/DocumentsPage';
 import CalendarPage from './pages/CalendarPage';
+import AuthPage from './pages/AuthPage';
+import { useNavigate, useLocation } from 'react-router-dom';
 import type { Page } from './types';
 import { useChat } from './hooks/useChat';
 import { Toaster } from './components/ui/Toaster';
+import { toast } from './components/ui/use-toast';
+import { authService, UserProfile } from './services/auth.service';
+
+const VALID_PAGES: Page[] = [
+  'chat', 'dashboard', 'analytics', 'organization', 'financials',
+  'explore', 'settings', 'automation', 'integrations', 'documents',
+  'calendar', 'add-organization'
+];
 
 export default function App() {
-  const [page, setPage] = useState<Page>('chat');
+  const routerNavigate = useNavigate();
+  const location = useLocation();
+
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(() => {
+    return authService.isAuthenticated();
+  });
+
+  const [currentUser, setCurrentUser] = useState<UserProfile>(() => {
+    const user = authService.getUser();
+    return user || {
+      id: 'usr_default',
+      name: 'Mannie Tech',
+      email: 'mannietech@oryn.ai',
+      role: 'Verified Administrator',
+      organization: 'Skillbridge Global'
+    };
+  });
+
+  useEffect(() => {
+    authService.getMe().then(user => {
+      if (user) {
+        setCurrentUser(user);
+        setIsAuthenticated(true);
+      }
+    }).catch(() => {
+      // Offline fallback preserves current session
+    });
+  }, []);
+
+  const pathSlug = location.pathname.replace(/^\/+/, '').split('/')[0];
+  const page: Page = (pathSlug && VALID_PAGES.includes(pathSlug as Page))
+    ? (pathSlug as Page)
+    : 'chat';
+
   const [isSidebarOpen, setIsSidebarOpen] = useState(() => {
     if (typeof window !== 'undefined') return window.innerWidth > 768;
     return true;
@@ -33,6 +76,24 @@ export default function App() {
   });
   const chat = useChat();
 
+  const handleLogin = (user: UserProfile) => {
+    setCurrentUser(user);
+    setIsAuthenticated(true);
+    toast({
+      title: 'Welcome to Oryn',
+      description: `Authenticated as ${user.name} (${user.role}).`
+    });
+  };
+
+  const handleLogout = async () => {
+    await authService.logout();
+    setIsAuthenticated(false);
+    toast({
+      title: 'Signed Out',
+      description: 'You have been safely logged out of your active workspace session.'
+    });
+  };
+
   const handleCompleteOrg = (data: any) => {
     setOrgProfile(data);
     localStorage.setItem('oryn_orgProfile', JSON.stringify(data));
@@ -41,9 +102,20 @@ export default function App() {
 
   const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
   const navigate = (p: Page) => {
-    setPage(p);
-    setIsSidebarOpen(false);
+    routerNavigate(p === 'chat' ? '/' : `/${p}`);
+    if (typeof window !== 'undefined' && window.innerWidth <= 768) {
+      setIsSidebarOpen(false);
+    }
   };
+
+  if (!isAuthenticated) {
+    return (
+      <>
+        <Toaster />
+        <AuthPage onLogin={handleLogin} />
+      </>
+    );
+  }
 
   const renderPage = () => {
     switch (page) {
@@ -53,7 +125,7 @@ export default function App() {
       case 'organization': return <OrganizationPage />;
       case 'financials':   return <FinancialsPage />;
       case 'explore':      return <ExplorePage />;
-      case 'settings':     return <SettingsPage />;
+      case 'settings':     return <SettingsPage onLogout={handleLogout} />;
       case 'automation':   return <AutomationPage />;
       case 'integrations': return <IntegrationsPage />;
       case 'documents':    return <DocumentsPage />;
@@ -101,6 +173,9 @@ export default function App() {
             onSelectSession={chat.setActiveSessionId}
             organizationName={orgProfile?.name || null}
             organizationLogo={orgProfile?.logo || null}
+            userName={currentUser.name}
+            userEmail={currentUser.email}
+            onLogout={handleLogout}
           />
           <main style={{ 
             flex: 1, 
@@ -109,14 +184,6 @@ export default function App() {
             flexDirection: 'column',
             position: 'relative'
           }}>
-            {/* Desktop Sidebar Toggle */}
-            <div className="desktop-only hide-on-mobile" style={{ position: 'absolute', top: 24, left: 24, zIndex: 100 }}>
-              {!isSidebarOpen && (
-                <button onClick={toggleSidebar} style={{ width: 40, height: 40, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--glass-bg-subtle)', borderRadius: 10, border: '1px solid var(--card-border)', color: 'var(--text-primary)', cursor: 'pointer', backdropFilter: 'blur(10px)', transition: 'all 0.2s' }} onMouseEnter={e => { e.currentTarget.style.background = 'var(--glass-bg-hover)'; e.currentTarget.style.color = 'var(--accent-primary)'; }} onMouseLeave={e => { e.currentTarget.style.background = 'var(--glass-bg-subtle)'; e.currentTarget.style.color = 'var(--text-primary)'; }}>
-                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
-                </button>
-              )}
-            </div>
             {renderPage()}
           </main>
         </div>
