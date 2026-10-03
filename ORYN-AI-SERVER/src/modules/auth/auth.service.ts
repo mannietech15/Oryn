@@ -114,7 +114,7 @@ export class AuthService {
   }
 
   public async register(payload: RegisterPayload): Promise<AuthSession> {
-    const { name, email, password, organization, role } = payload;
+    const { name, email, password, organization, role, location, industry } = payload;
     if (!email || !password || !name) {
       throw new ValidationError('Name, corporate email, and password are required for registration.');
     }
@@ -133,6 +133,8 @@ export class AuthService {
       email: normalizedEmail,
       role: role || 'Verified Administrator',
       organization: organization?.trim() || 'Oryn Enterprise Workspace',
+      location: location?.trim() || '',
+      industry: industry?.trim() || '',
       createdAt: new Date().toISOString(),
       lastLoginAt: new Date().toISOString()
     };

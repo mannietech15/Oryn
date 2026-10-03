@@ -12,6 +12,8 @@ export default function AuthPage({ onLogin }: AuthPageProps) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [organization, setOrganization] = useState('');
+  const [location, setLocation] = useState('');
+  const [industry, setIndustry] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
@@ -24,6 +26,8 @@ export default function AuthPage({ onLogin }: AuthPageProps) {
     setEmail('');
     setPassword('');
     setOrganization('');
+    setLocation('');
+    setIndustry('');
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -52,7 +56,9 @@ export default function AuthPage({ onLogin }: AuthPageProps) {
           name: name.trim(),
           email: cleanEmail,
           password,
-          organization: organization.trim() || 'My Workspace'
+          organization: organization.trim() || 'My Workspace',
+          location: location.trim(),
+          industry: industry.trim()
         });
         onLogin(session.user);
       }
@@ -305,6 +311,74 @@ export default function AuthPage({ onLogin }: AuthPageProps) {
                   value={organization}
                   onChange={e => setOrganization(e.target.value)}
                   placeholder="e.g. Acme Corp"
+                  style={{
+                    width: '100%',
+                    padding: '10px 12px',
+                    background: 'var(--glass-bg-subtle, rgba(255, 255, 255, 0.03))',
+                    border: '1px solid var(--card-border, rgba(255, 255, 255, 0.1))',
+                    borderRadius: 8,
+                    color: 'var(--text-primary, #fff)',
+                    fontSize: 13.5,
+                    outline: 'none',
+                    transition: 'border-color 0.2s'
+                  }}
+                  onFocus={e => (e.target.style.borderColor = 'var(--accent-primary)')}
+                  onBlur={e => (e.target.style.borderColor = 'var(--card-border)')}
+                />
+              </div>
+
+              <div>
+                <label style={{
+                  display: 'block',
+                  fontSize: 11,
+                  fontWeight: 600,
+                  color: 'var(--text-muted, #888)',
+                  textTransform: 'uppercase',
+                  letterSpacing: 0.6,
+                  marginBottom: 6,
+                  fontFamily: 'monospace'
+                }}>
+                  Operational HQ Location
+                </label>
+                <input
+                  type="text"
+                  value={location}
+                  onChange={e => setLocation(e.target.value)}
+                  placeholder="e.g. San Francisco, CA or London, UK"
+                  style={{
+                    width: '100%',
+                    padding: '10px 12px',
+                    background: 'var(--glass-bg-subtle, rgba(255, 255, 255, 0.03))',
+                    border: '1px solid var(--card-border, rgba(255, 255, 255, 0.1))',
+                    borderRadius: 8,
+                    color: 'var(--text-primary, #fff)',
+                    fontSize: 13.5,
+                    outline: 'none',
+                    transition: 'border-color 0.2s'
+                  }}
+                  onFocus={e => (e.target.style.borderColor = 'var(--accent-primary)')}
+                  onBlur={e => (e.target.style.borderColor = 'var(--card-border)')}
+                />
+              </div>
+
+              <div>
+                <label style={{
+                  display: 'block',
+                  fontSize: 11,
+                  fontWeight: 600,
+                  color: 'var(--text-muted, #888)',
+                  textTransform: 'uppercase',
+                  letterSpacing: 0.6,
+                  marginBottom: 6,
+                  fontFamily: 'monospace'
+                }}>
+                  Industry Sector
+                </label>
+                <input
+                  type="text"
+                  value={industry}
+                  onChange={e => setIndustry(e.target.value)}
+                  placeholder="e.g. Enterprise AI, Fintech, Healthcare"
                   style={{
                     width: '100%',
                     padding: '10px 12px',

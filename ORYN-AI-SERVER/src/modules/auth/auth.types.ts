@@ -6,6 +6,8 @@ export interface User {
   email: string;
   role: UserRole;
   organization: string;
+  location?: string;
+  industry?: string;
   avatar?: string;
   createdAt: string;
   lastLoginAt: string;
@@ -28,6 +30,8 @@ export interface RegisterPayload {
   password: string;
   organization?: string;
   role?: UserRole;
+  location?: string;
+  industry?: string;
 }
 
 export interface AuthSession {

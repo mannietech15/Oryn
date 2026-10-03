@@ -31,8 +31,8 @@ export default function EditOrganizationPage({
       .then(res => {
         if (res?.company) {
           if (!name && res.company.name) setName(res.company.name);
-          if (res.company.industry) setIndustry(res.company.industry);
-          if (res.company.location) setLocation(res.company.location);
+          if (!industry && res.company.industry) setIndustry(res.company.industry);
+          if (!location && res.company.location) setLocation(res.company.location);
         }
       })
       .catch(() => {

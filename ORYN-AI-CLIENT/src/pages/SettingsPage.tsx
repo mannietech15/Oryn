@@ -3,19 +3,34 @@ import { useNavigate } from 'react-router-dom';
 import { Plug, CheckCircle2, XCircle, X, Check } from 'lucide-react';
 import { GmailLogo, NvidiaLogo, SlackLogo, StripeLogo, ZendeskLogo, LedgerLogo } from '../components/BrandLogos';
 import { fetchOrganization, updateCompany, fetchIntegrations, testIntegration } from '../api/oryn';
+import { authService, UserProfile } from '../services/auth.service';
 
 type Tab = 'account' | 'preferences' | 'ai' | 'integrations' | 'security';
 type Persona = 'executive' | 'creative' | 'analytical' | 'developer';
 
-export default function SettingsPage({ onLogout }: { onLogout?: () => void } = {}) {
+interface SettingsPageProps {
+  onLogout?: () => void;
+  currentUser?: UserProfile | null;
+  orgProfile?: any;
+}
+
+export default function SettingsPage({ onLogout, currentUser, orgProfile }: SettingsPageProps = {}) {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<Tab>('ai');
 
-  // Form States persisted with localStorage fallback and server sync
-  const [name, setName] = useState(() => localStorage.getItem('oryn_profile_name') || 'Mannie Tech');
-  const [email, setEmail] = useState(() => localStorage.getItem('oryn_profile_email') || 'mannie@oryn.ai');
-  const [companyLocation, setCompanyLocation] = useState('San Francisco, CA');
-  const [companyIndustry, setCompanyIndustry] = useState('Enterprise AI & Workflow Systems');
+  // Form States initialized from authenticated user / scoped organization profile
+  const [name, setName] = useState(() => {
+    return currentUser?.name || authService.getUser()?.name || localStorage.getItem('oryn_profile_name') || '';
+  });
+  const [email, setEmail] = useState(() => {
+    return currentUser?.email || authService.getUser()?.email || localStorage.getItem('oryn_profile_email') || '';
+  });
+  const [companyLocation, setCompanyLocation] = useState(() => {
+    return orgProfile?.location || currentUser?.location || authService.getUser()?.location || localStorage.getItem('oryn_profile_location') || '';
+  });
+  const [companyIndustry, setCompanyIndustry] = useState(() => {
+    return orgProfile?.industry || currentUser?.industry || authService.getUser()?.industry || localStorage.getItem('oryn_profile_industry') || '';
+  });
 
   const [emailNotifs, setEmailNotifs] = useState(() => localStorage.getItem('oryn_pref_email') !== 'false');
   const [pushNotifs, setPushNotifs] = useState(() => localStorage.getItem('oryn_pref_push') === 'true');
@@ -32,14 +47,24 @@ export default function SettingsPage({ onLogout }: { onLogout?: () => void } = {
   const [testingId, setTestingId] = useState<string | null>(null);
   const [testResult, setTestResult] = useState<{ id: string; message: string; connected: boolean } | null>(null);
 
+  // Synchronize state when currentUser or orgProfile props change
+  useEffect(() => {
+    if (currentUser?.name) setName(currentUser.name);
+    if (currentUser?.email) setEmail(currentUser.email);
+    if (currentUser?.location) setCompanyLocation(currentUser.location);
+    if (currentUser?.industry) setCompanyIndustry(currentUser.industry);
+    if (orgProfile?.location) setCompanyLocation(orgProfile.location);
+    if (orgProfile?.industry) setCompanyIndustry(orgProfile.industry);
+  }, [currentUser, orgProfile]);
+
   // Load Organization & Integrations from server
   useEffect(() => {
     fetchOrganization()
       .then(data => {
         if (data?.company) {
-          if (data.company.name) setName(data.company.name);
-          if (data.company.location) setCompanyLocation(data.company.location);
-          if (data.company.industry) setCompanyIndustry(data.company.industry);
+          // Only fallback if not already provided by active user / profile
+          setCompanyLocation((prev: string) => prev ? prev : (data.company.location || ''));
+          setCompanyIndustry((prev: string) => prev ? prev : (data.company.industry || ''));
         }
       })
       .catch(console.error);
@@ -78,12 +103,35 @@ export default function SettingsPage({ onLogout }: { onLogout?: () => void } = {
     setSaveSuccessMsg(null);
     try {
       await updateCompany({
-        name,
+        name: orgProfile?.name || currentUser?.organization || name,
         location: companyLocation,
         industry: companyIndustry,
       });
       localStorage.setItem('oryn_profile_name', name);
       localStorage.setItem('oryn_profile_email', email);
+      localStorage.setItem('oryn_profile_location', companyLocation);
+      localStorage.setItem('oryn_profile_industry', companyIndustry);
+
+      const loggedUser = authService.getUser();
+      if (loggedUser) {
+        const updatedUser: UserProfile = {
+          ...loggedUser,
+          name,
+          email,
+          location: companyLocation,
+          industry: companyIndustry
+        };
+        localStorage.setItem('oryn_auth_user', JSON.stringify(updatedUser));
+        const userKey = `oryn_orgProfile_${loggedUser.id || loggedUser.email}`;
+        const currentOrg = localStorage.getItem(userKey);
+        const parsed = currentOrg ? JSON.parse(currentOrg) : {};
+        localStorage.setItem(userKey, JSON.stringify({
+          ...parsed,
+          location: companyLocation,
+          industry: companyIndustry
+        }));
+      }
+
       setSaveSuccessMsg('Profile and enterprise settings successfully persisted to datastore.');
       setTimeout(() => setSaveSuccessMsg(null), 4000);
     } catch (err: any) {
@@ -244,11 +292,11 @@ export default function SettingsPage({ onLogout }: { onLogout?: () => void } = {
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 32, flexWrap: 'wrap', gap: 16 }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 24 }}>
                   <div style={{ width: 80, height: 80, borderRadius: '50%', background: 'rgba(249,115,22,0.1)', border: '2px solid var(--accent-primary)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 24, color: 'var(--accent-primary)', fontWeight: 800 }}>
-                    {name.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase() || 'MT'}
+                    {name ? name.split(' ').filter(Boolean).map(n => n[0]).join('').slice(0, 2).toUpperCase() : 'U'}
                   </div>
                   <div>
-                    <div style={{ fontSize: 18, fontWeight: 700, color: 'var(--text-primary)', marginBottom: 4 }}>{name}</div>
-                    <div style={{ fontSize: 13, color: 'var(--text-secondary)' }}>Verified Organization Administrator · All privileges granted</div>
+                    <div style={{ fontSize: 18, fontWeight: 700, color: 'var(--text-primary)', marginBottom: 4 }}>{name || 'Workspace User'}</div>
+                    <div style={{ fontSize: 13, color: 'var(--text-secondary)' }}>{currentUser?.role || 'Verified Organization Administrator'} · All privileges granted</div>
                   </div>
                 </div>
                 <button
@@ -272,6 +320,7 @@ export default function SettingsPage({ onLogout }: { onLogout?: () => void } = {
                   <FormLabel>Full / Entity Name</FormLabel>
                   <input 
                     value={name} onChange={e => setName(e.target.value)}
+                    placeholder="e.g. Alex Morgan"
                     style={{ width: '100%', padding: '12px 16px', marginTop: 8, background: 'var(--glass-bg-subtle)', border: '1px solid var(--card-border)', borderRadius: 12, color: 'var(--text-primary)', outline: 'none' }} 
                   />
                 </div>
@@ -279,6 +328,7 @@ export default function SettingsPage({ onLogout }: { onLogout?: () => void } = {
                   <FormLabel>Email Address</FormLabel>
                   <input 
                     value={email} onChange={e => setEmail(e.target.value)}
+                    placeholder="name@company.com"
                     style={{ width: '100%', padding: '12px 16px', marginTop: 8, background: 'var(--glass-bg-subtle)', border: '1px solid var(--card-border)', borderRadius: 12, color: 'var(--text-primary)', outline: 'none' }} 
                   />
                 </div>
@@ -286,6 +336,7 @@ export default function SettingsPage({ onLogout }: { onLogout?: () => void } = {
                   <FormLabel>Operational HQ Location</FormLabel>
                   <input 
                     value={companyLocation} onChange={e => setCompanyLocation(e.target.value)}
+                    placeholder="e.g. San Francisco, CA or London, UK"
                     style={{ width: '100%', padding: '12px 16px', marginTop: 8, background: 'var(--glass-bg-subtle)', border: '1px solid var(--card-border)', borderRadius: 12, color: 'var(--text-primary)', outline: 'none' }} 
                   />
                 </div>
@@ -293,6 +344,7 @@ export default function SettingsPage({ onLogout }: { onLogout?: () => void } = {
                   <FormLabel>Industry Sector</FormLabel>
                   <input 
                     value={companyIndustry} onChange={e => setCompanyIndustry(e.target.value)}
+                    placeholder="e.g. Enterprise AI & Workflow Systems"
                     style={{ width: '100%', padding: '12px 16px', marginTop: 8, background: 'var(--glass-bg-subtle)', border: '1px solid var(--card-border)', borderRadius: 12, color: 'var(--text-primary)', outline: 'none' }} 
                   />
                 </div>

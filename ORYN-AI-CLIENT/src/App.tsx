@@ -34,11 +34,20 @@ const getScopedOrgProfile = (user: UserProfile | null) => {
   if (saved) {
     try {
       const parsed = JSON.parse(saved);
-      if (parsed?.name) return parsed;
+      if (parsed?.name) {
+        if (!parsed.location && user.location) parsed.location = user.location;
+        if (!parsed.industry && user.industry) parsed.industry = user.industry;
+        return parsed;
+      }
     } catch { /* noop */ }
   }
   if (user.organization) {
-    return { name: user.organization, logo: null };
+    return {
+      name: user.organization,
+      location: user.location || '',
+      industry: user.industry || '',
+      logo: null
+    };
   }
   return null;
 };
@@ -175,7 +184,7 @@ export default function App() {
       case 'organization': return <OrganizationPage />;
       case 'financials':   return <FinancialsPage />;
       case 'explore':      return <ExplorePage />;
-      case 'settings':     return <SettingsPage onLogout={handleLogout} />;
+      case 'settings':     return <SettingsPage onLogout={handleLogout} currentUser={currentUser} orgProfile={orgProfile} />;
       case 'automation':   return <AutomationPage />;
       case 'integrations': return <IntegrationsPage />;
       case 'documents':    return <DocumentsPage />;

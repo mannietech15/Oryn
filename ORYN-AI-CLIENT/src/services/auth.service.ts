@@ -4,6 +4,8 @@ export interface UserProfile {
   email: string;
   role: string;
   organization: string;
+  location?: string;
+  industry?: string;
   avatar?: string;
   createdAt?: string;
   lastLoginAt?: string;
@@ -87,7 +89,9 @@ export class ClientAuthService {
           name: email.split('@')[0].replace('.', ' ').replace(/\b\w/g, l => l.toUpperCase()),
           email,
           role: 'Verified Administrator',
-          organization: 'Enterprise Workspace'
+          organization: 'Enterprise Workspace',
+          location: 'HQ: Global Remote',
+          industry: 'Technology & Workflow Systems'
         };
         const fallbackSession: AuthSessionData = {
           token: 'demo_token_' + Date.now(),
@@ -101,7 +105,7 @@ export class ClientAuthService {
     }
   }
 
-  public async register(payload: { name: string; email: string; password: string; organization?: string }): Promise<AuthSessionData> {
+  public async register(payload: { name: string; email: string; password: string; organization?: string; location?: string; industry?: string }): Promise<AuthSessionData> {
     const response = await fetch('/api/auth/register', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -148,9 +152,14 @@ export class ClientAuthService {
       if (response.ok) {
         const res = await response.json();
         if (res.data?.user) {
-          this.user = res.data.user;
-          localStorage.setItem(USER_KEY, JSON.stringify(this.user));
-          return this.user;
+          const fetchedUser: UserProfile = res.data.user;
+          this.user = fetchedUser;
+          localStorage.setItem(USER_KEY, JSON.stringify(fetchedUser));
+          if (fetchedUser.name) localStorage.setItem('oryn_profile_name', fetchedUser.name);
+          if (fetchedUser.email) localStorage.setItem('oryn_profile_email', fetchedUser.email);
+          if (fetchedUser.location) localStorage.setItem('oryn_profile_location', fetchedUser.location);
+          if (fetchedUser.industry) localStorage.setItem('oryn_profile_industry', fetchedUser.industry);
+          return fetchedUser;
         }
       }
     } catch {
@@ -165,6 +174,10 @@ export class ClientAuthService {
     if (typeof window !== 'undefined') {
       localStorage.setItem(TOKEN_KEY, token);
       localStorage.setItem(USER_KEY, JSON.stringify(user));
+      if (user.name) localStorage.setItem('oryn_profile_name', user.name);
+      if (user.email) localStorage.setItem('oryn_profile_email', user.email);
+      if (user.location) localStorage.setItem('oryn_profile_location', user.location);
+      if (user.industry) localStorage.setItem('oryn_profile_industry', user.industry);
       localStorage.removeItem(LOGGED_OUT_KEY);
     }
   }
@@ -175,6 +188,10 @@ export class ClientAuthService {
     if (typeof window !== 'undefined') {
       localStorage.removeItem(TOKEN_KEY);
       localStorage.removeItem(USER_KEY);
+      localStorage.removeItem('oryn_profile_name');
+      localStorage.removeItem('oryn_profile_email');
+      localStorage.removeItem('oryn_profile_location');
+      localStorage.removeItem('oryn_profile_industry');
       localStorage.setItem(LOGGED_OUT_KEY, 'true');
     }
   }

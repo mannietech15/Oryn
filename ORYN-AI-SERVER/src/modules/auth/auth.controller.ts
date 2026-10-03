@@ -37,19 +37,21 @@ export class AuthController {
 
   register = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
-      const { name, email, password, organization, role } = req.body;
-      const session = await this.authService.register({ name, email, password, organization, role });
+      const { name, email, password, organization, role, location, industry } = req.body;
+      const session = await this.authService.register({ name, email, password, organization, role, location, industry });
       if (session.user.organization) {
         const currentOrg = defaultDatastore.getOrganization();
         const baseCompany = currentOrg?.company || {
-          industry: 'Enterprise AI & Workflow Systems',
-          location: 'HQ: Global',
+          industry: industry ? industry.trim() : 'Technology & Workflow Automation',
+          location: location ? location.trim() : 'HQ: Global Remote',
           foundedDate: new Date().toISOString().split('T')[0]
         };
         defaultDatastore.updateOrganization({
           company: {
             ...baseCompany,
-            name: session.user.organization
+            name: session.user.organization,
+            location: location && location.trim() ? location.trim() : (session.user.location || baseCompany.location),
+            industry: industry && industry.trim() ? industry.trim() : (session.user.industry || baseCompany.industry)
           }
         });
       }
