@@ -145,6 +145,12 @@ export class NvidiaProvider implements AIProvider {
     const is429 = msg.includes('429') || status === 429 || msg.toLowerCase().includes('rate-limit') || msg.toLowerCase().includes('rate_limit');
     const is410 = msg.includes('410') || status === 410;
     const is404 = msg.includes('404') || status === 404;
+    const isGpuOomOrServerFailure =
+      status >= 500 ||
+      msg.includes('OutOfMemory') ||
+      msg.includes('CUDA out of memory') ||
+      msg.includes('Engine loop is not running') ||
+      msg.toLowerCase().includes('out of memory');
 
     logger.error('NVIDIA API Error', { model: modelId, error: msg, status });
 
@@ -164,6 +170,15 @@ export class NvidiaProvider implements AIProvider {
         ErrorCode.PROVIDER_UNAVAILABLE,
         503,
         false
+      );
+    }
+    if (isGpuOomOrServerFailure) {
+      return new ProviderError(
+        'Upstream NVIDIA NIM GPU node encountered a transient memory or engine error.',
+        this.name,
+        ErrorCode.PROVIDER_UNAVAILABLE,
+        503,
+        true
       );
     }
     return new ProviderError(msg, this.name, ErrorCode.PROVIDER_ERROR, status, false);
