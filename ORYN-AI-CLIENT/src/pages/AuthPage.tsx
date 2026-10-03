@@ -9,32 +9,50 @@ interface AuthPageProps {
 export default function AuthPage({ onLogin }: AuthPageProps) {
   const [mode, setMode] = useState<'signin' | 'register'>('signin');
   const [name, setName] = useState('');
-  const [email, setEmail] = useState('mannietech@oryn.ai');
-  const [password, setPassword] = useState('••••••••••••');
-  const [organization, setOrganization] = useState('Skillbridge Global');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [organization, setOrganization] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
+  const handleModeChange = (newMode: 'signin' | 'register') => {
+    setMode(newMode);
+    setErrorMessage(null);
+    setName('');
+    setEmail('');
+    setPassword('');
+    setOrganization('');
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsLoading(true);
     setErrorMessage(null);
+
+    const cleanEmail = email.trim();
+    if (!cleanEmail || !password) {
+      setErrorMessage('Please provide both corporate email and password.');
+      return;
+    }
+
+    if (mode === 'register' && !name.trim()) {
+      setErrorMessage('Please provide your full name to create an account.');
+      return;
+    }
+
+    setIsLoading(true);
 
     try {
       if (mode === 'signin') {
-        const session = await authService.login(
-          email,
-          password === '••••••••••••' ? 'password123' : password
-        );
+        const session = await authService.login(cleanEmail, password);
         onLogin(session.user);
       } else {
         const session = await authService.register({
-          name: name.trim() || 'New User',
-          email,
-          password: password === '••••••••••••' ? 'password123' : password,
-          organization: organization.trim() || 'Oryn Enterprise'
+          name: name.trim(),
+          email: cleanEmail,
+          password,
+          organization: organization.trim() || 'My Workspace'
         });
         onLogin(session.user);
       }
@@ -56,8 +74,8 @@ export default function AuthPage({ onLogin }: AuthPageProps) {
     } catch {
       // Local fallback
       const fallbackUser: UserProfile = role === 'admin'
-        ? { id: 'usr_demo_1', name: 'Mannie Tech', email: 'mannietech@oryn.ai', role: 'Verified Administrator', organization: 'Skillbridge Global' }
-        : { id: 'usr_demo_2', name: 'Amara Nwosu', email: 'analyst@oryn.ai', role: 'Quantitative Analyst', organization: 'Skillbridge Global' };
+        ? { id: 'usr_demo_1', name: 'Mannie Tech', email: 'mannietech@oryn.ai', role: 'Verified Administrator', organization: 'Oryn AI Global' }
+        : { id: 'usr_demo_2', name: 'Amara Nwosu', email: 'analyst@oryn.ai', role: 'Quantitative Analyst', organization: 'Oryn AI Analytics' };
       authService.setSession('demo_token', fallbackUser);
       onLogin(fallbackUser);
     } finally {
@@ -167,7 +185,7 @@ export default function AuthPage({ onLogin }: AuthPageProps) {
           }}>
             <button
               type="button"
-              onClick={() => { setMode('signin'); setErrorMessage(null); }}
+              onClick={() => handleModeChange('signin')}
               style={{
                 flex: 1,
                 padding: '7px 0',
@@ -185,7 +203,7 @@ export default function AuthPage({ onLogin }: AuthPageProps) {
             </button>
             <button
               type="button"
-              onClick={() => { setMode('register'); setErrorMessage(null); }}
+              onClick={() => handleModeChange('register')}
               style={{
                 flex: 1,
                 padding: '7px 0',
@@ -252,7 +270,7 @@ export default function AuthPage({ onLogin }: AuthPageProps) {
                   required
                   value={name}
                   onChange={e => setName(e.target.value)}
-                  placeholder="Mannie Tech"
+                  placeholder="e.g. Alex Morgan"
                   style={{
                     width: '100%',
                     padding: '10px 12px',
@@ -286,7 +304,7 @@ export default function AuthPage({ onLogin }: AuthPageProps) {
                   type="text"
                   value={organization}
                   onChange={e => setOrganization(e.target.value)}
-                  placeholder="Skillbridge Global"
+                  placeholder="e.g. Acme Corp"
                   style={{
                     width: '100%',
                     padding: '10px 12px',
@@ -323,7 +341,7 @@ export default function AuthPage({ onLogin }: AuthPageProps) {
               required
               value={email}
               onChange={e => setEmail(e.target.value)}
-              placeholder="mannietech@oryn.ai"
+              placeholder="name@company.com"
               style={{
                 width: '100%',
                 padding: '10px 12px',
@@ -372,7 +390,7 @@ export default function AuthPage({ onLogin }: AuthPageProps) {
               required
               value={password}
               onChange={e => setPassword(e.target.value)}
-              placeholder="••••••••••••"
+              placeholder={mode === 'signin' ? 'Enter your password' : 'Create a secure password'}
               style={{
                 width: '100%',
                 padding: '10px 12px',

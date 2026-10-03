@@ -87,7 +87,7 @@ export class ClientAuthService {
           name: email.split('@')[0].replace('.', ' ').replace(/\b\w/g, l => l.toUpperCase()),
           email,
           role: 'Verified Administrator',
-          organization: 'Skillbridge Global'
+          organization: 'Enterprise Workspace'
         };
         const fallbackSession: AuthSessionData = {
           token: 'demo_token_' + Date.now(),
