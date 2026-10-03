@@ -23,7 +23,7 @@ import { authService, UserProfile } from './services/auth.service';
 const VALID_PAGES: Page[] = [
   'chat', 'dashboard', 'analytics', 'organization', 'financials',
   'explore', 'settings', 'automation', 'integrations', 'documents',
-  'calendar', 'add-organization'
+  'calendar', 'add-organization', 'edit-organization'
 ];
 
 const getScopedOrgProfile = (user: UserProfile | null) => {
