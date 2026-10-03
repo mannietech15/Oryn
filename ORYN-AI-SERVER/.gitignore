@@ -2,3 +2,5 @@ node_modules/
 dist/
 .env
 *.log
+data/oryn-auth.json
+data/test-*.json

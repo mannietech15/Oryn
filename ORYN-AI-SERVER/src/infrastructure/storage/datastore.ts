@@ -598,6 +598,11 @@ export class Datastore {
     return item;
   }
 
+  getEmailDraft(id: string): EmailLogRecord | null {
+    if (!this.cache) return null;
+    return this.cache.emailLogs.find(e => e.id === id) || null;
+  }
+
   getEmailLogs(limit: number = 20): EmailLogRecord[] {
     return (this.cache?.emailLogs || []).slice(0, limit);
   }
