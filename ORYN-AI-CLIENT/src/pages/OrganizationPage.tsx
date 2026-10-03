@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
-import { UserPlus, Download } from 'lucide-react';
+import { UserPlus, Download, Edit3 } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import type { Company, Employee, Team } from '../types';
 
 import { fetchOrganization, updateOrganizationData } from '../api/oryn';
@@ -15,6 +16,7 @@ import {
 } from '../components/OrganizationComponents';
 
 export default function OrganizationPage() {
+  const navigate = useNavigate();
   const [company, setCompany] = useState<Company>({
     name: 'Oryn AI Corp',
     industry: 'Enterprise AI & Workflow Systems',
@@ -131,6 +133,18 @@ export default function OrganizationPage() {
               }}
             >
               <Download size={14} /> Export
+            </button>
+            <button
+              onClick={() => navigate('/edit-organization')}
+              style={{
+                padding: '8px 14px', background: 'var(--glass-bg-subtle)', color: 'var(--text-primary)',
+                border: '1px solid var(--card-border)', borderRadius: 8, fontWeight: 600, fontSize: 13, cursor: 'pointer',
+                display: 'flex', alignItems: 'center', gap: 6, transition: 'all 0.2s ease'
+              }}
+              onMouseEnter={e => e.currentTarget.style.borderColor = 'var(--accent-primary)'}
+              onMouseLeave={e => e.currentTarget.style.borderColor = 'var(--card-border)'}
+            >
+              <Edit3 size={14} /> Edit Profile
             </button>
             <button
               onClick={() => setShowAddMember(true)}

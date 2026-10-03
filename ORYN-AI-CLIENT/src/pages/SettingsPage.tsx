@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Plug, CheckCircle2, XCircle, X, Check } from 'lucide-react';
 import { GmailLogo, NvidiaLogo, SlackLogo, StripeLogo, ZendeskLogo, LedgerLogo } from '../components/BrandLogos';
 import { fetchOrganization, updateCompany, fetchIntegrations, testIntegration } from '../api/oryn';
@@ -7,6 +8,7 @@ type Tab = 'account' | 'preferences' | 'ai' | 'integrations' | 'security';
 type Persona = 'executive' | 'creative' | 'analytical' | 'developer';
 
 export default function SettingsPage({ onLogout }: { onLogout?: () => void } = {}) {
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<Tab>('ai');
 
   // Form States persisted with localStorage fallback and server sync
@@ -258,14 +260,30 @@ export default function SettingsPage({ onLogout }: { onLogout?: () => void } = {
           {/* --- ACCOUNT TAB --- */}
           {activeTab === 'account' && (
             <SettingsSection title="Account Details" description="Manage your verified workspace identity and organization profile.">
-              <div style={{ display: 'flex', alignItems: 'center', gap: 24, marginBottom: 32 }}>
-                <div style={{ width: 80, height: 80, borderRadius: '50%', background: 'rgba(249,115,22,0.1)', border: '2px solid var(--accent-primary)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 24, color: 'var(--accent-primary)', fontWeight: 800 }}>
-                  {name.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase() || 'MT'}
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 32, flexWrap: 'wrap', gap: 16 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 24 }}>
+                  <div style={{ width: 80, height: 80, borderRadius: '50%', background: 'rgba(249,115,22,0.1)', border: '2px solid var(--accent-primary)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 24, color: 'var(--accent-primary)', fontWeight: 800 }}>
+                    {name.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase() || 'MT'}
+                  </div>
+                  <div>
+                    <div style={{ fontSize: 18, fontWeight: 700, color: 'var(--text-primary)', marginBottom: 4 }}>{name}</div>
+                    <div style={{ fontSize: 13, color: 'var(--text-secondary)' }}>Verified Organization Administrator · All privileges granted</div>
+                  </div>
                 </div>
-                <div>
-                  <div style={{ fontSize: 18, fontWeight: 700, color: 'var(--text-primary)', marginBottom: 4 }}>{name}</div>
-                  <div style={{ fontSize: 13, color: 'var(--text-secondary)' }}>Verified Organization Administrator · All privileges granted</div>
-                </div>
+                <button
+                  type="button"
+                  onClick={() => navigate('/edit-organization')}
+                  style={{
+                    padding: '8px 16px', background: 'rgba(249, 115, 22, 0.1)', border: '1px solid rgba(249, 115, 22, 0.3)',
+                    borderRadius: 8, color: 'var(--accent-primary)', fontSize: 12.5, fontWeight: 600, cursor: 'pointer',
+                    display: 'inline-flex', alignItems: 'center', gap: 6, transition: 'all 0.2s'
+                  }}
+                  onMouseEnter={e => e.currentTarget.style.background = 'rgba(249, 115, 22, 0.2)'}
+                  onMouseLeave={e => e.currentTarget.style.background = 'rgba(249, 115, 22, 0.1)'}
+                >
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
+                  Edit Organization Profile & Logo
+                </button>
               </div>
 
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 24 }}>
