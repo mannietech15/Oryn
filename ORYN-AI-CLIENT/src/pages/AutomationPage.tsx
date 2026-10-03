@@ -89,7 +89,7 @@ export default function AutomationPage() {
 
   return (
     <div style={{ flex: 1, overflowY: 'auto', padding: '36px 40px', background: 'var(--bg)', position: 'relative' }}>
-      <div style={{ maxWidth: 1200, margin: '0 auto', display: 'flex', flexDirection: 'column', gap: 28 }}>
+      <div style={{ width: '100%', display: 'flex', flexDirection: 'column', gap: 28 }}>
         
         {/* Header */}
         <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between' }}>
@@ -132,7 +132,7 @@ export default function AutomationPage() {
         )}
 
         {/* Operational Telemetry Summary */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 16 }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: 16 }}>
           {[
             { label: 'Registered Workflows', value: stats ? `${stats.totalWorkflows}` : '...', sub: `${stats?.activeWorkflows || 0} active daemons` },
             { label: 'Total Executions', value: stats ? `${stats.totalExecutions}` : '...', sub: 'Historical runs recorded' },
@@ -202,7 +202,7 @@ export default function AutomationPage() {
                           {wf.status.toUpperCase()}
                         </span>
                       </div>
-                      <div style={{ fontSize: 13, color: 'var(--text-secondary)', maxWidth: 800, lineHeight: 1.5 }}>
+                      <div style={{ fontSize: 13, color: 'var(--text-secondary)', maxWidth: '100%', lineHeight: 1.5 }}>
                         {wf.description}
                       </div>
                     </div>
