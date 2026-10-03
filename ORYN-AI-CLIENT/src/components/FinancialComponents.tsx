@@ -281,7 +281,7 @@ export function FiscalChart({ entries }: FiscalChartProps) {
   }
 
   return (
-    <div style={{ width: '100%', height: 280, marginTop: 10 }}>
+    <div style={{ width: '100%', height: 320, marginTop: 10 }}>
       <ResponsiveContainer width="100%" height="100%">
         <AreaChart data={chartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
           <defs>
@@ -733,7 +733,7 @@ export function LedgerTransactionList({ entries, loading = false }: LedgerTransa
 
       {/* Transaction List Entries */}
       {!loading && filteredEntries.length > 0 && (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 10, maxHeight: 440, overflowY: 'auto', paddingRight: 4 }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 10, maxHeight: 520, overflowY: 'auto', paddingRight: 4 }}>
           {filteredEntries.map((entry, idx) => (
             <TransactionItem key={entry.id || `${entry.date}-${idx}`} entry={entry} />
           ))}
