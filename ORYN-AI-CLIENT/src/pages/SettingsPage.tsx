@@ -126,7 +126,7 @@ export default function SettingsPage({ onLogout }: { onLogout?: () => void } = {
 
   return (
     <div style={{ flex: 1, overflowY: 'auto', padding: '36px 40px', background: 'var(--bg)', position: 'relative' }}>
-      <div className="page-centered-container">
+      <div className="page-fullwidth-container" style={{ width: '100%', display: 'flex', flexDirection: 'column', gap: 28 }}>
         
         {/* Header */}
         <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', flexWrap: 'wrap', gap: 16 }}>
