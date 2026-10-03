@@ -135,7 +135,7 @@ export default function DashboardPage({ orgProfile, currentUser }: DashboardPage
   const dateStr  = time.toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' });
 
   const hour = time.getHours();
-  const greeting = hour < 12 ? 'Good Morning,' : hour < 18 ? 'Good Afternoon,' : 'Good Evening,';
+  const greeting = hour < 12 ? 'Good Morning' : hour < 18 ? 'Good Afternoon' : 'Good Evening';
 
   /* Workspace / Business context */
   const businessName = orgProfile?.name || 'ORYN Core';
