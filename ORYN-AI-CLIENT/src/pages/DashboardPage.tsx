@@ -137,8 +137,10 @@ export default function DashboardPage({ orgProfile, currentUser }: DashboardPage
   const hour = time.getHours();
   const greeting = hour < 12 ? 'Good Morning' : hour < 18 ? 'Good Afternoon' : 'Good Evening';
 
-  /* Workspace / Business context */
-  const businessName = orgProfile?.name || 'ORYN Core';
+  /* User & Organization identity context */
+  const activeUser = currentUser || authService.getUser();
+  const userName = activeUser?.name || localStorage.getItem('oryn_profile_name') || 'Administrator';
+  const businessName = orgProfile?.name || activeUser?.organization || 'ORYN Core';
 
   /* ── Dynamic System State ── */
   const [financials, setFinancials]         = useState<{ metrics: any; entries: any[] } | null>(null);
@@ -341,7 +343,7 @@ export default function DashboardPage({ orgProfile, currentUser }: DashboardPage
           <div>
             <div className="dashboard-header-text" style={{ display: 'flex', alignItems: 'baseline', gap: 8 }}>
               <span style={{ fontFamily: 'var(--font-display)', fontSize: 26, fontWeight: 700, color: 'var(--text-primary)', letterSpacing: '-0.02em' }}>{greeting},</span>
-              <span style={{ fontFamily: 'var(--font-display)', fontSize: 26, fontWeight: 700, color: 'var(--accent-primary)', letterSpacing: '-0.02em' }}>{businessName}</span>
+              <span style={{ fontFamily: 'var(--font-display)', fontSize: 26, fontWeight: 700, color: 'var(--accent-primary)', letterSpacing: '-0.02em' }}>{userName}</span>
             </div>
             <div style={{ fontSize: 13, color: 'var(--text-secondary)', marginTop: 2 }}>
               Enterprise Operations & Overview
