@@ -13,6 +13,7 @@ import type {
   CommandResult, DashboardBriefing, DashboardAlert,
   DashboardGoal, HealthScore,
 } from '../types';
+import { authService, UserProfile } from '../services/auth.service';
 
 /* ─── Shared Components ───────────────────────────────────── */
 function Card({ title, subtitle, children, style = {}, delay = 0, action }: any) {
@@ -121,7 +122,12 @@ function useTypewriter(text: string, speed = 18) {
 }
 
 /* ─── Main Page ──────────────────────────────────────────── */
-export default function DashboardPage({ orgProfile }: { orgProfile?: any }) {
+export interface DashboardPageProps {
+  orgProfile?: any;
+  currentUser?: UserProfile | null;
+}
+
+export default function DashboardPage({ orgProfile, currentUser }: DashboardPageProps = {}) {
   /* Clock */
   const [time, setTime] = useState(new Date());
   useEffect(() => { const t = setInterval(() => setTime(new Date()), 1000); return () => clearInterval(t); }, []);
