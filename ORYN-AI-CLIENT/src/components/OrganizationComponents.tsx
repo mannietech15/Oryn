@@ -142,39 +142,89 @@ export interface OrgKpiData {
 export function OrgKpiGrid({ items, loading }: { items: OrgKpiData[]; loading?: boolean }) {
   return (
     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: 16 }}>
-      {items.map((k, i) => (
-        <div 
-          key={i} 
-          style={{
-            background: 'var(--card-bg)', 
-            border: '1px solid var(--card-border)', 
-            borderRadius: 14, 
-            padding: '20px', 
-            display: 'flex', 
-            flexDirection: 'column', 
-            gap: 8,
-            boxShadow: 'var(--shadow-subtle)',
-            transition: 'transform 0.2s ease, border-color 0.2s ease'
-          }}
-        >
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-            <span style={{ fontSize: 11, fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: 0.5 }}>
-              {k.label}
-            </span>
-            <span style={{ color: k.accent }}>{k.icon}</span>
+      {items.map((k, i) => {
+        const valStr = String(k.value || '');
+        const isUrl = valStr.includes('.') || valStr.startsWith('http') || valStr.includes('HQ:');
+
+        let fontSize = 26;
+        if (valStr.length > 20) {
+          fontSize = 14;
+        } else if (valStr.length > 14) {
+          fontSize = 16.5;
+        } else if (valStr.length > 9) {
+          fontSize = 20;
+        }
+
+        return (
+          <div 
+            key={i} 
+            style={{
+              background: 'var(--card-bg)', 
+              border: '1px solid var(--card-border)', 
+              borderRadius: 14, 
+              padding: '20px', 
+              display: 'flex', 
+              flexDirection: 'column', 
+              gap: 8,
+              boxShadow: 'var(--shadow-subtle)',
+              transition: 'transform 0.2s ease, border-color 0.2s ease'
+            }}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+              <span style={{ fontSize: 11, fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: 0.5 }}>
+                {k.label}
+              </span>
+              <span style={{ color: k.accent }}>{k.icon}</span>
+            </div>
+            <div style={{ 
+              fontSize, 
+              fontFamily: isUrl ? 'var(--font-sans, system-ui)' : 'var(--font-display)', 
+              fontWeight: 700, 
+              color: 'var(--text-primary)',
+              wordBreak: 'break-word',
+              overflowWrap: 'anywhere',
+              lineHeight: 1.25,
+              minHeight: 34,
+              display: 'flex',
+              alignItems: 'center'
+            }}>
+              {loading ? '...' : (
+                isUrl && valStr.toLowerCase().includes('.app') ? (
+                  <span style={{
+                    fontSize: 13.5,
+                    fontFamily: 'monospace',
+                    fontWeight: 600,
+                    color: 'var(--accent-primary)',
+                    background: 'rgba(249, 115, 22, 0.08)',
+                    padding: '4px 10px',
+                    borderRadius: 8,
+                    border: '1px solid rgba(249, 115, 22, 0.2)',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: 6,
+                    maxWidth: '100%',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    whiteSpace: 'nowrap'
+                  }} title={valStr}>
+                    <span style={{ width: 6, height: 6, borderRadius: '50%', background: 'var(--success)', flexShrink: 0 }} />
+                    {valStr}
+                  </span>
+                ) : (
+                  <span style={{ fontSize }}>{k.value}</span>
+                )
+              )}
+            </div>
+            <div style={{ fontSize: 11, color: 'var(--text-secondary)' }}>
+              {k.detail}
+            </div>
+            <div style={{ borderTop: '1px solid var(--card-border)', paddingTop: 8, marginTop: 4, display: 'flex', justifyContent: 'space-between', fontSize: 10, color: 'var(--text-muted)' }}>
+              <span>{k.source}</span>
+              <span>{k.period}</span>
+            </div>
           </div>
-          <div style={{ fontSize: 26, fontFamily: 'var(--font-display)', fontWeight: 700, color: 'var(--text-primary)' }}>
-            {loading ? '...' : k.value}
-          </div>
-          <div style={{ fontSize: 11, color: 'var(--text-secondary)' }}>
-            {k.detail}
-          </div>
-          <div style={{ borderTop: '1px solid var(--card-border)', paddingTop: 8, marginTop: 4, display: 'flex', justifyContent: 'space-between', fontSize: 10, color: 'var(--text-muted)' }}>
-            <span>{k.source}</span>
-            <span>{k.period}</span>
-          </div>
-        </div>
-      ))}
+        );
+      })}
     </div>
   );
 }
