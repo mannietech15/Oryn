@@ -328,7 +328,7 @@ export default function DashboardPage({ orgProfile }: { orgProfile?: any }) {
 
   return (
     <div className="dashboard-container" style={{ flex: 1, overflowY: 'auto', padding: '36px 40px', background: 'var(--bg)', position: 'relative' }}>
-      <div style={{ maxWidth: 1280, margin: '0 auto', position: 'relative', zIndex: 1, display: 'flex', flexDirection: 'column', gap: 28 }}>
+      <div style={{ width: '100%', position: 'relative', zIndex: 1, display: 'flex', flexDirection: 'column', gap: 28 }}>
         
         {/* ── Credible Header with Real System Status ── */}
         <div className="mobile-stack" style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between' }}>
