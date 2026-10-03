@@ -176,10 +176,10 @@ export class Datastore {
   private getDefaultData(): DatabaseSchema {
     return {
       financialEntries: [
-        { id: 'f-1', type: 'revenue', category: 'Enterprise Subscriptions', amount: 4200, date: new Date(Date.now() - 86400000 * 5).toISOString().split('T')[0], note: 'Monthly Stripe recurring subscription tranche', createdAt: new Date(Date.now() - 86400000 * 5).toISOString() },
-        { id: 'f-2', type: 'revenue', category: 'API Usage & Tokens', amount: 2150, date: new Date(Date.now() - 86400000 * 3).toISOString().split('T')[0], note: 'Metered token consumption overages', createdAt: new Date(Date.now() - 86400000 * 3).toISOString() },
-        { id: 'f-3', type: 'expense', category: 'Cloud Infrastructure & GPU', amount: 2450, date: new Date(Date.now() - 86400000 * 7).toISOString().split('T')[0], note: 'NVIDIA NIM compute cluster & AWS relays', createdAt: new Date(Date.now() - 86400000 * 7).toISOString() },
-        { id: 'f-4', type: 'expense', category: 'Operational Engineering', amount: 1650, date: new Date(Date.now() - 86400000 * 12).toISOString().split('T')[0], note: 'Observability & third-party API licensing', createdAt: new Date(Date.now() - 86400000 * 12).toISOString() },
+        { id: 'f-1', type: 'revenue', category: 'Starter Subscriptions', amount: 250, date: new Date(Date.now() - 86400000 * 5).toISOString().split('T')[0], note: 'Early access Stripe subscription tranche', createdAt: new Date(Date.now() - 86400000 * 5).toISOString() },
+        { id: 'f-2', type: 'revenue', category: 'API Usage & Tokens', amount: 120, date: new Date(Date.now() - 86400000 * 3).toISOString().split('T')[0], note: 'Metered token consumption overages', createdAt: new Date(Date.now() - 86400000 * 3).toISOString() },
+        { id: 'f-3', type: 'expense', category: 'Cloud Infrastructure & GPU', amount: 149, date: new Date(Date.now() - 86400000 * 7).toISOString().split('T')[0], note: 'NVIDIA NIM compute cluster & AWS relays', createdAt: new Date(Date.now() - 86400000 * 7).toISOString() },
+        { id: 'f-4', type: 'expense', category: 'Operational Engineering', amount: 90, date: new Date(Date.now() - 86400000 * 12).toISOString().split('T')[0], note: 'Observability & third-party API licensing', createdAt: new Date(Date.now() - 86400000 * 12).toISOString() },
       ],
       aiTaskLogs: [
         { id: 'task-init-1', type: 'chat', model: 'meta/llama-3.2-11b-vision-instruct', latencyMs: 245, tokensUsed: 420, status: 'success', timestamp: new Date(Date.now() - 600000).toISOString() },
@@ -225,9 +225,9 @@ export class Datastore {
           createdAt: new Date(Date.now() - 86400000 * 15).toISOString(),
           lastRunAt: new Date(Date.now() - 180000).toISOString(),
           nextRunAt: new Date(Date.now() + 120000).toISOString(),
-          runCount: 1120,
-          successCount: 1118,
-          failureCount: 2
+          runCount: 42,
+          successCount: 41,
+          failureCount: 1
         }
       ],
       workflowExecutionLogs: [
@@ -286,7 +286,7 @@ export class Datastore {
           title: 'Infrastructure & Inference Architecture Sync',
           time: '10:00 AM - 10:45 AM',
           type: 'internal',
-          attendees: ['Alex Chen', 'Jordan Lee'],
+          attendees: ['Chukwudi Okafor', 'Babatunde Adeyemi'],
           aiBrief: 'Review latency metrics on NVIDIA NIM Llama 3.2 gateway and evaluate fallback routing behavior.',
           createdAt: new Date().toISOString()
         },
@@ -304,7 +304,7 @@ export class Datastore {
           title: 'Fiscal Ledger Audit & Reconciliation',
           time: '3:00 PM - 3:30 PM',
           type: 'internal',
-          attendees: ['Sarah Miller', 'Operations Team'],
+          attendees: ['Chioma Nwosu', 'Operations Team'],
           aiBrief: 'Audit newly posted entries in Fiscal Ledger and verify margin thresholds.',
           createdAt: new Date().toISOString()
         }
@@ -317,9 +317,9 @@ export class Datastore {
           location: 'San Francisco, CA'
         },
         employees: [
-          { id: 'emp-1', name: 'Alex Chen', role: 'Principal Architect', email: 'alex@oryn.ai', status: 'active', joinedDate: '2025-01-20' },
-          { id: 'emp-2', name: 'Jordan Lee', role: 'Staff Systems Engineer', email: 'jordan@oryn.ai', status: 'active', joinedDate: '2025-02-01' },
-          { id: 'emp-3', name: 'Sarah Miller', role: 'Operations Lead', email: 'sarah@oryn.ai', status: 'active', joinedDate: '2025-02-15' },
+          { id: 'emp-1', name: 'Chukwudi Okafor', role: 'Principal Architect', email: 'chukwudi@oryn.ai', status: 'active', joinedDate: '2025-01-20' },
+          { id: 'emp-2', name: 'Babatunde Adeyemi', role: 'Staff Systems Engineer', email: 'babatunde@oryn.ai', status: 'active', joinedDate: '2025-02-01' },
+          { id: 'emp-3', name: 'Chioma Nwosu', role: 'Operations Lead', email: 'chioma@oryn.ai', status: 'active', joinedDate: '2025-02-15' },
         ],
         teams: [
           { id: 't1', name: 'Inference & Core Engineering', description: 'Core LLM routing, latency optimization, and streaming infrastructure.' },
