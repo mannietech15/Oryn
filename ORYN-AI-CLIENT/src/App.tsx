@@ -8,6 +8,7 @@ import FinancialsPage from './pages/FinancialsPage';
 import ExplorePage from './pages/ExplorePage';
 import SettingsPage from './pages/SettingsPage';
 import AddOrganizationPage from './pages/AddOrganizationPage';
+import EditOrganizationPage from './pages/EditOrganizationPage';
 import AutomationPage from './pages/AutomationPage';
 import IntegrationsPage from './pages/IntegrationsPage';
 import DocumentsPage from './pages/DocumentsPage';
@@ -130,6 +131,25 @@ export default function App() {
     navigate('dashboard');
   };
 
+  const handleSaveEditedOrg = (updatedData: any) => {
+    setOrgProfile(updatedData);
+    if (typeof window !== 'undefined') {
+      if (currentUser?.id || currentUser?.email) {
+        const userKey = `oryn_orgProfile_${currentUser.id || currentUser.email}`;
+        localStorage.setItem(userKey, JSON.stringify(updatedData));
+      }
+      localStorage.setItem('oryn_orgProfile', JSON.stringify(updatedData));
+    }
+    if (updatedData.name && updatedData.name !== currentUser.organization) {
+      const updatedUser = { ...currentUser, organization: updatedData.name };
+      setCurrentUser(updatedUser);
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('oryn_auth_user', JSON.stringify(updatedUser));
+      }
+    }
+    navigate('dashboard');
+  };
+
   const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
   const navigate = (p: Page) => {
     routerNavigate(p === 'chat' ? '/' : `/${p}`);
@@ -161,6 +181,14 @@ export default function App() {
       case 'documents':    return <DocumentsPage />;
       case 'calendar':     return <CalendarPage />;
       case 'add-organization': return <AddOrganizationPage onComplete={handleCompleteOrg} />;
+      case 'edit-organization': return (
+        <EditOrganizationPage
+          currentProfile={orgProfile}
+          userOrganization={currentUser?.organization}
+          onSave={handleSaveEditedOrg}
+          onCancel={() => navigate('dashboard')}
+        />
+      );
       default:             return <DashboardPage orgProfile={orgProfile || (currentUser?.organization ? { name: currentUser.organization } : null)} />;
     }
   };
