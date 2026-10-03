@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import type { Page } from '../types';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 
 interface Props {
   page: Page;
@@ -193,25 +193,199 @@ export default function Sidebar({
           </div>
         </div>
 
-        <div style={{ padding: '0 20px 12px' }}>
+        <div ref={orgDropdownRef} style={{ padding: '0 20px 12px', position: 'relative' }}>
           {organizationName ? (
-            <div 
-              onClick={() => onNavigate('organization')}
-              style={{ 
-              display: 'flex', alignItems: 'center', justifyContent: 'space-between', 
-              background: 'var(--glass-bg-subtle)', border: '1px solid var(--card-border)',
-              padding: '10px 14px', borderRadius: 8, cursor: 'pointer', transition: 'all 0.2s'
-            }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                {organizationLogo ? (
-                  <img src={organizationLogo} alt={organizationName} style={{ width: 24, height: 24, borderRadius: '50%', objectFit: 'cover', boxShadow: 'var(--shadow-subtle)' }} />
-                ) : (
-                  <div style={{ width: 20, height: 20, background: 'var(--accent-primary)', borderRadius: 4, boxShadow: '0 0 10px rgba(249,115,22,0.3)' }} />
-                )}
-                <span style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-primary)' }}>{organizationName}</span>
+            <>
+              <div 
+                onClick={() => setIsOrgDropdownOpen(!isOrgDropdownOpen)}
+                style={{ 
+                  display: 'flex', alignItems: 'center', justifyContent: 'space-between', 
+                  background: isOrgDropdownOpen ? 'var(--card-bg)' : 'var(--glass-bg-subtle)', 
+                  border: isOrgDropdownOpen ? '1px solid var(--accent-primary)' : '1px solid var(--card-border)',
+                  padding: '10px 14px', borderRadius: 8, cursor: 'pointer', transition: 'all 0.2s',
+                  boxShadow: isOrgDropdownOpen ? '0 0 12px rgba(249, 115, 22, 0.2)' : 'none'
+                }}
+              >
+                <div style={{ display: 'flex', alignItems: 'center', gap: 10, minWidth: 0 }}>
+                  {organizationLogo ? (
+                    <img src={organizationLogo} alt={organizationName} style={{ width: 24, height: 24, borderRadius: '50%', objectFit: 'cover', flexShrink: 0, boxShadow: 'var(--shadow-subtle)' }} />
+                  ) : (
+                    <div style={{ width: 20, height: 20, background: 'var(--accent-primary)', borderRadius: 4, flexShrink: 0, boxShadow: '0 0 10px rgba(249,115,22,0.3)' }} />
+                  )}
+                  <span style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-primary)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                    {organizationName}
+                  </span>
+                </div>
+                <svg 
+                  width="14" height="14" viewBox="0 0 24 24" fill="none" 
+                  stroke={isOrgDropdownOpen ? 'var(--accent-primary)' : 'var(--text-secondary)'} 
+                  strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
+                  style={{ transition: 'transform 0.2s ease', transform: isOrgDropdownOpen ? 'rotate(180deg)' : 'rotate(0deg)', flexShrink: 0 }}
+                >
+                  <polyline points="6 9 12 15 18 9"></polyline>
+                </svg>
               </div>
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--text-secondary)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
-            </div>
+
+              <AnimatePresence>
+                {isOrgDropdownOpen && (
+                  <motion.div
+                    initial={{ opacity: 0, y: -6, scale: 0.98 }}
+                    animate={{ opacity: 1, y: 4, scale: 1 }}
+                    exit={{ opacity: 0, y: -6, scale: 0.98 }}
+                    transition={{ duration: 0.18, ease: 'easeOut' }}
+                    style={{
+                      position: 'absolute',
+                      top: '100%',
+                      left: 20,
+                      right: 20,
+                      background: 'var(--card-bg, #121316)',
+                      border: '1px solid rgba(255, 255, 255, 0.12)',
+                      borderRadius: 12,
+                      padding: '8px',
+                      zIndex: 200,
+                      boxShadow: '0 12px 32px rgba(0, 0, 0, 0.6), 0 0 1px rgba(249, 115, 22, 0.4)',
+                      backdropFilter: 'blur(20px)',
+                      WebkitBackdropFilter: 'blur(20px)'
+                    }}
+                  >
+                    {/* Header preview */}
+                    <div style={{ padding: '8px 10px 10px', borderBottom: '1px solid rgba(255, 255, 255, 0.08)', marginBottom: 6 }}>
+                      <div style={{ fontSize: 10.5, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: 0.6 }}>
+                        Current Workspace
+                      </div>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 4 }}>
+                        <div style={{ width: 8, height: 8, borderRadius: '50%', background: '#22c55e', boxShadow: '0 0 6px #22c55e' }} />
+                        <span style={{ fontSize: 12.5, fontWeight: 600, color: 'var(--text-primary, #fff)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                          {organizationName}
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* Edit item */}
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setIsOrgDropdownOpen(false);
+                        onNavigate('edit-organization');
+                      }}
+                      style={{
+                        width: '100%',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 10,
+                        padding: '9px 10px',
+                        background: 'transparent',
+                        border: 'none',
+                        borderRadius: 8,
+                        color: 'var(--text-primary)',
+                        cursor: 'pointer',
+                        textAlign: 'left',
+                        transition: 'background 0.15s, color 0.15s'
+                      }}
+                      onMouseEnter={e => {
+                        e.currentTarget.style.background = 'rgba(249, 115, 22, 0.12)';
+                        e.currentTarget.style.color = 'var(--accent-primary)';
+                      }}
+                      onMouseLeave={e => {
+                        e.currentTarget.style.background = 'transparent';
+                        e.currentTarget.style.color = 'var(--text-primary)';
+                      }}
+                    >
+                      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M12 20h9"></path>
+                        <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path>
+                      </svg>
+                      <div>
+                        <div style={{ fontSize: 12.5, fontWeight: 600 }}>Edit Organization</div>
+                        <div style={{ fontSize: 10.5, color: 'var(--text-muted)' }}>Profile picture & details</div>
+                      </div>
+                    </button>
+
+                    {/* Organization details & roster item */}
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setIsOrgDropdownOpen(false);
+                        onNavigate('organization');
+                      }}
+                      style={{
+                        width: '100%',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 10,
+                        padding: '9px 10px',
+                        background: 'transparent',
+                        border: 'none',
+                        borderRadius: 8,
+                        color: 'var(--text-primary)',
+                        cursor: 'pointer',
+                        textAlign: 'left',
+                        transition: 'background 0.15s, color 0.15s'
+                      }}
+                      onMouseEnter={e => {
+                        e.currentTarget.style.background = 'rgba(255, 255, 255, 0.06)';
+                      }}
+                      onMouseLeave={e => {
+                        e.currentTarget.style.background = 'transparent';
+                      }}
+                    >
+                      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                        <circle cx="9" cy="7" r="4"></circle>
+                        <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                        <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                      </svg>
+                      <div>
+                        <div style={{ fontSize: 12.5, fontWeight: 600 }}>Organization Matrix</div>
+                        <div style={{ fontSize: 10.5, color: 'var(--text-muted)' }}>Teams, members & governance</div>
+                      </div>
+                    </button>
+
+                    {/* Add another organization */}
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setIsOrgDropdownOpen(false);
+                        onNavigate('add-organization');
+                      }}
+                      style={{
+                        width: '100%',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 10,
+                        padding: '9px 10px',
+                        background: 'transparent',
+                        border: 'none',
+                        borderRadius: 8,
+                        color: 'var(--text-secondary)',
+                        cursor: 'pointer',
+                        textAlign: 'left',
+                        borderTop: '1px solid rgba(255, 255, 255, 0.08)',
+                        marginTop: 4,
+                        paddingTop: 8,
+                        transition: 'background 0.15s, color 0.15s'
+                      }}
+                      onMouseEnter={e => {
+                        e.currentTarget.style.background = 'rgba(255, 255, 255, 0.06)';
+                        e.currentTarget.style.color = 'var(--text-primary)';
+                      }}
+                      onMouseLeave={e => {
+                        e.currentTarget.style.background = 'transparent';
+                        e.currentTarget.style.color = 'var(--text-secondary)';
+                      }}
+                    >
+                      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <line x1="12" y1="5" x2="12" y2="19"></line>
+                        <line x1="5" y1="12" x2="19" y2="12"></line>
+                      </svg>
+                      <div>
+                        <div style={{ fontSize: 12, fontWeight: 500 }}>Create New Organization</div>
+                      </div>
+                    </button>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </>
           ) : (
             <div 
               onClick={() => onNavigate('add-organization')}
