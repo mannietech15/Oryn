@@ -3,17 +3,17 @@
     {
       "id": "f-1",
       "type": "revenue",
-      "category": "Enterprise Subscriptions",
-      "amount": 4200,
+      "category": "Starter Subscriptions",
+      "amount": 250,
       "date": "2026-09-26",
-      "note": "Monthly Stripe recurring subscription tranche",
+      "note": "Early access Stripe subscription tranche",
       "createdAt": "2026-09-26T17:15:23.939Z"
     },
     {
       "id": "f-2",
       "type": "revenue",
       "category": "API Usage & Tokens",
-      "amount": 2150,
+      "amount": 120,
       "date": "2026-09-28",
       "note": "Metered token consumption overages",
       "createdAt": "2026-09-28T17:15:23.939Z"
@@ -22,7 +22,7 @@
       "id": "f-3",
       "type": "expense",
       "category": "Cloud Infrastructure & GPU",
-      "amount": 2450,
+      "amount": 149,
       "date": "2026-09-24",
       "note": "NVIDIA NIM compute cluster & AWS relays",
       "createdAt": "2026-09-24T17:15:23.939Z"
@@ -31,13 +31,22 @@
       "id": "f-4",
       "type": "expense",
       "category": "Operational Engineering",
-      "amount": 1650,
+      "amount": 90,
       "date": "2026-09-19",
       "note": "Observability & third-party API licensing",
       "createdAt": "2026-09-19T17:15:23.939Z"
     }
   ],
   "aiTaskLogs": [
+    {
+      "type": "automation",
+      "model": "engine/pipeline-runner",
+      "latencyMs": 299,
+      "tokensUsed": 0,
+      "status": "success",
+      "id": "task-1791045035156-377",
+      "timestamp": "2026-10-03T16:30:35.156Z"
+    },
     {
       "type": "automation",
       "model": "engine/pipeline-runner",
@@ -116,10 +125,10 @@
         "SMTP Relay"
       ],
       "createdAt": "2026-09-01T17:15:23.939Z",
-      "lastRunAt": "2026-10-02T16:04:02.420Z",
+      "lastRunAt": "2026-10-03T16:30:35.155Z",
       "nextRunAt": "2026-10-02T17:15:23.939Z",
-      "runCount": 27,
-      "successCount": 27,
+      "runCount": 28,
+      "successCount": 28,
       "failureCount": 0
     },
     {
@@ -161,6 +170,18 @@
     }
   ],
   "workflowExecutionLogs": [
+    {
+      "workflowId": "wf-1",
+      "workflowName": "Weekly Executive Revenue Briefing",
+      "trigger": "Manual Console Dispatch",
+      "durationMs": 299,
+      "status": "success",
+      "stepsCompleted": 4,
+      "totalSteps": 4,
+      "error": null,
+      "id": "exec-1791045035155-331",
+      "executedAt": "2026-10-03T16:30:35.155Z"
+    },
     {
       "workflowId": "wf-2",
       "workflowName": "Stripe Churn Risk Detection & Escrow",
@@ -260,7 +281,30 @@
       "aiSummary": "Fiscal overview confirming $6.4K revenue baseline with steady recurring expansion across active client tiers."
     }
   ],
-  "emailLogs": [],
+  "emailLogs": [
+    {
+      "id": "draft-1791052183139",
+      "to": "Olaoyepaulkolade@gmail.com",
+      "subject": "Application for Fullstack Developer Internship at TechRise",
+      "body": "Draft Email content",
+      "status": "awaiting_approval",
+      "messageId": null,
+      "error": null,
+      "createdAt": "2026-10-03T18:29:43.139Z",
+      "sentAt": null
+    },
+    {
+      "id": "draft-1791045608075",
+      "to": "olaoyepaulkolade@gmail.com",
+      "subject": "Application for Fullstack Developer Internship at TechRise",
+      "body": "Dear Hiring Manager, I am writing to express my interest in the Fullstack Developer Internship position at TechRise. As a highly motivated and detail-oriented individual with a passion for coding, I am confident that I would be an excellent fit for this role. With 2 years of experience in programming languages such as JavaScript, HTML/CSS, and Python, I possess a solid understanding of front-end and back-end development principles. My proficiency in React, Node.js, and MongoDB has allowed me to develop a range of projects, including [list projects]. I am excited about the opportunity to apply my skills and knowledge in a real-world setting and contribute to the success of TechRise. I have attached my resume, which provides more details about my experience and qualifications. I would welcome the opportunity to discuss my application and how I can contribute to the company's goals. Thank you for considering my application. I look forward to the opportunity to discuss this further. Best regards, Adekola Manasseh",
+      "status": "sent",
+      "messageId": "<918d6b85-cc6a-f54d-49f2-f0e831577228@gmail.com>",
+      "error": null,
+      "createdAt": "2026-10-03T16:40:08.075Z",
+      "sentAt": "2026-10-03T16:40:25.663Z"
+    }
+  ],
   "organization": {
     "company": {
       "name": "Skillbridge",
@@ -270,25 +314,25 @@
     "employees": [
       {
         "id": "emp-1",
-        "name": "Alex Chen",
+        "name": "Chukwudi Okafor",
         "role": "Principal Architect",
-        "email": "alex@oryn.ai",
+        "email": "chukwudi@oryn.ai",
         "status": "active",
         "joinedDate": "2025-01-20"
       },
       {
         "id": "emp-2",
-        "name": "Jordan Lee",
+        "name": "Babatunde Adeyemi",
         "role": "Staff Systems Engineer",
-        "email": "jordan@oryn.ai",
+        "email": "babatunde@oryn.ai",
         "status": "active",
         "joinedDate": "2025-02-01"
       },
       {
         "id": "emp-3",
-        "name": "Sarah Miller",
+        "name": "Chioma Nwosu",
         "role": "Operations Lead",
-        "email": "sarah@oryn.ai",
+        "email": "chioma@oryn.ai",
         "status": "active",
         "joinedDate": "2025-02-15"
       }
@@ -313,8 +357,8 @@
       "time": "10:00 AM - 10:45 AM",
       "type": "internal",
       "attendees": [
-        "Alex Chen",
-        "Jordan Lee"
+        "Chukwudi Okafor",
+        "Babatunde Adeyemi"
       ],
       "aiBrief": "Review latency metrics on NVIDIA NIM Llama 3.2 gateway and evaluate fallback routing behavior.",
       "createdAt": "2026-10-02T12:19:12.869Z"
@@ -337,7 +381,7 @@
       "time": "3:00 PM - 3:30 PM",
       "type": "internal",
       "attendees": [
-        "Sarah Miller",
+        "Chioma Nwosu",
         "Operations Team"
       ],
       "aiBrief": "Audit newly posted entries in Fiscal Ledger and verify margin thresholds.",
