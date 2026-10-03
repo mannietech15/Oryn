@@ -520,10 +520,16 @@ function MessageBubble({ msg, isMobile, onImageClick, language, onEdit, onRegene
               </span>
             </div>
 
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 6, fontSize: 13, background: 'var(--glass-bg-subtle)', padding: 12, borderRadius: 8 }}>
-              <div><strong style={{ color: 'var(--text-muted)' }}>To:</strong> <span style={{ color: 'var(--text-primary)', fontFamily: 'monospace' }}>{msg.emailDraft.to}</span></div>
-              <div><strong style={{ color: 'var(--text-muted)' }}>Subject:</strong> <span style={{ color: 'var(--text-primary)' }}>{msg.emailDraft.subject}</span></div>
-              <div style={{ borderTop: '1px solid var(--card-border)', paddingTop: 8, marginTop: 4, color: 'var(--text-secondary)', whiteSpace: 'pre-wrap', lineHeight: 1.5 }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 8, fontSize: 13, background: 'var(--glass-bg-subtle)', padding: 14, borderRadius: 10, border: '1px solid var(--card-border)' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
+                <span style={{ fontSize: 11, fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: 0.5, fontFamily: 'monospace' }}>To:</span>
+                <span style={{ padding: '2px 8px', background: 'rgba(255, 255, 255, 0.06)', borderRadius: 6, color: 'var(--text-primary)', fontFamily: 'monospace', fontSize: 12 }}>{msg.emailDraft.to}</span>
+              </div>
+              <div style={{ display: 'flex', alignItems: 'baseline', gap: 6 }}>
+                <span style={{ fontSize: 11, fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: 0.5, fontFamily: 'monospace' }}>Subject:</span>
+                <span style={{ color: 'var(--text-primary)', fontWeight: 600, fontSize: 13.5 }}>{msg.emailDraft.subject}</span>
+              </div>
+              <div style={{ borderTop: '1px solid var(--card-border)', paddingTop: 10, marginTop: 4, color: 'var(--text-secondary)', whiteSpace: 'pre-wrap', lineHeight: 1.6, maxHeight: 220, overflowY: 'auto' }}>
                 {msg.emailDraft.body}
               </div>
             </div>
