@@ -23,9 +23,22 @@ export class FallbackStrategy {
     const errorCode = isProviderError ? error.code : ErrorCode.PROVIDER_ERROR;
     const isRateLimit = errorCode === ErrorCode.PROVIDER_RATE_LIMITED;
     const isUnavailable = errorCode === ErrorCode.PROVIDER_UNAVAILABLE;
+    const isRetryable = isProviderError ? error.retryable : false;
 
     const maxRetries = AI_CONFIG.nvidia.maxRetries;
     const delays = AI_CONFIG.nvidia.retryDelaysMs;
+
+    // Check if default tier cluster node is unavailable/OOM; failover to pro tier cluster
+    if ((isUnavailable || isRetryable) && currentTier === 'default' && attempt === 0) {
+      logger.warn(`Default tier cluster node unavailable. Failing over to pro tier.`, {
+        error: isProviderError ? error.message : String(error),
+      });
+      return {
+        action: 'downgrade',
+        nextTier: 'pro',
+        reason: 'Default tier node unavailable; routing to pro tier cluster.',
+      };
+    }
 
     // Check if we can downgrade from pro/apex/logic to default
     if ((isUnavailable || isRateLimit) && currentTier !== 'default') {
@@ -40,13 +53,13 @@ export class FallbackStrategy {
     }
 
     // Check if we should back off and retry
-    if (isRateLimit && attempt < maxRetries) {
-      const delayMs = delays[attempt] || 5000;
-      logger.warn(`Rate limit detected on attempt ${attempt + 1}. Retrying in ${delayMs}ms.`);
+    if ((isRateLimit || isUnavailable || isRetryable) && attempt < maxRetries) {
+      const delayMs = delays[attempt] || 2000;
+      logger.warn(`Transient upstream error detected on attempt ${attempt + 1}. Retrying in ${delayMs}ms.`);
       return {
         action: 'retry',
         delayMs,
-        reason: 'Rate limit encountered, backing off before retry.',
+        reason: 'Transient upstream error encountered, backing off before retry.',
       };
     }
 
