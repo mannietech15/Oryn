@@ -24,12 +24,9 @@ export default function EditOrganizationPage({
   const [logo, setLogo] = useState<string | null>(currentProfile?.logo || null);
 
   const [isLoading, setIsLoading] = useState(false);
-  const [isFetching, setIsFetching] = useState(false);
-  const [saveSuccess, setSaveSuccess] = useState(false);
 
   // Sync with server if fresh data is available
   useEffect(() => {
-    setIsFetching(true);
     fetchOrganization()
       .then(res => {
         if (res?.company) {
@@ -40,9 +37,6 @@ export default function EditOrganizationPage({
       })
       .catch(() => {
         // Fall back to local props
-      })
-      .finally(() => {
-        setIsFetching(false);
       });
   }, []);
 
@@ -88,7 +82,6 @@ export default function EditOrganizationPage({
     }
 
     setIsLoading(true);
-    setSaveSuccess(false);
 
     const updatedProfile = {
       ...(currentProfile || {}),
@@ -112,7 +105,6 @@ export default function EditOrganizationPage({
 
     onSave(updatedProfile);
     setIsLoading(false);
-    setSaveSuccess(true);
 
     toast({
       title: 'Organization Updated',

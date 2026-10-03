@@ -85,13 +85,28 @@ export default function Sidebar({
         setIsOrgDropdownOpen(false);
       }
     };
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        setIsOrgDropdownOpen(false);
+      }
+    };
     if (isOrgDropdownOpen) {
       document.addEventListener('mousedown', handleClickOutside);
+      document.addEventListener('keydown', handleKeyDown);
     }
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener('keydown', handleKeyDown);
     };
   }, [isOrgDropdownOpen]);
+
+  const handleOrgNav = (targetPage: Page) => {
+    setIsOrgDropdownOpen(false);
+    onNavigate(targetPage);
+    if (isMobile && onClose) {
+      onClose();
+    }
+  };
 
   const [windowWidth, setWindowWidth] = useState(typeof window !== 'undefined' ? window.innerWidth : 1024);
   React.useEffect(() => {
@@ -264,10 +279,7 @@ export default function Sidebar({
                     {/* Edit item */}
                     <button
                       type="button"
-                      onClick={() => {
-                        setIsOrgDropdownOpen(false);
-                        onNavigate('edit-organization');
-                      }}
+                      onClick={() => handleOrgNav('edit-organization')}
                       style={{
                         width: '100%',
                         display: 'flex',
@@ -304,10 +316,7 @@ export default function Sidebar({
                     {/* Organization details & roster item */}
                     <button
                       type="button"
-                      onClick={() => {
-                        setIsOrgDropdownOpen(false);
-                        onNavigate('organization');
-                      }}
+                      onClick={() => handleOrgNav('organization')}
                       style={{
                         width: '100%',
                         display: 'flex',
@@ -344,10 +353,7 @@ export default function Sidebar({
                     {/* Add another organization */}
                     <button
                       type="button"
-                      onClick={() => {
-                        setIsOrgDropdownOpen(false);
-                        onNavigate('add-organization');
-                      }}
+                      onClick={() => handleOrgNav('add-organization')}
                       style={{
                         width: '100%',
                         display: 'flex',
