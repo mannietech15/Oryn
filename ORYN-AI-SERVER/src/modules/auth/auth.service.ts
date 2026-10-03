@@ -1,3 +1,5 @@
+import fs from 'fs';
+import path from 'path';
 import crypto from 'crypto';
 import { User, UserCredentials, LoginPayload, RegisterPayload, AuthSession } from './auth.types';
 import { ValidationError, UnauthorizedError } from '../../shared/errors/app-error';
@@ -6,17 +8,61 @@ export class AuthService {
   private users: Map<string, User> = new Map();
   private credentials: Map<string, UserCredentials> = new Map();
   private sessions: Map<string, AuthSession> = new Map();
+  private authStorePath = path.resolve(__dirname, '../../../data/oryn-auth.json');
 
   constructor() {
     this.seedDefaultUsers();
+    this.loadAuthStore();
+  }
+
+  private loadAuthStore(): void {
+    try {
+      if (fs.existsSync(this.authStorePath)) {
+        const raw = fs.readFileSync(this.authStorePath, 'utf-8');
+        const data = JSON.parse(raw);
+        if (Array.isArray(data.users)) {
+          data.users.forEach((u: User) => {
+            if (u.email) this.users.set(u.email.toLowerCase(), u);
+          });
+        }
+        if (Array.isArray(data.credentials)) {
+          data.credentials.forEach((c: UserCredentials) => {
+            if (c.email) this.credentials.set(c.email.toLowerCase(), c);
+          });
+        }
+        if (Array.isArray(data.sessions)) {
+          data.sessions.forEach((s: AuthSession) => {
+            if (s.token && new Date(s.expiresAt).getTime() > Date.now()) {
+              this.sessions.set(s.token, s);
+            }
+          });
+        }
+      }
+    } catch (err) {
+      console.error('Failed to load auth datastore', err);
+    }
+  }
+
+  private saveAuthStore(): void {
+    try {
+      const data = {
+        users: Array.from(this.users.values()),
+        credentials: Array.from(this.credentials.values()),
+        sessions: Array.from(this.sessions.values())
+      };
+      fs.writeFileSync(this.authStorePath, JSON.stringify(data, null, 2), 'utf-8');
+    } catch (err) {
+      console.error('Failed to save auth datastore', err);
+    }
   }
 
   private hashPassword(password: string, salt: string): string {
     return crypto.pbkdf2Sync(password, salt, 1000, 64, 'sha512').toString('hex');
   }
 
-  private generateToken(): string {
-    return 'oryn_sec_' + crypto.randomBytes(32).toString('hex');
+  private generateToken(email?: string): string {
+    const prefix = email ? Buffer.from(email.toLowerCase()).toString('base64url') + '_' : '';
+    return 'oryn_sec_' + prefix + crypto.randomBytes(24).toString('hex');
   }
 
   private seedDefaultUsers(): void {
@@ -100,7 +146,7 @@ export class AuthService {
     user.lastLoginAt = new Date().toISOString();
     this.users.set(normalizedEmail, user);
 
-    const token = this.generateToken();
+    const token = this.generateToken(normalizedEmail);
     const expiresAt = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(); // 30 days
 
     const session: AuthSession = {
@@ -110,6 +156,7 @@ export class AuthService {
     };
 
     this.sessions.set(token, session);
+    this.saveAuthStore();
     return session;
   }
 
@@ -142,7 +189,7 @@ export class AuthService {
     this.users.set(normalizedEmail, user);
     this.credentials.set(normalizedEmail, { email: normalizedEmail, passwordHash, salt });
 
-    const token = this.generateToken();
+    const token = this.generateToken(normalizedEmail);
     const expiresAt = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString();
 
     const session: AuthSession = {
@@ -152,6 +199,7 @@ export class AuthService {
     };
 
     this.sessions.set(token, session);
+    this.saveAuthStore();
     return session;
   }
 
@@ -161,32 +209,43 @@ export class AuthService {
     }
 
     const session = this.sessions.get(token);
-    if (!session) {
-      // In case server restarted, provide graceful recovery for standard tokens or create valid fallback
-      if (token.startsWith('oryn_sec_') || token.startsWith('demo_token')) {
-        const defaultUser = this.users.get('mannietech@oryn.ai')!;
-        const fallbackSession: AuthSession = {
-          token,
-          user: defaultUser,
-          expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString()
-        };
-        this.sessions.set(token, fallbackSession);
-        return fallbackSession;
+    if (session) {
+      if (new Date(session.expiresAt).getTime() < Date.now()) {
+        this.sessions.delete(token);
+        this.saveAuthStore();
+        throw new UnauthorizedError('Session has expired. Please sign in again.');
       }
-      throw new UnauthorizedError('Session expired or invalid token.');
+      return session;
     }
 
-    if (new Date(session.expiresAt).getTime() < Date.now()) {
-      this.sessions.delete(token);
-      throw new UnauthorizedError('Session has expired. Please sign in again.');
+    // In case server restarted, recover session from token payload
+    if (token.startsWith('oryn_sec_')) {
+      const parts = token.slice('oryn_sec_'.length).split('_');
+      if (parts.length >= 2) {
+        try {
+          const recoveredEmail = Buffer.from(parts[0], 'base64url').toString('utf8');
+          const matchedUser = this.users.get(recoveredEmail.toLowerCase());
+          if (matchedUser) {
+            const recoveredSession: AuthSession = {
+              token,
+              user: matchedUser,
+              expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString()
+            };
+            this.sessions.set(token, recoveredSession);
+            this.saveAuthStore();
+            return recoveredSession;
+          }
+        } catch { /* noop */ }
+      }
     }
 
-    return session;
+    throw new UnauthorizedError('Session expired or invalid token.');
   }
 
   public logout(token: string): boolean {
     if (token) {
       this.sessions.delete(token);
+      this.saveAuthStore();
     }
     return true;
   }
