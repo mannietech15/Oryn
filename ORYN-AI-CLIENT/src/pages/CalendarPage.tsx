@@ -76,7 +76,7 @@ export default function CalendarPage() {
         time: newEvent.time,
         type: newEvent.type,
         attendees: attendeesList.length ? attendeesList : ['Operations Team'],
-        aiBrief: newEvent.aiBrief || 'AI briefing synthesized from active operational state.'
+        aiBrief: newEvent.aiBrief || 'Meeting notes and agenda items.'
       });
 
       setEvents(prev => [created, ...prev]);
@@ -113,7 +113,7 @@ export default function CalendarPage() {
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8, flexWrap: 'wrap', gap: 16 }}>
           <div>
             <h1 style={{ fontFamily: 'var(--font-display)', fontSize: 26, fontWeight: 700, margin: 0, color: 'var(--text-primary)', letterSpacing: '-0.02em' }}>
-              Operational Calendar
+              Team & Operations Calendar
             </h1>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
@@ -135,7 +135,7 @@ export default function CalendarPage() {
           </div>
         </div>
         <p style={{ color: 'var(--text-secondary)', fontSize: 14, margin: 0 }}>
-          Synchronized schedule with automated daemon dispatches and executive meetings.
+          Manage upcoming meetings, deadlines, and team schedule.
         </p>
       </div>
 
@@ -147,11 +147,11 @@ export default function CalendarPage() {
           <div style={{ flex: 2, display: 'flex', flexDirection: 'column', gap: 16 }}>
             {loading ? (
               <div style={{ color: 'var(--text-muted)', textAlign: 'center', padding: 40 }}>
-                Loading operational schedule...
+                Loading schedule...
               </div>
             ) : events.length === 0 ? (
               <div style={{ padding: 40, textAlign: 'center', color: 'var(--text-muted)', background: 'var(--card-bg)', borderRadius: 16, border: '1px solid var(--card-border)' }}>
-                No operational events scheduled. Click "+ Schedule Event" to register a sync or daemon trigger.
+                No events scheduled. Click "+ Schedule Event" to add a meeting or deadline.
               </div>
             ) : (
               events.map((event, i) => (
@@ -170,10 +170,10 @@ export default function CalendarPage() {
             <div style={{ padding: '24px', background: 'rgba(249, 115, 22, 0.05)', border: '1px solid var(--accent-primary)', borderRadius: 16 }}>
               <h3 style={{ fontSize: 15, fontWeight: 700, color: 'var(--accent-primary)', margin: '0 0 12px', display: 'flex', alignItems: 'center', gap: 8 }}>
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="12 2 20.66 7 20.66 17 12 22 3.34 17 3.34 7"></polygon></svg>
-                Oryn Operational Brief
+                Schedule Summary
               </h3>
               <p style={{ fontSize: 13, color: 'var(--text-primary)', margin: 0, lineHeight: 1.6 }}>
-                Active daemons are running nominally. Background workflows and fiscal auditing milestones {finSummary ? `(Volume: ${finSummary})` : ''} are synchronized to your team calendar.
+                Team events and operational milestones {finSummary ? `(Volume: ${finSummary})` : ''} are synchronized to your calendar.
               </p>
             </div>
           </div>
