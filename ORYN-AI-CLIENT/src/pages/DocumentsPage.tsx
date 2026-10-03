@@ -71,7 +71,7 @@ export default function DocumentsPage() {
 
   return (
     <div style={{ flex: 1, overflowY: 'auto', padding: '36px 40px', background: 'var(--bg)', position: 'relative' }}>
-      <div style={{ maxWidth: 1200, margin: '0 auto', display: 'flex', flexDirection: 'column', gap: 28 }}>
+      <div style={{ width: '100%', display: 'flex', flexDirection: 'column', gap: 28 }}>
         
         {/* Header */}
         <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between' }}>
@@ -146,7 +146,7 @@ export default function DocumentsPage() {
             <div style={{ fontSize: 16, fontWeight: 600, color: 'var(--text-primary)' }}>
               No Documents Analyzed Yet
             </div>
-            <div style={{ fontSize: 13, color: 'var(--text-secondary)', maxWidth: 450, lineHeight: 1.5 }}>
+            <div style={{ fontSize: 13, color: 'var(--text-secondary)', maxWidth: 600, lineHeight: 1.5 }}>
               Upload your first financial statement, contract, or spreadsheet above. ORYN will process it via NVIDIA Llama 3.2 Vision and generate a verified operational summary.
             </div>
           </div>
