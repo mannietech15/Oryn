@@ -137,7 +137,7 @@ export default function IntegrationsPage() {
 
   return (
     <div style={{ flex: 1, overflowY: 'auto', padding: '36px 40px', background: 'var(--bg)', position: 'relative' }}>
-      <div style={{ maxWidth: 1200, margin: '0 auto', display: 'flex', flexDirection: 'column', gap: 28 }}>
+      <div style={{ width: '100%', display: 'flex', flexDirection: 'column', gap: 28 }}>
         
         {/* Header */}
         <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between' }}>
