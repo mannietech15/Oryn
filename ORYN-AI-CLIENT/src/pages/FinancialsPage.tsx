@@ -68,7 +68,7 @@ export default function FinancialsPage() {
 
   return (
     <div style={{ flex: 1, overflowY: 'auto', padding: '36px 40px', background: 'var(--bg)', position: 'relative' }}>
-      <div className="page-centered-container">
+      <div className="page-fullwidth-container" style={{ width: '100%', display: 'flex', flexDirection: 'column', gap: 28 }}>
 
         
         {/* Header */}
@@ -114,7 +114,7 @@ export default function FinancialsPage() {
         </FinCard>
 
         {/* 2-Column Section: Entry Form & Transaction Registry */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'minmax(320px, 1fr) minmax(400px, 1.35fr)', gap: 24, alignItems: 'start' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'minmax(360px, 1fr) minmax(500px, 1.6fr)', gap: 24, alignItems: 'start' }}>
           {/* Left Column: Entry Form */}
           <FinCard 
             title="Record Ledger Transaction" 
