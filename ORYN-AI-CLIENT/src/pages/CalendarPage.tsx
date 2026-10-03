@@ -40,7 +40,7 @@ export default function CalendarPage() {
       let finText = '';
       if (finResult.status === 'fulfilled' && finResult.value?.metrics) {
         const fin = finResult.value.metrics;
-        finText = `Volume: $${(fin.totalRevenue / 1000).toFixed(1)}K (Margin: ${fin.margin}%)`;
+        finText = `Volume: ${fin.totalRevenue >= 1000 ? `$${(fin.totalRevenue / 1000).toFixed(1)}K` : `$${fin.totalRevenue.toLocaleString()}`} (Margin: ${fin.margin}%)`;
       }
 
       let wfText = '';
@@ -241,7 +241,7 @@ export default function CalendarPage() {
                 <input
                   value={newEvent.attendees}
                   onChange={e => setNewEvent({ ...newEvent, attendees: e.target.value })}
-                  placeholder="Alex Chen, Jordan Lee"
+                  placeholder="Chukwudi Okafor, Babatunde Adeyemi"
                   style={{ width: '100%', padding: '10px 14px', marginTop: 6, background: 'var(--glass-bg-subtle)', border: '1px solid var(--card-border)', borderRadius: 10, color: 'var(--text-primary)' }}
                 />
               </div>
