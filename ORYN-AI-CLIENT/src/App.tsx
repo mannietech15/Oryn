@@ -26,6 +26,22 @@ const VALID_PAGES: Page[] = [
   'calendar', 'add-organization'
 ];
 
+const getScopedOrgProfile = (user: UserProfile | null) => {
+  if (typeof window === 'undefined' || !user) return null;
+  const userKey = `oryn_orgProfile_${user.id || user.email}`;
+  const saved = localStorage.getItem(userKey);
+  if (saved) {
+    try {
+      const parsed = JSON.parse(saved);
+      if (parsed?.name) return parsed;
+    } catch { /* noop */ }
+  }
+  if (user.organization) {
+    return { name: user.organization, logo: null };
+  }
+  return null;
+};
+
 export default function App() {
   const routerNavigate = useNavigate();
   const location = useLocation();
@@ -38,11 +54,16 @@ export default function App() {
     const user = authService.getUser();
     return user || {
       id: 'usr_default',
-      name: 'Mannie Tech',
-      email: 'mannietech@oryn.ai',
+      name: 'Oryn User',
+      email: 'user@oryn.ai',
       role: 'Verified Administrator',
-      organization: 'Skillbridge Global'
+      organization: 'Enterprise Workspace'
     };
+  });
+
+  const [orgProfile, setOrgProfile] = useState<any>(() => {
+    const user = authService.getUser();
+    return getScopedOrgProfile(user);
   });
 
   useEffect(() => {
@@ -50,6 +71,12 @@ export default function App() {
       if (user) {
         setCurrentUser(user);
         setIsAuthenticated(true);
+        setOrgProfile((prev: any) => {
+          if (!prev || !prev.name) {
+            return getScopedOrgProfile(user);
+          }
+          return prev;
+        });
       }
     }).catch(() => {
       // Offline fallback preserves current session
@@ -65,20 +92,13 @@ export default function App() {
     if (typeof window !== 'undefined') return window.innerWidth > 768;
     return true;
   });
-  const [orgProfile, setOrgProfile] = useState<any>(() => {
-    if (typeof window !== 'undefined') {
-      const saved = localStorage.getItem('oryn_orgProfile');
-      if (saved) {
-        try { return JSON.parse(saved); } catch (e) { return null; }
-      }
-    }
-    return null;
-  });
   const chat = useChat();
 
   const handleLogin = (user: UserProfile) => {
     setCurrentUser(user);
     setIsAuthenticated(true);
+    const profile = getScopedOrgProfile(user);
+    setOrgProfile(profile);
     toast({
       title: 'Welcome to Oryn',
       description: `Authenticated as ${user.name} (${user.role}).`
@@ -88,6 +108,10 @@ export default function App() {
   const handleLogout = async () => {
     await authService.logout();
     setIsAuthenticated(false);
+    setOrgProfile(null);
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem('oryn_orgProfile');
+    }
     toast({
       title: 'Signed Out',
       description: 'You have been safely logged out of your active workspace session.'
@@ -96,7 +120,13 @@ export default function App() {
 
   const handleCompleteOrg = (data: any) => {
     setOrgProfile(data);
-    localStorage.setItem('oryn_orgProfile', JSON.stringify(data));
+    if (typeof window !== 'undefined') {
+      if (currentUser?.id || currentUser?.email) {
+        const userKey = `oryn_orgProfile_${currentUser.id || currentUser.email}`;
+        localStorage.setItem(userKey, JSON.stringify(data));
+      }
+      localStorage.setItem('oryn_orgProfile', JSON.stringify(data));
+    }
     navigate('dashboard');
   };
 
@@ -120,7 +150,7 @@ export default function App() {
   const renderPage = () => {
     switch (page) {
       case 'chat':         return <ChatPage {...chat} />;
-      case 'dashboard':    return <DashboardPage orgProfile={orgProfile} />;
+      case 'dashboard':    return <DashboardPage orgProfile={orgProfile || (currentUser?.organization ? { name: currentUser.organization } : null)} />;
       case 'analytics':    return <AnalyticsPage />;
       case 'organization': return <OrganizationPage />;
       case 'financials':   return <FinancialsPage />;
@@ -131,7 +161,7 @@ export default function App() {
       case 'documents':    return <DocumentsPage />;
       case 'calendar':     return <CalendarPage />;
       case 'add-organization': return <AddOrganizationPage onComplete={handleCompleteOrg} />;
-      default:             return <DashboardPage orgProfile={orgProfile} />;
+      default:             return <DashboardPage orgProfile={orgProfile || (currentUser?.organization ? { name: currentUser.organization } : null)} />;
     }
   };
 
@@ -171,7 +201,7 @@ export default function App() {
             activeSessionId={chat.activeSessionId}
             onNewChat={chat.startNewSession}
             onSelectSession={chat.setActiveSessionId}
-            organizationName={orgProfile?.name || null}
+            organizationName={orgProfile?.name || currentUser?.organization || null}
             organizationLogo={orgProfile?.logo || null}
             userName={currentUser.name}
             userEmail={currentUser.email}

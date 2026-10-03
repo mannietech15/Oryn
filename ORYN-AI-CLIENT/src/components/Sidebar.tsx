@@ -70,8 +70,8 @@ export default function Sidebar({
   onClose, 
   organizationName, 
   organizationLogo,
-  userName = 'Mannie Tech',
-  userEmail = 'mannietech@oryn.ai',
+  userName = 'Workspace User',
+  userEmail = 'user@oryn.ai',
   onLogout 
 }: Props) {
   const [hoveredItem, setHoveredItem] = useState<string | null>(null);
@@ -178,7 +178,9 @@ export default function Sidebar({
 
         <div style={{ padding: '0 20px 12px' }}>
           {organizationName ? (
-            <div style={{ 
+            <div 
+              onClick={() => onNavigate('organization')}
+              style={{ 
               display: 'flex', alignItems: 'center', justifyContent: 'space-between', 
               background: 'var(--glass-bg-subtle)', border: '1px solid var(--card-border)',
               padding: '10px 14px', borderRadius: 8, cursor: 'pointer', transition: 'all 0.2s'

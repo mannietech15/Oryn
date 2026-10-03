@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import { AuthService, defaultAuthService } from './auth.service';
+import { defaultDatastore } from '../../infrastructure/storage/datastore';
 
 export class AuthController {
   constructor(private authService: AuthService = defaultAuthService) {}
@@ -8,6 +9,22 @@ export class AuthController {
     try {
       const { email, password } = req.body;
       const session = await this.authService.login({ email, password });
+      if (session.user.organization) {
+        const currentOrg = defaultDatastore.getOrganization();
+        if (!currentOrg?.company?.name || currentOrg.company.name === 'Oryn AI Corp') {
+          const baseCompany = currentOrg?.company || {
+            industry: 'Enterprise AI & Workflow Systems',
+            location: 'HQ: Global',
+            foundedDate: new Date().toISOString().split('T')[0]
+          };
+          defaultDatastore.updateOrganization({
+            company: {
+              ...baseCompany,
+              name: session.user.organization
+            }
+          });
+        }
+      }
       res.status(200).json({
         success: true,
         message: 'Successfully authenticated with Oryn Gateway.',
@@ -22,6 +39,20 @@ export class AuthController {
     try {
       const { name, email, password, organization, role } = req.body;
       const session = await this.authService.register({ name, email, password, organization, role });
+      if (session.user.organization) {
+        const currentOrg = defaultDatastore.getOrganization();
+        const baseCompany = currentOrg?.company || {
+          industry: 'Enterprise AI & Workflow Systems',
+          location: 'HQ: Global',
+          foundedDate: new Date().toISOString().split('T')[0]
+        };
+        defaultDatastore.updateOrganization({
+          company: {
+            ...baseCompany,
+            name: session.user.organization
+          }
+        });
+      }
       res.status(201).json({
         success: true,
         message: 'Corporate workspace identity registered successfully.',

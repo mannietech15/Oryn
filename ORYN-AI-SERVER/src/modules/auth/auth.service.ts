@@ -25,7 +25,7 @@ export class AuthService {
       name: 'Mannie Tech',
       email: 'mannietech@oryn.ai',
       role: 'Verified Administrator',
-      organization: 'Skillbridge Global',
+      organization: 'Oryn AI Global',
       avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=80',
       createdAt: '2026-01-15T08:00:00.000Z',
       lastLoginAt: new Date().toISOString()
