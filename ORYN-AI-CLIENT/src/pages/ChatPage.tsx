@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
-import { Mail, Send, CheckCircle2, XCircle, BarChart3, TrendingUp, Code2, Lightbulb } from 'lucide-react';
+import { Mail, Send, CheckCircle2, XCircle, BarChart3, TrendingUp, Code2, Lightbulb, Loader2 } from 'lucide-react';
 import { GmailLogo } from '../components/BrandLogos';
 import { useChat } from '../hooks/useChat';
 import type { Message } from '../types';
@@ -327,6 +327,17 @@ function MessageBubble({ msg, isMobile, onImageClick, language, onEdit, onRegene
   const [isEditing, setIsEditing] = useState(false);
   const [editValue, setEditValue] = useState(msg.content);
   const [isHovered, setIsHovered] = useState(false);
+  const [isSendingEmail, setIsSendingEmail] = useState(false);
+
+  const handleConfirmEmail = async () => {
+    if (!msg.emailDraft || isSendingEmail) return;
+    setIsSendingEmail(true);
+    try {
+      await onConfirmEmail?.(msg.id, msg.emailDraft.id);
+    } finally {
+      setIsSendingEmail(false);
+    }
+  };
   
   if (isUser) {
     return (
@@ -521,15 +532,33 @@ function MessageBubble({ msg, isMobile, onImageClick, language, onEdit, onRegene
               <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 10 }}>
                 <button
                   onClick={() => onDiscardEmail?.(msg.id)}
-                  style={{ padding: '6px 14px', borderRadius: 6, background: 'transparent', border: '1px solid var(--card-border)', color: 'var(--text-muted)', fontSize: 12, cursor: 'pointer' }}
+                  disabled={isSendingEmail}
+                  style={{ padding: '6px 14px', borderRadius: 6, background: 'transparent', border: '1px solid var(--card-border)', color: 'var(--text-muted)', fontSize: 12, cursor: isSendingEmail ? 'not-allowed' : 'pointer' }}
                 >
                   Discard Draft
                 </button>
                 <button
-                  onClick={() => onConfirmEmail?.(msg.id, msg.emailDraft!.id)}
-                  style={{ padding: '6px 16px', borderRadius: 6, background: 'var(--accent-primary)', border: 'none', color: '#fff', fontSize: 12, fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6 }}
+                  onClick={handleConfirmEmail}
+                  disabled={isSendingEmail}
+                  style={{
+                    padding: '6px 16px', borderRadius: 6,
+                    background: isSendingEmail ? 'rgba(249, 115, 22, 0.6)' : 'var(--accent-primary)',
+                    border: 'none', color: '#fff', fontSize: 12, fontWeight: 600,
+                    cursor: isSendingEmail ? 'wait' : 'pointer', display: 'flex', alignItems: 'center', gap: 6,
+                    transition: 'all 0.2s'
+                  }}
                 >
-                  <Send size={13} /> Confirm & Send via SMTP
+                  {isSendingEmail ? (
+                    <>
+                      <Loader2 size={13} className="spin-slow" />
+                      <span>Dispatching via SMTP...</span>
+                    </>
+                  ) : (
+                    <>
+                      <Send size={13} />
+                      <span>Confirm & Send via SMTP</span>
+                    </>
+                  )}
                 </button>
               </div>
             )}
