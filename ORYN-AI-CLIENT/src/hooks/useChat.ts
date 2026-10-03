@@ -349,10 +349,16 @@ export function useChat() {
 
             if (email) {
               try {
+                let resolvedBody = (email.body || email.message || '').trim();
+                // If model output placeholder dots or empty body, recover body from clean text
+                if (!resolvedBody || resolvedBody === '...' || resolvedBody.length < 5) {
+                  resolvedBody = cleanEmail.trim();
+                }
+
                 stagedDraft = await stageEmailDraft({
                   to: Array.isArray(email.to) ? email.to.join(', ') : (email.to || ''),
-                  subject: email.subject || 'Message from Oryn AI',
-                  body: email.body || email.message || ''
+                  subject: email.subject && email.subject !== '...' ? email.subject : 'Message from Oryn AI',
+                  body: resolvedBody
                 });
               } catch (e) {
                 console.error("Failed to stage email draft", e);
