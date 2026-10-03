@@ -181,12 +181,6 @@ export default function ExplorePage() {
         textAlign: 'center',
         borderBottom: '1px solid var(--border)',
         position: 'relative'
-      }}>
-        <div style={{ display: 'inline-flex', alignItems: 'center', gap: 8, padding: '4px 12px', borderRadius: 20, background: 'rgba(34, 197, 94, 0.1)', border: '1px solid rgba(34, 197, 94, 0.25)', color: 'var(--success)', fontSize: 11, fontWeight: 700, textTransform: 'uppercase', marginBottom: 16 }}>
-          <span style={{ width: 6, height: 6, borderRadius: '50%', background: 'var(--success)' }} />
-          LIVE ECOSYSTEM TELEMETRY · REAL-TIME DISCOVERY
-        </div>
-
         <h1 style={{ fontFamily: 'var(--font-display)', fontSize: 36, fontWeight: 800, marginBottom: 12, letterSpacing: '-0.02em', color: 'var(--text-primary)' }}>
           Explore the Ecosystem
         </h1>
@@ -259,7 +253,7 @@ export default function ExplorePage() {
 
         {loading ? (
           <div style={{ padding: 60, textAlign: 'center', color: 'var(--muted)', fontSize: 14 }}>
-            Syncing live ecosystem telemetry...
+            Loading ecosystem directory...
           </div>
         ) : (
           <div style={{ animation: 'rise 0.5s ease-out' }}>
