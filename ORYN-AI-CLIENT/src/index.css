@@ -123,14 +123,16 @@ input, textarea { font-family: inherit; }
   border-color: var(--glass-border);
 }
 
-/* Centered Enterprise Layout Helper */
-.page-centered-container {
-  max-width: 1200px;
-  margin: 0 auto;
+/* Full-Width Enterprise Layout Helper */
+.page-centered-container,
+.page-fullwidth-container {
+  width: 100%;
+  max-width: 100%;
+  margin: 0;
   display: flex;
   flex-direction: column;
   gap: 28px;
-  width: 100%;
+  box-sizing: border-box;
 }
 
 
