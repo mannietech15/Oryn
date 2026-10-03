@@ -20,19 +20,69 @@ function extractTasks(text: string): { clean: string; tasks: string[] } {
 }
 
 function extractEmailAction(text: string): { clean: string; email: any | null } {
-  const match = text.match(/(?:\n|^)?(?:```(?:json)?\s*)?\{"email_action":\s*"send"[\s\S]*?\}(?:\s*```)?/is);
+  // Matches raw or fenced JSON containing email_action: send
+  const match = text.match(/(?:\n|^)?(?:```(?:json)?\s*)?\{[\s\S]*?"email_action"\s*:\s*"send"[\s\S]*?\}(?:\s*```)?/is);
   if (!match) return { clean: text, email: null };
+
+  const matchedStr = match[0];
+  const cleanedText = text.replace(matchedStr, '').trim();
+
   try {
-    const jsonStr = match[0].replace(/```json/ig, '').replace(/```/g, '').trim();
-    const parsed = JSON.parse(jsonStr);
-    if (parsed.email_action === 'send') {
-      return { clean: text.replace(match[0], '').trim(), email: parsed };
+    const rawJson = matchedStr
+      .replace(/```(?:json)?/gi, '')
+      .replace(/```/g, '')
+      .trim();
+
+    // Direct JSON parse attempt
+    try {
+      const parsed = JSON.parse(rawJson);
+      if (parsed.email_action === 'send') {
+        return { clean: cleanedText, email: parsed };
+      }
+    } catch {
+      // Repair unescaped newlines inside strings if direct parse fails
+      const sanitized = rawJson.replace(/:\s*"([^"\\]*(?:\\.[^"\\]*)*)"/gs, (_, val) => {
+        return `:"${val.replace(/\n/g, '\\n').replace(/\r/g, '\\r').replace(/\t/g, '\\t')}"`;
+      });
+      const parsed = JSON.parse(sanitized);
+      if (parsed.email_action === 'send') {
+        return { clean: cleanedText, email: parsed };
+      }
     }
-    return { clean: text, email: null };
-  } catch (e) {
-    console.error("Failed to parse email action", e);
-    return { clean: text, email: null };
+  } catch {
+    // Graceful regex field extraction fallback for loosely formatted model output
+    try {
+      const toMatch = matchedStr.match(/"to"\s*:\s*(?:\[(.*?)\]|"([^"]+)")/i);
+      const subjMatch = matchedStr.match(/"subject"\s*:\s*"([^"]+)"/i);
+      const bodyMatch = matchedStr.match(/"body"\s*:\s*"([\s\S]*?)"(?:\s*\}|\s*,)/i);
+
+      let toVal: string[] = [];
+      if (toMatch) {
+        if (toMatch[1]) {
+          toVal = toMatch[1].split(',').map(s => s.replace(/["'\s]/g, '')).filter(Boolean);
+        } else if (toMatch[2]) {
+          toVal = [toMatch[2].trim()];
+        }
+      }
+
+      if (toVal.length > 0) {
+        return {
+          clean: cleanedText,
+          email: {
+            email_action: 'send',
+            to: toVal,
+            subject: subjMatch ? subjMatch[1] : 'Message from Oryn AI',
+            body: bodyMatch ? bodyMatch[1].replace(/\\n/g, '\n') : ''
+          }
+        };
+      }
+    } catch (e) {
+      console.error("Failed to parse email action with fallback", e);
+    }
   }
+
+  // Always strip matched JSON block so user never sees raw JSON in chat bubble
+  return { clean: cleanedText, email: null };
 }
 
 export function useChat() {
