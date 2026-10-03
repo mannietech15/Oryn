@@ -140,11 +140,11 @@ export default function CalendarPage() {
       </div>
 
       {/* Content Area */}
-      <div style={{ flex: 1, overflowY: 'auto', padding: '40px 48px' }}>
-        <div style={{ maxWidth: 1000, margin: '0 auto', display: 'flex', gap: 32 }}>
+      <div style={{ flex: 1, overflowY: 'auto', padding: '36px 40px' }}>
+        <div style={{ width: '100%', display: 'flex', gap: 32, alignItems: 'flex-start' }}>
           
           {/* Main Schedule */}
-          <div style={{ flex: 2, display: 'flex', flexDirection: 'column', gap: 16 }}>
+          <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 16 }}>
             {loading ? (
               <div style={{ color: 'var(--text-muted)', textAlign: 'center', padding: 40 }}>
                 Loading schedule...
@@ -166,7 +166,7 @@ export default function CalendarPage() {
           </div>
 
           {/* Right Sidebar */}
-          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 24 }}>
+          <div style={{ width: 360, flexShrink: 0, display: 'flex', flexDirection: 'column', gap: 24 }}>
             <div style={{ padding: '24px', background: 'rgba(249, 115, 22, 0.05)', border: '1px solid var(--accent-primary)', borderRadius: 16 }}>
               <h3 style={{ fontSize: 15, fontWeight: 700, color: 'var(--accent-primary)', margin: '0 0 12px', display: 'flex', alignItems: 'center', gap: 8 }}>
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="12 2 20.66 7 20.66 17 12 22 3.34 17 3.34 7"></polygon></svg>
