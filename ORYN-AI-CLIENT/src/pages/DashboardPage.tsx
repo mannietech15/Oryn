@@ -138,8 +138,18 @@ export default function DashboardPage({ orgProfile, currentUser }: DashboardPage
   const greeting = hour < 12 ? 'Good Morning' : hour < 18 ? 'Good Afternoon' : 'Good Evening';
 
   /* User & Organization identity context */
+  const [userName, setUserName] = useState<string>(() => {
+    return currentUser?.name || authService.getUser()?.name || localStorage.getItem('oryn_profile_name') || 'Administrator';
+  });
+
+  useEffect(() => {
+    const resolved = currentUser?.name || authService.getUser()?.name || localStorage.getItem('oryn_profile_name');
+    if (resolved) {
+      setUserName(resolved);
+    }
+  }, [currentUser]);
+
   const activeUser = currentUser || authService.getUser();
-  const userName = activeUser?.name || localStorage.getItem('oryn_profile_name') || 'Administrator';
   const businessName = orgProfile?.name || activeUser?.organization || 'ORYN Core';
 
   /* ── Dynamic System State ── */
