@@ -70,6 +70,8 @@ class RootErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState
   }
 }
 
+import { BrowserRouter } from 'react-router-dom';
+
 const rootElement = document.getElementById('root');
 
 if (!rootElement) {
@@ -79,7 +81,9 @@ if (!rootElement) {
 ReactDOM.createRoot(rootElement).render(
   <React.StrictMode>
     <RootErrorBoundary>
-      <App />
+      <BrowserRouter>
+        <App />
+      </BrowserRouter>
     </RootErrorBoundary>
   </React.StrictMode>
 );
