@@ -765,7 +765,7 @@ export default function ChatPage({
         {/* Messages List (Hidden if empty) */}
         {messages.length > 0 && (
           <div style={{ flex: 1, overflowY: 'auto', padding: isMobile ? '24px 16px' : '32px 48px', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-            <div style={{ width: '100%', maxWidth: '850px', display: 'flex', flexDirection: 'column', gap: 32 }}>
+            <div style={{ width: '100%', maxWidth: '1200px', display: 'flex', flexDirection: 'column', gap: 32 }}>
               {messages.map((m, i) => (
                 <MessageBubble
                   key={m.id}
@@ -816,7 +816,7 @@ export default function ChatPage({
         }}>
           <div style={{
             width: '100%', 
-            maxWidth: '850px', 
+            maxWidth: '1100px', 
             background: 'var(--card-bg)',
             backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)',
             borderRadius: 24, 
@@ -1121,7 +1121,7 @@ export default function ChatPage({
 
           {/* Pills for Empty State */}
           {messages.length === 0 && (
-            <div style={{ display: 'flex', gap: 12, marginTop: 16, flexWrap: 'wrap', justifyContent: 'center', maxWidth: '850px', width: '100%' }}>
+            <div style={{ display: 'flex', gap: 12, marginTop: 16, flexWrap: 'wrap', justifyContent: 'center', maxWidth: '1100px', width: '100%' }}>
               {[
                 { icon: <BarChart3 size={15} color="var(--accent-primary)" />, label: 'Analyze Data', prompt: 'Analyze the recent sales trends and identify key growth opportunities...' },
                 { icon: <TrendingUp size={15} color="var(--accent-primary)" />, label: 'Strategy', prompt: 'Help me outline a go-to-market strategy for a new product...' },

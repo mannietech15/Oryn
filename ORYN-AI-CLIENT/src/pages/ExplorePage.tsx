@@ -214,7 +214,7 @@ export default function ExplorePage() {
       </div>
 
       {/* Main Content Sections */}
-      <div style={{ padding: '40px', maxWidth: 1400, margin: '0 auto' }}>
+      <div style={{ padding: '36px 40px', width: '100%', boxSizing: 'border-box' }}>
         
         {/* Navigation Tabs and Create Action */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 40, borderBottom: '1px solid var(--border)', paddingBottom: 16, flexWrap: 'wrap', gap: 16 }}>
