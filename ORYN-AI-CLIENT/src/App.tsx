@@ -179,7 +179,7 @@ export default function App() {
   const renderPage = () => {
     switch (page) {
       case 'chat':         return <ChatPage {...chat} />;
-      case 'dashboard':    return <DashboardPage orgProfile={orgProfile || (currentUser?.organization ? { name: currentUser.organization } : null)} />;
+      case 'dashboard':    return <DashboardPage orgProfile={orgProfile || (currentUser?.organization ? { name: currentUser.organization } : null)} currentUser={currentUser} />;
       case 'analytics':    return <AnalyticsPage />;
       case 'organization': return <OrganizationPage />;
       case 'financials':   return <FinancialsPage />;
@@ -198,7 +198,7 @@ export default function App() {
           onCancel={() => navigate('dashboard')}
         />
       );
-      default:             return <DashboardPage orgProfile={orgProfile || (currentUser?.organization ? { name: currentUser.organization } : null)} />;
+      default:             return <DashboardPage orgProfile={orgProfile || (currentUser?.organization ? { name: currentUser.organization } : null)} currentUser={currentUser} />;
     }
   };
 
