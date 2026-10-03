@@ -76,6 +76,23 @@ export default function Sidebar({
 }: Props) {
   const [hoveredItem, setHoveredItem] = useState<string | null>(null);
   
+  const [isOrgDropdownOpen, setIsOrgDropdownOpen] = useState(false);
+  const orgDropdownRef = React.useRef<HTMLDivElement>(null);
+
+  React.useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (orgDropdownRef.current && !orgDropdownRef.current.contains(event.target as Node)) {
+        setIsOrgDropdownOpen(false);
+      }
+    };
+    if (isOrgDropdownOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [isOrgDropdownOpen]);
+
   const [windowWidth, setWindowWidth] = useState(typeof window !== 'undefined' ? window.innerWidth : 1024);
   React.useEffect(() => {
     const handleResize = () => setWindowWidth(window.innerWidth);
