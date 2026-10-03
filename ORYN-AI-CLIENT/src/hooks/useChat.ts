@@ -344,7 +344,16 @@ export function useChat() {
           }
           
           const errMsg = error.message || '';
-          const isTransient = errMsg.includes('terminated') || errMsg.includes('Connection') || errMsg.includes('upstream') || errMsg.includes('fetch') || errMsg.toLowerCase().includes('time');
+          const isTransient = errMsg.includes('terminated') || 
+                              errMsg.includes('Connection') || 
+                              errMsg.includes('upstream') || 
+                              errMsg.includes('fetch') || 
+                              errMsg.toLowerCase().includes('time') ||
+                              errMsg.toLowerCase().includes('out of memory') ||
+                              errMsg.toLowerCase().includes('cuda') ||
+                              errMsg.toLowerCase().includes('engine loop') ||
+                              errMsg.includes('503') ||
+                              errMsg.includes('500');
           
           if (isTransient && retryCount < MAX_RETRIES) {
             retryCount++;
@@ -364,12 +373,19 @@ export function useChat() {
     } catch (err: any) {
       const isAuthError = err.message?.includes('API key not valid') || err.message?.includes('INVALID_ARGUMENT') || err.message?.includes('401');
       const isRateLimit = err.message?.includes('rate-limit') || err.message?.includes('429');
+      const isGpuOverload = err.message?.toLowerCase().includes('out of memory') || 
+                            err.message?.toLowerCase().includes('cuda') || 
+                            err.message?.toLowerCase().includes('engine loop') ||
+                            err.message?.includes('GPU node') ||
+                            err.message?.includes('memory overload');
       
       let errorContent: string;
       if (isAuthError) {
         errorContent = '***[API AUTHENTICATION ERROR]***<br/><br/>NVIDIA NIM is reporting that your **API Key is invalid**. Please check your `.env` file in `ORYN-AI-SERVER`, ensure there are no trailing spaces, and **restart the server**.';
       } else if (isRateLimit) {
         errorContent = '***[RATE LIMITED]***<br/><br/>The AI inference gateway is temporarily rate-limited. Please **wait 30 seconds** and try again.';
+      } else if (isGpuOverload) {
+        errorContent = '***[COMPUTE CLUSTER LOAD]***<br/><br/>The NVIDIA inference node encountered temporary GPU memory load. Please resend your message or switch model tier in the selector.';
       } else if (err.message?.includes('terminated')) {
         errorContent = '***[CONNECTION DROPPED]***<br/><br/>The connection to the AI provider was dropped unexpectedly after multiple retries. Please try sending your message again.';
       } else if (err.message && !err.message.includes('fetch')) {
