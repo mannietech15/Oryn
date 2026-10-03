@@ -190,10 +190,12 @@ export function buildFiscalKpis(
   entryCount: number
 ): FiscalKpiData[] {
   const rev = metrics?.totalRevenue ?? 0;
+  const exp = metrics?.totalExpenses ?? 0;
+  const np = metrics?.netProfit ?? 0;
   return [
     {
       label: 'Gross Ledger Revenue',
-      value: `$${(rev / 1000).toFixed(1)}K`,
+      value: rev >= 1000 ? `$${(rev / 1000).toFixed(1)}K` : `$${rev.toLocaleString()}`,
       detail: `${entryCount} total transactions posted to ledger`,
       source: 'JSON Storage Engine',
       period: 'Verified historical total',
@@ -207,7 +209,7 @@ export function buildFiscalKpis(
     },
     {
       label: 'Operational Disbursements',
-      value: `$${((metrics?.totalExpenses ?? 0) / 1000).toFixed(1)}K`,
+      value: exp >= 1000 ? `$${(exp / 1000).toFixed(1)}K` : `$${exp.toLocaleString()}`,
       detail: 'Accumulated operational liabilities',
       source: 'Accounts Payable Ledger',
       period: 'Verified historical total',
@@ -221,7 +223,7 @@ export function buildFiscalKpis(
     },
     {
       label: 'Net Capital Velocity',
-      value: `${(metrics?.netProfit ?? 0) < 0 ? '-' : ''}$${Math.abs((metrics?.netProfit ?? 0) / 1000).toFixed(1)}K`,
+      value: `${np < 0 ? '-' : ''}$${Math.abs(np) >= 1000 ? (Math.abs(np) / 1000).toFixed(1) + 'K' : Math.abs(np).toLocaleString()}`,
       detail: (metrics?.netProfit ?? 0) >= 0 ? 'Net positive retained cash velocity' : 'Operating deficit / negative run-rate',
       source: 'Capital Treasury Ledger',
       period: 'Verified net delta',
