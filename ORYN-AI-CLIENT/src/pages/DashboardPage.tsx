@@ -333,35 +333,12 @@ export default function DashboardPage({ orgProfile }: { orgProfile?: any }) {
         {/* ── Credible Header with Real System Status ── */}
         <div className="mobile-stack" style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between' }}>
           <div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 8 }}>
-              {/* Subtle System Status Pill */}
-              <div style={{
-                display: 'inline-flex', alignItems: 'center', gap: 6,
-                padding: '3px 10px', borderRadius: 6,
-                background: 'rgba(34, 197, 94, 0.08)', border: '1px solid rgba(34, 197, 94, 0.2)',
-                fontSize: 11, fontWeight: 600, color: 'var(--success)', fontFamily: 'monospace'
-              }}>
-                <span style={{ width: 6, height: 6, borderRadius: '50%', background: 'var(--success)', display: 'inline-block' }} />
-                TELEMETRY ENGINE: ONLINE
-              </div>
-
-              {/* Verified Ledger Badge */}
-              <div style={{
-                display: 'inline-flex', alignItems: 'center', gap: 6,
-                padding: '3px 10px', borderRadius: 6,
-                background: 'var(--glass-bg-subtle)', border: '1px solid var(--card-border)',
-                fontSize: 11, color: 'var(--text-muted)', fontFamily: 'monospace'
-              }}>
-                {finMetrics?.entryCount ? `PERSISTENT LEDGER · ${finMetrics.entryCount} TRANSACTIONS` : 'UNINITIALIZED LEDGER'}
-              </div>
-            </div>
-
             <div className="dashboard-header-text" style={{ display: 'flex', alignItems: 'baseline', gap: 8 }}>
               <span style={{ fontFamily: 'var(--font-display)', fontSize: 26, fontWeight: 700, color: 'var(--text-primary)', letterSpacing: '-0.02em' }}>{greeting},</span>
               <span style={{ fontFamily: 'var(--font-display)', fontSize: 26, fontWeight: 700, color: 'var(--accent-primary)', letterSpacing: '-0.02em' }}>{businessName}</span>
             </div>
             <div style={{ fontSize: 13, color: 'var(--text-secondary)', marginTop: 2 }}>
-              Enterprise Operations & Financial Telemetry Center
+              Enterprise Operations & Overview
             </div>
           </div>
 
