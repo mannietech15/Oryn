@@ -109,13 +109,18 @@ export class EmailService {
       throw new AppError(errorMsg, 503, ErrorCode.SMTP_UNCONFIGURED);
     }
 
-    try {
+      const formattedHtml = `
+        <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; font-size: 15px; line-height: 1.6; color: #111827; max-width: 600px;">
+          ${body.split(/\n\s*\n/).map(p => `<p style="margin: 0 0 14px 0;">${p.replace(/\n/g, '<br>')}</p>`).join('')}
+        </div>
+      `;
+
       const info = await this.transporter.sendMail({
         from: `"Oryn AI" <${ENV.SMTP_USER}>`,
         to: recipient,
         subject: finalSubject,
         text: body,
-        html: body.replace(/\n/g, '<br>'),
+        html: formattedHtml,
       });
 
       logger.info('Email dispatched via verified SMTP transport', { messageId: info.messageId, to: recipient });
