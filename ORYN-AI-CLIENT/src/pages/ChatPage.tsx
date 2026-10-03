@@ -577,9 +577,26 @@ function MessageBubble({ msg, isMobile, onImageClick, language, onEdit, onRegene
             )}
 
             {msg.emailDraft.status === 'failed' && (
-              <div style={{ fontSize: 11, color: 'var(--danger)', fontFamily: 'monospace', display: 'flex', alignItems: 'center', gap: 6 }}>
-                <XCircle size={13} />
-                {msg.emailDraft.error || 'Failed to dispatch email.'}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                <div style={{ fontSize: 11, color: 'var(--danger)', fontFamily: 'monospace', display: 'flex', alignItems: 'center', gap: 6 }}>
+                  <XCircle size={13} />
+                  {msg.emailDraft.error || 'Failed to dispatch email.'}
+                </div>
+                <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 8, marginTop: 4 }}>
+                  <button
+                    onClick={() => onDiscardEmail?.(msg.id)}
+                    style={{ padding: '4px 10px', borderRadius: 6, background: 'transparent', border: '1px solid var(--card-border)', color: 'var(--text-muted)', fontSize: 11, cursor: 'pointer' }}
+                  >
+                    Dismiss
+                  </button>
+                  <button
+                    onClick={handleConfirmEmail}
+                    disabled={isSendingEmail}
+                    style={{ padding: '4px 12px', borderRadius: 6, background: 'rgba(239, 68, 68, 0.15)', border: '1px solid rgba(239, 68, 68, 0.3)', color: '#ef4444', fontSize: 11, fontWeight: 600, cursor: isSendingEmail ? 'wait' : 'pointer' }}
+                  >
+                    {isSendingEmail ? 'Retrying...' : 'Retry Dispatch'}
+                  </button>
+                </div>
               </div>
             )}
           </div>
