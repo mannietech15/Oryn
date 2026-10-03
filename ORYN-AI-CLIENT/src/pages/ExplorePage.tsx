@@ -181,6 +181,7 @@ export default function ExplorePage() {
         textAlign: 'center',
         borderBottom: '1px solid var(--border)',
         position: 'relative'
+      }}>
         <h1 style={{ fontFamily: 'var(--font-display)', fontSize: 36, fontWeight: 800, marginBottom: 12, letterSpacing: '-0.02em', color: 'var(--text-primary)' }}>
           Explore the Ecosystem
         </h1>

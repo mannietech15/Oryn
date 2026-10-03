@@ -89,12 +89,11 @@ export function FiscalInsightSummary({
       }}
     >
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 12, borderBottom: '1px solid var(--card-border)', paddingBottom: 12 }}>
-        <div style={{ fontFamily: 'monospace', fontSize: 11, fontWeight: 700, color: 'var(--accent-primary)', letterSpacing: 1, display: 'flex', alignItems: 'center', gap: 8 }}>
-          <span style={{ width: 6, height: 6, borderRadius: '50%', background: 'var(--accent-primary)' }} />
-          FISCAL AUDIT · DOUBLE-ENTRY LEDGER RECONCILIATION
+        <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--accent-primary)', display: 'flex', alignItems: 'center', gap: 8 }}>
+          Financial Summary & Analysis
         </div>
-        <div style={{ fontSize: 11, color: 'var(--text-muted)', fontFamily: 'monospace' }}>
-          DATASET: PERSISTENT_LEDGER_STORAGE
+        <div style={{ fontSize: 12, color: 'var(--text-muted)' }}>
+          Verified Accounting Summary
         </div>
       </div>
 

@@ -51,16 +51,7 @@ export default function Header({ page, onNavigate, onToggleSidebar }: Props) {
           </div>
         </div>
 
-        {/* Technical Status & Demo Workspace Indicator */}
-        <div className="hide-on-mobile" style={{ display: 'flex', alignItems: 'center', gap: 8, marginLeft: 8, paddingLeft: 14, borderLeft: '1px solid var(--card-border)' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 11, fontFamily: 'monospace', color: 'var(--text-muted)' }}>
-            <span style={{ width: 6, height: 6, borderRadius: '50%', background: 'var(--success)', display: 'inline-block' }} />
-            <span>ENGINE v1.0</span>
-          </div>
-          <span style={{ fontSize: 10, color: 'var(--text-muted)', background: 'var(--glass-bg-subtle)', padding: '2px 6px', borderRadius: 4, fontFamily: 'monospace', border: '1px solid var(--card-border)' }}>
-            DEMO WORKSPACE
-          </span>
-        </div>
+
       </div>
 
       {/* Center: Global Search Bar */}
