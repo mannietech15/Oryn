@@ -243,6 +243,78 @@ export function useChat() {
     
     const baseMessages = overrideMessages || messages;
 
+    // Check if user is confirming an awaiting email draft by typing 'yes', 'send it', 'confirm', etc.
+    const normalizedText = text.trim().toLowerCase().replace(/[.,!]/g, '');
+    const isConfirmation = ['yes', 'send it', 'confirm', 'proceed', 'go ahead', 'send the email', 'send email'].includes(normalizedText);
+    const pendingEmailMsg = baseMessages.slice().reverse().find(m => m.emailDraft && m.emailDraft.status === 'awaiting_approval');
+
+    if (isConfirmation && pendingEmailMsg && pendingEmailMsg.emailDraft) {
+      const userMsg: Message = {
+        id: genId(),
+        role: 'user',
+        content: text,
+        timestamp: new Date()
+      };
+      setMessages(prev => [...prev, userMsg]);
+      setStats(prev => ({ ...prev, messages: prev.messages + 1 }));
+
+      const draftId = pendingEmailMsg.emailDraft.id;
+      const targetMessageId = pendingEmailMsg.id;
+      const recipient = pendingEmailMsg.emailDraft.to;
+
+      const confirmAssistantId = genId();
+      setMessages(prev => [...prev, {
+        id: confirmAssistantId,
+        role: 'assistant',
+        content: `Authorizing Human-in-the-Loop dispatch via SMTP relay...`,
+        timestamp: new Date()
+      }]);
+
+      try {
+        const res = await confirmEmailDraft(draftId);
+        setMessages(prev => prev.map(m => {
+          if (m.id === targetMessageId && m.emailDraft) {
+            return {
+              ...m,
+              emailDraft: {
+                ...m.emailDraft,
+                status: 'sent',
+                messageId: res.messageId
+              }
+            };
+          }
+          if (m.id === confirmAssistantId) {
+            return {
+              ...m,
+              content: `Email successfully dispatched via configured Gmail SMTP relay to **${recipient}**.\n\n*Reference ID: \`${res.messageId || 'SENT'}\`*`
+            };
+          }
+          return m;
+        }));
+      } catch (err: any) {
+        setMessages(prev => prev.map(m => {
+          if (m.id === targetMessageId && m.emailDraft) {
+            return {
+              ...m,
+              emailDraft: {
+                ...m.emailDraft,
+                status: 'failed',
+                error: err.message || 'SMTP dispatch failed'
+              }
+            };
+          }
+          if (m.id === confirmAssistantId) {
+            return {
+              ...m,
+              content: `SMTP dispatch attempt failed: ${err.message || 'Transport connection error'}. You can check your SMTP settings or retry.`
+            };
+          }
+          return m;
+        }));
+      }
+      return;
+    }
+
     // Rename session if it's new
     setSessions(prev => prev.map(s => {
       if (s.id === activeSessionId && s.title === 'New Conversation') {
