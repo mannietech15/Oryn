@@ -210,7 +210,7 @@ export default function DashboardPage({ orgProfile }: { orgProfile?: any }) {
   const contextualKPIs = [
     {
       label: 'Fiscal Ledger Revenue',
-      value: finMetrics ? `$${(finMetrics.totalRevenue / 1000).toFixed(1)}K` : '$0.0K',
+      value: finMetrics ? (finMetrics.totalRevenue >= 1000 ? `$${(finMetrics.totalRevenue / 1000).toFixed(1)}K` : `$${finMetrics.totalRevenue.toLocaleString()}`) : '$0',
       change: finMetrics?.totalRevenue > 0 ? '+12.4% vs previous cycle' : 'No transactions recorded',
       trend: finMetrics?.totalRevenue > 0 ? 'up' : 'neutral',
       period: finMetrics?.entryCount ? `Verified ledger (${finMetrics.entryCount} posted transactions)` : 'Ledger initialized',
@@ -220,7 +220,7 @@ export default function DashboardPage({ orgProfile }: { orgProfile?: any }) {
     },
     {
       label: 'Operating Net Profit',
-      value: finMetrics ? `$${(finMetrics.netProfit / 1000).toFixed(1)}K` : '$0.0K',
+      value: finMetrics ? (Math.abs(finMetrics.netProfit) >= 1000 ? `${finMetrics.netProfit < 0 ? '-' : ''}$${Math.abs(finMetrics.netProfit / 1000).toFixed(1)}K` : `${finMetrics.netProfit < 0 ? '-' : ''}$${Math.abs(finMetrics.netProfit).toLocaleString()}`) : '$0',
       change: `${finMetrics?.margin ?? 0}% Operating Margin`,
       trend: (finMetrics?.margin ?? 0) >= 20 ? 'up' : 'down',
       period: 'Fiscal accounting ledger cycle',
