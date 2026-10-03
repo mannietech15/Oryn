@@ -188,7 +188,7 @@ export default function AnalyticsPage() {
 
   return (
     <div style={{ flex: 1, overflowY: 'auto', padding: '36px 40px', background: 'var(--bg)', position: 'relative' }}>
-      <div style={{ maxWidth: 1200, margin: '0 auto', display: 'flex', flexDirection: 'column', gap: 28 }}>
+      <div style={{ width: '100%', display: 'flex', flexDirection: 'column', gap: 28 }}>
         
         {/* Header */}
         <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between' }}>
@@ -224,7 +224,7 @@ export default function AnalyticsPage() {
         <OperationalInsightSummary finMetrics={finMetrics} wfStats={wfStats} />
 
         {/* Contextual KPIs */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 16 }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: 16 }}>
           {contextualAnalyticsKpis.map((k, i) => (
             <div key={i} style={{
               background: 'var(--card-bg)', border: '1px solid var(--card-border)',
@@ -256,7 +256,7 @@ export default function AnalyticsPage() {
               No financial telemetry recorded for this time range. Post transactions in Fiscal Ledger to view live trend lines.
             </div>
           ) : (
-            <div style={{ width: '100%', height: 280, marginTop: 10 }}>
+            <div style={{ width: '100%', height: 320, marginTop: 10 }}>
               <ResponsiveContainer width="100%" height="100%">
                 <AreaChart data={chartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                   <defs>
@@ -283,7 +283,7 @@ export default function AnalyticsPage() {
 
         {/* Statistical Projections Section */}
         <AnCard title="Statistical Forecast Model (Estimate)" subtitle="Projected 30-day baseline extrapolated from current ledger run-rate">
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 16 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 16 }}>
             <div style={{ background: 'var(--glass-bg-subtle)', padding: 16, borderRadius: 12, border: '1px solid var(--card-border)' }}>
               <div style={{ fontSize: 10, color: 'var(--text-muted)', textTransform: 'uppercase', fontFamily: 'monospace' }}>PROJECTED REVENUE (NEXT 30D)</div>
               <div style={{ fontSize: 24, fontWeight: 700, color: 'var(--text-primary)', marginTop: 4 }}>
