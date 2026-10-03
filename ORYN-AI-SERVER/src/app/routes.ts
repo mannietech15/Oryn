@@ -12,6 +12,7 @@ import documentsRoutes from '../modules/documents/documents.routes';
 import organizationRoutes from '../modules/organization/organization.routes';
 import calendarRoutes from '../modules/calendar/calendar.routes';
 import ecosystemRoutes from '../modules/ecosystem/ecosystem.routes';
+import authRoutes from '../modules/auth/auth.routes';
 
 const router = Router();
 
@@ -19,6 +20,7 @@ const router = Router();
 router.use('/', healthRoutes);
 
 // Mount Modular API Routes under /api
+router.use('/api', authRoutes);
 router.use('/api', chatRoutes);
 router.use('/api', analysisRoutes);
 router.use('/api', dashboardRoutes);
