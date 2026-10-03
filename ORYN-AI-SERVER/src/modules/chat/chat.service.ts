@@ -6,9 +6,27 @@ import { Logger } from '../../infrastructure/logging/logger';
 
 const logger = new Logger('ChatService');
 
+/**
+ * ChatService coordinates conversation flows, system prompt synthesis, and
+ * tool-assisted AI completions.
+ * 
+ * HUMAN-IN-THE-LOOP (HITL) ARCHITECTURE:
+ * To safeguard communications and prevent autonomous email spam, Oryn strictly implements
+ * a two-stage dispatch protocol:
+ * 1. Staging: When an email generation intent is detected, the LLM constructs the draft
+ *    and appends a structured JSON payload (`email_action: "send"`).
+ * 2. Review & Consent: The frontend client strips raw JSON from view, mounts a high-fidelity
+ *    approval card showing recipient, subject, and content preview, and requires user authorization.
+ * 3. Execution: On explicit user consent (either via the UI action button or conversational
+ *    affirmation), the backend triggers authenticated SMTP transport with real-time audit logging.
+ */
 export class ChatService {
   constructor(private inference: InferenceService = defaultInferenceService) {}
 
+  /**
+   * Constructs the master system prompt including model personality, tool capabilities,
+   * language localization, and Human-in-the-Loop action schemas.
+   */
   buildSystemPrompt(options: { webSearch?: boolean; taskExtract?: boolean; language?: string }): string {
     const { webSearch, taskExtract, language } = options;
     return `You are Oryn (pronounced "Orine"), a sleek futuristic business AI assistant. Your name is Oryn — always write it as "Oryn" (never spell it out letter by letter). You are professional, insightful, and concise.

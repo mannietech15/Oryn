@@ -8,6 +8,15 @@ import { ErrorCode } from '../../shared/errors/error-codes';
 
 const logger = new Logger('EmailService');
 
+/**
+ * EmailService manages outbound communication through verified SMTP transports.
+ * 
+ * SECURITY & AUDIT PROTOCOL:
+ * - Direct execution without human authorization is prohibited for unverified actions.
+ * - Outgoing drafts are staged in persistent local storage with unique IDs and 'awaiting_approval' status.
+ * - Confirmed dispatches update the audit record with remote messageId and timestamp.
+ * - Failed dispatches log error traces and retain records for diagnostic retries.
+ */
 export class EmailService {
   private transporter: nodemailer.Transporter | null = null;
   private isConfigured: boolean = false;
@@ -109,6 +118,7 @@ export class EmailService {
       throw new AppError(errorMsg, 503, ErrorCode.SMTP_UNCONFIGURED);
     }
 
+    try {
       const formattedHtml = `
         <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; font-size: 15px; line-height: 1.6; color: #111827; max-width: 600px;">
           ${body.split(/\n\s*\n/).map(p => `<p style="margin: 0 0 14px 0;">${p.replace(/\n/g, '<br>')}</p>`).join('')}

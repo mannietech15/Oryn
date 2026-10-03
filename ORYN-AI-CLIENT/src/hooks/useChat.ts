@@ -571,6 +571,12 @@ export function useChat() {
     sendMessage(userMsg.content, newHistory);
   }, [messages, isStreaming, sendMessage]);
 
+  /**
+   * Human-in-the-Loop Email Confirmation Handler:
+   * Authorizes and dispatches an awaiting draft through the backend SMTP transport.
+   * Can be triggered directly by the user clicking "Confirm & Send" on the proposal card,
+   * or conversationally when the user replies affirmatively ("yes", "send it", "approved").
+   */
   const confirmEmail = useCallback(async (messageId: string, draftId: string) => {
     try {
       const res = await confirmEmailDraft(draftId);
