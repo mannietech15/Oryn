@@ -83,7 +83,7 @@ export default function OrganizationPage() {
 
   return (
     <div style={{ flex: 1, overflowY: 'auto', padding: '36px 40px', background: 'var(--bg)', position: 'relative' }}>
-      <div className="page-centered-container">
+      <div className="page-fullwidth-container" style={{ width: '100%', display: 'flex', flexDirection: 'column', gap: 28 }}>
 
         
         {/* Header */}
@@ -155,7 +155,7 @@ export default function OrganizationPage() {
         <OrgKpiGrid items={kpiItems} loading={loading} />
 
         {/* 2-Column Section: Business Profile & Departments */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'minmax(320px, 1.15fr) minmax(320px, 1fr)', gap: 24, alignItems: 'start' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(420px, 1fr))', gap: 24, alignItems: 'start' }}>
           {/* Left Column: Business Profile */}
           <OrgCard 
             title="Enterprise Business Profile" 
