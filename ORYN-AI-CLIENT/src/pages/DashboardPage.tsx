@@ -346,7 +346,7 @@ export default function DashboardPage({ orgProfile, currentUser }: DashboardPage
               <span style={{ fontFamily: 'var(--font-display)', fontSize: 26, fontWeight: 700, color: 'var(--accent-primary)', letterSpacing: '-0.02em' }}>{userName}</span>
             </div>
             <div style={{ fontSize: 13, color: 'var(--text-secondary)', marginTop: 2 }}>
-              Enterprise Operations & Overview
+              {businessName} · Enterprise Operations & Overview
             </div>
           </div>
 
