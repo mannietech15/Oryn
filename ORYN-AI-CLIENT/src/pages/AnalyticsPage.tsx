@@ -138,7 +138,7 @@ export default function AnalyticsPage() {
   const contextualAnalyticsKpis = [
     {
       icon: <TrendingUp size={22} />,
-      value: finMetrics ? `$${(finMetrics.totalRevenue / 1000).toFixed(1)}K` : '$0.0K',
+      value: finMetrics ? (finMetrics.totalRevenue >= 1000 ? `$${(finMetrics.totalRevenue / 1000).toFixed(1)}K` : `$${finMetrics.totalRevenue.toLocaleString()}`) : '$0',
       label: 'Ledger Revenue',
       period: 'Verified persistent ledger volume',
       source: 'JSON Ledger Storage',
