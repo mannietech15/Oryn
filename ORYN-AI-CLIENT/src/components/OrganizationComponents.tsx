@@ -647,7 +647,7 @@ export function PersonnelDirectory({ employees, loading = false }: PersonnelDire
 
       {/* Personnel List Items */}
       {!loading && filtered.length > 0 && (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 10, maxHeight: 460, overflowY: 'auto', paddingRight: 4 }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 10, maxHeight: 520, overflowY: 'auto', paddingRight: 4 }}>
           {filtered.map(emp => (
             <PersonnelTableRow key={emp.id} employee={emp} />
           ))}
