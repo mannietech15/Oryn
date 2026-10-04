@@ -13,7 +13,12 @@ router.post(
 );
 router.get('/dashboard/briefing', defaultDashboardController.getBriefing);
 router.get('/dashboard/alerts', defaultDashboardController.getAlerts);
+router.post('/dashboard/alerts/:id/dismiss', defaultDashboardController.dismissAlert);
+
 router.get('/dashboard/goals', defaultDashboardController.getGoals);
+router.post('/dashboard/goals', defaultDashboardController.createGoal);
+router.patch('/dashboard/goals/:id', defaultDashboardController.updateGoal);
+router.delete('/dashboard/goals/:id', defaultDashboardController.deleteGoal);
 router.post(
   '/dashboard/goals/:id/action',
   validateParams(goalActionParamSchema),

@@ -51,6 +51,8 @@ model Organization {
   workflows   Workflow[]
   documents   Document[]
   events      CalendarEvent[]
+  goals       StrategicGoal[]
+  alerts      AnomalyAlert[]
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
@@ -252,3 +254,35 @@ model IntegrationSecret {
 
   @@map("integration_secrets")
 }
+
+model StrategicGoal {
+  id          String       @id @default(uuid())
+  orgId       String
+  organization Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  label       String
+  target      Float
+  current     Float        @default(0)
+  unit        String       @default("") // '$', '%', ''
+  color       String       @default("#f97316")
+  completed   Boolean      @default(false)
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+
+  @@map("strategic_goals")
+}
+
+model AnomalyAlert {
+  id          String       @id @default(uuid())
+  orgId       String
+  organization Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  type        String       // 'critical' | 'warning' | 'opportunity' | 'info'
+  icon        String       @default("⚡")
+  title       String
+  detail      String
+  action      String
+  dismissed   Boolean      @default(false)
+  createdAt   DateTime     @default(now())
+
+  @@map("anomaly_alerts")
+}
+

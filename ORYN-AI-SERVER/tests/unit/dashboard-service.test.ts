@@ -32,14 +32,14 @@ describe('DashboardService', () => {
     assert.ok(briefing.highlight);
   });
 
-  it('should return goals list', () => {
-    const goals = service.getGoals();
+  it('should return goals list', async () => {
+    const goals = await service.getGoals();
     assert.ok(Array.isArray(goals));
-    assert.strictEqual(goals.length, 4);
+    assert.ok(goals.length >= 4);
   });
 
-  it('should calculate system health score with breakdown', () => {
-    const health = service.getHealthScore();
+  it('should calculate system health score with breakdown', async () => {
+    const health = await service.getHealthScore();
     assert.strictEqual(typeof health.score, 'number');
     assert.ok(health.score >= 0 && health.score <= 100);
     assert.ok(Array.isArray(health.breakdown));

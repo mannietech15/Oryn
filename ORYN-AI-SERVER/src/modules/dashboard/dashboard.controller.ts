@@ -37,8 +37,52 @@ export class DashboardController {
     }
   };
 
-  getGoals = (_req: Request, res: Response): void => {
-    res.json(this.dashboardService.getGoals());
+  getGoals = async (_req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const goals = await this.dashboardService.getGoals();
+      res.json(goals);
+    } catch (err) {
+      next(err);
+    }
+  };
+
+  createGoal = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const created = await this.dashboardService.createGoal(req.body);
+      res.status(201).json(created);
+    } catch (err) {
+      next(err);
+    }
+  };
+
+  updateGoal = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const { id } = req.params;
+      const success = await this.dashboardService.updateGoal(id, req.body);
+      res.json({ success });
+    } catch (err) {
+      next(err);
+    }
+  };
+
+  deleteGoal = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const { id } = req.params;
+      const success = await this.dashboardService.deleteGoal(id);
+      res.json({ success });
+    } catch (err) {
+      next(err);
+    }
+  };
+
+  dismissAlert = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const { id } = req.params;
+      const success = await this.dashboardService.dismissAlert(id);
+      res.json({ success });
+    } catch (err) {
+      next(err);
+    }
   };
 
   getGoalAction = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
@@ -54,8 +98,13 @@ export class DashboardController {
     }
   };
 
-  getHealthScore = (_req: Request, res: Response): void => {
-    res.json(this.dashboardService.getHealthScore());
+  getHealthScore = async (_req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const health = await this.dashboardService.getHealthScore();
+      res.json(health);
+    } catch (err) {
+      next(err);
+    }
   };
 }
 

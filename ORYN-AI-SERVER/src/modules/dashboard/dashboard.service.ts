@@ -10,6 +10,7 @@ import { InferenceService, defaultInferenceService } from '../inference/inferenc
 import { Logger } from '../../infrastructure/logging/logger';
 import { defaultDatastore, Datastore } from '../../infrastructure/storage/datastore';
 import { defaultEmailService, EmailService } from '../email/email.service';
+import { prisma } from '../../infrastructure/database/prisma';
 import { ENV } from '../../config/env';
 
 const logger = new Logger('DashboardService');
@@ -191,33 +192,72 @@ Respond ONLY with a JSON object (no markdown):
     }
   }
 
-  async getAlerts(): Promise<AlertItem[]> {
+  async getAlerts(orgId = 'org_oryn_global_001'): Promise<AlertItem[]> {
     const alerts: AlertItem[] = [];
-    const fin = this.datastore.getFinancialMetrics();
-    const taskStats = this.datastore.getTaskMetrics();
-    const smtpStatus = await this.emailService.verifyTransport();
 
+    try {
+      const persistedAlerts = await prisma.anomalyAlert.findMany({
+        where: { orgId, dismissed: false },
+        orderBy: { createdAt: 'desc' },
+      });
+      for (const a of persistedAlerts) {
+        alerts.push({
+          id: a.id,
+          type: a.type as any,
+          icon: a.icon,
+          title: a.title,
+          detail: a.detail,
+          action: a.action,
+          time: new Date(a.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        });
+      }
+
+      // Query live workflow failures from PostgreSQL
+      const recentFailures = await prisma.workflowExecutionLog.findMany({
+        where: { status: 'FAILURE' },
+        orderBy: { executedAt: 'desc' },
+        take: 2,
+        include: { workflow: true },
+      });
+      for (const f of recentFailures) {
+        alerts.push({
+          id: `wf-fail-${f.id}`,
+          type: 'critical',
+          icon: '🚨',
+          title: `Pipeline Interrupted: ${f.workflow?.name || 'Automation Task'}`,
+          detail: f.errorDetails || 'Workflow execution terminated with unhandled exception.',
+          action: 'Inspect execution stack trace in Automation Telemetry log.',
+          time: new Date(f.executedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        });
+      }
+    } catch {
+      // Fallback
+    }
+
+    // SMTP Transport Live Probe
+    const smtpStatus = await this.emailService.verifyTransport();
     if (!smtpStatus.connected) {
       alerts.push({
         id: 'alert-smtp',
         type: 'warning',
         icon: '🔌',
-        title: 'SMTP Transport Unconfigured',
+        title: 'SMTP Transport Offline',
         detail: smtpStatus.message,
         action: 'Configure valid SMTP_HOST and SMTP_PASS in server .env to enable mail dispatch.',
-        time: 'Active now'
+        time: 'Active now',
       });
     }
 
+    const fin = this.datastore.getFinancialMetrics();
     if (fin.entryCount === 0) {
       alerts.push({
         id: 'alert-fin-empty',
         type: 'info',
         icon: '📊',
-        title: 'Financial Ledger Has No Records',
-        detail: 'No transactions have been posted to the fiscal ledger yet.',
+        title: 'Fiscal Ledger Initialized',
+        detail: 'No transactions have been posted to the persistent ledger yet.',
         action: 'Post a transaction in Financials to populate real-time margin analytics.',
-        time: 'Pending'
+        time: 'Pending',
       });
     } else if (fin.margin < 15) {
       alerts.push({
@@ -227,49 +267,153 @@ Respond ONLY with a JSON object (no markdown):
         title: 'Operating Margin Compression',
         detail: `Operating margin is currently at ${fin.margin}%, below the 20% target baseline.`,
         action: 'Audit cloud infrastructure expenses and metered API token consumption.',
-        time: 'Calculated'
+        time: 'Calculated',
       });
     }
-
-    if (taskStats.avgLatencyMs > 400) {
-      alerts.push({
-        id: 'alert-latency',
-        type: 'warning',
-        icon: '⏱️',
-        title: 'Inference Latency Spike',
-        detail: `Average task latency is ${taskStats.avgLatencyMs}ms across the last ${taskStats.totalCount} operations.`,
-        action: 'Inspect upstream NVIDIA NIM response times or fallback routing.',
-        time: 'Telemetry check'
-      });
-    }
-
-    alerts.push({
-      id: 'alert-health',
-      type: 'opportunity',
-      icon: '⚡',
-      title: 'Workflow Engine Nominal',
-      detail: `All ${this.datastore.getWorkflowStats().activeWorkflows} background automation daemons are running nominally with ${taskStats.successRate}% execution success.`,
-      action: 'Explore automated pipeline triggers in the Automation panel.',
-      time: 'Just now'
-    });
 
     return alerts;
   }
 
-  getGoals(): GoalItem[] {
-    const fin = this.datastore.getFinancialMetrics();
-    const taskStats = this.datastore.getTaskMetrics();
+  async dismissAlert(id: string): Promise<boolean> {
+    try {
+      await prisma.anomalyAlert.updateMany({
+        where: { id },
+        data: { dismissed: true },
+      });
+      return true;
+    } catch {
+      return false;
+    }
+  }
 
-    return [
-      { id: 'rev', label: 'Q3 Revenue Target', target: 200000, current: fin.totalRevenue, unit: '$', color: '#0088ff' },
-      { id: 'margin', label: 'Target Operating Margin', target: 70, current: Math.max(0, fin.margin), unit: '%', color: '#00ffaa' },
-      { id: 'tasks', label: 'System Executions Goal', target: 1000, current: taskStats.totalCount, unit: '', color: '#f97316' },
-      { id: 'reliability', label: 'Execution Reliability', target: 99, current: Math.min(100, taskStats.successRate), unit: '%', color: '#a855f7' },
-    ];
+  async getGoals(orgId = 'org_oryn_global_001'): Promise<GoalItem[]> {
+    try {
+      const persisted = await prisma.strategicGoal.findMany({
+        where: { orgId },
+        orderBy: { createdAt: 'asc' },
+      });
+
+      if (persisted.length > 0) {
+        const fin = this.datastore.getFinancialMetrics();
+        const taskStats = this.datastore.getTaskMetrics();
+
+        return persisted.map(g => {
+          let liveCurrent = g.current;
+          if (g.label.toLowerCase().includes('revenue')) liveCurrent = fin.totalRevenue;
+          else if (g.label.toLowerCase().includes('margin')) liveCurrent = Math.max(0, fin.margin);
+          else if (g.label.toLowerCase().includes('execution') || g.label.toLowerCase().includes('task')) liveCurrent = taskStats.totalCount;
+
+          return {
+            id: g.id,
+            label: g.label,
+            target: g.target,
+            current: liveCurrent,
+            unit: g.unit,
+            color: g.color,
+            completed: g.completed,
+          };
+        });
+      }
+
+      // Seed initial goals into PostgreSQL if empty
+      const fin = this.datastore.getFinancialMetrics();
+      const taskStats = this.datastore.getTaskMetrics();
+      const initialSeed = [
+        { orgId, label: 'Q3 Revenue Target', target: 200000, current: fin.totalRevenue, unit: '$', color: '#0088ff' },
+        { orgId, label: 'Target Operating Margin', target: 70, current: Math.max(0, fin.margin), unit: '%', color: '#00ffaa' },
+        { orgId, label: 'System Executions Goal', target: 1000, current: taskStats.totalCount, unit: '', color: '#f97316' },
+        { orgId, label: 'Execution Reliability', target: 99, current: Math.min(100, taskStats.successRate), unit: '%', color: '#a855f7' },
+      ];
+
+      for (const g of initialSeed) {
+        await prisma.strategicGoal.create({ data: g });
+      }
+
+      const freshlySeeded = await prisma.strategicGoal.findMany({ where: { orgId }, orderBy: { createdAt: 'asc' } });
+      return freshlySeeded.map(g => ({
+        id: g.id,
+        label: g.label,
+        target: g.target,
+        current: g.current,
+        unit: g.unit,
+        color: g.color,
+        completed: g.completed,
+      }));
+    } catch {
+      const fin = this.datastore.getFinancialMetrics();
+      const taskStats = this.datastore.getTaskMetrics();
+      return [
+        { id: 'rev', label: 'Q3 Revenue Target', target: 200000, current: fin.totalRevenue, unit: '$', color: '#0088ff' },
+        { id: 'margin', label: 'Target Operating Margin', target: 70, current: Math.max(0, fin.margin), unit: '%', color: '#00ffaa' },
+        { id: 'tasks', label: 'System Executions Goal', target: 1000, current: taskStats.totalCount, unit: '', color: '#f97316' },
+        { id: 'reliability', label: 'Execution Reliability', target: 99, current: Math.min(100, taskStats.successRate), unit: '%', color: '#a855f7' },
+      ];
+    }
+  }
+
+  async createGoal(data: { label: string; target: number; unit?: string; color?: string; orgId?: string }): Promise<GoalItem> {
+    const orgId = data.orgId || 'org_oryn_global_001';
+    try {
+      const created = await prisma.strategicGoal.create({
+        data: {
+          orgId,
+          label: data.label,
+          target: data.target,
+          current: 0,
+          unit: data.unit || '',
+          color: data.color || '#f97316',
+          completed: false,
+        },
+      });
+      return {
+        id: created.id,
+        label: created.label,
+        target: created.target,
+        current: created.current,
+        unit: created.unit,
+        color: created.color,
+        completed: created.completed,
+      };
+    } catch {
+      return {
+        id: `goal-${Date.now()}`,
+        label: data.label,
+        target: data.target,
+        current: 0,
+        unit: data.unit || '',
+        color: data.color || '#f97316',
+        completed: false,
+      };
+    }
+  }
+
+  async updateGoal(id: string, data: { current?: number; target?: number; completed?: boolean }): Promise<boolean> {
+    try {
+      await prisma.strategicGoal.update({
+        where: { id },
+        data: {
+          current: data.current !== undefined ? data.current : undefined,
+          target: data.target !== undefined ? data.target : undefined,
+          completed: data.completed !== undefined ? data.completed : undefined,
+        },
+      });
+      return true;
+    } catch {
+      return false;
+    }
+  }
+
+  async deleteGoal(id: string): Promise<boolean> {
+    try {
+      await prisma.strategicGoal.delete({ where: { id } });
+      return true;
+    } catch {
+      return false;
+    }
   }
 
   async getGoalRecommendation(id: string): Promise<{ recommendation: string; goalId: string } | null> {
-    const goals = this.getGoals();
+    const goals = await this.getGoals();
     const goal = goals.find(g => g.id === id);
     if (!goal) return null;
 
@@ -294,15 +438,52 @@ Provide a 2-sentence actionable operational recommendation. Respond ONLY with a 
     }
   }
 
-  getHealthScore(): HealthScore {
-    const fin = this.datastore.getFinancialMetrics();
-    const taskStats = this.datastore.getTaskMetrics();
-    const wfStats = this.datastore.getWorkflowStats();
+  async getHealthScore(orgId = 'org_oryn_global_001'): Promise<HealthScore> {
+    let totalRevenue = 0;
+    let margin = 0;
+    let taskSuccessRate = 100;
+    let workflowSuccessRate = 100;
 
-    // Dynamically calculate composite score out of 100
-    const marginComponent = Math.min(30, Math.max(0, (fin.margin / 100) * 30));
-    const reliabilityComponent = Math.min(40, (taskStats.successRate / 100) * 40);
-    const workflowComponent = Math.min(30, (wfStats.successRate / 100) * 30);
+    try {
+      const revenueSum = await prisma.financialEntry.aggregate({
+        where: { orgId, type: 'REVENUE' },
+        _sum: { amount: true },
+      });
+      const expenseSum = await prisma.financialEntry.aggregate({
+        where: { orgId, type: 'EXPENSE' },
+        _sum: { amount: true },
+      });
+      totalRevenue = Number(revenueSum._sum.amount || 0);
+      const totalExpenses = Number(expenseSum._sum.amount || 0);
+      const netProfit = totalRevenue - totalExpenses;
+      margin = totalRevenue > 0 ? Number(((netProfit / totalRevenue) * 100).toFixed(1)) : 0;
+
+      const workflows = await prisma.workflow.findMany({ where: { orgId } });
+      const totalExecs = workflows.reduce((acc, w) => acc + w.runCount, 0);
+      const totalSucc = workflows.reduce((acc, w) => acc + w.successCount, 0);
+      workflowSuccessRate = totalExecs > 0 ? Math.round((totalSucc / totalExecs) * 100) : 100;
+
+      const taskLogs = await prisma.aiTaskLog.findMany({ take: 50, orderBy: { timestamp: 'desc' } });
+      if (taskLogs.length > 0) {
+        const successes = taskLogs.filter(t => t.status === 'success').length;
+        taskSuccessRate = Math.round((successes / taskLogs.length) * 100);
+      }
+    } catch {
+      const fin = this.datastore.getFinancialMetrics();
+      const taskStats = this.datastore.getTaskMetrics();
+      const wfStats = this.datastore.getWorkflowStats();
+      totalRevenue = fin.totalRevenue;
+      margin = fin.margin;
+      taskSuccessRate = taskStats.successRate;
+      workflowSuccessRate = wfStats.successRate;
+    }
+
+    const mem = process.memoryUsage();
+    const memUsageMb = Math.round(mem.heapUsed / 1024 / 1024);
+
+    const marginComponent = Math.min(30, Math.max(0, (margin / 100) * 30));
+    const reliabilityComponent = Math.min(40, (taskSuccessRate / 100) * 40);
+    const workflowComponent = Math.min(30, (workflowSuccessRate / 100) * 30);
     const totalScore = Math.round(marginComponent + reliabilityComponent + workflowComponent);
 
     let grade = 'A';
@@ -320,7 +501,7 @@ Provide a 2-sentence actionable operational recommendation. Respond ONLY with a 
         { label: 'Workflow Automation', value: Math.round(workflowComponent * 3.33), color: '#f97316' },
       ],
       trend: 'Calculated from live system metrics',
-      summary: `Operating health is at ${totalScore}/100. Fiscal margin and AI task execution reliability are continuously evaluated from actual ledger state.`,
+      summary: `Operating health is at ${totalScore}/100. Heap usage: ${memUsageMb}MB. Fiscal margin and AI task execution reliability are continuously evaluated from actual PostgreSQL state.`,
     };
   }
 }
