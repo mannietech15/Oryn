@@ -6,16 +6,16 @@ import { AIProvider } from '../../src/modules/inference/providers/provider.inter
 class MockAIProvider implements AIProvider {
   constructor(public readonly name: string) {}
 
-  async chat() {
-    return { content: 'Mock response', model: 'mock-model' };
-  }
-
-  async *streamChat() {
-    yield 'Mock chunk';
-  }
-
-  async isHealthy() {
+  supports(_capability: any) {
     return true;
+  }
+
+  async generate(_req: any): Promise<any> {
+    return { content: 'Mock response', model: 'mock-model', provider: this.name };
+  }
+
+  async *stream(_req: any): AsyncIterable<any> {
+    yield { content: 'Mock chunk' };
   }
 }
 
@@ -39,7 +39,7 @@ describe('ModelRouter', () => {
 
   it('should route request to corresponding provider based on decision', () => {
     const router = new ModelRouter(new MockAIProvider('nvidia') as any, new MockAIProvider('pollinations') as any);
-    const { provider, decision } = router.route('fast');
+    const { provider, decision } = router.route('text');
     assert.strictEqual(provider.name, 'nvidia');
     assert.strictEqual(decision.providerName, 'nvidia');
   });

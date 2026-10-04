@@ -35,6 +35,7 @@ describe('AutomationService Pipeline & Execution Suite', () => {
 
     // Toggle back to preserve original operational state
     const reverted = await automationService.toggleWorkflow(targetWf.id, testOrgId);
+    assert.ok(reverted);
     assert.strictEqual(reverted.status, initialStatus);
   });
 

@@ -3,20 +3,20 @@ import assert from 'node:assert';
 import { RoutingStrategy } from '../../src/modules/inference/strategies/routing.strategy';
 
 describe('RoutingStrategy', () => {
-  it('should select default tier model for fast capability requests', () => {
-    const decision = RoutingStrategy.selectRoute('fast', 'default');
+  it('should select default tier model for fast text requests', () => {
+    const decision = RoutingStrategy.selectRoute('text', 'default');
     assert.strictEqual(decision.providerName, 'nvidia');
     assert.strictEqual(decision.targetModelId, 'meta/llama-3.2-11b-vision-instruct');
   });
 
-  it('should select pro tier model for deep reasoning capability', () => {
-    const decision = RoutingStrategy.selectRoute('reasoning', 'pro');
+  it('should select pro tier model for json / reasoning capability', () => {
+    const decision = RoutingStrategy.selectRoute('json', 'pro');
     assert.strictEqual(decision.providerName, 'nvidia');
     assert.strictEqual(decision.targetModelId, 'meta/llama-3.2-90b-vision-instruct');
   });
 
-  it('should select vision tier model for multimodal capability', () => {
-    const decision = RoutingStrategy.selectRoute('multimodal', 'apex');
+  it('should select vision tier model for vision capability', () => {
+    const decision = RoutingStrategy.selectRoute('vision', 'apex');
     assert.strictEqual(decision.providerName, 'nvidia');
     assert.strictEqual(decision.targetModelId, 'meta/llama-3.2-90b-vision-instruct');
   });

@@ -49,6 +49,7 @@ export interface GoalItem {
   current: number;
   unit: string;
   color: string;
+  completed?: boolean;
 }
 
 export interface HealthScore {
