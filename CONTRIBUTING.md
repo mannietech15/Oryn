@@ -201,5 +201,36 @@ Before submitting a PR for UI or interactive workflows:
 2. Test the **Human-in-the-Loop Email** workflow: Ask Oryn to draft an email, confirm that the proposal card displays with correct recipient chips, and test both button click and conversational confirmation ("yes" / "continue").
 3. Check the dark mode contrast and responsiveness on both desktop and mobile viewports.
 
+---
+
+## Guidelines for Extending Oryn AI
+
+### 1. Adding New AI Models or Providers
+Oryn AI uses an intelligent multi-tier routing architecture:
+- Register new provider implementations implementing `InferenceProvider` under `ORYN-AI-SERVER/src/modules/inference/providers/`.
+- Update `RoutingStrategy` to map appropriate capabilities (`fast`, `pro`, `vision`, `deep-reasoning`) to the new provider.
+- Implement graceful failover in `ModelRouter` to ensure system uptime if a single upstream provider degrades.
+
+### 2. Implementing New Tool Integrations (Strict HITL Policy)
+Oryn strictly adheres to a **Human-in-the-Loop (HITL)** security model:
+- **No Unsupervised Side Effects**: Any tool that performs external communication (emails, Slack messages), financial changes (ledger updates, Stripe invoices), or irreversible file mutations **MUST NEVER** execute autonomously.
+- **Two-Stage Protocol**: The LLM must emit an action payload staging the intent in persistent storage. The frontend must render a high-fidelity proposal card requiring explicit user authorization (via UI button or conversational affirmation).
+- **Execution Telemetry**: Record the dispatch status, remote message/transaction IDs, and latency in the persistent datastore.
+
+### 3. UI Design Standards
+- **Aesthetic Excellence**: Use modern dark-mode styling, subtle glassmorphism (`backdrop-filter: blur`), curated color palettes (deep blacks, slate borders, red glowing accents), and smooth CSS transitions.
+- **Zero Static Placeholders**: Avoid hardcoded mocks or placeholder dots (`"..."`). All UI elements should bind to real state or display clear empty-state messaging.
+- **Responsiveness**: Ensure layouts adjust seamlessly across desktop, tablet, and mobile displays.
+
+---
+
+## Community & Questions
+
+Have questions or want to discuss a new feature idea before opening a PR?
+- **GitHub Issues**: Open a feature proposal or bug report on [GitHub Issues](https://github.com/mannietech15/Oryn/issues).
+- **Maintainer Contact**: Reach out directly to `mannietech817@gmail.com`.
+- **License**: All contributions are licensed under the [Apache License 2.0](LICENSE).
+
+
 
 
