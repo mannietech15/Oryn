@@ -1,0 +1,254 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+enum Role {
+  SUPER_ADMIN
+  ORG_ADMIN
+  OPERATOR
+  AUDITOR
+  VIEWER
+}
+
+enum TransactionType {
+  REVENUE
+  EXPENSE
+}
+
+enum WorkflowStatus {
+  ACTIVE
+  PAUSED
+  DISABLED
+}
+
+enum ExecutionStatus {
+  SUCCESS
+  FAILURE
+  RUNNING
+}
+
+enum EmailDraftStatus {
+  DRAFT
+  AWAITING_APPROVAL
+  SENT
+  FAILED
+}
+
+model Organization {
+  id          String   @id @default(uuid())
+  name        String
+  industry    String
+  foundedDate DateTime
+  location    String
+  users       User[]
+  teams       Team[]
+  financials  FinancialEntry[]
+  workflows   Workflow[]
+  documents   Document[]
+  events      CalendarEvent[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("organizations")
+}
+
+model Team {
+  id             String       @id @default(uuid())
+  orgId          String
+  organization   Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  name           String
+  description    String
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+
+  @@map("teams")
+}
+
+model User {
+  id              String      @id @default(uuid())
+  orgId           String
+  organization    Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  email           String      @unique
+  passwordHash    String
+  name            String
+  role            Role        @default(OPERATOR)
+  avatarUrl       String?
+  mfaSecret       String?
+  mfaEnabled      Boolean     @default(false)
+  lastLoginAt     DateTime?
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+  tasks           AiTaskLog[]
+  emailLogs       EmailLog[]
+  auditLogs       AuditLog[]
+  sessions        Session[]
+
+  @@map("users")
+}
+
+model Session {
+  id           String   @id @default(uuid())
+  userId       String
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  refreshToken String   @unique
+  userAgent    String?
+  ipAddress    String?
+  expiresAt    DateTime
+  createdAt    DateTime @default(now())
+
+  @@map("sessions")
+}
+
+model FinancialEntry {
+  id          String          @id @default(uuid())
+  orgId       String
+  organization Organization    @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  type        TransactionType
+  category    String
+  amount      Decimal         @db.Decimal(12, 2)
+  date        DateTime
+  note        String?
+  referenceId String?
+  createdAt   DateTime        @default(now())
+
+  @@index([orgId, date])
+  @@map("financial_entries")
+}
+
+model Workflow {
+  id            String             @id @default(uuid())
+  orgId         String
+  organization  Organization       @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  name          String
+  description   String
+  status        WorkflowStatus     @default(ACTIVE)
+  triggerType   String             // 'cron' | 'webhook' | 'event'
+  triggerConfig Json
+  steps         Json               // Array of step definitions
+  runCount      Int                @default(0)
+  successCount  Int                @default(0)
+  failureCount  Int                @default(0)
+  lastRunAt     DateTime?
+  nextRunAt     DateTime?
+  createdAt     DateTime           @default(now())
+  updatedAt     DateTime           @updatedAt
+  executions    WorkflowExecutionLog[]
+
+  @@map("workflows")
+}
+
+model WorkflowExecutionLog {
+  id             String          @id @default(uuid())
+  workflowId     String
+  workflow       Workflow        @relation(fields: [workflowId], references: [id], onDelete: Cascade)
+  trigger        String
+  durationMs     Int
+  status         ExecutionStatus
+  stepsCompleted Int
+  totalSteps     Int
+  errorDetails   String?
+  executedAt     DateTime        @default(now())
+
+  @@index([workflowId, executedAt])
+  @@map("workflow_execution_logs")
+}
+
+model EmailLog {
+  id             String           @id @default(uuid())
+  userId         String?
+  user           User?            @relation(fields: [userId], references: [id])
+  to             String
+  subject        String
+  body           String
+  status         EmailDraftStatus @default(AWAITING_APPROVAL)
+  idempotencyKey String           @unique
+  messageId      String?
+  error          String?
+  createdAt      DateTime         @default(now())
+  sentAt         DateTime?
+
+  @@map("email_logs")
+}
+
+model Document {
+  id            String       @id @default(uuid())
+  orgId         String
+  organization  Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  name          String
+  fileUrl       String
+  mimeType      String
+  fileSize      Int
+  tags          String[]
+  aiSummary     String
+  extractedText String?      @db.Text
+  createdAt     DateTime     @default(now())
+
+  @@map("documents")
+}
+
+model CalendarEvent {
+  id           String       @id @default(uuid())
+  orgId        String
+  organization Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  title        String
+  startTime    DateTime
+  endTime      DateTime
+  type         String       // 'internal' | 'external' | 'automation'
+  attendees    String[]
+  aiBrief      String
+  createdAt    DateTime     @default(now())
+
+  @@map("calendar_events")
+}
+
+model AiTaskLog {
+  id               String   @id @default(uuid())
+  userId           String?
+  user             User?    @relation(fields: [userId], references: [id])
+  type             String   // 'chat' | 'analysis' | 'command'
+  model            String
+  latencyMs        Int
+  tokensUsed       Int      @default(0)
+  promptTokens     Int      @default(0)
+  completionTokens Int      @default(0)
+  status           String
+  timestamp        DateTime @default(now())
+
+  @@index([timestamp])
+  @@map("ai_task_logs")
+}
+
+model AuditLog {
+  id          String   @id @default(uuid())
+  userId      String?
+  user        User?    @relation(fields: [userId], references: [id])
+  action      String   // e.g., 'AUTH_LOGIN', 'EMAIL_DISPATCH', 'TRANSACTION_CREATE'
+  resource    String
+  resourceId  String?
+  ipAddress   String
+  userAgent   String
+  metadata    Json?
+  timestamp   DateTime @default(now())
+
+  @@index([userId, timestamp])
+  @@map("audit_logs")
+}
+
+model IntegrationSecret {
+  id          String   @id @default(uuid())
+  provider    String   @unique // e.g. 'smtp', 'nvidia', 'openai', 'anthropic', 'slack'
+  encryptedKey String
+  iv          String
+  authTag     String
+  isActive    Boolean  @default(true)
+  metadata    Json?
+  updatedAt   DateTime @updatedAt
+  createdAt   DateTime @default(now())
+
+  @@map("integration_secrets")
+}

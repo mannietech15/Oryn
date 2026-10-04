@@ -9,19 +9,30 @@
     "test": "ts-node -T tests/run-tests.ts"
   },
   "dependencies": {
+    "@prisma/client": "^6.4.1",
+    "argon2": "^0.45.1",
+    "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",
     "dotenv": "^16.4.5",
     "express": "^4.19.2",
+    "express-rate-limit": "^8.7.0",
+    "helmet": "^8.3.0",
+    "ioredis": "^6.0.0",
+    "jsonwebtoken": "^9.0.3",
     "multer": "^1.4.5-lts.1",
     "nodemailer": "^9.0.3",
-    "openai": "^6.31.0"
+    "openai": "^6.31.0",
+    "zod": "^4.6.5"
   },
   "devDependencies": {
+    "@types/cookie-parser": "^1.4.10",
     "@types/cors": "^2.8.17",
     "@types/express": "^4.17.21",
+    "@types/jsonwebtoken": "^9.0.10",
     "@types/multer": "^1.4.11",
     "@types/node": "^20.12.7",
     "@types/nodemailer": "^8.0.1",
+    "prisma": "^6.4.1",
     "ts-node-dev": "^2.0.0",
     "typescript": "^5.4.5"
   }
