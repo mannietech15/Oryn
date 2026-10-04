@@ -50,7 +50,11 @@ export class ClientAuthService {
     if (!this.user && typeof window !== 'undefined') {
       const saved = localStorage.getItem(USER_KEY);
       if (saved) {
-        try { this.user = JSON.parse(saved); } catch { /* noop */ }
+        try {
+          this.user = JSON.parse(saved);
+        } catch {
+          /* noop */
+        }
       }
     }
     return this.user;
@@ -66,50 +70,36 @@ export class ClientAuthService {
   }
 
   public async login(email: string, password: string): Promise<AuthSessionData> {
-    try {
-      const response = await fetch('/api/auth/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password })
-      });
+    const response = await fetch('/api/auth/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
+      body: JSON.stringify({ email, password }),
+    });
 
-      const data = await response.json();
-      if (!response.ok || !data.success) {
-        throw new Error(data.message || 'Authentication failed. Please check credentials.');
-      }
-
-      const session: AuthSessionData = data.data;
-      this.setSession(session.token, session.user);
-      return session;
-    } catch (err: any) {
-      // Graceful offline demo fallback
-      if (err.message && err.message.includes('fetch')) {
-        const fallbackUser: UserProfile = {
-          id: 'usr_local_demo',
-          name: email.split('@')[0].replace('.', ' ').replace(/\b\w/g, l => l.toUpperCase()),
-          email,
-          role: 'Verified Administrator',
-          organization: 'Enterprise Workspace',
-          location: 'HQ: Global Remote',
-          industry: 'Technology & Workflow Systems'
-        };
-        const fallbackSession: AuthSessionData = {
-          token: 'demo_token_' + Date.now(),
-          user: fallbackUser,
-          expiresAt: new Date(Date.now() + 86400000).toISOString()
-        };
-        this.setSession(fallbackSession.token, fallbackSession.user);
-        return fallbackSession;
-      }
-      throw err;
+    const data = await response.json();
+    if (!response.ok || !data.success) {
+      throw new Error(data.message || 'Authentication failed. Please verify your credentials.');
     }
+
+    const session: AuthSessionData = data.data;
+    this.setSession(session.token, session.user);
+    return session;
   }
 
-  public async register(payload: { name: string; email: string; password: string; organization?: string; location?: string; industry?: string }): Promise<AuthSessionData> {
+  public async register(payload: {
+    name: string;
+    email: string;
+    password: string;
+    organization?: string;
+    location?: string;
+    industry?: string;
+  }): Promise<AuthSessionData> {
     const response = await fetch('/api/auth/register', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload)
+      credentials: 'include',
+      body: JSON.stringify(payload),
     });
 
     const data = await response.json();
@@ -124,30 +114,31 @@ export class ClientAuthService {
 
   public async logout(): Promise<void> {
     const token = this.getToken();
-    if (token) {
-      try {
-        await fetch('/api/auth/logout', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
-          },
-          body: JSON.stringify({ token })
-        });
-      } catch {
-        // Continue clearing client session even if network is offline
-      }
+    try {
+      await fetch('/api/auth/logout', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+        credentials: 'include',
+        body: JSON.stringify({ token }),
+      });
+    } catch {
+      // Continue clearing client session even if network is offline
     }
     this.clearSession();
   }
 
   public async getMe(): Promise<UserProfile | null> {
     const token = this.getToken();
-    if (!token) return null;
 
     try {
       const response = await fetch('/api/auth/me', {
-        headers: { 'Authorization': `Bearer ${token}` }
+        headers: {
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+        credentials: 'include',
       });
       if (response.ok) {
         const res = await response.json();
