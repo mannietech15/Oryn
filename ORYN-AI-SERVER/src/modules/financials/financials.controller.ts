@@ -1,15 +1,15 @@
 import { Request, Response, NextFunction } from 'express';
-import { defaultDatastore, Datastore } from '../../infrastructure/storage/datastore';
+import { FinancialsService, defaultFinancialsService } from './financials.service';
 import { ValidationError } from '../../shared/errors/app-error';
 
 export class FinancialsController {
-  constructor(private datastore: Datastore = defaultDatastore) {}
+  constructor(private financialsService: FinancialsService = defaultFinancialsService) {}
 
-  getLedger = async (_req: Request, res: Response, next: NextFunction): Promise<void> => {
+  getLedger = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
-      const entries = this.datastore.getFinancialEntries();
-      const metrics = this.datastore.getFinancialMetrics();
-      res.json({ entries, metrics });
+      const orgId = (req as any).user?.orgId;
+      const data = await this.financialsService.getLedger(orgId);
+      res.json(data);
     } catch (err) {
       next(err);
     }
@@ -29,16 +29,17 @@ export class FinancialsController {
         throw new ValidationError("Field 'amount' must be a positive number");
       }
 
-      const entry = this.datastore.addFinancialEntry({
+      const orgId = (req as any).user?.orgId;
+      const result = await this.financialsService.addEntry({
         type,
         category,
         amount,
-        date: date || new Date().toISOString().split('T')[0],
-        note: note || ''
+        date,
+        note,
+        orgId,
       });
 
-      const metrics = this.datastore.getFinancialMetrics();
-      res.status(201).json({ entry, metrics });
+      res.status(201).json(result);
     } catch (err) {
       next(err);
     }
