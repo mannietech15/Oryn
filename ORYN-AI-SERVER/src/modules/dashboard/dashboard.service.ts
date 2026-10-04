@@ -25,7 +25,7 @@ export class DashboardService {
     private emailService: EmailService = defaultEmailService
   ) {}
 
-  getAnalytics(): AnalyticsData {
+  getAnalytics(range?: string): AnalyticsData {
     const fin = this.datastore.getFinancialMetrics();
     const taskStats = this.datastore.getTaskMetrics();
     const taskLogs = this.datastore.getTaskLogs(100);
@@ -45,14 +45,20 @@ export class DashboardService {
 
     const org = this.datastore.getOrganization();
 
-    // Compute dynamic usage timeline from actual transaction and task activity
+    // Compute dynamic usage timeline from actual transaction and task activity based on range
     const entries = this.datastore.getFinancialEntries();
-    const timelineSlots = 9;
+    const timelineSlots = range === '7D' ? 7 : range === '90D' ? 12 : 9;
     const usageTimeline = Array.from({ length: timelineSlots }, (_, idx) => {
       const entryCount = entries.filter((_, i) => i % timelineSlots === idx).length;
       const baseActivity = Math.max(15, (taskStats.totalCount * 10) / timelineSlots);
       return Math.round(baseActivity + entryCount * 12 + (idx * 5));
     });
+
+    const months = range === '7D'
+      ? ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
+      : range === '90D'
+      ? ['W1', 'W2', 'W3', 'W4', 'W5', 'W6', 'W7', 'W8', 'W9', 'W10', 'W11', 'W12']
+      : ['Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec', 'Jan', 'Feb', 'Mar'];
 
     return {
       kpis: {
@@ -78,7 +84,7 @@ export class DashboardService {
         },
       },
       usageTimeline,
-      months: ['Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec', 'Jan', 'Feb', 'Mar'],
+      months,
       breakdown,
       team: org.employees.map((emp, i) => {
         const empTasks = Math.max(1, Math.round(taskStats.totalCount / (org.employees.length || 1))) + i * 3;

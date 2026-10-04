@@ -8,7 +8,8 @@ export class FinancialsController {
   getLedger = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
       const orgId = (req as any).user?.orgId;
-      const data = await this.financialsService.getLedger(orgId);
+      const range = req.query.range as string | undefined;
+      const data = await this.financialsService.getLedger(orgId, range);
       res.json(data);
     } catch (err) {
       next(err);

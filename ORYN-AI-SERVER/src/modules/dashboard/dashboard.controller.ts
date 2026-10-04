@@ -5,8 +5,9 @@ import { NotFoundError } from '../../shared/errors/app-error';
 export class DashboardController {
   constructor(private dashboardService: DashboardService = defaultDashboardService) {}
 
-  getAnalytics = (_req: Request, res: Response): void => {
-    res.json(this.dashboardService.getAnalytics());
+  getAnalytics = (req: Request, res: Response): void => {
+    const range = req.query.range as string | undefined;
+    res.json(this.dashboardService.getAnalytics(range));
   };
 
   handleCommand = async (req: Request, res: Response, next: NextFunction): Promise<void> => {

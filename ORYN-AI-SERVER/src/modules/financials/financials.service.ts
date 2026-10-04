@@ -41,15 +41,31 @@ export class FinancialsService {
     }
   }
 
-  async getLedger(orgId = this.defaultOrgId) {
+  async getLedger(orgId = this.defaultOrgId, range?: string) {
     try {
+      let startDate: Date | undefined;
+      if (range === '7D') {
+        startDate = new Date(Date.now() - 7 * 86400000);
+      } else if (range === '30D') {
+        startDate = new Date(Date.now() - 30 * 86400000);
+      } else if (range === '90D') {
+        startDate = new Date(Date.now() - 90 * 86400000);
+      } else if (range === '1Y') {
+        startDate = new Date(Date.now() - 365 * 86400000);
+      }
+
+      const whereClause: any = { orgId };
+      if (startDate) {
+        whereClause.date = { gte: startDate };
+      }
+
       const entries = await prisma.financialEntry.findMany({
-        where: { orgId },
+        where: whereClause,
         orderBy: { date: 'desc' },
       });
 
       if (entries.length > 0) {
-        const metrics = await this.getMetrics(orgId);
+        const metrics = await this.getMetrics(orgId, range);
         return {
           entries: entries.map((e) => ({
             id: e.id,
@@ -125,16 +141,34 @@ export class FinancialsService {
     }
   }
 
-  async getMetrics(orgId = this.defaultOrgId): Promise<FinancialMetricResult> {
+  async getMetrics(orgId = this.defaultOrgId, range?: string): Promise<FinancialMetricResult> {
     try {
+      let startDate: Date | undefined;
+      if (range === '7D') {
+        startDate = new Date(Date.now() - 7 * 86400000);
+      } else if (range === '30D') {
+        startDate = new Date(Date.now() - 30 * 86400000);
+      } else if (range === '90D') {
+        startDate = new Date(Date.now() - 90 * 86400000);
+      } else if (range === '1Y') {
+        startDate = new Date(Date.now() - 365 * 86400000);
+      }
+
+      const revWhere: any = { orgId, type: 'REVENUE' };
+      const expWhere: any = { orgId, type: 'EXPENSE' };
+      if (startDate) {
+        revWhere.date = { gte: startDate };
+        expWhere.date = { gte: startDate };
+      }
+
       const revenueSum = await prisma.financialEntry.aggregate({
-        where: { orgId, type: 'REVENUE' },
+        where: revWhere,
         _sum: { amount: true },
         _count: { id: true },
       });
 
       const expenseSum = await prisma.financialEntry.aggregate({
-        where: { orgId, type: 'EXPENSE' },
+        where: expWhere,
         _sum: { amount: true },
         _count: { id: true },
       });
