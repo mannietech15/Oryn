@@ -328,12 +328,23 @@ function MessageBubble({ msg, isMobile, onImageClick, language, onEdit, onRegene
   const [editValue, setEditValue] = useState(msg.content);
   const [isHovered, setIsHovered] = useState(false);
   const [isSendingEmail, setIsSendingEmail] = useState(false);
+  const [localStatus, setLocalStatus] = useState<'awaiting_approval' | 'sent' | 'failed' | null>(null);
+  const [localMessageId, setLocalMessageId] = useState<string | null>(null);
+
+  const effectiveStatus = localStatus || msg.emailDraft?.status;
+  const effectiveMessageId = localMessageId || msg.emailDraft?.messageId;
 
   const handleConfirmEmail = async () => {
     if (!msg.emailDraft || isSendingEmail) return;
     setIsSendingEmail(true);
     try {
-      await onConfirmEmail?.(msg.id, msg.emailDraft.id);
+      const res: any = await onConfirmEmail?.(msg.id, msg.emailDraft.id);
+      setLocalStatus('sent');
+      if (res?.messageId) {
+        setLocalMessageId(res.messageId);
+      }
+    } catch {
+      setLocalStatus('failed');
     } finally {
       setIsSendingEmail(false);
     }
@@ -512,11 +523,11 @@ function MessageBubble({ msg, isMobile, onImageClick, language, onEdit, onRegene
               <span style={{
                 fontSize: 10, fontWeight: 700, fontFamily: 'monospace',
                 padding: '2px 8px', borderRadius: 4,
-                background: msg.emailDraft.status === 'sent' ? 'rgba(34, 197, 94, 0.1)' : msg.emailDraft.status === 'failed' ? 'rgba(239, 68, 68, 0.1)' : 'rgba(249, 115, 22, 0.1)',
-                color: msg.emailDraft.status === 'sent' ? 'var(--success)' : msg.emailDraft.status === 'failed' ? 'var(--danger)' : 'var(--accent-primary)',
-                border: `1px solid ${msg.emailDraft.status === 'sent' ? 'rgba(34, 197, 94, 0.3)' : msg.emailDraft.status === 'failed' ? 'rgba(239, 68, 68, 0.3)' : 'rgba(249, 115, 22, 0.3)'}`
+                background: effectiveStatus === 'sent' ? 'rgba(34, 197, 94, 0.15)' : effectiveStatus === 'failed' ? 'rgba(239, 68, 68, 0.15)' : 'rgba(249, 115, 22, 0.15)',
+                color: effectiveStatus === 'sent' ? 'var(--success)' : effectiveStatus === 'failed' ? 'var(--danger)' : 'var(--accent-primary)',
+                border: `1px solid ${effectiveStatus === 'sent' ? 'rgba(34, 197, 94, 0.4)' : effectiveStatus === 'failed' ? 'rgba(239, 68, 68, 0.4)' : 'rgba(249, 115, 22, 0.4)'}`
               }}>
-                {msg.emailDraft.status === 'awaiting_approval' ? 'AWAITING APPROVAL' : msg.emailDraft.status === 'sent' ? 'SENT VIA SMTP' : 'DISPATCH FAILED'}
+                {effectiveStatus === 'awaiting_approval' ? 'AWAITING APPROVAL' : effectiveStatus === 'sent' ? 'SENT VIA SMTP' : 'DISPATCH FAILED'}
               </span>
             </div>
 
@@ -534,7 +545,7 @@ function MessageBubble({ msg, isMobile, onImageClick, language, onEdit, onRegene
               </div>
             </div>
 
-            {msg.emailDraft.status === 'awaiting_approval' && (
+            {effectiveStatus === 'awaiting_approval' && (
               <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 10 }}>
                 <button
                   onClick={() => onDiscardEmail?.(msg.id)}
@@ -569,14 +580,30 @@ function MessageBubble({ msg, isMobile, onImageClick, language, onEdit, onRegene
               </div>
             )}
 
-            {msg.emailDraft.status === 'sent' && (
-              <div style={{ fontSize: 11, color: 'var(--success)', fontFamily: 'monospace', display: 'flex', alignItems: 'center', gap: 6 }}>
-                <CheckCircle2 size={13} />
-                Message dispatched via configured SMTP relay. Reference ID: {msg.emailDraft.messageId || 'N/A'}
+            {effectiveStatus === 'sent' && (
+              <div style={{
+                background: 'rgba(34, 197, 94, 0.1)',
+                border: '1px solid rgba(34, 197, 94, 0.35)',
+                borderRadius: 8,
+                padding: '12px 16px',
+                display: 'flex',
+                alignItems: 'center',
+                gap: 10,
+                color: 'var(--success)',
+                fontSize: 12.5,
+                fontWeight: 600
+              }}>
+                <CheckCircle2 size={18} style={{ flexShrink: 0 }} />
+                <div>
+                  <div>Message dispatched successfully via configured Gmail SMTP relay.</div>
+                  <div style={{ fontSize: 11, fontFamily: 'monospace', opacity: 0.85, marginTop: 2 }}>
+                    Reference ID: {effectiveMessageId || 'N/A'}
+                  </div>
+                </div>
               </div>
             )}
 
-            {msg.emailDraft.status === 'failed' && (
+            {effectiveStatus === 'failed' && (
               <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
                 <div style={{ fontSize: 11, color: 'var(--danger)', fontFamily: 'monospace', display: 'flex', alignItems: 'center', gap: 6 }}>
                   <XCircle size={13} />

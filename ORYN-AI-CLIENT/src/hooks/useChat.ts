@@ -1,6 +1,7 @@
 import { useState, useCallback, useRef, useEffect } from 'react';
 import { streamChat, analyzeFile, stageEmailDraft, confirmEmailDraft } from '../api/oryn';
 import type { Message, Task, SessionStats, ChatFeatures } from '../types';
+import { toast } from '../components/ui/use-toast';
 
 function genId() {
   return Math.random().toString(36).slice(2);
@@ -243,9 +244,10 @@ export function useChat() {
     
     const baseMessages = overrideMessages || messages;
 
-    // Check if user is confirming an awaiting email draft by typing 'yes', 'send it', 'confirm', etc.
+    // Check if user is confirming an awaiting email draft by typing 'yes', 'send it', 'confirm', 'continue', etc.
     const normalizedText = text.trim().toLowerCase().replace(/[.,!]/g, '');
-    const isConfirmation = ['yes', 'send it', 'confirm', 'proceed', 'go ahead', 'send the email', 'send email'].includes(normalizedText);
+    const isConfirmation = ['yes', 'send it', 'confirm', 'proceed', 'go ahead', 'send the email', 'send email', 'continue', 'send', 'approved', 'yep', 'do it'].includes(normalizedText) ||
+      /^(yes|send it|send email|confirm|proceed|go ahead|continue|approved?|send)\b/i.test(text.trim());
     const pendingEmailMsg = baseMessages.slice().reverse().find(m => m.emailDraft && m.emailDraft.status === 'awaiting_approval');
 
     if (isConfirmation && pendingEmailMsg && pendingEmailMsg.emailDraft) {
@@ -580,33 +582,56 @@ export function useChat() {
   const confirmEmail = useCallback(async (messageId: string, draftId: string) => {
     try {
       const res = await confirmEmailDraft(draftId);
-      setMessages(prev => prev.map(m => {
-        if (m.id === messageId && m.emailDraft) {
-          return {
-            ...m,
-            emailDraft: {
-              ...m.emailDraft,
-              status: 'sent',
-              messageId: res.messageId
+      setMessagesMap(prevMap => {
+        const copy: Record<string, Message[]> = {};
+        for (const [sId, msgs] of Object.entries(prevMap)) {
+          copy[sId] = msgs.map(m => {
+            if ((m.id === messageId || m.emailDraft?.id === draftId) && m.emailDraft) {
+              return {
+                ...m,
+                emailDraft: {
+                  ...m.emailDraft,
+                  status: 'sent',
+                  messageId: res.messageId
+                }
+              };
             }
-          };
+            return m;
+          });
         }
-        return m;
-      }));
+        return copy;
+      });
+      toast({
+        title: "Email Sent Successfully",
+        description: `Dispatched via verified SMTP transport. (Ref: ${res.messageId ? res.messageId.slice(0, 24) + '...' : 'OK'})`,
+      });
+      return res;
     } catch (err: any) {
-      setMessages(prev => prev.map(m => {
-        if (m.id === messageId && m.emailDraft) {
-          return {
-            ...m,
-            emailDraft: {
-              ...m.emailDraft,
-              status: 'failed',
-              error: err.message || 'SMTP dispatch failed'
+      setMessagesMap(prevMap => {
+        const copy: Record<string, Message[]> = {};
+        for (const [sId, msgs] of Object.entries(prevMap)) {
+          copy[sId] = msgs.map(m => {
+            if ((m.id === messageId || m.emailDraft?.id === draftId) && m.emailDraft) {
+              return {
+                ...m,
+                emailDraft: {
+                  ...m.emailDraft,
+                  status: 'failed',
+                  error: err.message || 'SMTP dispatch failed'
+                }
+              };
             }
-          };
+            return m;
+          });
         }
-        return m;
-      }));
+        return copy;
+      });
+      toast({
+        title: "Dispatch Failed",
+        description: err.message || "Failed to dispatch email via SMTP.",
+        variant: "destructive"
+      });
+      throw err;
     }
   }, []);
 
