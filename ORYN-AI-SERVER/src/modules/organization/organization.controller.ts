@@ -1,12 +1,14 @@
 import { Request, Response, NextFunction } from 'express';
-import { defaultDatastore, Datastore } from '../../infrastructure/storage/datastore';
+import { OrganizationService, defaultOrganizationService } from './organization.service';
+import { ValidationError } from '../../shared/errors/app-error';
 
 export class OrganizationController {
-  constructor(private datastore: Datastore = defaultDatastore) {}
+  constructor(private organizationService: OrganizationService = defaultOrganizationService) {}
 
-  getOrganization = async (_req: Request, res: Response, next: NextFunction): Promise<void> => {
+  getOrganization = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
-      const org = this.datastore.getOrganization();
+      const orgId = (req as any).user?.orgId;
+      const org = await this.organizationService.getOrganization(orgId);
       res.json(org);
     } catch (err) {
       next(err);
@@ -16,13 +18,30 @@ export class OrganizationController {
   updateCompany = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
       const { company, employees, teams } = req.body;
-      const patch: any = {};
-      if (company) patch.company = company;
-      if (employees) patch.employees = employees;
-      if (teams) patch.teams = teams;
+      const orgId = (req as any).user?.orgId;
 
-      const updated = this.datastore.updateOrganization(patch);
+      const updated = await this.organizationService.updateCompany({
+        orgId,
+        company,
+        employees,
+        teams,
+      });
+
       res.json(updated);
+    } catch (err) {
+      next(err);
+    }
+  };
+
+  addEmployee = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const { name, email, role } = req.body;
+      if (!name || !email) {
+        throw new ValidationError('Name and email are required to add a team member.');
+      }
+      const orgId = (req as any).user?.orgId;
+      const created = await this.organizationService.addEmployee({ name, email, role, orgId });
+      res.status(201).json(created);
     } catch (err) {
       next(err);
     }
