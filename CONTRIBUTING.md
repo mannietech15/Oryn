@@ -115,3 +115,49 @@ npm run dev
 # Client runs at http://localhost:5173
 ```
 
+---
+
+## Git Workflow & Branching Model
+
+We follow a structured Git branching strategy to maintain stability on the `main` branch.
+
+### 1. Branch Naming Conventions
+Always create a feature branch off of the latest `main`:
+
+```bash
+git checkout main
+git pull origin main
+git checkout -b <type>/<short-description>
+```
+
+Branch naming prefixes:
+- `feat/`: New feature or user-facing capability (e.g. `feat/slack-integration`)
+- `fix/`: Bug fix or patch (e.g. `fix/email-regex-fences`)
+- `docs/`: Documentation additions or revisions (e.g. `docs/api-specs`)
+- `refactor/`: Code reorganization without functional changes (e.g. `refactor/datastore-cache`)
+- `test/`: New automated test suites or fixtures (e.g. `test/hil-workflow`)
+- `perf/`: Performance improvements and latency optimizations (e.g. `perf/stream-buffering`)
+
+### 2. Conventional Commits Standard
+Commit messages should adhere to the [Conventional Commits](https://www.conventionalcommits.org/) specification:
+
+```text
+<type>(<scope>): <short imperative description>
+
+[optional longer body detailing non-obvious design choices or context]
+
+[optional issue reference: Fixes #123]
+```
+
+Examples:
+- `feat(chat): add retry action on failed SMTP dispatch`
+- `fix(auth): prevent session expiration race condition`
+- `docs(licensing): clarify Apache 2.0 patent grant provisions`
+- `test(email): verify draft staging and transition to sent status`
+
+### 3. Pull Request Guidelines
+- **Keep PRs focused**: Avoid bundling unrelated changes across frontend and backend in one massive PR.
+- **Provide clear summaries**: Detail the motivation, screenshots or recordings of UI changes, and verification commands.
+- **Ensure green builds**: PRs must compile cleanly and pass the full test suite before review.
+
+
