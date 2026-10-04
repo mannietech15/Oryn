@@ -64,3 +64,42 @@ Oryn AI handles sensitive third-party API credentials, including high-throughput
 - **Port Security**: SMTP connections default to port 587 (STARTTLS) or port 465 (TLS/SSL) with verified cryptographic certificates.
 - **Immediate Credential Rotation**: If credentials are inadvertently exposed or compromised, immediately revoke the API key or App Password in your provider console and update your server environment.
 
+---
+
+## Human-in-the-Loop (HITL) Execution Security
+
+One of the largest attack vectors in agentic AI systems is **unauthorized autonomous side effects** — where prompt injections, jailbreaks, or model hallucinations cause an AI to take irreversible actions (such as sending malicious emails, deleting ledger records, or triggering unauthorized webhooks).
+
+Oryn AI solves this through a defensive **staged-consent state machine**:
+
+```text
+[User Prompt]
+      │
+      ▼
+[LLM Inference Analysis]
+      │
+      ▼
+[Draft Staged in Datastore] ──► status: 'awaiting_approval' (No side-effects executed)
+      │
+      ▼
+[Interactive UI Proposal Card] ──► Displays Recipient, Subject, and Full Content
+      │
+      ▼
+[Human Review & Consent]
+      ├── Option A: User clicks "Confirm & Send via SMTP"
+      └── Option B: User conversationally replies "yes", "confirm", or "proceed"
+      │
+      ▼
+[Backend Authorization & Transport] ──► Verified SMTP handshake executed
+      │
+      ▼
+[Persistent Audit Trail] ──► status: 'sent', remote messageId, timestamp recorded
+```
+
+### Security Guarantees:
+1. **Zero Blind Dispatches**: The LLM *cannot* directly invoke SMTP or network relays. It can only emit a structured proposal payload that stages a pending draft.
+2. **Deterministic State Transitions**: A draft in `awaiting_approval` state cannot be triggered more than once (idempotent status transition prevents double-dispatch attacks).
+3. **Audit Trail Immutability**: Every dispatched email logs the local `draftId`, recipient, subject, dispatch timestamp, and upstream `messageId` into `oryn-db.json` for compliance verification.
+4. **Failure Isolation**: If an upstream SMTP error occurs, the draft record transitions to `failed` and logs error traces without crashing backend daemons.
+
+
