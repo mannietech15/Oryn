@@ -99,7 +99,7 @@ function OperationalInsightSummary({ finMetrics, wfStats }: { finMetrics: any; w
             2. EVIDENCE
           </div>
           <div style={{ fontSize: 13, color: 'var(--text-primary)', lineHeight: 1.5 }}>
-            Total autonomous background executions stand at {execs} runs, with 0 unhandled critical exceptions recorded in runner audit logs.
+            Total autonomous background executions stand at {execs} runs, with {wfStats?.failureCount || 0} unhandled critical exceptions recorded in runner audit logs.
           </div>
         </div>
 
@@ -141,7 +141,7 @@ export default function AnalyticsPage() {
       value: finMetrics ? (finMetrics.totalRevenue >= 1000 ? `$${(finMetrics.totalRevenue / 1000).toFixed(1)}K` : `$${finMetrics.totalRevenue.toLocaleString()}`) : '$0',
       label: 'Ledger Revenue',
       period: 'Verified persistent ledger volume',
-      source: 'JSON Ledger Storage',
+      source: 'PostgreSQL Ledger',
       accent: 'var(--accent-primary)',
       trend: 'up',
       detail: finMetrics?.entryCount ? `${finMetrics.entryCount} posted transactions` : 'No transactions'
@@ -158,7 +158,7 @@ export default function AnalyticsPage() {
     },
     {
       icon: <Zap size={22} />,
-      value: telemetry?.p95LatencyMs ? `${telemetry.p95LatencyMs}ms` : '180ms',
+      value: telemetry?.p95LatencyMs ? `${telemetry.p95LatencyMs}ms` : (loading ? '...' : '--'),
       label: 'Inference Latency (P95)',
       period: 'Gateway ingress benchmark',
       source: 'NVIDIA NIM Relay',
@@ -295,18 +295,18 @@ export default function AnalyticsPage() {
             <div style={{ background: 'var(--glass-bg-subtle)', padding: 16, borderRadius: 12, border: '1px solid var(--card-border)' }}>
               <div style={{ fontSize: 10, color: 'var(--text-muted)', textTransform: 'uppercase', fontFamily: 'monospace' }}>TARGET OPERATING MARGIN</div>
               <div style={{ fontSize: 24, fontWeight: 700, color: 'var(--success)', marginTop: 4 }}>
-                {finMetrics ? `${Math.max(20, finMetrics.margin)}%` : '0%'}
+                {finMetrics ? `${finMetrics.margin}%` : '0%'}
               </div>
-              <div style={{ fontSize: 11, color: 'var(--text-secondary)', marginTop: 2 }}>Estimated breakeven bound</div>
+              <div style={{ fontSize: 11, color: 'var(--text-secondary)', marginTop: 2 }}>Calculated from current fiscal run-rate</div>
             </div>
 
             <div style={{ background: 'var(--glass-bg-subtle)', padding: 16, borderRadius: 12, border: '1px solid var(--card-border)' }}>
               <div style={{ fontSize: 10, color: 'var(--text-muted)', textTransform: 'uppercase', fontFamily: 'monospace' }}>STATISTICAL CONFIDENCE</div>
               <div style={{ fontSize: 24, fontWeight: 700, color: 'var(--accent-primary)', marginTop: 4 }}>
-                {telemetry?.confidenceScore ? `${telemetry.confidenceScore}%` : '85%'}
+                {telemetry?.confidenceScore ? `${telemetry.confidenceScore}%` : (loading ? '...' : 'N/A')}
               </div>
               <div style={{ fontSize: 11, color: 'var(--text-secondary)', marginTop: 2 }}>
-                Sample standard deviation: ±{telemetry?.standardDeviation ?? 4.2}%
+                {telemetry?.standardDeviation ? `Sample standard deviation: ±${telemetry.standardDeviation}%` : 'Awaiting baseline run metrics'}
               </div>
             </div>
           </div>
