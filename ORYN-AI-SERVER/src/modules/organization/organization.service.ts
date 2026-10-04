@@ -106,15 +106,19 @@ export class OrganizationService {
 
   async addEmployee(employee: { name: string; email: string; role: string; orgId?: string }) {
     const orgId = employee.orgId || this.defaultOrgId;
-
     try {
+      const validRoles = ['SUPER_ADMIN', 'ORG_ADMIN', 'OPERATOR', 'AUDITOR', 'VIEWER'];
+      const normalizedRole = validRoles.includes(employee.role?.toUpperCase())
+        ? (employee.role.toUpperCase() as any)
+        : 'OPERATOR';
+
       const created = await prisma.user.create({
         data: {
           orgId,
           name: employee.name,
           email: employee.email.toLowerCase(),
           passwordHash: 'pending_invitation',
-          role: (employee.role.toUpperCase() as any) || 'OPERATOR',
+          role: normalizedRole,
         },
       });
 
