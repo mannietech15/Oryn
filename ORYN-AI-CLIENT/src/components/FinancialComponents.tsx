@@ -196,7 +196,7 @@ export function buildFiscalKpis(
       label: 'Gross Ledger Revenue',
       value: rev >= 1000 ? `$${(rev / 1000).toFixed(1)}K` : `$${rev.toLocaleString()}`,
       detail: `${entryCount} total transactions posted to ledger`,
-      source: 'JSON Storage Engine',
+      source: 'PostgreSQL Ledger Engine',
       period: 'Verified historical total',
       accent: 'var(--accent-primary)',
       icon: (
