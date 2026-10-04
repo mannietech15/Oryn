@@ -1,13 +1,14 @@
 import { Request, Response, NextFunction } from 'express';
-import { defaultDatastore, Datastore } from '../../infrastructure/storage/datastore';
-import { ValidationError, NotFoundError } from '../../shared/errors/app-error';
+import { CalendarService, defaultCalendarService } from './calendar.service';
+import { ValidationError } from '../../shared/errors/app-error';
 
 export class CalendarController {
-  constructor(private datastore: Datastore = defaultDatastore) {}
+  constructor(private calendarService: CalendarService = defaultCalendarService) {}
 
-  getEvents = async (_req: Request, res: Response, next: NextFunction): Promise<void> => {
+  getEvents = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
-      const events = this.datastore.getCalendarEvents();
+      const orgId = (req as any).user?.orgId;
+      const events = await this.calendarService.getEvents(orgId);
       res.json(events);
     } catch (err) {
       next(err);
@@ -29,12 +30,14 @@ export class CalendarController {
         throw new ValidationError(`Field 'type' must be one of: ${validTypes.join(', ')}`);
       }
 
-      const event = this.datastore.addCalendarEvent({
+      const orgId = (req as any).user?.orgId;
+      const event = await this.calendarService.createEvent({
         title,
         time,
         type: type || 'internal',
         attendees: Array.isArray(attendees) ? attendees : (attendees ? [String(attendees)] : []),
-        aiBrief: aiBrief || 'Scheduled operational event.'
+        aiBrief: aiBrief || 'Scheduled operational event.',
+        orgId,
       });
 
       res.status(201).json(event);
@@ -46,9 +49,8 @@ export class CalendarController {
   deleteEvent = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
       const { id } = req.params;
-      const deleted = this.datastore.deleteCalendarEvent(id);
-      if (!deleted) throw new NotFoundError(`Calendar event '${id}' not found`);
-
+      const orgId = (req as any).user?.orgId;
+      await this.calendarService.deleteEvent(id, orgId);
       res.json({ success: true, id });
     } catch (err) {
       next(err);
