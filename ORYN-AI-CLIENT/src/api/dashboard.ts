@@ -41,3 +41,37 @@ export async function fetchHealthScore(): Promise<HealthScore> {
   if (!res.ok) throw new Error('Health score fetch failed');
   return res.json() as Promise<HealthScore>;
 }
+
+export async function createGoal(goal: { label: string; target: number; unit?: string; color?: string }): Promise<DashboardGoal> {
+  const res = await fetch(`${BASE}/goals`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(goal),
+  });
+  if (!res.ok) throw new Error('Failed to create milestone goal');
+  return res.json() as Promise<DashboardGoal>;
+}
+
+export async function updateGoal(id: string, updates: { current?: number; target?: number; completed?: boolean }): Promise<void> {
+  const res = await fetch(`${BASE}/goals/${id}`, {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(updates),
+  });
+  if (!res.ok) throw new Error('Failed to update goal');
+}
+
+export async function deleteGoal(id: string): Promise<void> {
+  const res = await fetch(`${BASE}/goals/${id}`, {
+    method: 'DELETE',
+  });
+  if (!res.ok) throw new Error('Failed to delete goal');
+}
+
+export async function dismissAlert(id: string): Promise<void> {
+  const res = await fetch(`${BASE}/alerts/${id}/dismiss`, {
+    method: 'POST',
+  });
+  if (!res.ok) throw new Error('Failed to dismiss alert');
+}
+
