@@ -226,13 +226,13 @@ export default function ExplorePage() {
                 style={{
                   background: 'none', border: 'none', padding: '8px 4px', cursor: 'pointer',
                   fontFamily: 'var(--font-display)', fontSize: 13, fontWeight: 700, letterSpacing: 2,
-                  textTransform: 'uppercase', color: activeTab === tab ? 'var(--cyan)' : 'var(--muted)',
+                  textTransform: 'uppercase', color: activeTab === tab ? 'var(--accent-primary)' : 'var(--text-muted)',
                   position: 'relative', transition: 'all 0.3s'
                 }}
               >
                 {tab} ({tab === 'communities' ? communities.length : tab === 'networking' ? businesses.length : trends.length})
                 {activeTab === tab && (
-                  <div style={{ position: 'absolute', bottom: -17, left: 0, right: 0, height: 2, background: 'var(--cyan)', boxShadow: '0 0 10px var(--cyan)' }} />
+                  <div style={{ position: 'absolute', bottom: -17, left: 0, right: 0, height: 2, background: 'var(--accent-primary)', boxShadow: '0 0 10px rgba(249, 115, 22, 0.4)' }} />
                 )}
               </button>
             ))}
@@ -294,7 +294,9 @@ export default function ExplorePage() {
                               )}
                             </div>
                             <h3 style={{ fontFamily: 'var(--font-display)', fontSize: 20, marginBottom: 8 }}>{c.name}</h3>
-                            <div style={{ fontSize: 12, color: 'var(--cyan)', fontWeight: 700, marginBottom: 16 }}>{c.members} Members</div>
+                            <div style={{ fontSize: 12, color: 'var(--accent-primary)', fontWeight: 700, marginBottom: 16 }}>
+                              {c.members.toLowerCase().includes('member') ? c.members : `${c.members} Members`}
+                            </div>
                             <p style={{ color: 'var(--muted)', fontSize: 14, lineHeight: 1.6, marginBottom: 20 }}>{c.description}</p>
                             <div style={{ display: 'flex', gap: 8, marginBottom: 24, flexWrap: 'wrap' }}>
                               {c.tags.map(tag => (
@@ -309,8 +311,8 @@ export default function ExplorePage() {
                             style={{
                               width: '100%', padding: '12px',
                               background: c.joined ? 'rgba(34, 197, 94, 0.12)' : 'rgba(249, 115, 22,0.08)',
-                              border: `1px solid ${c.joined ? 'var(--success)' : 'var(--cyan)'}`,
-                              borderRadius: 10, color: c.joined ? 'var(--success)' : 'var(--cyan)',
+                              border: `1px solid ${c.joined ? 'var(--success)' : 'var(--accent-primary)'}`,
+                              borderRadius: 10, color: c.joined ? 'var(--success)' : 'var(--accent-primary)',
                               fontWeight: 700, cursor: isJoining ? 'wait' : 'pointer', transition: 'all 0.2s'
                             }}
                           >
