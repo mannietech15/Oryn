@@ -1,0 +1,36 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: oryn-postgres
+    restart: always
+    environment:
+      POSTGRES_USER: oryn_admin
+      POSTGRES_PASSWORD: oryn_secure_pass_2026
+      POSTGRES_DB: oryn_db
+    ports:
+      - "5433:5432"
+    volumes:
+      - oryn_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U oryn_admin -d oryn_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    container_name: oryn-redis
+    restart: always
+    ports:
+      - "6379:6379"
+    volumes:
+      - oryn_redisdata:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+volumes:
+  oryn_pgdata:
+  oryn_redisdata:
