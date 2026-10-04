@@ -273,7 +273,7 @@ export function DepartmentGrid({ teams, employees = [] }: DepartmentGridProps) {
                   color: 'var(--accent-primary)',
                   border: '1px solid rgba(249, 115, 22, 0.2)'
                 }}>
-                  {Math.max(1, count)} CONTRIBUTORS
+                  {count} {count === 1 ? 'CONTRIBUTOR' : 'CONTRIBUTORS'}
                 </span>
               </div>
               <div style={{ fontSize: 12, color: 'var(--text-secondary)', lineHeight: 1.5 }}>
@@ -357,9 +357,9 @@ export function buildOrgKpiItems(
       )
     },
     {
-      label: 'Governance & Compliance',
-      value: '100%',
-      detail: 'Zero policy violations in corporate audit log',
+      label: 'Personnel Active Ratio',
+      value: total > 0 ? `${Math.round((activeCount / total) * 100)}%` : '0%',
+      detail: `${activeCount} of ${total} active on roster`,
       source: 'IAM Security Gateway',
       period: 'Verified active benchmark',
       accent: 'var(--success)',
@@ -439,7 +439,7 @@ export function BusinessProfileCard({ company }: BusinessProfileCardProps) {
     <div style={{ marginTop: 16, padding: '12px 16px', borderRadius: 10, background: 'var(--glass-bg-subtle)', border: '1px solid var(--card-border)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 10 }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 11, fontFamily: 'monospace', color: 'var(--text-secondary)' }}>
         <span style={{ width: 6, height: 6, borderRadius: '50%', background: 'var(--success)' }} />
-        ENTERPRISE REGISTRATION: ORG-US-WEST-90214
+        ENTERPRISE TENANT: ACTIVE
       </div>
       <div style={{ fontSize: 11, color: 'var(--text-muted)', fontFamily: 'monospace' }}>
         TIER: PRODUCTION ENTERPRISE CLUSTER
