@@ -8,4 +8,5 @@ import './unit/email-hil.test';
 import './unit/financials-service.test';
 import './unit/organization-service.test';
 import './unit/automation-service.test';
+import './unit/calendar-service.test';
 import './security-auth.test';
