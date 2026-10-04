@@ -8,7 +8,7 @@
 
 ### **The Autonomous AI Business Manager for Modern Enterprise Platforms**
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-orange.svg?style=for-the-badge)](https://opensource.org/licenses/MIT)
+[![License: Apache 2.0](https://img.shields.io/badge/License-Apache%202.0-red.svg?style=for-the-badge)](https://opensource.org/licenses/Apache-2.0)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.4-blue.svg?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
 [![React](https://img.shields.io/badge/React-18.3-61dafb.svg?style=for-the-badge&logo=react&logoColor=black)](https://reactjs.org/)
 [![Vite](https://img.shields.io/badge/Vite-5.2-646CFF.svg?style=for-the-badge&logo=vite&logoColor=white)](https://vitejs.dev/)
@@ -297,17 +297,19 @@ ORYN-AI/
 
 Contributions are what make the open-source community an incredible place to learn, inspire, and create. Any contributions you make are **greatly appreciated**.
 
-1. Fork the Project
-2. Create your Feature Branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your Changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the Branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
+Please review our **[`CONTRIBUTING.md`](./CONTRIBUTING.md)** for local development environment setup, branching strategy, testing protocols, and PR guidelines.
+
+---
+
+## 🔒 Security
+
+For vulnerability reporting, response SLAs, and secrets isolation practices, please consult our **[`SECURITY.md`](./SECURITY.md)**.
 
 ---
 
 ## 📄 License
 
-Distributed under the **MIT License**. See [`LICENSE`](./LICENSE) and [`docs/LICENSING.md`](./docs/LICENSING.md) for full terms, permissions, and compliance details.
+Distributed under the **Apache License, Version 2.0**. See [`LICENSE`](./LICENSE) and [`docs/LICENSING.md`](./docs/LICENSING.md) for full terms, patent grants, and compliance details.
 
 ---
 
