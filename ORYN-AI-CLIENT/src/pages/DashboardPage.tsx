@@ -232,7 +232,7 @@ export default function DashboardPage({ orgProfile, currentUser }: DashboardPage
       change: finMetrics?.totalRevenue > 0 ? '+12.4% vs previous cycle' : 'No transactions recorded',
       trend: finMetrics?.totalRevenue > 0 ? 'up' : 'neutral',
       period: finMetrics?.entryCount ? `Verified ledger (${finMetrics.entryCount} posted transactions)` : 'Ledger initialized',
-      source: 'JSON / Fiscal Ledger',
+      source: 'PostgreSQL / Fiscal Ledger',
       updated: finMetrics?.lastUpdated ? `Synced ${new Date(finMetrics.lastUpdated).toLocaleTimeString()}` : 'Real-time',
       prompt: 'Break down gross revenue vs operating expenses for this cycle.'
     },
@@ -258,9 +258,9 @@ export default function DashboardPage({ orgProfile, currentUser }: DashboardPage
     },
     {
       label: 'Composite Operations Score',
-      value: health ? `${health.score}/100` : '90/100',
-      change: `Grade ${health?.grade ?? 'A'}`,
-      trend: (health?.score ?? 90) >= 80 ? 'up' : 'down',
+      value: health ? `${health.score}/100` : (healthLoading ? '...' : '--/100'),
+      change: health ? `Grade ${health.grade}` : 'Evaluating',
+      trend: (health?.score ?? 0) >= 80 ? 'up' : 'down',
       period: 'Evaluated across live subsystems',
       source: 'Telemetry Diagnostic Engine',
       updated: 'Live evaluation',
@@ -273,7 +273,7 @@ export default function DashboardPage({ orgProfile, currentUser }: DashboardPage
     name: w.name,
     status: w.status === 'active' ? 'Active' : 'Paused',
     task: `${w.trigger} · ${w.steps.join(' → ')}`,
-    load: w.status === 'active' ? 70 : 0,
+    load: w.status === 'active' ? Math.min(100, Math.max(20, (w.runCount || 1) * 4)) : 0,
     trigger: w.trigger,
     color: w.status === 'active' ? 'var(--success)' : 'var(--text-secondary)'
   }));
@@ -362,7 +362,7 @@ export default function DashboardPage({ orgProfile, currentUser }: DashboardPage
 
           <div style={{ textAlign: 'right' }}>
             <div style={{ fontFamily: 'var(--font-display)', fontSize: 22, fontWeight: 600, color: 'var(--text-primary)', fontVariantNumeric: 'tabular-nums' }}>{clockStr}</div>
-            <div style={{ fontFamily: 'var(--font-body)', fontSize: 12, color: 'var(--text-secondary)', marginTop: 2 }}>{dateStr} · UTC+1</div>
+            <div style={{ fontFamily: 'var(--font-body)', fontSize: 12, color: 'var(--text-secondary)', marginTop: 2 }}>{dateStr} · {Intl.DateTimeFormat().resolvedOptions().timeZone}</div>
           </div>
         </div>
 
