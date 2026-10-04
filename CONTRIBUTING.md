@@ -51,3 +51,67 @@ ORYN-AI/
 ├── CONTRIBUTING.md       # Contribution specifications (this file)
 └── SECURITY.md           # Vulnerability disclosure and security policy
 ```
+
+---
+
+## Local Development Setup
+
+### Prerequisites
+Before getting started, ensure you have the following installed on your machine:
+- **Node.js**: `v18.0.0` or higher (`node -v`)
+- **npm**: `v9.0.0` or higher (`npm -v`)
+- **Git**: Modern git client (`git --version`)
+
+### 1. Clone the Repository
+```bash
+git clone https://github.com/mannietech15/Oryn.git
+cd Oryn
+```
+
+### 2. Backend Server Setup
+```bash
+cd ORYN-AI-SERVER
+
+# Install server dependencies
+npm install
+
+# Configure environment variables
+cp .env.example .env
+```
+
+Ensure your `ORYN-AI-SERVER/.env` contains the required keys:
+```env
+PORT=3006
+NODE_ENV=development
+CORS_ORIGIN=http://localhost:5173
+
+# AI Inference Gateway (NVIDIA NIM or compatible endpoint)
+NVIDIA_API_KEY=your_nvidia_api_key_here
+NVIDIA_BASE_URL=https://integrate.api.nvidia.com/v1
+
+# Outbound Mail Transport (Verified Gmail SMTP relay)
+SMTP_HOST=smtp.gmail.com
+SMTP_PORT=587
+SMTP_USER=your_verified_sender@gmail.com
+SMTP_PASS=your_gmail_app_password
+```
+
+Start the backend development daemon:
+```bash
+npm run dev
+# Server listens on http://localhost:3006
+```
+
+### 3. Frontend Client Setup
+In a new terminal window:
+```bash
+cd ORYN-AI-CLIENT
+
+# Install frontend dependencies
+npm install
+
+# Start Vite hot-reload development server
+npm run dev
+# Client runs at http://localhost:5173
+```
+
