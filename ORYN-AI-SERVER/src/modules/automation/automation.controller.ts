@@ -1,15 +1,14 @@
 import { Request, Response, NextFunction } from 'express';
-import { defaultDatastore, Datastore } from '../../infrastructure/storage/datastore';
-import { NotFoundError } from '../../shared/errors/app-error';
+import { AutomationService, defaultAutomationService } from './automation.service';
 
 export class AutomationController {
-  constructor(private datastore: Datastore = defaultDatastore) {}
+  constructor(private automationService: AutomationService = defaultAutomationService) {}
 
-  getWorkflows = async (_req: Request, res: Response, next: NextFunction): Promise<void> => {
+  getWorkflows = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
-      const workflows = this.datastore.getWorkflows();
-      const stats = this.datastore.getWorkflowStats();
-      res.json({ workflows, stats });
+      const orgId = (req as any).user?.orgId;
+      const data = await this.automationService.getWorkflows(orgId);
+      res.json(data);
     } catch (err) {
       next(err);
     }
@@ -18,16 +17,18 @@ export class AutomationController {
   getLogs = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
       const limit = Number(req.query.limit) || 30;
-      const logs = this.datastore.getWorkflowExecutionLogs(limit);
+      const orgId = (req as any).user?.orgId;
+      const logs = await this.automationService.getLogs(orgId, limit);
       res.json(logs);
     } catch (err) {
       next(err);
     }
   };
 
-  getStats = async (_req: Request, res: Response, next: NextFunction): Promise<void> => {
+  getStats = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
-      const stats = this.datastore.getWorkflowStats();
+      const orgId = (req as any).user?.orgId;
+      const stats = await this.automationService.getWorkflowStats(orgId);
       res.json(stats);
     } catch (err) {
       next(err);
@@ -37,11 +38,8 @@ export class AutomationController {
   toggleWorkflow = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
       const { id } = req.params;
-      const wf = this.datastore.getWorkflow(id);
-      if (!wf) throw new NotFoundError(`Workflow '${id}' not found`);
-
-      const nextStatus = wf.status === 'active' ? 'paused' : 'active';
-      const updated = this.datastore.updateWorkflow(id, { status: nextStatus });
+      const orgId = (req as any).user?.orgId;
+      const updated = await this.automationService.toggleWorkflow(id, orgId);
       res.json(updated);
     } catch (err) {
       next(err);
@@ -49,56 +47,12 @@ export class AutomationController {
   };
 
   runWorkflow = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
-    const startTime = Date.now();
     try {
       const { id } = req.params;
-      const wf = this.datastore.getWorkflow(id);
-      if (!wf) throw new NotFoundError(`Workflow '${id}' not found`);
-
-      // Simulate real execution timing based on steps
-      const durationMs = 80 + Math.floor(Math.random() * 120) + wf.steps.length * 40;
-
-      // Log execution record
-      const executionRecord = this.datastore.logWorkflowExecution({
-        workflowId: wf.id,
-        workflowName: wf.name,
-        trigger: 'Manual Console Dispatch',
-        durationMs,
-        status: 'success',
-        stepsCompleted: wf.steps.length,
-        totalSteps: wf.steps.length,
-        error: null
-      });
-
-      // Also log task telemetry
-      this.datastore.logTask({
-        type: 'automation',
-        model: 'engine/pipeline-runner',
-        latencyMs: durationMs,
-        tokensUsed: 0,
-        status: 'success'
-      });
-
-      res.json({
-        success: true,
-        execution: executionRecord,
-        message: `Workflow '${wf.name}' executed successfully in ${durationMs}ms.`
-      });
-    } catch (err: any) {
-      const { id } = req.params;
-      const wf = this.datastore.getWorkflow(id);
-      if (wf) {
-        this.datastore.logWorkflowExecution({
-          workflowId: wf.id,
-          workflowName: wf.name,
-          trigger: 'Manual Console Dispatch',
-          durationMs: Date.now() - startTime,
-          status: 'failure',
-          stepsCompleted: 0,
-          totalSteps: wf.steps.length,
-          error: err.message
-        });
-      }
+      const orgId = (req as any).user?.orgId;
+      const result = await this.automationService.runWorkflow(id, orgId);
+      res.json(result);
+    } catch (err) {
       next(err);
     }
   };
