@@ -129,7 +129,7 @@ export class AutomationService {
       const wf = await prisma.workflow.findUnique({ where: { id } });
       if (wf) {
         const stepCount = Array.isArray(wf.steps) ? wf.steps.length : 3;
-        const durationMs = 80 + Math.floor(Math.random() * 120) + stepCount * 40;
+        const durationMs = Math.max(1, Date.now() - startTime);
 
         const [log] = await prisma.$transaction([
           prisma.workflowExecutionLog.create({
@@ -185,7 +185,7 @@ export class AutomationService {
     const wf = defaultDatastore.getWorkflow(id);
     if (!wf) throw new NotFoundError(`Workflow '${id}' not found`);
 
-    const durationMs = 80 + Math.floor(Math.random() * 120) + wf.steps.length * 40;
+    const durationMs = Math.max(1, Date.now() - startTime);
     const execution = defaultDatastore.logWorkflowExecution({
       workflowId: wf.id,
       workflowName: wf.name,

@@ -174,7 +174,7 @@ export default function AutomationPage() {
             workflows.map(wf => {
               const successRate = wf.runCount > 0
                 ? `${Math.round((wf.successCount / wf.runCount) * 100)}%`
-                : '100%';
+                : 'N/A';
               const isRunning = runningId === wf.id;
 
               return (
