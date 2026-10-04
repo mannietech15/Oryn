@@ -17,19 +17,19 @@ export class FinancialsService {
   private defaultOrgId = 'org_oryn_global_001';
 
   constructor() {
-    this.ensureDefaultOrganization().catch(() => {});
+    this.ensureOrganization().catch(() => {});
   }
 
-  private async ensureDefaultOrganization(): Promise<void> {
+  async ensureOrganization(orgId = this.defaultOrgId): Promise<void> {
     try {
       const existing = await prisma.organization.findUnique({
-        where: { id: this.defaultOrgId },
+        where: { id: orgId },
       });
       if (!existing) {
         await prisma.organization.create({
           data: {
-            id: this.defaultOrgId,
-            name: 'Oryn AI Global',
+            id: orgId,
+            name: orgId === this.defaultOrgId ? 'Oryn AI Global' : 'Oryn Enterprise Node',
             industry: 'Enterprise AI & Workflow Systems',
             foundedDate: new Date('2025-01-15'),
             location: 'San Francisco, CA',
@@ -86,7 +86,7 @@ export class FinancialsService {
     const entryDate = data.date ? new Date(data.date) : new Date();
 
     try {
-      await this.ensureDefaultOrganization();
+      await this.ensureOrganization(orgId);
       const created = await prisma.financialEntry.create({
         data: {
           orgId,
