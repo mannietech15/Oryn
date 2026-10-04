@@ -1,10 +1,11 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Zap, Plug, Lightbulb } from 'lucide-react';
+import { Zap, Plug, Lightbulb, Plus, Trash2, CheckCircle, X } from 'lucide-react';
 import { GmailLogo, NvidiaLogo, SlackLogo, StripeLogo, ZendeskLogo, LedgerLogo } from '../components/BrandLogos';
 import {
   runCommand, fetchBriefing, fetchAlerts, fetchGoals,
   fetchGoalAction, fetchHealthScore,
+  createGoal, updateGoal, deleteGoal, dismissAlert
 } from '../api/dashboard';
 import {
   fetchFinancials, fetchWorkflows, fetchIntegrations
@@ -180,6 +181,62 @@ export default function DashboardPage({ orgProfile, currentUser }: DashboardPage
   const cmdInputRef = useRef<HTMLInputElement>(null);
   const briefingText = useTypewriter(briefing?.summary ?? '');
 
+  const [showAddGoal, setShowAddGoal] = useState(false);
+  const [newGoalLabel, setNewGoalLabel] = useState('');
+  const [newGoalTarget, setNewGoalTarget] = useState('');
+  const [newGoalUnit, setNewGoalUnit] = useState<'$' | '%' | ''>('$');
+  const [isSavingGoal, setIsSavingGoal] = useState(false);
+
+  const handleCreateGoal = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newGoalLabel.trim() || !newGoalTarget || Number(newGoalTarget) <= 0) return;
+    setIsSavingGoal(true);
+    try {
+      const created = await createGoal({
+        label: newGoalLabel.trim(),
+        target: Number(newGoalTarget),
+        unit: newGoalUnit,
+        color: '#f97316'
+      });
+      setGoals(prev => [...prev, created]);
+      setNewGoalLabel('');
+      setNewGoalTarget('');
+      setShowAddGoal(false);
+    } catch (err) {
+      console.error('Failed to create milestone', err);
+    } finally {
+      setIsSavingGoal(false);
+    }
+  };
+
+  const handleToggleGoal = async (id: string, currentCompleted?: boolean) => {
+    const nextCompleted = !currentCompleted;
+    setGoals(prev => prev.map(g => g.id === id ? { ...g, completed: nextCompleted } : g));
+    try {
+      await updateGoal(id, { completed: nextCompleted });
+    } catch {
+      setGoals(prev => prev.map(g => g.id === id ? { ...g, completed: currentCompleted } : g));
+    }
+  };
+
+  const handleDeleteGoal = async (id: string) => {
+    setGoals(prev => prev.filter(g => g.id !== id));
+    try {
+      await deleteGoal(id);
+    } catch (err) {
+      console.error('Failed to delete goal', err);
+    }
+  };
+
+  const handleDismissAlert = async (id: string) => {
+    setAlerts(prev => prev.filter(a => a.id !== id));
+    try {
+      await dismissAlert(id);
+    } catch (err) {
+      console.error('Failed to dismiss alert', err);
+    }
+  };
+
   /* ── Load all data on mount and poll in realtime ── */
   const loadDashboardData = useCallback(() => {
     return Promise.allSettled([
@@ -201,7 +258,7 @@ export default function DashboardPage({ orgProfile, currentUser }: DashboardPage
 
   useEffect(() => {
     loadDashboardData();
-    const interval = setInterval(loadDashboardData, 15000);
+    const interval = setInterval(loadDashboardData, 5000);
     return () => clearInterval(interval);
   }, [loadDashboardData]);
 
@@ -636,7 +693,18 @@ export default function DashboardPage({ orgProfile, currentUser }: DashboardPage
                         <span style={{ fontSize: 10, fontWeight: 700, fontFamily: 'monospace', color: th.color, background: th.bg, padding: '2px 6px', borderRadius: 4 }}>
                           {th.label}
                         </span>
-                        <span style={{ fontSize: 10, color: 'var(--text-muted)' }}>{a.time}</span>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                          <span style={{ fontSize: 10, color: 'var(--text-muted)' }}>{a.time}</span>
+                          <button
+                            onClick={() => handleDismissAlert(a.id)}
+                            title="Dismiss alert"
+                            style={{ background: 'transparent', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', padding: 2, display: 'flex', alignItems: 'center' }}
+                            onMouseEnter={e => e.currentTarget.style.color = 'var(--text-primary)'}
+                            onMouseLeave={e => e.currentTarget.style.color = 'var(--text-muted)'}
+                          >
+                            <X size={12} />
+                          </button>
+                        </div>
                       </div>
                       <div style={{ fontSize: 12.5, fontWeight: 600, color: 'var(--text-primary)' }}>{a.title}</div>
                       <div style={{ fontSize: 11.5, color: 'var(--text-secondary)', lineHeight: 1.4 }}>{a.detail}</div>
@@ -653,7 +721,62 @@ export default function DashboardPage({ orgProfile, currentUser }: DashboardPage
 
           {/* Row 5: Strategic Milestones & Targets */}
           <div className="span-12" style={{ gridColumn: 'span 12' }}>
-            <Card delay={0.45} title="Strategic Operational Milestones" subtitle="Target progression tracking with algorithmic gap analysis">
+            <Card
+              delay={0.45}
+              title="Strategic Operational Milestones"
+              subtitle="Target progression tracking with algorithmic gap analysis"
+              action={
+                <button
+                  onClick={() => setShowAddGoal(!showAddGoal)}
+                  style={{
+                    padding: '6px 12px', borderRadius: 8,
+                    background: 'var(--accent-primary)', color: '#fff',
+                    border: 'none', fontSize: 11, fontWeight: 600,
+                    cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6,
+                    boxShadow: '0 2px 6px rgba(249, 115, 22, 0.3)'
+                  }}
+                >
+                  <Plus size={13} /> {showAddGoal ? 'Cancel' : 'New Milestone'}
+                </button>
+              }
+            >
+            {showAddGoal && (
+              <form onSubmit={handleCreateGoal} style={{ display: 'flex', gap: 10, flexWrap: 'wrap', marginBottom: 18, padding: 14, background: 'var(--glass-bg-subtle)', borderRadius: 10, border: '1px solid var(--card-border)' }}>
+                <input
+                  required
+                  placeholder="Milestone label (e.g. Q4 MRR Goal)"
+                  value={newGoalLabel}
+                  onChange={e => setNewGoalLabel(e.target.value)}
+                  style={{ flex: 2, minWidth: 180, padding: '8px 12px', background: 'var(--card-bg)', border: '1px solid var(--card-border)', borderRadius: 6, color: 'var(--text-primary)', fontSize: 12 }}
+                />
+                <input
+                  required
+                  type="number"
+                  min="1"
+                  placeholder="Target value"
+                  value={newGoalTarget}
+                  onChange={e => setNewGoalTarget(e.target.value)}
+                  style={{ flex: 1, minWidth: 100, padding: '8px 12px', background: 'var(--card-bg)', border: '1px solid var(--card-border)', borderRadius: 6, color: 'var(--text-primary)', fontSize: 12 }}
+                />
+                <select
+                  value={newGoalUnit}
+                  onChange={e => setNewGoalUnit(e.target.value as any)}
+                  style={{ width: 80, padding: '8px', background: 'var(--card-bg)', border: '1px solid var(--card-border)', borderRadius: 6, color: 'var(--text-primary)', fontSize: 12 }}
+                >
+                  <option value="$">$ (USD)</option>
+                  <option value="%">% (Ratio)</option>
+                  <option value="">Units</option>
+                </select>
+                <button
+                  type="submit"
+                  disabled={isSavingGoal}
+                  style={{ padding: '8px 16px', background: 'var(--accent-primary)', border: 'none', borderRadius: 6, color: '#fff', fontSize: 12, fontWeight: 600, cursor: 'pointer' }}
+                >
+                  {isSavingGoal ? 'Saving...' : 'Add Target'}
+                </button>
+              </form>
+            )}
+
             {goalsLoading ? (
               <div style={{ color: 'var(--text-secondary)', fontSize: 13 }}>Loading targets...</div>
             ) : (
@@ -665,15 +788,40 @@ export default function DashboardPage({ orgProfile, currentUser }: DashboardPage
                     <div key={g.id} style={{ background: 'var(--glass-bg-subtle)', padding: '16px', borderRadius: 12, border: '1px solid var(--card-border)' }}>
                       <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 12 }}>
                         <div>
-                          <div style={{ fontSize: 13.5, color: 'var(--text-primary)', fontWeight: 600 }}>{g.label}</div>
+                          <div style={{ fontSize: 13.5, color: g.completed ? 'var(--text-muted)' : 'var(--text-primary)', textDecoration: g.completed ? 'line-through' : 'none', fontWeight: 600 }}>{g.label}</div>
                           <div style={{ fontSize: 11.5, color: 'var(--text-muted)', marginTop: 2 }}>Current: {fmt(g.current)} · Target: {fmt(g.target)}</div>
                         </div>
-                        <div style={{ fontSize: 16, fontFamily: 'monospace', fontWeight: 700, color: pct >= 80 ? 'var(--success)' : 'var(--accent-primary)' }}>
-                          {pct}%
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                          <button
+                            onClick={() => handleToggleGoal(g.id, g.completed)}
+                            title={g.completed ? "Mark Incomplete" : "Mark Complete"}
+                            style={{
+                              background: 'transparent', border: 'none', cursor: 'pointer',
+                              color: g.completed ? 'var(--success)' : 'var(--text-muted)',
+                              display: 'flex', alignItems: 'center'
+                            }}
+                          >
+                            <CheckCircle size={16} />
+                          </button>
+                          <div style={{ fontSize: 15, fontFamily: 'monospace', fontWeight: 700, color: g.completed ? 'var(--success)' : pct >= 80 ? 'var(--success)' : 'var(--accent-primary)' }}>
+                            {g.completed ? 'DONE' : `${pct}%`}
+                          </div>
+                          <button
+                            onClick={() => handleDeleteGoal(g.id)}
+                            title="Delete Milestone"
+                            style={{
+                              background: 'transparent', border: 'none', cursor: 'pointer',
+                              color: 'var(--text-muted)', display: 'flex', alignItems: 'center', padding: 2
+                            }}
+                            onMouseEnter={e => e.currentTarget.style.color = 'var(--danger)'}
+                            onMouseLeave={e => e.currentTarget.style.color = 'var(--text-muted)'}
+                          >
+                            <Trash2 size={13} />
+                          </button>
                         </div>
                       </div>
                       <div style={{ height: 6, background: 'var(--glass-bg-hover)', borderRadius: 3, overflow: 'hidden', marginBottom: 12 }}>
-                        <div style={{ height: '100%', width: `${pct}%`, background: 'var(--accent-primary)', borderRadius: 3 }} />
+                        <div style={{ height: '100%', width: `${g.completed ? 100 : pct}%`, background: g.completed ? 'var(--success)' : 'var(--accent-primary)', borderRadius: 3 }} />
                       </div>
                       <button
                         onClick={() => handleGoalAction(g.id)}
