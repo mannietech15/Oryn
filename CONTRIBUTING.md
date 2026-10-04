@@ -160,4 +160,46 @@ Examples:
 - **Provide clear summaries**: Detail the motivation, screenshots or recordings of UI changes, and verification commands.
 - **Ensure green builds**: PRs must compile cleanly and pass the full test suite before review.
 
+---
+
+## Testing Protocols & Verification Standards
+
+To guarantee enterprise stability and prevent regressions, all changes must pass automated verification suites.
+
+### 1. Backend Automated Tests (`node:test`)
+The server uses Node.js's native test runner without external bloated test harnesses:
+
+```bash
+cd ORYN-AI-SERVER
+npm test
+```
+
+The test runner executes all test modules across:
+- **`AppError Hierarchy`**: Exception mapping, HTTP status codes, and error codes.
+- **`Validator Utility & Schemas`**: Input payload validation and rejection of malformed requests.
+- **`RoutingStrategy`**: Multi-tier LLM routing, vision/deep-reasoning tier selection, and image intent detection.
+- **`DashboardService`**: Financial metric calculations, ledger aggregates, and system health scores.
+- **`ModelRouter`**: Provider registry and failover fallback logic.
+- **`Datastore`**: Local JSON persistence, atomic transactions, and task telemetry logging.
+- **`Human-in-the-Loop Email Protocol`**: Draft staging, state machine transitions (`awaiting_approval` -> `sent`/`failed`), and audit logging.
+
+When adding new backend endpoints or services, you must provide corresponding unit tests under `ORYN-AI-SERVER/tests/unit/<feature>.test.ts` and register them in `ORYN-AI-SERVER/tests/run-tests.ts`.
+
+### 2. Frontend Type Checking & Production Build
+Ensure that all TypeScript types, React JSX components, and Tailwind styles compile without errors or warnings:
+
+```bash
+cd ORYN-AI-CLIENT
+npm run build
+```
+
+This executes `tsc && vite build` and validates that the production bundle emits cleanly without syntax or type errors.
+
+### 3. Manual Smoke Testing Checklist
+Before submitting a PR for UI or interactive workflows:
+1. Verify that the Executive Dashboard loads and renders live KPIs from `oryn-db.json`.
+2. Test the **Human-in-the-Loop Email** workflow: Ask Oryn to draft an email, confirm that the proposal card displays with correct recipient chips, and test both button click and conversational confirmation ("yes" / "continue").
+3. Check the dark mode contrast and responsiveness on both desktop and mobile viewports.
+
+
 
