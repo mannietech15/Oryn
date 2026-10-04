@@ -1,5 +1,7 @@
 import express, { Express } from 'express';
 import cors from 'cors';
+import helmet from 'helmet';
+import cookieParser from 'cookie-parser';
 import path from 'path';
 import { ENV, ALLOWED_ORIGINS } from '../config/env';
 import appRoutes from './routes';
@@ -11,7 +13,9 @@ export function createApp(): Express {
   const app = express();
 
   // Security & Core Middleware
+  app.use(helmet({ contentSecurityPolicy: false }));
   app.use(cors({ origin: ALLOWED_ORIGINS, credentials: true }));
+  app.use(cookieParser());
   app.use(express.json({ limit: '5mb' }));
   app.use(requestLogger);
 

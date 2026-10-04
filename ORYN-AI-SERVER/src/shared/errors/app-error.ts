@@ -59,6 +59,13 @@ export class SecurityError extends AppError {
   }
 }
 
+export class ForbiddenError extends SecurityError {
+  constructor(message = 'Access forbidden: Insufficient permissions.') {
+    super(message, ErrorCode.AUTHORIZATION_ERROR);
+  }
+}
+
+
 export class UnauthorizedError extends AppError {
   constructor(message = 'Authentication required to access this resource', details?: Record<string, any>) {
     super(message, 401, ErrorCode.AUTHENTICATION_ERROR, true, details);

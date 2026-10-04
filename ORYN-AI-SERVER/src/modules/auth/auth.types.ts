@@ -1,4 +1,13 @@
-export type UserRole = 'Verified Administrator' | 'Enterprise Administrator' | 'Quantitative Analyst' | 'Member';
+export type UserRole =
+  | 'SUPER_ADMIN'
+  | 'ORG_ADMIN'
+  | 'OPERATOR'
+  | 'AUDITOR'
+  | 'VIEWER'
+  | 'Verified Administrator'
+  | 'Enterprise Administrator'
+  | 'Quantitative Analyst'
+  | 'Member';
 
 export interface User {
   id: string;

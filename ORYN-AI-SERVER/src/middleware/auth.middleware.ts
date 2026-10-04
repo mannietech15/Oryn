@@ -13,12 +13,14 @@ declare global {
 
 export function requireAuth(req: Request, _res: Response, next: NextFunction): void {
   try {
+    const cookieToken = (req as any).cookies?.oryn_access_token;
     const authHeader = req.headers.authorization;
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      throw new UnauthorizedError('Bearer authentication token missing in Authorization header.');
+    const token = cookieToken || (authHeader?.startsWith('Bearer ') ? authHeader.substring(7) : undefined);
+
+    if (!token) {
+      throw new UnauthorizedError('Authentication required. Missing session cookie or Bearer authorization token.');
     }
 
-    const token = authHeader.substring(7);
     const session = defaultAuthService.verifySession(token);
     req.user = session.user;
     next();
@@ -29,9 +31,11 @@ export function requireAuth(req: Request, _res: Response, next: NextFunction): v
 
 export function optionalAuth(req: Request, _res: Response, next: NextFunction): void {
   try {
+    const cookieToken = (req as any).cookies?.oryn_access_token;
     const authHeader = req.headers.authorization;
-    if (authHeader && authHeader.startsWith('Bearer ')) {
-      const token = authHeader.substring(7);
+    const token = cookieToken || (authHeader?.startsWith('Bearer ') ? authHeader.substring(7) : undefined);
+
+    if (token) {
       const session = defaultAuthService.verifySession(token);
       req.user = session.user;
     }
