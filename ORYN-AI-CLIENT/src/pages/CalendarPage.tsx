@@ -173,7 +173,7 @@ export default function CalendarPage() {
                 Schedule Summary
               </h3>
               <p style={{ fontSize: 13, color: 'var(--text-primary)', margin: 0, lineHeight: 1.6 }}>
-                Team events and operational milestones {finSummary ? `(Volume: ${finSummary})` : ''} are synchronized to your calendar.
+                Team events and operational milestones {finSummary ? `(${finSummary})` : ''} are synchronized to your calendar.
               </p>
             </div>
           </div>
