@@ -128,12 +128,37 @@ export function useChat() {
       return { ...prevMap, [activeSessionId]: newMsgs };
     });
   }, [activeSessionId]);
-  const [tasks, setTasks] = useState<Task[]>([
-    { id: genId(), text: 'Review Q1 revenue report', done: true, createdAt: new Date() },
-    { id: genId(), text: 'Enterprise upsell pipeline', done: false, createdAt: new Date() },
-    { id: genId(), text: 'APAC expansion brief', done: false, createdAt: new Date() },
-  ]);
-  const [stats, setStats] = useState<SessionStats>({ messages: 1, tasks: 3, files: 0 });
+  const [tasks, setTasks] = useState<Task[]>(() => {
+    const saved = localStorage.getItem('oryn_tasks');
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved);
+        parsed.forEach((t: any) => t.createdAt = new Date(t.createdAt));
+        return parsed;
+      } catch {}
+    }
+    return [];
+  });
+
+  const [stats, setStats] = useState<SessionStats>(() => ({
+    messages: (messagesMap[activeSessionId] || []).length,
+    tasks: 0,
+    files: 0
+  }));
+
+  useEffect(() => {
+    localStorage.setItem('oryn_tasks', JSON.stringify(tasks));
+  }, [tasks]);
+
+  useEffect(() => {
+    const activeMsgs = messagesMap[activeSessionId] || [];
+    const fileCount = activeMsgs.reduce((acc, m) => acc + (m.attachedFiles?.length || 0), 0);
+    setStats({
+      messages: activeMsgs.length,
+      tasks: tasks.length,
+      files: fileCount
+    });
+  }, [messagesMap, activeSessionId, tasks]);
   const [features, setFeatures] = useState<ChatFeatures>({ voice: true, taskExtract: true, webSearch: true });
   const [model, setModel] = useState<'fast' | 'pro' | 'logic' | 'apex'>('fast');
   const [language, setLanguage] = useState<string>('English');
@@ -226,14 +251,10 @@ export function useChat() {
 
   const resetChat = useCallback(() => {
     setMessages([]);
-    setTasks([
-      { id: genId(), text: 'Review Q1 revenue report', done: true, createdAt: new Date() },
-      { id: genId(), text: 'Enterprise upsell pipeline', done: false, createdAt: new Date() },
-      { id: genId(), text: 'APAC expansion brief', done: false, createdAt: new Date() },
-    ]);
-    setStats({ messages: 1, tasks: 3, files: 0 });
+    setTasks([]);
+    setStats({ messages: 0, tasks: 0, files: 0 });
     setPendingFiles([]);
-  }, []);
+  }, [setMessages]);
 
   const sendMessage = useCallback(async (text: string, overrideMessages?: Message[]) => {
     if (isStreaming) return;
