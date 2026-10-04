@@ -5,3 +5,4 @@ import './unit/dashboard-service.test';
 import './unit/model-router.test';
 import './unit/datastore.test';
 import './unit/email-hil.test';
+import './security-auth.test';
