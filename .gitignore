@@ -32,3 +32,9 @@ Thumbs.db
 .idea/
 *.swp
 *.swo
+
+# Media & Recordings (Avoid committing large video artifacts)
+*.mp4
+*.webm
+*.mov
+*.wav
