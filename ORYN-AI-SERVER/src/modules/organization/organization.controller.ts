@@ -46,6 +46,28 @@ export class OrganizationController {
       next(err);
     }
   };
+
+  removeEmployee = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const { id } = req.params;
+      const orgId = (req as any).user?.orgId;
+      const success = await this.organizationService.removeEmployee(id, orgId);
+      res.json({ success, id });
+    } catch (err) {
+      next(err);
+    }
+  };
+
+  deleteDepartment = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const { id } = req.params;
+      const orgId = (req as any).user?.orgId;
+      const success = await this.organizationService.deleteDepartment(id, orgId);
+      res.json({ success, id });
+    } catch (err) {
+      next(err);
+    }
+  };
 }
 
 export const defaultOrganizationController = new OrganizationController();
