@@ -10,15 +10,24 @@ export class DocumentsService {
 
   constructor(private datastore: Datastore = defaultDatastore) {}
 
-  async getDocuments(orgId = this.defaultOrgId): Promise<DocumentRecord[]> {
+  async getDocuments(orgId = this.defaultOrgId, search?: string, tag?: string): Promise<DocumentRecord[]> {
     try {
       const records = await prisma.document.findMany({
-        where: { orgId },
+        where: {
+          orgId,
+          ...(tag ? { tags: { has: tag } } : {}),
+          ...(search ? { name: { contains: search, mode: 'insensitive' } } : {}),
+        },
         orderBy: { createdAt: 'desc' },
       });
 
       return records.map((doc) => {
-        const ext = doc.mimeType?.split('/')[1]?.toUpperCase() || 'FILE';
+        const extFromName = doc.name.includes('.') ? doc.name.split('.').pop()?.toUpperCase() : '';
+        const extFromMime = doc.mimeType ? doc.mimeType.split('/').pop()?.toUpperCase() : '';
+        const ext = (extFromName && extFromName.length <= 5)
+          ? extFromName
+          : ((extFromMime && extFromMime.length <= 5) ? extFromMime : 'DOC');
+
         const sizeStr = doc.fileSize > 1024 * 1024
           ? `${(doc.fileSize / (1024 * 1024)).toFixed(1)} MB`
           : `${Math.round(doc.fileSize / 1024)} KB`;
@@ -35,7 +44,10 @@ export class DocumentsService {
       });
     } catch (err: any) {
       logger.warn('Falling back to datastore for documents', { error: err.message });
-      return this.datastore.getDocuments();
+      let docs = this.datastore.getDocuments();
+      if (tag) docs = docs.filter(d => d.tags.includes(tag) || d.type.toUpperCase() === tag.toUpperCase());
+      if (search) docs = docs.filter(d => d.name.toLowerCase().includes(search.toLowerCase()));
+      return docs;
     }
   }
 

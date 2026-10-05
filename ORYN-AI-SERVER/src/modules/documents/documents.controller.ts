@@ -15,7 +15,9 @@ export class DocumentsController {
   getDocuments = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
       const orgId = (req as any).user?.orgId;
-      const documents = await this.documentsService.getDocuments(orgId);
+      const search = typeof req.query.search === 'string' ? req.query.search : undefined;
+      const tag = typeof req.query.tag === 'string' ? req.query.tag : undefined;
+      const documents = await this.documentsService.getDocuments(orgId, search, tag);
       res.json(documents);
     } catch (err) {
       next(err);
