@@ -190,6 +190,22 @@ export async function updateOrganizationData(payload: { company?: any; employees
   return res.json();
 }
 
+export async function removeContributor(id: string) {
+  const res = await fetch(`${BASE}/organization/employees/${id}`, {
+    method: 'DELETE',
+  });
+  if (!res.ok) throw new Error('Failed to remove contributor');
+  return res.json();
+}
+
+export async function deleteDepartment(id: string) {
+  const res = await fetch(`${BASE}/organization/departments/${id}`, {
+    method: 'DELETE',
+  });
+  if (!res.ok) throw new Error('Failed to delete department');
+  return res.json();
+}
+
 // --- Human-in-the-Loop Email Actions ---
 export async function stageEmailDraft(payload: { to: string; subject: string; body: string }) {
   const res = await fetch(`${BASE}/email/draft`, {
