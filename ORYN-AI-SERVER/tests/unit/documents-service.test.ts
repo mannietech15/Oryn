@@ -87,4 +87,43 @@ describe('DocumentsService Enterprise Ingestion Suite', () => {
       }
     );
   });
+
+  it('should handle end-to-end multi-document ingestion and batch cleanup', async () => {
+    const docs = await Promise.all([
+      documentsService.addDocument({
+        name: `Tech_Spec_A_${Date.now()}.txt`,
+        type: 'TXT',
+        size: '12 KB',
+        tags: ['Spec', 'Engineering'],
+        aiSummary: 'Distributed consensus algorithm specifications.',
+        orgId: testOrgId,
+      }),
+      documentsService.addDocument({
+        name: `Tech_Spec_B_${Date.now()}.png`,
+        type: 'PNG',
+        size: '850 KB',
+        tags: ['Architecture', 'Diagram'],
+        aiSummary: 'Infrastructure cluster topology diagram.',
+        mimeType: 'image/png',
+        orgId: testOrgId,
+      }),
+    ]);
+
+    assert.strictEqual(docs.length, 2);
+    assert.strictEqual(docs[0].type, 'TXT');
+    assert.strictEqual(docs[1].type, 'PNG');
+
+    const all = await documentsService.getDocuments(testOrgId);
+    assert.ok(all.some(d => d.id === docs[0].id));
+    assert.ok(all.some(d => d.id === docs[1].id));
+
+    // Batch cleanup
+    for (const d of docs) {
+      await documentsService.deleteDocument(d.id, testOrgId);
+    }
+
+    const postCleanup = await documentsService.getDocuments(testOrgId);
+    assert.strictEqual(postCleanup.some(d => d.id === docs[0].id), false);
+    assert.strictEqual(postCleanup.some(d => d.id === docs[1].id), false);
+  });
 });
