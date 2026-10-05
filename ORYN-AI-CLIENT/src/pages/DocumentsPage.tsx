@@ -119,6 +119,73 @@ export default function DocumentsPage() {
           </div>
         </div>
 
+        {/* Live Repository Telemetry Cards */}
+        <div style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
+          gap: 16
+        }}>
+          <div style={{
+            background: 'var(--card-bg)',
+            border: '1px solid var(--card-border)',
+            borderRadius: 12,
+            padding: '16px 20px',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 6
+          }}>
+            <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+              Indexed Documents
+            </div>
+            <div style={{ fontSize: 24, fontWeight: 800, color: 'var(--text-primary)', fontFamily: 'var(--font-display)' }}>
+              {documents.length}
+            </div>
+            <div style={{ fontSize: 11, color: 'var(--text-secondary)' }}>
+              {documents.length === 1 ? '1 enterprise file synced' : `${documents.length} enterprise files synced`}
+            </div>
+          </div>
+
+          <div style={{
+            background: 'var(--card-bg)',
+            border: '1px solid var(--card-border)',
+            borderRadius: 12,
+            padding: '16px 20px',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 6
+          }}>
+            <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+              Unique Formats
+            </div>
+            <div style={{ fontSize: 24, fontWeight: 800, color: 'var(--text-primary)', fontFamily: 'var(--font-display)' }}>
+              {new Set(documents.map(d => d.type)).size}
+            </div>
+            <div style={{ fontSize: 11, color: 'var(--text-secondary)' }}>
+              {new Set(documents.map(d => d.type)).size === 0 ? 'No extensions' : Array.from(new Set(documents.map(d => d.type))).join(', ')}
+            </div>
+          </div>
+
+          <div style={{
+            background: 'var(--card-bg)',
+            border: '1px solid var(--card-border)',
+            borderRadius: 12,
+            padding: '16px 20px',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 6
+          }}>
+            <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+              Multimodal Ingestion
+            </div>
+            <div style={{ fontSize: 24, fontWeight: 800, color: '#10B981', fontFamily: 'var(--font-display)' }}>
+              Active
+            </div>
+            <div style={{ fontSize: 11, color: 'var(--text-secondary)' }}>
+              NVIDIA Vision & Groq Llama 3.3
+            </div>
+          </div>
+        </div>
+
         {errorMsg && (
           <div style={{
             padding: '12px 18px', borderRadius: 10,
