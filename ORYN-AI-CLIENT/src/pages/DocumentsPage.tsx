@@ -12,6 +12,15 @@ interface DocumentRecord {
   aiSummary: string;
 }
 
+const getFormatBadgeStyle = (type: string) => {
+  const t = type.toUpperCase();
+  if (t.includes('PDF')) return { bg: 'rgba(239, 68, 68, 0.1)', border: 'rgba(239, 68, 68, 0.25)', color: '#EF4444' };
+  if (t.includes('CSV') || t.includes('XLS')) return { bg: 'rgba(16, 185, 129, 0.1)', border: 'rgba(16, 185, 129, 0.25)', color: '#10B981' };
+  if (t.includes('DOC')) return { bg: 'rgba(59, 130, 246, 0.1)', border: 'rgba(59, 130, 246, 0.25)', color: '#3B82F6' };
+  if (t.includes('PNG') || t.includes('JPG') || t.includes('IMAGE')) return { bg: 'rgba(168, 85, 247, 0.1)', border: 'rgba(168, 85, 247, 0.25)', color: '#A855F7' };
+  return { bg: 'rgba(249, 115, 22, 0.1)', border: 'rgba(249, 115, 22, 0.25)', color: 'var(--accent-primary)' };
+};
+
 export default function DocumentsPage() {
   const [documents, setDocuments] = useState<DocumentRecord[]>([]);
   const [loading, setLoading] = useState(true);
@@ -317,15 +326,20 @@ export default function DocumentsPage() {
                 boxShadow: 'var(--shadow-subtle)'
               }}>
                 <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                    <div style={{
-                      width: 44, height: 44, borderRadius: 10,
-                      background: 'rgba(249, 115, 22, 0.08)', border: '1px solid rgba(249, 115, 22, 0.2)',
-                      display: 'flex', alignItems: 'center', justifyContent: 'center',
-                      fontSize: 12, fontWeight: 800, color: 'var(--accent-primary)', fontFamily: 'monospace'
-                    }}>
-                      {doc.type}
-                    </div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+                    {(() => {
+                      const badgeStyle = getFormatBadgeStyle(doc.type);
+                      return (
+                        <div style={{
+                          width: 46, height: 46, borderRadius: 10,
+                          background: badgeStyle.bg, border: `1px solid ${badgeStyle.border}`,
+                          display: 'flex', alignItems: 'center', justifyContent: 'center',
+                          fontSize: 12, fontWeight: 800, color: badgeStyle.color, fontFamily: 'monospace'
+                        }}>
+                          {doc.type}
+                        </div>
+                      );
+                    })()}
                     <div>
                       <div style={{ fontSize: 15, fontWeight: 700, color: 'var(--text-primary)' }}>
                         {doc.name}
@@ -333,6 +347,19 @@ export default function DocumentsPage() {
                       <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 2 }}>
                         Size: {doc.size} · Ingested: {doc.date}
                       </div>
+                      {doc.tags && doc.tags.length > 0 && (
+                        <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginTop: 5 }}>
+                          {doc.tags.map(t => (
+                            <span key={t} style={{
+                              padding: '2px 8px', borderRadius: 4,
+                              background: 'var(--surface-hover)', border: '1px solid var(--border)',
+                              fontSize: 10, fontWeight: 600, color: 'var(--text-secondary)'
+                            }}>
+                              #{t}
+                            </span>
+                          ))}
+                        </div>
+                      )}
                     </div>
                   </div>
 
