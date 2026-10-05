@@ -39,6 +39,25 @@ export class DocumentsService {
     }
   }
 
+  private async ensureOrganization(orgId: string): Promise<void> {
+    try {
+      const exists = await prisma.organization.findUnique({ where: { id: orgId } });
+      if (!exists) {
+        await prisma.organization.create({
+          data: {
+            id: orgId,
+            name: 'ORYN Global AI',
+            industry: 'Artificial Intelligence',
+            location: 'San Francisco, CA',
+            foundedDate: new Date('2024-01-01'),
+          },
+        });
+      }
+    } catch (e: any) {
+      logger.debug('Organization existence check or creation notice', { error: e.message });
+    }
+  }
+
   async addDocument(data: {
     name: string;
     type: string;
@@ -52,23 +71,34 @@ export class DocumentsService {
     const orgId = data.orgId || this.defaultOrgId;
     const sizeBytes = data.fileSize || 1024 * 50;
 
+    const extFromMime = data.mimeType ? data.mimeType.split('/').pop()?.toUpperCase() : '';
+    const cleanType = (data.type || extFromMime || 'DOC').toUpperCase().replace(/[^A-Z0-9]/g, '');
+    const cleanTags = Array.from(new Set(
+      (data.tags || []).map(t => t.trim()).filter(Boolean)
+    ));
+    if (!cleanTags.includes(cleanType)) {
+      cleanTags.push(cleanType);
+    }
+
     try {
+      await this.ensureOrganization(orgId);
+
       const created = await prisma.document.create({
         data: {
           orgId,
-          name: data.name,
-          fileUrl: `/uploads/${encodeURIComponent(data.name)}`,
-          mimeType: data.mimeType || `application/${data.type.toLowerCase()}`,
+          name: data.name.trim(),
+          fileUrl: `/uploads/${encodeURIComponent(data.name.trim())}`,
+          mimeType: data.mimeType || `application/${cleanType.toLowerCase()}`,
           fileSize: sizeBytes,
-          tags: data.tags,
-          aiSummary: data.aiSummary,
+          tags: cleanTags,
+          aiSummary: data.aiSummary?.trim() || 'Document ingested and indexed for neural processing.',
         },
       });
 
       const docRecord: DocumentRecord = {
         id: created.id,
         name: created.name,
-        type: data.type,
+        type: cleanType,
         size: data.size,
         date: created.createdAt.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
         tags: created.tags,
@@ -81,31 +111,33 @@ export class DocumentsService {
     } catch (err: any) {
       logger.warn('Failed to insert document into PostgreSQL, saving to datastore', { error: err.message });
       return this.datastore.addDocument({
-        name: data.name,
-        type: data.type,
+        name: data.name.trim(),
+        type: cleanType,
         size: data.size,
-        tags: data.tags,
-        aiSummary: data.aiSummary,
+        tags: cleanTags,
+        aiSummary: data.aiSummary?.trim() || 'Document indexed.',
       });
     }
   }
 
   async deleteDocument(id: string, orgId = this.defaultOrgId): Promise<boolean> {
+    let deletedInPg = false;
     try {
       const res = await prisma.document.deleteMany({
         where: { id, orgId },
       });
-      this.datastore.deleteDocument(id);
-      if (res.count === 0 && !this.datastore.getDocument(id)) {
-        throw new NotFoundError(`Document '${id}' not found`);
-      }
-      return true;
+      deletedInPg = res.count > 0;
     } catch (err: any) {
-      if (err instanceof NotFoundError) throw err;
-      const deleted = this.datastore.deleteDocument(id);
-      if (!deleted) throw new NotFoundError(`Document '${id}' not found`);
-      return true;
+      logger.warn('Error deleting document from PostgreSQL', { error: err.message });
     }
+
+    const deletedInDatastore = this.datastore.deleteDocument(id);
+
+    if (!deletedInPg && !deletedInDatastore) {
+      throw new NotFoundError(`Document '${id}' not found`);
+    }
+
+    return true;
   }
 }
 
