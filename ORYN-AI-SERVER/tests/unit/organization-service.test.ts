@@ -1,10 +1,22 @@
-import { describe, it } from 'node:test';
+import { describe, it, after } from 'node:test';
 import assert from 'node:assert';
 import { OrganizationService } from '../../src/modules/organization/organization.service';
+import { prisma } from '../../src/infrastructure/database/prisma';
 
 describe('OrganizationService Directory & Governance Suite', () => {
   const orgService = new OrganizationService();
   const testOrgId = 'org_oryn_global_001';
+
+  after(async () => {
+    try {
+      await prisma.user.deleteMany({
+        where: {
+          orgId: testOrgId,
+          email: { startsWith: 'test.contributor' }
+        }
+      });
+    } catch {}
+  });
 
   it('should retrieve corporate organization profile with employees and teams', async () => {
     const org = await orgService.getOrganization(testOrgId);
