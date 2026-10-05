@@ -366,8 +366,8 @@ export function buildOrgKpiItems(
     },
     {
       label: 'Operational Headquarters',
-      value: companyLocation.split(',')[0] || 'San Francisco',
-      detail: `${employees.filter(e => e.status === 'remote').length} distributed remote contributors`,
+      value: companyLocation ? (companyLocation.split(',')[0].trim() || companyLocation) : '--',
+      detail: total > 0 ? `${employees.filter(e => e.status === 'remote').length} distributed remote contributors` : 'Global corporate headquarters',
       source: 'Geographic Presence Registry',
       period: 'Primary corporate node',
       accent: 'var(--text-secondary)',
@@ -381,8 +381,8 @@ export function buildOrgKpiItems(
     },
     {
       label: 'Personnel Active Ratio',
-      value: total > 0 ? `${Math.round((activeCount / total) * 100)}%` : '0%',
-      detail: `${activeCount} of ${total} active on roster`,
+      value: total > 0 ? `${Math.round((activeCount / total) * 100)}%` : '--',
+      detail: total > 0 ? `${activeCount} of ${total} active on roster` : 'Roster pending verification',
       source: 'IAM Security Gateway',
       period: 'Verified active benchmark',
       accent: 'var(--success)',
