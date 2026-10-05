@@ -40,12 +40,16 @@ export default function CalendarPage() {
       let finText = '';
       if (finResult.status === 'fulfilled' && finResult.value?.metrics) {
         const fin = finResult.value.metrics;
-        finText = `Volume: ${fin.totalRevenue >= 1000 ? `$${(fin.totalRevenue / 1000).toFixed(1)}K` : `$${fin.totalRevenue.toLocaleString()}`} (Margin: ${fin.margin}%)`;
+        if (fin.entryCount > 0) {
+          finText = `Volume: ${fin.totalRevenue >= 1000 ? `$${(fin.totalRevenue / 1000).toFixed(1)}K` : `$${fin.totalRevenue.toLocaleString()}`} (Margin: ${fin.margin}%)`;
+        }
       }
 
       let wfText = '';
       if (wfResult.status === 'fulfilled' && wfResult.value?.stats) {
-        wfText = ` · ${wfResult.value.stats.activeWorkflows} active daemons synchronized`;
+        if (wfResult.value.stats.activeWorkflows > 0) {
+          wfText = `${finText ? ' · ' : ''}${wfResult.value.stats.activeWorkflows} active daemons synchronized`;
+        }
       }
 
       setFinSummary(`${finText}${wfText}`);
