@@ -3,7 +3,7 @@ import { UserPlus, Download, Edit3 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import type { Company, Employee, Team } from '../types';
 
-import { fetchOrganization, updateOrganizationData } from '../api/oryn';
+import { fetchOrganization, updateOrganizationData, removeContributor } from '../api/oryn';
 import {
   OrgCard,
   GovernanceInsightSummary,
@@ -80,6 +80,15 @@ export default function OrganizationPage() {
       console.error('Failed to add employee', err);
     } finally {
       setIsSubmitting(false);
+    }
+  };
+
+  const handleRemoveMember = async (id: string) => {
+    try {
+      await removeContributor(id);
+      setEmployees(prev => prev.filter(e => e.id !== id));
+    } catch (err) {
+      console.error('Failed to remove contributor', err);
     }
   };
 
@@ -194,7 +203,7 @@ export default function OrganizationPage() {
           title="Personnel Directory & Access Registry" 
           subtitle={`Verified roster of ${employees.length} corporate contributors`}
         >
-          <PersonnelDirectory employees={employees} loading={loading} />
+          <PersonnelDirectory employees={employees} loading={loading} onDelete={handleRemoveMember} />
         </OrgCard>
 
       </div>
