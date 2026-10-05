@@ -347,7 +347,7 @@ export function buildOrgKpiItems(
     {
       label: 'Verified Personnel',
       value: `${total}`,
-      detail: `${activeCount} actively active onsite/relayed contributors`,
+      detail: total > 0 ? `${activeCount} deployed onsite / relayed contributors` : 'No contributors enrolled',
       source: 'Corporate Directory',
       period: 'Active headcount roster',
       accent: 'var(--accent-primary)',
@@ -363,7 +363,7 @@ export function buildOrgKpiItems(
     {
       label: 'Functional Departments',
       value: `${teams.length}`,
-      detail: 'Core operational & engineering branches',
+      detail: teams.length > 0 ? 'Core operational & engineering branches' : 'No departments registered',
       source: 'Department Registry',
       period: 'Active organizational units',
       accent: 'var(--text-primary)',
