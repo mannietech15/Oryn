@@ -83,4 +83,22 @@ describe('OrganizationService Directory & Governance Suite', () => {
     assert.ok(team);
     assert.strictEqual(team?.name, testTeamName);
   });
+
+  it('should remove an employee and confirm deletion from roster', async () => {
+    const tempEmail = `temp.removal.${Date.now()}@oryn.ai`;
+    const employee = await orgService.addEmployee({
+      orgId: testOrgId,
+      name: 'Temporary Contributor',
+      email: tempEmail,
+      role: 'Contractor',
+    });
+    assert.ok(employee.id);
+
+    const deleted = await orgService.removeEmployee(employee.id, testOrgId);
+    assert.strictEqual(deleted, true);
+
+    const refreshed = await orgService.getOrganization(testOrgId);
+    const found = refreshed.employees.find(e => e.id === employee.id);
+    assert.strictEqual(found, undefined);
+  });
 });
