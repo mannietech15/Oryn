@@ -1,19 +1,21 @@
 import { Request, Response, NextFunction } from 'express';
-import { defaultDatastore, Datastore } from '../../infrastructure/storage/datastore';
+import { defaultDocumentsService, DocumentsService } from './documents.service';
 import { defaultAnalysisService, AnalysisService } from '../analysis/analysis.service';
+import { defaultDatastore, Datastore } from '../../infrastructure/storage/datastore';
 import { ValidationError, NotFoundError } from '../../shared/errors/app-error';
-
 import { ENV } from '../../config/env';
 
 export class DocumentsController {
   constructor(
-    private datastore: Datastore = defaultDatastore,
-    private analysisService: AnalysisService = defaultAnalysisService
+    private documentsService: DocumentsService = defaultDocumentsService,
+    private analysisService: AnalysisService = defaultAnalysisService,
+    private datastore: Datastore = defaultDatastore
   ) {}
 
-  getDocuments = async (_req: Request, res: Response, next: NextFunction): Promise<void> => {
+  getDocuments = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
-      const documents = this.datastore.getDocuments();
+      const orgId = (req as any).user?.orgId;
+      const documents = await this.documentsService.getDocuments(orgId);
       res.json(documents);
     } catch (err) {
       next(err);
@@ -37,12 +39,16 @@ export class DocumentsController {
         ? `${(req.file.size / (1024 * 1024)).toFixed(1)} MB`
         : `${Math.round(req.file.size / 1024)} KB`;
 
-      const doc = this.datastore.addDocument({
+      const orgId = (req as any).user?.orgId;
+      const doc = await this.documentsService.addDocument({
         name: req.file.originalname,
         type: ext,
         size: sizeStr,
         tags: ['Analyzed', ext],
-        aiSummary: analysisResult.analysis
+        aiSummary: analysisResult.analysis,
+        mimeType: req.file.mimetype,
+        fileSize: req.file.size,
+        orgId
       });
 
       // Calculate dynamic tokens from character length heuristics
@@ -68,8 +74,8 @@ export class DocumentsController {
   deleteDocument = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
       const { id } = req.params;
-      const deleted = this.datastore.deleteDocument(id);
-      if (!deleted) throw new NotFoundError(`Document '${id}' not found`);
+      const orgId = (req as any).user?.orgId;
+      await this.documentsService.deleteDocument(id, orgId);
 
       res.json({ success: true, id });
     } catch (err) {
@@ -79,3 +85,4 @@ export class DocumentsController {
 }
 
 export const defaultDocumentsController = new DocumentsController();
+
