@@ -428,16 +428,20 @@ export class Datastore {
     return this.cache?.documents || [];
   }
 
-  addDocument(doc: Omit<DocumentRecord, 'id' | 'date'>): DocumentRecord {
+  addDocument(doc: Omit<DocumentRecord, 'id' | 'date'> & Partial<Pick<DocumentRecord, 'id' | 'date'>>): DocumentRecord {
     const record: DocumentRecord = {
       ...doc,
-      id: `doc-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
-      date: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+      id: doc.id || `doc-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
+      date: doc.date || new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
     };
     if (!this.cache) this.cache = this.getDefaultData();
     this.cache.documents.unshift(record);
     this.save();
     return record;
+  }
+
+  getDocument(id: string): DocumentRecord | undefined {
+    return this.cache?.documents.find(d => d.id === id);
   }
 
   deleteDocument(id: string): boolean {
