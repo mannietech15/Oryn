@@ -1,4 +1,4 @@
-import { describe, it } from 'node:test';
+import { describe, it, after } from 'node:test';
 import assert from 'node:assert';
 import { CalendarService } from '../../src/modules/calendar/calendar.service';
 
@@ -77,5 +77,19 @@ describe('CalendarService Operational Scheduling Suite', () => {
     const events = await calendarService.getEvents(testOrgId);
     const found = events.find(e => e.id === created.id);
     assert.strictEqual(found, undefined);
+  });
+
+  after(async () => {
+    try {
+      const { prisma } = await import('../../src/infrastructure/database/prisma');
+      await prisma.calendarEvent.deleteMany({
+        where: {
+          orgId: testOrgId,
+          title: {
+            in: ['Initial Operational Sync', 'Temporary Architecture Sync'],
+          },
+        },
+      });
+    } catch {}
   });
 });
