@@ -28,6 +28,7 @@ export default function DocumentsPage() {
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedTag, setSelectedTag] = useState('ALL');
+  const [uploadProgress, setUploadProgress] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const loadDocs = async (silent = false) => {
@@ -58,7 +59,15 @@ export default function DocumentsPage() {
     const file = e.target.files?.[0];
     if (!file) return;
 
+    const MAX_SIZE = 25 * 1024 * 1024;
+    if (file.size > MAX_SIZE) {
+      setErrorMsg(`File size exceeds 25MB limit (${(file.size / (1024 * 1024)).toFixed(1)} MB). Please select a smaller document.`);
+      if (fileInputRef.current) fileInputRef.current.value = '';
+      return;
+    }
+
     setIsUploading(true);
+    setUploadProgress(`Analyzing ${file.name} (${file.size > 1024 * 1024 ? (file.size / (1024 * 1024)).toFixed(1) + ' MB' : Math.round(file.size / 1024) + ' KB'})...`);
     setErrorMsg(null);
 
     try {
@@ -72,6 +81,7 @@ export default function DocumentsPage() {
       setErrorMsg(err.message || 'Failed to upload and analyze document.');
     } finally {
       setIsUploading(false);
+      setUploadProgress(null);
       if (fileInputRef.current) fileInputRef.current.value = '';
     }
   };
@@ -137,7 +147,7 @@ export default function DocumentsPage() {
               {isUploading ? (
                 <>
                   <span className="spinner" style={{ width: 14, height: 14 }} />
-                  Analyzing Multimodal Document...
+                  {uploadProgress || 'Analyzing Multimodal Document...'}
                 </>
               ) : (
                 <>
@@ -282,9 +292,15 @@ export default function DocumentsPage() {
           <div style={{
             padding: '12px 18px', borderRadius: 10,
             background: 'rgba(239, 68, 68, 0.08)', border: '1px solid rgba(239, 68, 68, 0.25)',
-            color: 'var(--danger)', fontSize: 13
+            color: 'var(--danger)', fontSize: 13, display: 'flex', alignItems: 'center', justifyContent: 'space-between'
           }}>
-            {errorMsg}
+            <span>{errorMsg}</span>
+            <button
+              onClick={() => setErrorMsg(null)}
+              style={{ background: 'transparent', border: 'none', color: 'var(--danger)', cursor: 'pointer', display: 'flex' }}
+            >
+              <X size={14} />
+            </button>
           </div>
         )}
 

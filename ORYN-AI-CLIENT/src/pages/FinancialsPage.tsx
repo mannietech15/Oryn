@@ -19,18 +19,6 @@ export default function FinancialsPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
-  const loadData = async () => {
-    try {
-      const data = await fetchFinancials();
-      setEntries(data.entries || []);
-      setMetrics(data.metrics || null);
-    } catch (err: any) {
-      console.error(err);
-      setErrorMsg('Failed to load financial ledger from server.');
-    } finally {
-      setLoading(false);
-    }
-  };
 
   useEffect(() => {
     let isSubscribed = true;

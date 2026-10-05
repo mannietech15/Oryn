@@ -151,6 +151,7 @@ export interface DashboardGoal {
   current: number;
   unit: string;
   color: string;
+  completed?: boolean;
 }
 
 export interface HealthScore {

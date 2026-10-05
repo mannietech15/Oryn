@@ -25,40 +25,6 @@ export default function CalendarPage() {
     aiBrief: ''
   });
 
-  const loadData = async () => {
-    try {
-      const [eventsData, finResult, wfResult] = await Promise.allSettled([
-        fetchCalendarEvents(),
-        fetchFinancials(),
-        fetchWorkflows(),
-      ]);
-
-      if (eventsData.status === 'fulfilled' && Array.isArray(eventsData.value)) {
-        setEvents(eventsData.value);
-      }
-
-      let finText = '';
-      if (finResult.status === 'fulfilled' && finResult.value?.metrics) {
-        const fin = finResult.value.metrics;
-        if (fin.entryCount > 0) {
-          finText = `Volume: ${fin.totalRevenue >= 1000 ? `$${(fin.totalRevenue / 1000).toFixed(1)}K` : `$${fin.totalRevenue.toLocaleString()}`} (Margin: ${fin.margin}%)`;
-        }
-      }
-
-      let wfText = '';
-      if (wfResult.status === 'fulfilled' && wfResult.value?.stats) {
-        if (wfResult.value.stats.activeWorkflows > 0) {
-          wfText = `${finText ? ' · ' : ''}${wfResult.value.stats.activeWorkflows} active daemons synchronized`;
-        }
-      }
-
-      setFinSummary(`${finText}${wfText}`);
-    } catch (err) {
-      console.error('Failed to load operational schedule', err);
-    } finally {
-      setLoading(false);
-    }
-  };
 
   useEffect(() => {
     let isSubscribed = true;
