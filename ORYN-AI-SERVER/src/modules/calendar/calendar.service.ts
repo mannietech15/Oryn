@@ -44,16 +44,20 @@ export class CalendarService {
     const startTime = new Date(now.getTime() + 3600000);
     const endTime = new Date(now.getTime() + 7200000);
 
+    const sanitizedAttendees = Array.from(new Set(
+      (data.attendees || []).map(a => a.trim()).filter(Boolean)
+    ));
+
     try {
       const created = await prisma.calendarEvent.create({
         data: {
           orgId,
-          title: data.title,
+          title: data.title.trim(),
           startTime,
           endTime,
           type: data.type || 'internal',
-          attendees: data.attendees || [],
-          aiBrief: data.aiBrief || 'Autonomous AI agenda and operational briefing prepared.',
+          attendees: sanitizedAttendees.length ? sanitizedAttendees : ['Operations Team'],
+          aiBrief: data.aiBrief?.trim() || 'Autonomous AI agenda and operational briefing prepared.',
         },
       });
 
@@ -68,11 +72,11 @@ export class CalendarService {
       };
     } catch {
       return defaultDatastore.addCalendarEvent({
-        title: data.title,
+        title: data.title.trim(),
         time: data.time,
         type: data.type || 'internal',
-        attendees: data.attendees || [],
-        aiBrief: data.aiBrief || 'Scheduled operational event.',
+        attendees: sanitizedAttendees.length ? sanitizedAttendees : ['Operations Team'],
+        aiBrief: data.aiBrief?.trim() || 'Scheduled operational event.',
       });
     }
   }
