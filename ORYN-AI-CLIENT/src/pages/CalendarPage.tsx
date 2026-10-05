@@ -239,7 +239,10 @@ export default function CalendarPage() {
                 Schedule Summary
               </h3>
               <p style={{ fontSize: 13, color: 'var(--text-primary)', margin: 0, lineHeight: 1.6 }}>
-                Team events and operational milestones {finSummary ? `(${finSummary})` : ''} are synchronized to your calendar.
+                {events.length > 0 
+                  ? `${events.length} ${events.length === 1 ? 'operational event' : 'operational events'} scheduled. ${finSummary ? `Telemetry: ${finSummary}.` : 'Schedule is synchronized in real time.'}`
+                  : `No operational events currently scheduled. ${finSummary ? `Telemetry (${finSummary}) active.` : 'Click "+ Schedule Event" to register team syncs or autonomous dispatches.'}`
+                }
               </p>
             </div>
           </div>
