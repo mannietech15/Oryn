@@ -3,20 +3,7 @@
   "aiTaskLogs": [],
   "workflows": [],
   "workflowExecutionLogs": [],
-  "documents": [
-    {
-      "id": "doc-1",
-      "name": "Q3_Financial_Performance.pdf",
-      "type": "PDF",
-      "size": "2.4 MB",
-      "date": "Sep 29, 2026",
-      "tags": [
-        "Finance",
-        "Ledger"
-      ],
-      "aiSummary": "Fiscal overview confirming $6.4K revenue baseline with steady recurring expansion across active client tiers."
-    }
-  ],
+  "documents": [],
   "emailLogs": [
     {
       "id": "draft-1791052183139",
