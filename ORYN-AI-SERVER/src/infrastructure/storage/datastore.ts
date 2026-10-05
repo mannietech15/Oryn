@@ -179,17 +179,7 @@ export class Datastore {
       aiTaskLogs: [],
       workflows: [],
       workflowExecutionLogs: [],
-      documents: [
-        {
-          id: 'doc-1',
-          name: 'Q3_Financial_Performance.pdf',
-          type: 'PDF',
-          size: '2.4 MB',
-          date: new Date(Date.now() - 86400000 * 2).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
-          tags: ['Finance', 'Ledger'],
-          aiSummary: 'Fiscal overview confirming $6.4K revenue baseline with steady recurring expansion across active client tiers.'
-        }
-      ],
+      documents: [],
       emailLogs: [],
       calendarEvents: [],
       organization: {
