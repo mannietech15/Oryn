@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { FileUp, FolderOpen, Trash2 } from 'lucide-react';
+import { FileUp, FolderOpen, Trash2, Search, X } from 'lucide-react';
 import { fetchDocuments, uploadDocument, deleteDocument } from '../api/oryn';
 
 interface DocumentRecord {
@@ -17,6 +17,8 @@ export default function DocumentsPage() {
   const [loading, setLoading] = useState(true);
   const [isUploading, setIsUploading] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [selectedTag, setSelectedTag] = useState('ALL');
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const loadDocs = async (silent = false) => {
@@ -73,6 +75,20 @@ export default function DocumentsPage() {
       setErrorMsg(err.message || 'Failed to delete document.');
     }
   };
+
+  const filteredDocuments = documents.filter(doc => {
+    const query = searchQuery.trim().toLowerCase();
+    const matchesSearch = query === '' ||
+      doc.name.toLowerCase().includes(query) ||
+      doc.aiSummary.toLowerCase().includes(query) ||
+      doc.tags.some(t => t.toLowerCase().includes(query));
+
+    const matchesTag = selectedTag === 'ALL' ||
+      doc.type.toUpperCase() === selectedTag.toUpperCase() ||
+      doc.tags.some(t => t.toUpperCase() === selectedTag.toUpperCase());
+
+    return matchesSearch && matchesTag;
+  });
 
   return (
     <div style={{ flex: 1, overflowY: 'auto', padding: '36px 40px', background: 'var(--bg)', position: 'relative' }}>
@@ -191,6 +207,68 @@ export default function DocumentsPage() {
           </div>
         </div>
 
+        {/* Search & Tag Filter Bar */}
+        <div style={{
+          display: 'flex',
+          flexWrap: 'wrap',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          gap: 16,
+          background: 'var(--card-bg)',
+          border: '1px solid var(--card-border)',
+          borderRadius: 12,
+          padding: '12px 18px'
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10, flex: 1, minWidth: 240 }}>
+            <Search size={16} color="var(--text-muted)" />
+            <input
+              type="text"
+              placeholder="Search documents by name, summary or tag..."
+              value={searchQuery}
+              onChange={e => setSearchQuery(e.target.value)}
+              style={{
+                background: 'transparent',
+                border: 'none',
+                outline: 'none',
+                color: 'var(--text-primary)',
+                fontSize: 13,
+                width: '100%'
+              }}
+            />
+            {searchQuery && (
+              <button
+                onClick={() => setSearchQuery('')}
+                style={{ background: 'transparent', border: 'none', cursor: 'pointer', color: 'var(--text-muted)', display: 'flex' }}
+              >
+                <X size={14} />
+              </button>
+            )}
+          </div>
+
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+            {['ALL', 'PDF', 'CSV', 'DOCX', 'TXT', 'PNG', 'JPG'].map(tag => (
+              <button
+                key={tag}
+                onClick={() => setSelectedTag(tag)}
+                style={{
+                  padding: '5px 12px',
+                  borderRadius: 20,
+                  fontSize: 11,
+                  fontWeight: 600,
+                  cursor: 'pointer',
+                  border: '1px solid',
+                  borderColor: selectedTag === tag ? 'var(--accent-primary)' : 'var(--card-border)',
+                  background: selectedTag === tag ? 'rgba(249, 115, 22, 0.12)' : 'transparent',
+                  color: selectedTag === tag ? 'var(--accent-primary)' : 'var(--text-secondary)',
+                  transition: 'all 0.15s ease'
+                }}
+              >
+                {tag}
+              </button>
+            ))}
+          </div>
+        </div>
+
         {errorMsg && (
           <div style={{
             padding: '12px 18px', borderRadius: 10,
@@ -222,9 +300,17 @@ export default function DocumentsPage() {
               Upload your first financial statement, contract, or spreadsheet above. ORYN will process it via NVIDIA Llama 3.2 Vision and generate a verified operational summary.
             </div>
           </div>
+        ) : filteredDocuments.length === 0 ? (
+          <div style={{
+            padding: '48px 30px', textAlign: 'center',
+            background: 'var(--card-bg)', borderRadius: 14, border: '1px solid var(--card-border)',
+            color: 'var(--text-secondary)', fontSize: 14
+          }}>
+            No documents match the filter "{selectedTag !== 'ALL' ? selectedTag : searchQuery}".
+          </div>
         ) : (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-            {documents.map(doc => (
+            {filteredDocuments.map(doc => (
               <div key={doc.id} style={{
                 background: 'var(--card-bg)', border: '1px solid var(--card-border)',
                 borderRadius: 14, padding: '24px', display: 'flex', flexDirection: 'column', gap: 14,
