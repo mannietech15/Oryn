@@ -162,6 +162,34 @@ export class OrganizationService {
       return newEmp;
     }
   }
+
+  async removeEmployee(id: string, orgId = this.defaultOrgId): Promise<boolean> {
+    try {
+      await prisma.user.deleteMany({
+        where: { id, orgId }
+      });
+      return true;
+    } catch {
+      const org = defaultDatastore.getOrganization();
+      org.employees = org.employees.filter(e => e.id !== id);
+      defaultDatastore.updateOrganization({ employees: org.employees });
+      return true;
+    }
+  }
+
+  async deleteDepartment(id: string, orgId = this.defaultOrgId): Promise<boolean> {
+    try {
+      await prisma.team.deleteMany({
+        where: { id, orgId }
+      });
+      return true;
+    } catch {
+      const org = defaultDatastore.getOrganization();
+      org.teams = org.teams.filter(t => t.id !== id);
+      defaultDatastore.updateOrganization({ teams: org.teams });
+      return true;
+    }
+  }
 }
 
 export const defaultOrganizationService = new OrganizationService();
