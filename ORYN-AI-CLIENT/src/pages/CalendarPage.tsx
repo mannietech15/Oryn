@@ -121,11 +121,11 @@ export default function CalendarPage() {
         .filter(Boolean);
 
       const created = await addCalendarEvent({
-        title: newEvent.title,
-        time: newEvent.time,
+        title: newEvent.title.trim(),
+        time: newEvent.time.trim(),
         type: newEvent.type,
         attendees: attendeesList.length ? attendeesList : ['Operations Team'],
-        aiBrief: newEvent.aiBrief || 'Meeting notes and agenda items.'
+        aiBrief: newEvent.aiBrief.trim() || 'Operational meeting notes and agenda items.'
       });
 
       setEvents(prev => [created, ...prev]);
