@@ -19,19 +19,24 @@ export default function DocumentsPage() {
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const loadDocs = async () => {
+  const loadDocs = async (silent = false) => {
     try {
+      if (!silent && documents.length === 0) setLoading(true);
       const data = await fetchDocuments();
       setDocuments(data || []);
     } catch (err: any) {
-      setErrorMsg(`Failed to retrieve documents: ${err.message}`);
+      if (!silent) setErrorMsg(`Failed to retrieve documents: ${err.message}`);
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    loadDocs();
+    loadDocs(false);
+    const interval = setInterval(() => {
+      loadDocs(true);
+    }, 4000);
+    return () => clearInterval(interval);
   }, []);
 
   const handleUploadClick = () => {
