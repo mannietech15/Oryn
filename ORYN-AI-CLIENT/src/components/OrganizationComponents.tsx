@@ -100,7 +100,11 @@ export function GovernanceInsightSummary({
             1. WORKFORCE DISTRIBUTION
           </div>
           <div style={{ fontSize: 13, color: 'var(--text-primary)', lineHeight: 1.5 }}>
-            Verified corporate personnel roster totals <strong style={{ color: 'var(--accent-primary)' }}>{totalEmployees} members</strong> deployed across <strong style={{ color: 'var(--text-primary)' }}>{departmentsCount} functional units</strong>.
+            {totalEmployees === 0 ? (
+              <>No active corporate personnel registered. Enroll members to establish departmental deployment.</>
+            ) : (
+              <>Verified corporate personnel roster totals <strong style={{ color: 'var(--accent-primary)' }}>{totalEmployees} {totalEmployees === 1 ? 'member' : 'members'}</strong> deployed across <strong style={{ color: 'var(--text-primary)' }}>{departmentsCount} functional {departmentsCount === 1 ? 'unit' : 'units'}</strong>.</>
+            )}
           </div>
         </div>
 
@@ -110,7 +114,11 @@ export function GovernanceInsightSummary({
             2. ACCESS & ENGAGEMENT
           </div>
           <div style={{ fontSize: 13, color: 'var(--text-primary)', lineHeight: 1.5 }}>
-            <strong style={{ color: 'var(--success)' }}>{activeCount} active</strong> and <strong style={{ color: 'var(--text-secondary)' }}>{remoteCount} remote</strong> verified contributors with 100% authenticated corporate domain identities.
+            {totalEmployees === 0 ? (
+              <>Awaiting contributor enrollment. Enterprise IAM directory synchronizer is listening.</>
+            ) : (
+              <><strong style={{ color: 'var(--success)' }}>{activeCount} active</strong> and <strong style={{ color: 'var(--text-secondary)' }}>{remoteCount} remote</strong> verified contributors with 100% authenticated corporate domain identities.</>
+            )}
           </div>
         </div>
 
@@ -120,7 +128,11 @@ export function GovernanceInsightSummary({
             3. GOVERNANCE STATUS
           </div>
           <div style={{ fontSize: 13, color: 'var(--text-primary)', lineHeight: 1.5 }}>
-            Departmental coverage is balanced. Continue syncing corporate directory with enterprise IAM credentials.
+            {totalEmployees === 0 ? (
+              <>Enroll contributors using the '+ Enroll Contributor' action to provision operational nodes.</>
+            ) : (
+              <>Departmental coverage is balanced. Continue syncing corporate directory with enterprise IAM credentials.</>
+            )}
           </div>
         </div>
       </div>
