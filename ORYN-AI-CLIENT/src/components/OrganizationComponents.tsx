@@ -392,7 +392,7 @@ export function BusinessProfileCard({ company }: BusinessProfileCardProps) {
           LEGAL ENTITY
         </div>
         <div style={{ fontSize: 16, fontWeight: 700, color: 'var(--text-primary)', fontFamily: 'var(--font-display)' }}>
-          {company.name}
+          {company.name || 'Not Configured'}
         </div>
         <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 4 }}>
           Multi-tenant verified organization
@@ -404,7 +404,7 @@ export function BusinessProfileCard({ company }: BusinessProfileCardProps) {
           PRIMARY SECTOR
         </div>
         <div style={{ fontSize: 16, fontWeight: 700, color: 'var(--accent-primary)', fontFamily: 'var(--font-display)' }}>
-          {company.industry}
+          {company.industry || 'Not Specified'}
         </div>
         <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 4 }}>
           Core operating classification
@@ -416,7 +416,7 @@ export function BusinessProfileCard({ company }: BusinessProfileCardProps) {
           HEADQUARTERS
         </div>
         <div style={{ fontSize: 16, fontWeight: 700, color: 'var(--text-primary)', fontFamily: 'var(--font-display)' }}>
-          {company.location}
+          {company.location || 'Not Specified'}
         </div>
         <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 4 }}>
           Principal operations node
@@ -428,7 +428,7 @@ export function BusinessProfileCard({ company }: BusinessProfileCardProps) {
           FOUNDATION DATE
         </div>
         <div style={{ fontSize: 16, fontWeight: 700, color: 'var(--text-primary)', fontFamily: 'var(--font-display)' }}>
-          {company.foundedDate}
+          {company.foundedDate || 'Not Specified'}
         </div>
         <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 4 }}>
           Corporate milestone registration

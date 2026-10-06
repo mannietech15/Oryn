@@ -18,10 +18,10 @@ import {
 export default function OrganizationPage() {
   const navigate = useNavigate();
   const [company, setCompany] = useState<Company>({
-    name: 'Oryn AI Corp',
-    industry: 'Enterprise AI & Workflow Systems',
-    foundedDate: '2025-01-15',
-    location: 'San Francisco, CA'
+    name: '',
+    industry: '',
+    foundedDate: '',
+    location: ''
   });
 
   const [employees, setEmployees] = useState<Employee[]>([]);
