@@ -74,8 +74,9 @@ export async function checkHealth(): Promise<{ status: string; uptime: number; m
 }
 
 // --- Financials ---
-export async function fetchFinancials() {
-  const res = await fetch(`${BASE}/financials`);
+export async function fetchFinancials(range?: string) {
+  const url = range ? `${BASE}/financials?range=${encodeURIComponent(range)}` : `${BASE}/financials`;
+  const res = await fetch(url);
   if (!res.ok) throw new Error('Failed to fetch financials');
   return res.json();
 }
