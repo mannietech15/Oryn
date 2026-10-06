@@ -235,20 +235,13 @@ export class Datastore {
       calendarEvents: [],
       organization: {
         company: {
-          name: 'Oryn AI Corp',
-          industry: 'Enterprise AI & Workflow Systems',
-          foundedDate: '2025-01-15',
-          location: 'San Francisco, CA'
+          name: "Oryn AI Global Enterprise",
+          industry: "Enterprise Autonomous Intelligence",
+          foundedDate: "2025-01-15",
+          location: "San Francisco, CA & London, UK"
         },
-        employees: [
-          { id: 'emp-1', name: 'Chukwudi Okafor', role: 'Principal Architect', email: 'chukwudi@oryn.ai', status: 'active', joinedDate: '2025-01-20' },
-          { id: 'emp-2', name: 'Babatunde Adeyemi', role: 'Staff Systems Engineer', email: 'babatunde@oryn.ai', status: 'active', joinedDate: '2025-02-01' },
-          { id: 'emp-3', name: 'Chioma Nwosu', role: 'Operations Lead', email: 'chioma@oryn.ai', status: 'active', joinedDate: '2025-02-15' },
-        ],
-        teams: [
-          { id: 't1', name: 'Inference & Core Engineering', description: 'Core LLM routing, latency optimization, and streaming infrastructure.' },
-          { id: 't2', name: 'Enterprise Workflow Systems', description: 'Background job queues, event webhooks, and third-party integrations.' },
-        ]
+        employees: [],
+        teams: []
       },
       ecosystemCommunities: [
         { id: '1', name: 'AI SaaS Builders', members: '12.4k', memberCount: 12400, tags: ['AI', 'SaaS', 'Dev'], description: 'A community for founders building the next generation of AI-native SaaS.', icon: '🤖', joined: false },
