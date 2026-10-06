@@ -57,7 +57,52 @@ export default function CalendarPage() {
   };
 
   useEffect(() => {
-    loadData();
+    let isSubscribed = true;
+
+    const pollSchedule = async () => {
+      try {
+        const [eventsData, finResult, wfResult] = await Promise.allSettled([
+          fetchCalendarEvents(),
+          fetchFinancials(),
+          fetchWorkflows(),
+        ]);
+
+        if (isSubscribed && eventsData.status === 'fulfilled' && Array.isArray(eventsData.value)) {
+          setEvents(eventsData.value);
+        }
+
+        let finText = '';
+        if (finResult.status === 'fulfilled' && finResult.value?.metrics) {
+          const fin = finResult.value.metrics;
+          if (fin.entryCount > 0) {
+            finText = `Volume: ${fin.totalRevenue >= 1000 ? `$${(fin.totalRevenue / 1000).toFixed(1)}K` : `$${fin.totalRevenue.toLocaleString()}`} (Margin: ${fin.margin}%)`;
+          }
+        }
+
+        let wfText = '';
+        if (wfResult.status === 'fulfilled' && wfResult.value?.stats) {
+          if (wfResult.value.stats.activeWorkflows > 0) {
+            wfText = `${finText ? ' · ' : ''}${wfResult.value.stats.activeWorkflows} active daemons synchronized`;
+          }
+        }
+
+        if (isSubscribed) {
+          setFinSummary(`${finText}${wfText}`);
+        }
+      } catch (err) {
+        if (isSubscribed) console.error('Failed to poll schedule', err);
+      } finally {
+        if (isSubscribed) setLoading(false);
+      }
+    };
+
+    pollSchedule();
+    const interval = setInterval(pollSchedule, 4000);
+
+    return () => {
+      isSubscribed = false;
+      clearInterval(interval);
+    };
   }, []);
 
   const handleCreateEvent = async (e: React.FormEvent) => {
