@@ -54,7 +54,16 @@ export class OrganizationService {
       logger.warn('Falling back to local datastore for organization', { error: err.message });
     }
 
-    return defaultDatastore.getOrganization();
+    return {
+      company: {
+        name: 'Oryn AI Global Enterprise',
+        industry: 'Enterprise Autonomous Intelligence',
+        foundedDate: '2025-01-15',
+        location: 'San Francisco, CA & London, UK',
+      },
+      employees: [],
+      teams: [],
+    };
   }
 
   async updateCompany(data: {
