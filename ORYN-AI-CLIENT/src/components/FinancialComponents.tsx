@@ -70,6 +70,7 @@ export function FiscalInsightSummary({
   entryCount: number; 
 }) {
   const isProfitable = netProfit >= 0;
+  const hasEntries = entryCount > 0;
 
   return (
     <motion.div 
@@ -104,7 +105,11 @@ export function FiscalInsightSummary({
             1. OBSERVATION
           </div>
           <div style={{ fontSize: 13, color: 'var(--text-primary)', lineHeight: 1.5 }}>
-            Ledger gross volume is verified at <strong style={{ color: 'var(--success)' }}>${revenue.toLocaleString()}</strong> against <strong style={{ color: 'var(--danger)' }}>${expenses.toLocaleString()}</strong> in operational disbursements.
+            {hasEntries ? (
+              <>Ledger gross volume is verified at <strong style={{ color: 'var(--success)' }}>${revenue.toLocaleString()}</strong> against <strong style={{ color: 'var(--danger)' }}>${expenses.toLocaleString()}</strong> in disbursements.</>
+            ) : (
+              <>No transactions recorded in the persistent ledger.</>
+            )}
           </div>
         </div>
 
@@ -114,7 +119,11 @@ export function FiscalInsightSummary({
             2. EVIDENCE
           </div>
           <div style={{ fontSize: 13, color: 'var(--text-primary)', lineHeight: 1.5 }}>
-            Operating margin is currently at <strong style={{ color: isProfitable ? 'var(--success)' : 'var(--danger)' }}>{margin.toFixed(1)}%</strong> across {entryCount} verified posted ledger transactions.
+            {hasEntries ? (
+              <>Operating margin is currently at <strong style={{ color: isProfitable ? 'var(--success)' : 'var(--danger)' }}>{margin.toFixed(1)}%</strong> across {entryCount} verified posted ledger transactions.</>
+            ) : (
+              <>Postgres transaction journal is synchronized. Awaiting debits or credits.</>
+            )}
           </div>
         </div>
 
@@ -124,9 +133,13 @@ export function FiscalInsightSummary({
             3. RECOMMENDED ACTION
           </div>
           <div style={{ fontSize: 13, color: 'var(--text-primary)', lineHeight: 1.5 }}>
-            {isProfitable 
-              ? 'Capital reserves are self-sustaining. Allocate surplus velocity toward autonomous workflow scaling.'
-              : 'Disbursements exceed recognized collections. Audit variable infrastructure expenditures.'}
+            {hasEntries ? (
+              isProfitable 
+                ? 'Capital reserves are self-sustaining. Allocate surplus velocity toward autonomous workflow scaling.'
+                : 'Disbursements exceed recognized collections. Audit variable infrastructure expenditures.'
+            ) : (
+              'Post a double-entry debit or credit using the form below to initialize real-time ledger velocity.'
+            )}
           </div>
         </div>
       </div>
