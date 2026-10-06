@@ -15,26 +15,24 @@ export class AutomationService {
         orderBy: { createdAt: 'desc' },
       });
 
-      if (workflows.length > 0) {
-        const stats = await this.getWorkflowStats(orgId);
-        return {
-          workflows: workflows.map((w) => ({
-            id: w.id,
-            name: w.name,
-            description: w.description,
-            status: w.status.toLowerCase(),
-            trigger: (w.triggerConfig as any)?.label || w.triggerType,
-            steps: Array.isArray(w.steps) ? w.steps : [],
-            createdAt: w.createdAt.toISOString(),
-            lastRunAt: w.lastRunAt?.toISOString() || null,
-            nextRunAt: w.nextRunAt?.toISOString() || null,
-            runCount: w.runCount,
-            successCount: w.successCount,
-            failureCount: w.failureCount,
-          })),
-          stats,
-        };
-      }
+      const stats = await this.getWorkflowStats(orgId);
+      return {
+        workflows: workflows.map((w) => ({
+          id: w.id,
+          name: w.name,
+          description: w.description,
+          status: w.status.toLowerCase(),
+          trigger: (w.triggerConfig as any)?.label || w.triggerType,
+          steps: Array.isArray(w.steps) ? w.steps : [],
+          createdAt: w.createdAt.toISOString(),
+          lastRunAt: w.lastRunAt?.toISOString() || null,
+          nextRunAt: w.nextRunAt?.toISOString() || null,
+          runCount: w.runCount,
+          successCount: w.successCount,
+          failureCount: w.failureCount,
+        })),
+        stats,
+      };
     } catch (err: any) {
       logger.warn('Falling back to local datastore for workflows', { error: err.message });
     }
@@ -78,20 +76,18 @@ export class AutomationService {
         include: { workflow: { select: { name: true } } },
       });
 
-      if (logs.length > 0) {
-        return logs.map((l) => ({
-          id: l.id,
-          workflowId: l.workflowId,
-          workflowName: l.workflow?.name || 'Automation Pipeline',
-          trigger: l.trigger,
-          durationMs: l.durationMs,
-          status: l.status.toLowerCase(),
-          executedAt: l.executedAt.toISOString(),
-          stepsCompleted: l.stepsCompleted,
-          totalSteps: l.totalSteps,
-          error: l.errorDetails,
-        }));
-      }
+      return logs.map((l) => ({
+        id: l.id,
+        workflowId: l.workflowId,
+        workflowName: l.workflow?.name || 'Automation Pipeline',
+        trigger: l.trigger,
+        durationMs: l.durationMs,
+        status: l.status.toLowerCase(),
+        executedAt: l.executedAt.toISOString(),
+        stepsCompleted: l.stepsCompleted,
+        totalSteps: l.totalSteps,
+        error: l.errorDetails,
+      }));
     } catch (err: any) {
       logger.warn('Falling back to local datastore for workflow logs', { error: err.message });
     }
