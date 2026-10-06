@@ -33,14 +33,30 @@ export default function OrganizationPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
-    fetchOrganization()
-      .then(data => {
-        if (data.company) setCompany(data.company);
-        if (data.employees) setEmployees(data.employees);
-        if (data.teams) setTeams(data.teams);
-      })
-      .catch(console.error)
-      .finally(() => setLoading(false));
+    let isSubscribed = true;
+
+    const fetchOrg = () => {
+      fetchOrganization()
+        .then(data => {
+          if (isSubscribed) {
+            if (data.company) setCompany(data.company);
+            if (data.employees) setEmployees(data.employees);
+            if (data.teams) setTeams(data.teams);
+          }
+        })
+        .catch(console.error)
+        .finally(() => {
+          if (isSubscribed) setLoading(false);
+        });
+    };
+
+    fetchOrg();
+    const interval = setInterval(fetchOrg, 5000);
+
+    return () => {
+      isSubscribed = false;
+      clearInterval(interval);
+    };
   }, []);
 
   const handleAddMember = async (member: { name: string; role: string; email: string; status: 'active' | 'on-leave' | 'remote' }) => {
