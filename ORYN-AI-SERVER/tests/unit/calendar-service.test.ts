@@ -27,6 +27,8 @@ describe('CalendarService Operational Scheduling Suite', () => {
     assert.ok(['internal', 'external', 'automation'].includes(found.type));
     assert.ok(Array.isArray(found.attendees));
     assert.ok(found.aiBrief);
+
+    await calendarService.deleteEvent(created.id, testOrgId);
   });
 
   it('should schedule a new operational meeting with attendees and AI brief', async () => {

@@ -27,15 +27,17 @@ export class AnalysisController {
       const latencies = logs.map(l => l.latencyMs).sort((a, b) => a - b);
       const p95LatencyMs = latencies.length > 0
         ? latencies[Math.floor(latencies.length * 0.95)] || latencies[latencies.length - 1]
-        : 180;
+        : null;
       const p50LatencyMs = latencies.length > 0
         ? latencies[Math.floor(latencies.length * 0.50)] || latencies[0]
-        : 120;
+        : null;
       
       const variance = latencies.length > 1
         ? Math.sqrt(latencies.reduce((acc, l) => acc + Math.pow(l - (metrics.avgLatencyMs || 200), 2), 0) / latencies.length)
-        : 4.2;
-      const confidence = Math.min(98, Math.max(75, Math.round(100 - (variance / (metrics.avgLatencyMs || 200)) * 25)));
+        : 0;
+      const confidence = latencies.length > 0
+        ? Math.min(98, Math.max(75, Math.round(100 - (variance / (metrics.avgLatencyMs || 200)) * 25)))
+        : 100;
 
       res.json({
         metrics,

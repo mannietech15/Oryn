@@ -176,50 +176,9 @@ export class Datastore {
   private getDefaultData(): DatabaseSchema {
     return {
       financialEntries: [],
-      aiTaskLogs: [
-        { id: 'task-init-1', type: 'chat', model: 'meta/llama-3.2-11b-vision-instruct', latencyMs: 245, tokensUsed: 420, status: 'success', timestamp: new Date(Date.now() - 600000).toISOString() },
-        { id: 'task-init-2', type: 'analysis', model: 'meta/llama-3.2-90b-vision-instruct', latencyMs: 512, tokensUsed: 890, status: 'success', timestamp: new Date(Date.now() - 300000).toISOString() },
-        { id: 'task-init-3', type: 'command', model: 'meta/llama-3.2-11b-vision-instruct', latencyMs: 182, tokensUsed: 210, status: 'success', timestamp: new Date(Date.now() - 60000).toISOString() }
-      ],
+      aiTaskLogs: [],
       workflows: [],
-      workflowExecutionLogs: [
-        {
-          id: 'exec-1',
-          workflowId: 'wf-1',
-          workflowName: 'Weekly Executive Revenue Briefing',
-          trigger: 'Cron Schedule (17:00 UTC)',
-          durationMs: 420,
-          status: 'success',
-          executedAt: new Date(Date.now() - 86400000 * 6).toISOString(),
-          stepsCompleted: 4,
-          totalSteps: 4,
-          error: null
-        },
-        {
-          id: 'exec-2',
-          workflowId: 'wf-2',
-          workflowName: 'Stripe Churn Risk Detection & Escrow',
-          trigger: 'Webhook invoice.payment_failed',
-          durationMs: 184,
-          status: 'success',
-          executedAt: new Date(Date.now() - 3600000 * 4).toISOString(),
-          stepsCompleted: 4,
-          totalSteps: 4,
-          error: null
-        },
-        {
-          id: 'exec-3',
-          workflowId: 'wf-3',
-          workflowName: 'High Latency Anomaly Alerting',
-          trigger: 'Cron */5 * * * *',
-          durationMs: 95,
-          status: 'success',
-          executedAt: new Date(Date.now() - 180000).toISOString(),
-          stepsCompleted: 3,
-          totalSteps: 3,
-          error: null
-        }
-      ],
+      workflowExecutionLogs: [],
       documents: [
         {
           id: 'doc-1',

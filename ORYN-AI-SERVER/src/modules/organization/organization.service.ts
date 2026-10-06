@@ -97,11 +97,19 @@ export class OrganizationService {
       if (data.teams && Array.isArray(data.teams)) {
         for (const t of data.teams) {
           if (t.name) {
-            await prisma.team.upsert({
-              where: { id: t.id || `t_${Date.now()}` },
-              update: { name: t.name, description: t.description || '' },
-              create: { orgId, name: t.name, description: t.description || '' },
+            const existingTeam = await prisma.team.findFirst({
+              where: { orgId, name: t.name }
             });
+            if (existingTeam) {
+              await prisma.team.update({
+                where: { id: existingTeam.id },
+                data: { description: t.description || existingTeam.description }
+              });
+            } else {
+              await prisma.team.create({
+                data: { orgId, name: t.name, description: t.description || '' }
+              });
+            }
           }
         }
       }

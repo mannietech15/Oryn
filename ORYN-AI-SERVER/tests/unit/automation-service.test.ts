@@ -1,4 +1,4 @@
-import { describe, it } from 'node:test';
+import { describe, it, after } from 'node:test';
 import assert from 'node:assert';
 import { AutomationService } from '../../src/modules/automation/automation.service';
 
@@ -75,5 +75,16 @@ describe('AutomationService Pipeline & Execution Suite', () => {
     assert.strictEqual(typeof stats.totalExecutions, 'number');
     assert.strictEqual(typeof stats.successRate, 'number');
     assert.ok(stats.successRate >= 0 && stats.successRate <= 100);
+  });
+
+  after(async () => {
+    try {
+      const { prisma } = await import('../../src/infrastructure/database/prisma');
+      await prisma.workflow.updateMany({
+        where: { orgId: testOrgId },
+        data: { runCount: 0, successCount: 0, failureCount: 0, lastRunAt: null }
+      });
+      await prisma.workflowExecutionLog.deleteMany({});
+    } catch {}
   });
 });
