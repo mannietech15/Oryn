@@ -275,35 +275,7 @@ export class Datastore {
         }
       ],
       emailLogs: [],
-      calendarEvents: [
-        {
-          id: 'cal-1',
-          title: 'Infrastructure & Inference Architecture Sync',
-          time: '10:00 AM - 10:45 AM',
-          type: 'internal',
-          attendees: ['Chukwudi Okafor', 'Babatunde Adeyemi'],
-          aiBrief: 'Review latency metrics on NVIDIA NIM Llama 3.2 gateway and evaluate fallback routing behavior.',
-          createdAt: new Date().toISOString()
-        },
-        {
-          id: 'cal-2',
-          title: 'Weekly Executive Sales Synthesis Pipeline',
-          time: '17:00 UTC - Dispatch',
-          type: 'automation',
-          attendees: ['Workflow Daemon', 'Custom SMTP Relay'],
-          aiBrief: 'Autonomous aggregation of Stripe transactions and dispatch to executive leadership.',
-          createdAt: new Date().toISOString()
-        },
-        {
-          id: 'cal-3',
-          title: 'Fiscal Ledger Audit & Reconciliation',
-          time: '3:00 PM - 3:30 PM',
-          type: 'internal',
-          attendees: ['Chioma Nwosu', 'Operations Team'],
-          aiBrief: 'Audit newly posted entries in Fiscal Ledger and verify margin thresholds.',
-          createdAt: new Date().toISOString()
-        }
-      ],
+      calendarEvents: [],
       organization: {
         company: {
           name: 'Oryn AI Corp',
