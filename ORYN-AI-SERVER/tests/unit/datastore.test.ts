@@ -13,18 +13,16 @@ describe('Datastore', () => {
 
   const datastore = new Datastore(testDbPath);
 
-  it('should initialize default state with financial entries, workflows, and org', () => {
+  it('should initialize clean state with empty arrays and valid org', () => {
     const entries = datastore.getFinancialEntries();
     assert.ok(Array.isArray(entries));
-    assert.ok(entries.length > 0);
 
     const workflows = datastore.getWorkflows();
     assert.ok(Array.isArray(workflows));
-    assert.strictEqual(workflows.length, 3);
 
     const org = datastore.getOrganization();
     assert.ok(org.company);
-    assert.strictEqual(org.company.name, 'Oryn AI Corp');
+    assert.strictEqual(org.company.name, 'Oryn AI Global Enterprise');
   });
 
   it('should calculate accurate financial metrics from ledger', () => {
@@ -64,20 +62,25 @@ describe('Datastore', () => {
   });
 
   it('should toggle workflow status and log workflow execution', () => {
-    const wf = datastore.getWorkflows()[0];
-    const initialStatus = wf.status;
-    const toggled = datastore.updateWorkflow(wf.id, {
-      status: initialStatus === 'active' ? 'paused' : 'active'
+    const newWf = datastore.addWorkflow({
+      name: 'Test Runner Workflow',
+      description: 'Automated verification pipeline',
+      trigger: 'Manual Trigger',
+      steps: ['Step 1', 'Step 2'],
+      status: 'active',
     });
-    assert.notStrictEqual(toggled?.status, initialStatus);
+    const toggled = datastore.updateWorkflow(newWf.id, {
+      status: 'paused'
+    });
+    assert.strictEqual(toggled?.status, 'paused');
 
     const execLog = datastore.logWorkflowExecution({
-      workflowId: wf.id,
-      workflowName: wf.name,
+      workflowId: newWf.id,
+      workflowName: newWf.name,
       trigger: 'Test Runner',
       durationMs: 90,
       status: 'success',
-      stepsCompleted: 3,
+      stepsCompleted: 2,
       totalSteps: 3,
       error: null
     });

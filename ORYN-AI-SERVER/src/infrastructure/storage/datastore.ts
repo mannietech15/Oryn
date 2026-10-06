@@ -404,6 +404,21 @@ export class Datastore {
     return this.cache?.workflows.find(w => w.id === id);
   }
 
+  addWorkflow(wf: Omit<WorkflowRecord, 'id' | 'createdAt' | 'runCount' | 'successCount' | 'failureCount'> & Partial<Pick<WorkflowRecord, 'runCount' | 'successCount' | 'failureCount'>>): WorkflowRecord {
+    const record: WorkflowRecord = {
+      id: `wf-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
+      createdAt: new Date().toISOString(),
+      runCount: 0,
+      successCount: 0,
+      failureCount: 0,
+      ...wf,
+    };
+    if (!this.cache) this.cache = this.getDefaultData();
+    this.cache.workflows.unshift(record);
+    this.save();
+    return record;
+  }
+
   updateWorkflow(id: string, patch: Partial<WorkflowRecord>): WorkflowRecord | null {
     if (!this.cache) return null;
     const idx = this.cache.workflows.findIndex(w => w.id === id);

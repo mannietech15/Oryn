@@ -7,17 +7,26 @@ describe('CalendarService Operational Scheduling Suite', () => {
   const testOrgId = 'org_oryn_global_001';
 
   it('should list operational calendar events for organization', async () => {
+    const created = await calendarService.createEvent({
+      orgId: testOrgId,
+      title: 'Initial Operational Sync',
+      time: '10:00 AM - 10:30 AM',
+      type: 'internal',
+      attendees: ['Operations Team'],
+      aiBrief: 'Operational agenda item.',
+    });
+
     const events = await calendarService.getEvents(testOrgId);
     assert.ok(Array.isArray(events));
     assert.ok(events.length > 0);
 
-    const first = events[0];
-    assert.ok(first.id);
-    assert.ok(first.title);
-    assert.ok(first.time);
-    assert.ok(['internal', 'external', 'automation'].includes(first.type));
-    assert.ok(Array.isArray(first.attendees));
-    assert.ok(first.aiBrief);
+    const found = events.find((e) => e.id === created.id) || events[0];
+    assert.ok(found.id);
+    assert.ok(found.title);
+    assert.ok(found.time);
+    assert.ok(['internal', 'external', 'automation'].includes(found.type));
+    assert.ok(Array.isArray(found.attendees));
+    assert.ok(found.aiBrief);
   });
 
   it('should schedule a new operational meeting with attendees and AI brief', async () => {
