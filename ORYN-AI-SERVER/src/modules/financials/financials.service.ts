@@ -64,21 +64,19 @@ export class FinancialsService {
         orderBy: { date: 'desc' },
       });
 
-      if (entries.length > 0) {
-        const metrics = await this.getMetrics(orgId, range);
-        return {
-          entries: entries.map((e) => ({
-            id: e.id,
-            type: e.type.toLowerCase(),
-            category: e.category,
-            amount: Number(e.amount),
-            date: e.date.toISOString().split('T')[0],
-            note: e.note || '',
-            createdAt: e.createdAt.toISOString(),
-          })),
-          metrics,
-        };
-      }
+      const metrics = await this.getMetrics(orgId, range);
+      return {
+        entries: entries.map((e) => ({
+          id: e.id,
+          type: e.type.toLowerCase(),
+          category: e.category,
+          amount: Number(e.amount),
+          date: e.date.toISOString().split('T')[0],
+          note: e.note || '',
+          createdAt: e.createdAt.toISOString(),
+        })),
+        metrics,
+      };
     } catch (err: any) {
       logger.warn('Falling back to local datastore for financials', { error: err.message });
     }
