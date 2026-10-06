@@ -313,8 +313,8 @@ export default function AutomationPage() {
           </div>
 
           {logs.length === 0 ? (
-            <div style={{ padding: 24, textAlign: 'center', color: 'var(--text-muted)', fontSize: 13 }}>
-              No execution records in audit log.
+            <div style={{ padding: 36, textAlign: 'center', background: 'var(--glass-bg-subtle)', borderRadius: 10, border: '1px dashed var(--card-border)', color: 'var(--text-muted)', fontSize: 13 }}>
+              No execution telemetry recorded in audit trail. Run an automated pipeline to record live dispatches.
             </div>
           ) : (
             <div style={{ overflowX: 'auto' }}>
