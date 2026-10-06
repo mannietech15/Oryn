@@ -1,42 +1,5 @@
 {
-  "financialEntries": [
-    {
-      "id": "f-1",
-      "type": "revenue",
-      "category": "Starter Subscriptions",
-      "amount": 250,
-      "date": "2026-09-26",
-      "note": "Early access Stripe subscription tranche",
-      "createdAt": "2026-09-26T17:15:23.939Z"
-    },
-    {
-      "id": "f-2",
-      "type": "revenue",
-      "category": "API Usage & Tokens",
-      "amount": 120,
-      "date": "2026-09-28",
-      "note": "Metered token consumption overages",
-      "createdAt": "2026-09-28T17:15:23.939Z"
-    },
-    {
-      "id": "f-3",
-      "type": "expense",
-      "category": "Cloud Infrastructure & GPU",
-      "amount": 149,
-      "date": "2026-09-24",
-      "note": "NVIDIA NIM compute cluster & AWS relays",
-      "createdAt": "2026-09-24T17:15:23.939Z"
-    },
-    {
-      "id": "f-4",
-      "type": "expense",
-      "category": "Operational Engineering",
-      "amount": 90,
-      "date": "2026-09-19",
-      "note": "Observability & third-party API licensing",
-      "createdAt": "2026-09-19T17:15:23.939Z"
-    }
-  ],
+  "financialEntries": [],
   "aiTaskLogs": [
     {
       "type": "automation",
@@ -400,7 +363,7 @@
         "Dev"
       ],
       "description": "A community for founders building the next generation of AI-native SaaS.",
-      "icon": "🤖",
+      "icon": "\ud83e\udd16",
       "joined": false
     },
     {
@@ -413,7 +376,7 @@
         "B2B"
       ],
       "description": "Strategies and tools for hyper-growth in the enterprise space.",
-      "icon": "🚀",
+      "icon": "\ud83d\ude80",
       "joined": false
     },
     {
@@ -426,7 +389,7 @@
         "ESG"
       ],
       "description": "Ethical finance and green technology innovators.",
-      "icon": "🌿",
+      "icon": "\ud83c\udf3f",
       "joined": false
     }
   ],
@@ -533,14 +496,14 @@
       "company": "CloudScale Inc.",
       "result": "320% Revenue growth",
       "summary": "Implemented ORYN-AI to automate decision-making across 4 global offices.",
-      "image": "🏢"
+      "image": "\ud83c\udfe2"
     },
     {
       "id": "2",
       "company": "Velocity Retail",
       "result": "45% Cost Reduction",
       "summary": "Optimized inventory using our predictive analytics engine.",
-      "image": "🛒"
+      "image": "\ud83d\uded2"
     }
   ]
 }

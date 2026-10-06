@@ -175,12 +175,7 @@ export class Datastore {
 
   private getDefaultData(): DatabaseSchema {
     return {
-      financialEntries: [
-        { id: 'f-1', type: 'revenue', category: 'Starter Subscriptions', amount: 250, date: new Date(Date.now() - 86400000 * 5).toISOString().split('T')[0], note: 'Early access Stripe subscription tranche', createdAt: new Date(Date.now() - 86400000 * 5).toISOString() },
-        { id: 'f-2', type: 'revenue', category: 'API Usage & Tokens', amount: 120, date: new Date(Date.now() - 86400000 * 3).toISOString().split('T')[0], note: 'Metered token consumption overages', createdAt: new Date(Date.now() - 86400000 * 3).toISOString() },
-        { id: 'f-3', type: 'expense', category: 'Cloud Infrastructure & GPU', amount: 149, date: new Date(Date.now() - 86400000 * 7).toISOString().split('T')[0], note: 'NVIDIA NIM compute cluster & AWS relays', createdAt: new Date(Date.now() - 86400000 * 7).toISOString() },
-        { id: 'f-4', type: 'expense', category: 'Operational Engineering', amount: 90, date: new Date(Date.now() - 86400000 * 12).toISOString().split('T')[0], note: 'Observability & third-party API licensing', createdAt: new Date(Date.now() - 86400000 * 12).toISOString() },
-      ],
+      financialEntries: [],
       aiTaskLogs: [
         { id: 'task-init-1', type: 'chat', model: 'meta/llama-3.2-11b-vision-instruct', latencyMs: 245, tokensUsed: 420, status: 'success', timestamp: new Date(Date.now() - 600000).toISOString() },
         { id: 'task-init-2', type: 'analysis', model: 'meta/llama-3.2-90b-vision-instruct', latencyMs: 512, tokensUsed: 890, status: 'success', timestamp: new Date(Date.now() - 300000).toISOString() },
