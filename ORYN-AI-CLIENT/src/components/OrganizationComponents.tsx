@@ -234,6 +234,29 @@ export interface DepartmentGridProps {
 }
 
 export function DepartmentGrid({ teams, employees = [] }: DepartmentGridProps) {
+  if (teams.length === 0) {
+    return (
+      <div style={{
+        padding: '36px 20px',
+        textAlign: 'center',
+        background: 'var(--glass-bg-subtle)',
+        borderRadius: 12,
+        border: '1px dashed var(--card-border)',
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        gap: 6
+      }}>
+        <span style={{ color: 'var(--text-primary)', fontSize: 13, fontWeight: 600 }}>
+          No functional departments created
+        </span>
+        <span style={{ color: 'var(--text-muted)', fontSize: 11 }}>
+          Create teams in settings or configure organizational hierarchy.
+        </span>
+      </div>
+    );
+  }
+
   return (
     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 16 }}>
       {teams.map(t => {
