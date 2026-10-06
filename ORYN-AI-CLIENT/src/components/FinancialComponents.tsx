@@ -277,13 +277,18 @@ export interface FiscalChartProps {
 }
 
 export function FiscalChart({ entries }: FiscalChartProps) {
-  const chartData = [...entries]
-    .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
-    .map(e => ({
-      date: e.date,
-      revenue: e.type === 'revenue' ? e.amount : 0,
-      expense: e.type === 'expense' ? e.amount : 0
-    }));
+  const groupedByDate: Record<string, { date: string; revenue: number; expense: number }> = {};
+  for (const e of entries) {
+    const d = e.date ? String(e.date).split('T')[0] : 'Today';
+    if (!groupedByDate[d]) {
+      groupedByDate[d] = { date: d, revenue: 0, expense: 0 };
+    }
+    if (e.type === 'revenue') groupedByDate[d].revenue += Number(e.amount);
+    else groupedByDate[d].expense += Number(e.amount);
+  }
+  const chartData = Object.values(groupedByDate).sort(
+    (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()
+  );
 
   if (chartData.length === 0) {
     return (
