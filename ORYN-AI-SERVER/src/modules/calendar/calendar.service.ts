@@ -15,17 +15,15 @@ export class CalendarService {
         orderBy: { startTime: 'asc' },
       });
 
-      if (events.length > 0) {
-        return events.map((e) => ({
-          id: e.id,
-          title: e.title,
-          time: `${e.startTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} - ${e.endTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`,
-          type: e.type,
-          attendees: e.attendees,
-          aiBrief: e.aiBrief,
-          createdAt: e.createdAt.toISOString(),
-        }));
-      }
+      return events.map((e) => ({
+        id: e.id,
+        title: e.title,
+        time: `${e.startTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} - ${e.endTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`,
+        type: e.type,
+        attendees: e.attendees,
+        aiBrief: e.aiBrief,
+        createdAt: e.createdAt.toISOString(),
+      }));
     } catch (err: any) {
       logger.warn('Falling back to local datastore for calendar events', { error: err.message });
     }
