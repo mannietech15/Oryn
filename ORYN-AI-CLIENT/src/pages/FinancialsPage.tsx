@@ -33,7 +33,31 @@ export default function FinancialsPage() {
   };
 
   useEffect(() => {
-    loadData();
+    let isSubscribed = true;
+
+    const fetchLedger = () => {
+      fetchFinancials()
+        .then(data => {
+          if (isSubscribed) {
+            setEntries(data.entries || []);
+            setMetrics(data.metrics || null);
+          }
+        })
+        .catch(err => {
+          if (isSubscribed) console.error(err);
+        })
+        .finally(() => {
+          if (isSubscribed) setLoading(false);
+        });
+    };
+
+    fetchLedger();
+    const interval = setInterval(fetchLedger, 4000);
+
+    return () => {
+      isSubscribed = false;
+      clearInterval(interval);
+    };
   }, []);
 
   const handleAddEntry = async (entry: { type: 'revenue' | 'expense'; category: string; amount: number; date: string; note?: string }) => {
