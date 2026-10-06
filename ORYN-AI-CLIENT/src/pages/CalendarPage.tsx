@@ -150,8 +150,25 @@ export default function CalendarPage() {
                 Loading schedule...
               </div>
             ) : events.length === 0 ? (
-              <div style={{ padding: 40, textAlign: 'center', color: 'var(--text-muted)', background: 'var(--card-bg)', borderRadius: 16, border: '1px solid var(--card-border)' }}>
-                No events scheduled. Click "+ Schedule Event" to add a meeting or deadline.
+              <div style={{
+                padding: '48px 32px',
+                textAlign: 'center',
+                color: 'var(--text-muted)',
+                background: 'var(--card-bg)',
+                borderRadius: 16,
+                border: '1px dashed var(--card-border)',
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                gap: 10
+              }}>
+                <CalendarIcon size={32} color="var(--accent-primary)" opacity={0.6} />
+                <span style={{ fontSize: 14, fontWeight: 600, color: 'var(--text-primary)' }}>
+                  No operational events scheduled
+                </span>
+                <span style={{ fontSize: 12 }}>
+                  Click "+ Schedule Event" to register a team sync, client meeting, or pipeline dispatch.
+                </span>
               </div>
             ) : (
               events.map((event, i) => (
