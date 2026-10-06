@@ -56,7 +56,33 @@ export default function AutomationPage() {
   };
 
   useEffect(() => {
-    loadData();
+    let isSubscribed = true;
+
+    const pollData = async () => {
+      try {
+        const [wfRes, logsRes] = await Promise.all([
+          fetchWorkflows(),
+          fetchWorkflowLogs(20)
+        ]);
+        if (isSubscribed) {
+          setWorkflows(wfRes.workflows || []);
+          setStats(wfRes.stats || null);
+          setLogs(logsRes || []);
+        }
+      } catch (err) {
+        if (isSubscribed) console.error('Failed to poll workflows', err);
+      } finally {
+        if (isSubscribed) setLoading(false);
+      }
+    };
+
+    pollData();
+    const interval = setInterval(pollData, 4000);
+
+    return () => {
+      isSubscribed = false;
+      clearInterval(interval);
+    };
   }, []);
 
   const handleToggle = async (id: string) => {
