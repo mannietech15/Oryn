@@ -6,6 +6,7 @@ import { dashboardCommandSchema, goalActionParamSchema } from './dashboard.schem
 const router = Router();
 
 router.get('/analytics', defaultDashboardController.getAnalytics);
+router.get('/analytics/forecast', defaultDashboardController.getForecast);
 router.post(
   '/dashboard/command',
   validateBody(dashboardCommandSchema),

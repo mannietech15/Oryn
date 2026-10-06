@@ -59,3 +59,19 @@ export interface HealthScore {
   trend: string;
   summary: string;
 }
+
+export interface ForecastPeriod {
+  period: string;
+  projectedRevenue: number;
+  lowerBound: number;
+  upperBound: number;
+}
+
+export interface AnalyticsForecast {
+  historical: Array<{ month: string; revenue: number }>;
+  forecast: ForecastPeriod[];
+  slope: number;
+  growthRatePct: number;
+  confidencePct: number;
+  summary: string;
+}

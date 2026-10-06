@@ -107,6 +107,15 @@ export class DashboardController {
       next(err);
     }
   };
+
+  getForecast = async (_req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const forecast = await this.dashboardService.getForecast();
+      res.json(forecast);
+    } catch (err) {
+      next(err);
+    }
+  };
 }
 
 export const defaultDashboardController = new DashboardController();
