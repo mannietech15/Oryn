@@ -51,6 +51,7 @@ function AnCard({ title, subtitle, children, colSpan, style, delay = 0 }: { titl
 }
 
 function OperationalInsightSummary({ finMetrics, wfStats }: { finMetrics: any; wfStats: any }) {
+  const hasEntries = Boolean(finMetrics && finMetrics.entryCount > 0);
   const rev = finMetrics ? `$${finMetrics.totalRevenue.toLocaleString()}` : '$0';
   const margin = finMetrics ? `${finMetrics.margin}%` : '0%';
   const execs = wfStats ? `${wfStats.totalExecutions}` : '0';
@@ -89,7 +90,11 @@ function OperationalInsightSummary({ finMetrics, wfStats }: { finMetrics: any; w
             1. OBSERVATION
           </div>
           <div style={{ fontSize: 13, color: 'var(--text-primary)', lineHeight: 1.5 }}>
-            Ledger gross volume is verified at <strong style={{ color: 'var(--success)' }}>{rev}</strong> with an operating margin of <strong style={{ color: 'var(--text-primary)' }}>{margin}</strong>.
+            {hasEntries ? (
+              <>Ledger gross volume is verified at <strong style={{ color: 'var(--success)' }}>{rev}</strong> with an operating margin of <strong style={{ color: 'var(--text-primary)' }}>{margin}</strong>.</>
+            ) : (
+              <>No transactions recorded in selected window. Real-time telemetry is live and ready.</>
+            )}
           </div>
         </div>
 
@@ -99,7 +104,11 @@ function OperationalInsightSummary({ finMetrics, wfStats }: { finMetrics: any; w
             2. EVIDENCE
           </div>
           <div style={{ fontSize: 13, color: 'var(--text-primary)', lineHeight: 1.5 }}>
-            Total autonomous background executions stand at {execs} runs, with {wfStats?.failureCount || 0} unhandled critical exceptions recorded in runner audit logs.
+            {wfStats && wfStats.totalExecutions > 0 ? (
+              <>Total autonomous background executions stand at {execs} runs, with {wfStats?.failureCount || 0} unhandled exceptions recorded.</>
+            ) : (
+              <>Zero automated pipeline exceptions detected. Awaiting active trigger execution.</>
+            )}
           </div>
         </div>
 
@@ -109,7 +118,11 @@ function OperationalInsightSummary({ finMetrics, wfStats }: { finMetrics: any; w
             3. RECOMMENDED ACTION
           </div>
           <div style={{ fontSize: 13, color: 'var(--text-primary)', lineHeight: 1.5 }}>
-            Reconcile newly posted entries and verify pipeline triggers in the Automation panel.
+            {hasEntries ? (
+              (finMetrics?.margin ?? 0) >= 0 ? 'Surplus capital reserves active. Maintain execution velocity and verify automated workflows.' : 'Operating expenditures exceed revenue. Audit variable cloud and inference licensing.'
+            ) : (
+              'Post a transaction in Financials or run an automated task to populate live telemetry.'
+            )}
           </div>
         </div>
       </div>
