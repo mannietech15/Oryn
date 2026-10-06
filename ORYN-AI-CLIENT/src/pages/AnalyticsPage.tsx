@@ -138,12 +138,24 @@ export default function AnalyticsPage() {
   const [timeRange, setTimeRange] = useState<'7D' | '30D' | '90D'>('30D');
 
   useEffect(() => {
-    Promise.allSettled([
-      fetchFinancials().then(setFinancials),
-      fetchWorkflows().then(setWorkflowsData),
-      fetchAnalyticsTelemetry().then(setTelemetry),
-    ]).finally(() => setLoading(false));
-  }, []);
+    let isSubscribed = true;
+
+    const fetchAll = () => {
+      Promise.allSettled([
+        fetchFinancials(timeRange).then(data => { if (isSubscribed) setFinancials(data); }),
+        fetchWorkflows().then(data => { if (isSubscribed) setWorkflowsData(data); }),
+        fetchAnalyticsTelemetry().then(data => { if (isSubscribed) setTelemetry(data); }),
+      ]).finally(() => { if (isSubscribed) setLoading(false); });
+    };
+
+    fetchAll();
+    const timer = setInterval(fetchAll, 5000);
+
+    return () => {
+      isSubscribed = false;
+      clearInterval(timer);
+    };
+  }, [timeRange]);
 
   const finMetrics = financials?.metrics;
   const wfStats = workflowsData?.stats;
