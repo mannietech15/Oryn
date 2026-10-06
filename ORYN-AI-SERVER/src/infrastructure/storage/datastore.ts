@@ -181,50 +181,7 @@ export class Datastore {
         { id: 'task-init-2', type: 'analysis', model: 'meta/llama-3.2-90b-vision-instruct', latencyMs: 512, tokensUsed: 890, status: 'success', timestamp: new Date(Date.now() - 300000).toISOString() },
         { id: 'task-init-3', type: 'command', model: 'meta/llama-3.2-11b-vision-instruct', latencyMs: 182, tokensUsed: 210, status: 'success', timestamp: new Date(Date.now() - 60000).toISOString() }
       ],
-      workflows: [
-        {
-          id: 'wf-1',
-          name: 'Weekly Executive Revenue Briefing',
-          description: 'Aggregates Stripe transactions, runs inference synthesis with Llama 3.2, and dispatches an executive brief.',
-          status: 'active',
-          trigger: 'Every Friday at 17:00 UTC',
-          steps: ['Stripe Ingestion', 'Inference Synthesis', 'Executive Report', 'SMTP Relay'],
-          createdAt: new Date(Date.now() - 86400000 * 30).toISOString(),
-          lastRunAt: new Date(Date.now() - 86400000 * 6).toISOString(),
-          nextRunAt: new Date(Date.now() + 86400000 * 1).toISOString(),
-          runCount: 24,
-          successCount: 24,
-          failureCount: 0
-        },
-        {
-          id: 'wf-2',
-          name: 'Stripe Churn Risk Detection & Escrow',
-          description: 'Monitors recurring subscription webhooks for failure signals and drafts retention actions.',
-          status: 'active',
-          trigger: 'Webhook Event: invoice.payment_failed',
-          steps: ['Webhook Listener', 'Account Health Check', 'Draft Retention Action', 'Admin Notification'],
-          createdAt: new Date(Date.now() - 86400000 * 20).toISOString(),
-          lastRunAt: new Date(Date.now() - 3600000 * 4).toISOString(),
-          nextRunAt: null,
-          runCount: 142,
-          successCount: 140,
-          failureCount: 2
-        },
-        {
-          id: 'wf-3',
-          name: 'High Latency Anomaly Alerting',
-          description: 'Samples inference gateway latency metrics every 5 minutes and flags telemetry drift.',
-          status: 'active',
-          trigger: 'Cron: */5 * * * *',
-          steps: ['Gateway Probe', 'Statistical Variance Check', 'PagerDuty Dispatch'],
-          createdAt: new Date(Date.now() - 86400000 * 15).toISOString(),
-          lastRunAt: new Date(Date.now() - 180000).toISOString(),
-          nextRunAt: new Date(Date.now() + 120000).toISOString(),
-          runCount: 42,
-          successCount: 41,
-          failureCount: 1
-        }
-      ],
+      workflows: [],
       workflowExecutionLogs: [
         {
           id: 'exec-1',
