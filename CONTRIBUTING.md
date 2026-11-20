@@ -46,8 +46,6 @@ ORYN-AI/
 │   ├── data/               # Persistent JSON document database
 │   └── package.json
 │
-├── docs/                 # Architectural deep-dives and licensing guides
-├── LICENSE               # Official Apache License 2.0
 ├── CONTRIBUTING.md       # Contribution specifications (this file)
 └── SECURITY.md           # Vulnerability disclosure and security policy
 ```
@@ -152,7 +150,6 @@ Commit messages should adhere to the [Conventional Commits](https://www.conventi
 Examples:
 - `feat(chat): add retry action on failed SMTP dispatch`
 - `fix(auth): prevent session expiration race condition`
-- `docs(licensing): clarify Apache 2.0 patent grant provisions`
 - `test(email): verify draft staging and transition to sent status`
 
 ### 3. Pull Request Guidelines
@@ -229,7 +226,7 @@ Oryn strictly adheres to a **Human-in-the-Loop (HITL)** security model:
 Have questions or want to discuss a new feature idea before opening a PR?
 - **GitHub Issues**: Open a feature proposal or bug report on [GitHub Issues](https://github.com/mannietech15/Oryn/issues).
 - **Maintainer Contact**: Reach out directly to `mannietech817@gmail.com`.
-- **License**: All contributions are licensed under the [Apache License 2.0](LICENSE).
+- **Ownership**: By submitting a contribution, you agree it may be used in ORYN under the project owner's terms. ORYN is not open-source licensed; all rights are reserved.
 
 
 

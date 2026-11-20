@@ -8,7 +8,6 @@
 
 ### **The Autonomous AI Business Manager for Modern Enterprise Platforms**
 
-[![License: Apache 2.0](https://img.shields.io/badge/License-Apache%202.0-red.svg?style=for-the-badge)](https://opensource.org/licenses/Apache-2.0)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.4-blue.svg?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
 [![React](https://img.shields.io/badge/React-18.3-61dafb.svg?style=for-the-badge&logo=react&logoColor=black)](https://reactjs.org/)
 [![Vite](https://img.shields.io/badge/Vite-5.2-646CFF.svg?style=for-the-badge&logo=vite&logoColor=white)](https://vitejs.dev/)
@@ -309,7 +308,9 @@ For vulnerability reporting, response SLAs, and secrets isolation practices, ple
 
 ## 📄 License
 
-Distributed under the **Apache License, Version 2.0**. See [`LICENSE`](./LICENSE) and [`docs/LICENSING.md`](./docs/LICENSING.md) for full terms, patent grants, and compliance details.
+Copyright © 2026 Manasseh (MannieTech). All rights reserved.
+
+This source code is published for viewing only. No permission is granted to copy, modify, distribute, or use it without written permission from the author.
 
 ---
 
